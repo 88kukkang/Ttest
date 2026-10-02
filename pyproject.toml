@@ -1,0 +1,33 @@
+[project]
+name = "moisdb"
+version = "0.1.0"
+description = "행정안전부 보도자료 수집·DB화·키워드 분석 파이프라인"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31",
+    "beautifulsoup4>=4.12",
+    "lxml>=5.0",
+    "olefile>=0.46",
+    "pymupdf>=1.24",
+]
+
+[project.optional-dependencies]
+analysis = ["kiwipiepy>=0.18"]
+dev = ["pytest>=8", "kiwipiepy>=0.18"]
+
+[project.scripts]
+moisdb = "moisdb.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["moisdb*"]
+
+[tool.setuptools.package-data]
+moisdb = ["resources/*.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

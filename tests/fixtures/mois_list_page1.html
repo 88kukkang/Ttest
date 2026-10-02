@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!-- 합성 픽스처: 전자정부프레임워크 게시판 목록 구조를 본떠 만든 테스트용 HTML (실제 사이트 사본 아님) -->
+<html lang="ko">
+<head><meta charset="UTF-8"><title>행정안전부&gt; 뉴스·소식&gt; 보도자료&gt; 보도자료</title></head>
+<body>
+<div id="header"><ul class="gnb"><li><a href="/frt/sub/a01/intro.do">기관소개</a></li></ul></div>
+<div id="contents">
+  <form name="searchForm" method="post" action="/frt/bbs/type010/commonSelectBoardList.do">
+    <input type="hidden" name="bbsId" value="BBSMSTR_000000000008">
+    <table class="table_style1">
+      <caption>보도자료 목록</caption>
+      <thead>
+        <tr><th scope="col">번호</th><th scope="col">제목</th><th scope="col">담당부서</th>
+            <th scope="col">등록일</th><th scope="col">조회</th><th scope="col">첨부</th></tr>
+      </thead>
+      <tbody>
+        <tr class="notice">
+          <td><img src="/images/ico_notice.gif" alt="공지"></td>
+          <td class="l"><a href="/frt/bbs/type010/commonSelectBoardArticle.do;jsessionid=AAA.node10?bbsId=BBSMSTR_000000000008&amp;nttId=110001">보도자료 이용 안내</a></td>
+          <td>대변인실</td><td>2024.01.02</td><td>9999</td><td></td>
+        </tr>
+        <tr>
+          <td>5123</td>
+          <td class="l"><a href="/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&amp;nttId=120105">  지방소멸대응기금
+             2026년 배분 결과 발표 </a><img src="/images/ico_new.gif" alt="새글"></td>
+          <td>지역균형발전과</td><td>2025.06.10</td><td>321</td><td><img alt="첨부파일"></td>
+        </tr>
+        <tr>
+          <td>5122</td>
+          <td class="l"><a href="javascript:void(0);" onclick="fn_egov_inqire_notice('120101'); return false;">민생회복 소비쿠폰 지급 계획</a></td>
+          <td>지역경제지원관</td><td>2025-06-05</td><td>1200</td><td></td>
+        </tr>
+        <tr>
+          <td>5121</td>
+          <td class="l"><a href="/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&amp;nttId=120090">재난안전관리체계 점검 회의 개최</a></td>
+          <td>재난안전관리본부</td><td>2025.06.04</td><td>88</td><td></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="paging">
+      <a href="javascript:fn_egov_link_page(1);">1</a>
+      <a href="javascript:fn_egov_link_page(2);">2</a>
+    </div>
+  </form>
+</div>
+<div id="footer">세종특별자치시 도움6로 42 정부세종청사</div>
+</body>
+</html>
