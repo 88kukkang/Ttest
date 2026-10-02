@@ -1,5 +1,7 @@
 """가짜 HTTP 로 목록 → 상세 → 첨부 → 텍스트 → 형태소 → 분석까지 한 번에 돌려 본다."""
 
+from pathlib import Path
+
 import pytest
 
 from moisdb import db
@@ -42,9 +44,13 @@ def test_full_pipeline(env, fake_http):
     assert (settings.raw_dir / "mois" / "press" / "120105.html").exists()
 
     atts = conn.execute("SELECT seq, file_type, status FROM attachments ORDER BY seq").fetchall()
-    assert [tuple(a) for a in atts] == [(1, "hwpx", "downloaded"), (2, "pdf", "downloaded"), (3, "html", "error")]
+    # 같은 문서의 PDF 는 HWPX 가 있으므로 보류, 사진은 받지 않음, 세 번째는 서버가 HTML 오류 페이지를 줌
+    assert [tuple(a) for a in atts] == [
+        (1, "hwpx", "downloaded"), (2, None, "deferred"), (3, "html", "error"), (4, None, "skipped"),
+    ]
+    assert not any("fileSn=1" in url for url, _ in fake_http.calls)
 
-    assert extract_attachments(conn) == (2, 0, 0)
+    assert extract_attachments(conn) == (1, 0, 0)
     # 추출 재시도가 다운로드 실패(HTML 응답)를 '건너뜀'으로 덮어쓰면 안 된다
     assert extract_attachments(conn, retry_errors=True) == (0, 0, 0)
     assert conn.execute("SELECT status FROM attachments WHERE seq = 3").fetchone()[0] == "error"
@@ -52,7 +58,7 @@ def test_full_pipeline(env, fake_http):
     doc = conn.execute("SELECT text_source, text FROM doc_text").fetchone()
     assert doc["text_source"] == "attachments"  # HWPX 가 본문을 포함하므로 첨부만 사용
     assert "홍길동" not in doc["text"]  # 담당자 줄 제거
-    assert doc["text"].count("평가위원회") == 1  # 본문·HWPX·PDF 중복 없음
+    assert doc["text"].count("평가위원회") == 1  # 본문·HWPX 중복 없음
 
     from moisdb.analysis.keywords import load_corpus, top_terms
     from moisdb.analysis.tokenizer import NounTokenizer, tokenize_corpus
@@ -78,3 +84,19 @@ def test_cli_search_and_stats(env, fake_http, capsys):
     main(["--data-dir", str(settings.data_dir), "stats"])
     out = capsys.readouterr().out
     assert "fetched" in out and "2025-06" in out
+
+
+def test_fallback_to_other_format_when_extraction_fails(env, fake_http):
+    settings, conn = env
+    mois_board.discover(conn, fake_http, settings)
+    mois_board.fetch_details(conn, fake_http, settings, limit=1)
+    # 받은 HWPX 가 깨져 있다고 가정 → 추출 실패 → 같은 이름의 PDF 를 대신 받는다
+    hwpx = conn.execute("SELECT local_path FROM attachments WHERE seq = 1").fetchone()[0]
+    Path(hwpx).write_bytes(b"PK\x03\x04 broken")
+    assert extract_attachments(conn) == (0, 0, 1)
+    assert conn.execute("SELECT status FROM attachments WHERE seq = 2").fetchone()[0] == "pending"
+
+    assert mois_board.download_pending(conn, fake_http, settings) == 1
+    assert extract_attachments(conn) == (1, 0, 0)
+    build_doc_text(conn)
+    assert conn.execute("SELECT text_source FROM doc_text").fetchone()[0] == "body+attachments"

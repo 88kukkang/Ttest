@@ -14,7 +14,7 @@
 | 정책브리핑 웹(korea.kr) | 전 부처 통합 | 누리집과 중복, 스크래핑 | 사용 안 함 |
 | **Claude in Chrome** | 사람처럼 화면을 보고 조작, 구조 파악이 빠름 | 수천 건 반복에는 느리고 비싸며, 중간에 끊기면 이어서 하기 어려움 | **정찰(구조 확인)·예외 처리** |
 
-**결론:** 대량 수집은 파이썬 스크립트(이 저장소)로 하고, Claude in Chrome 은 ① 처음에 사이트 구조를 확인하고
+**결론:** 대량 수집은 파이썬 스크립트(이 저장소)로 하고 — 내 PC 또는 GitHub Actions(아래 README 참고)에서 — Claude in Chrome 은 ① 처음에 사이트 구조를 확인하고
 ② 스크립트가 못 여는 페이지가 생겼을 때 들여다보는 용도로 쓴다. 정찰 절차는 [`CHROME_RECON.md`](CHROME_RECON.md).
 
 규모 감각: 행안부는 보도자료를 거의 매일 여러 건 내므로 16개월이면 **수천 건**, 첨부까지 합치면 요청 수천~1만 회 정도로 예상한다.
@@ -123,21 +123,21 @@ SQLite 파일은 DB Browser for SQLite, 엑셀(파워쿼리), pandas, R 에서 �
 
 ---
 
-## 7. 아직 검증하지 못한 가정 (첫 실행 때 확인할 것)
+## 7. 실제 사이트 확인 결과 (2026-10-02, GitHub Actions 정찰)
 
-이 저장소는 접속이 막힌 환경에서 작성했다. 아래는 공개 자료와 전자정부프레임워크 관례로 추정한 부분이며,
-테스트는 **실제 페이지가 아니라 그 구조를 본떠 만든 합성 HTML**로 돌렸다.
-
-| 항목 | 현재 가정 | 확인 방법 |
+| 항목 | 확인된 구조 | 반영 |
 |---|---|---|
-| 목록 URL·페이지 파라미터 | `commonSelectBoardList.do?bbsId=…&pageIndex=N` | `moisdb recon list --page 2` 결과가 1쪽과 다른지 |
-| 목록 행 구조 | 표(tr)에 번호·제목·부서·등록일 칸 | recon 결과에 date/department 가 채워지는지 |
-| 상세 본문 위치 | 알려진 class 후보 → 없으면 휴리스틱 | `moisdb recon article <nttId>` 의 "본문 탐지"와 미리보기 |
-| 첨부 다운로드 | `/cmm/fms/FileDown.do?atchFileId=…&fileSn=…` 또는 `fn_egov_downFile('FILE_…','0')` | recon 의 첨부 목록, `stats` 의 file_type 분포(html 이 많으면 실패) |
-| 정책브리핑 API | 엔드포인트·`startDate/endDate`·`MinisterCode` 필드 | 활용신청 화면의 명세와 대조 |
+| 목록 | `commonSelectBoardList.do?bbsId=BBSMSTR_000000000008&pageIndex=N`, 쪽당 10건, 열: 번호·제목·첨부·**작성자(=담당부서)**·등록일·조회수 | `parse_list()` 가 '작성자' 열을 부서로 읽음 |
+| 목록의 함정 | 상단 메뉴에 다른 게시판 글 링크(`bbsId=BBSMSTR_000000000031&nttId=…`), 페이지 이동 `fn_egov_select_noticeList(1609)` | 이 게시판 글 링크만 인정 |
+| 상세 | 제목 `h4.subject`, 메타 `div.table_info`(등록일·작성자·조회수), 본문 `div#desc_pc` (모바일용 `div#desc_mo` 에 같은 내용 중복) | 선택자 맨 앞에 추가 |
+| 본문 속 주석 | 한글 편집기 JSON 이 HTML 주석으로 수십 KB 들어 있음 | 저장 전 주석 제거 |
+| 첨부 | `div.fileList` 의 `/cmm/fms/FileDown.do?atchFileId=…&fileSn=N`, 대부분 **같은 문서의 .hwpx + .pdf** 한 쌍, '바로보기'는 `fn_fileMgCheck` | HWPX 만 받고 PDF 는 보류(HWPX 실패 시 PDF 로 대체) |
+| 첨부 본문 서식 | 맨 앞 '보도자료/보도시점/배포', 끝에 칸마다 한 줄씩 풀린 연락처 표, 그 뒤 '붙임' | 연락처 표 구간만 제거, 붙임은 유지 |
+| 정책브리핑 API | 아직 미확인 (인증키 필요) | — |
 
-어긋나면 `moisdb/sources/mois_board.py` 의 `TITLE_SELECTORS`, `BODY_SELECTORS`, `parse_list()` 를 고치고
-`moisdb reparse` → `build-text` → `tokenize` 로 다시 반영한다(재수집 불필요).
+실제 페이지 사본은 `tests/fixtures/real/` 에 두고 회귀 테스트(`tests/test_real_pages.py`)로 계속 점검한다.
+사이트가 개편되면 `moisdb recon` 으로 다시 확인하고 `moisdb/sources/mois_board.py` 의 선택자를 고친 뒤
+`moisdb reparse` → `build-text` → `tokenize` 로 반영한다(재수집 불필요).
 
 ---
 

@@ -49,6 +49,7 @@ def test_parse_article_metadata_body_and_attachments():
         "250610 (보도자료) 지방소멸대응기금 배분.hwpx",
         "250610 (보도자료) 지방소멸대응기금 배분.pdf",
         "(붙임) 시군구별 배분액.hwp",
+        "현장 사진.jpg",
     ]
     assert art.attachments[1].url == (
         "https://www.mois.go.kr/cmm/fms/FileDown.do?atchFileId=FILE_000000000123456&fileSn=1"

@@ -1,6 +1,6 @@
 name: moisdb-run
 
-# ci/task.env 를 바꿔 push 하면 실행된다. 결과는 같은 브랜치에 커밋된다.
+# ci/task.env 를 바꿔 push 하면 실행된다. 결과(dataset/, reports/, samples/)는 같은 브랜치에 커밋된다.
 on:
   push:
     branches: [claude/moi-press-release-database-ncgqwa]
@@ -16,7 +16,7 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 340
+    timeout-minutes: 345
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -24,8 +24,27 @@ jobs:
           python-version: "3.11"
       - name: Install
         run: pip install -e ".[analysis]"
+      - name: Restore collected data
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: moisdb-data-${{ github.run_id }}
+          restore-keys: moisdb-data-
       - name: Run task
         run: bash ci/run.sh
+      - name: Save collected data
+        if: always() && hashFiles('data/mois.sqlite3') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: data
+          key: moisdb-data-${{ github.run_id }}
+      - name: Upload full data (원본 HTML·첨부 포함)
+        if: always() && hashFiles('data/mois.sqlite3') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: moisdb-data-full
+          path: data
+          retention-days: 30
       - name: Commit results
         if: always()
         run: |

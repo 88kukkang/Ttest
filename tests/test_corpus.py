@@ -51,3 +51,24 @@ def test_compose_modes():
     assert compose_text(BODY, ["첨부"], mode="body") == (BODY, "body")
     assert compose_text(BODY, ["첨부"], mode="attachments") == ("첨부", "attachments")
     assert compose_text(BODY, []) == (BODY, "body")
+
+
+def test_clean_text_drops_contact_table_but_keeps_appendix():
+    raw = "\n".join([
+        "□ 행정안전부는 민원 혁신 사례보고회를 개최한다.",
+        "담당 부서",
+        "행정안전부",
+        "민원제도과",
+        "책임자",
+        "과 장",
+        "김교열",
+        "(044-205-2441)",
+        "붙임",
+        "5개 기관 민원해결 우수사례 발표 요약",
+        "- 반복·특이민원에 대해 충분한 면담과 현장 확인을 통해 민원 발생 원인을 파악",
+    ])
+    assert clean_text(raw).splitlines() == [
+        "□ 행정안전부는 민원 혁신 사례보고회를 개최한다.",
+        "5개 기관 민원해결 우수사례 발표 요약",
+        "- 반복·특이민원에 대해 충분한 면담과 현장 확인을 통해 민원 발생 원인을 파악",
+    ]

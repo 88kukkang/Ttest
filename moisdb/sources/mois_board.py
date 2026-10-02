@@ -21,10 +21,11 @@ from datetime import date
 from pathlib import Path
 from urllib.parse import unquote, urljoin
 
-from bs4 import BeautifulSoup, NavigableString, Tag
+from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 
 from .. import db
 from ..config import ARTICLE_PATH, BOARDS, FILE_DOWN_PATH, LIST_PATH, MOIS_BASE, START_DATE, Settings
+from ..corpus import plan_downloads, release_deferred
 from ..extract import html_to_text, sniff_type
 from ..http import decode_html
 
@@ -34,7 +35,9 @@ SOURCE = "mois"
 
 DATE_RE = re.compile(r"(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})")
 NTT_RE = re.compile(r"nttId=(\d+)")
+BBS_RE = re.compile(r"bbsId=(\w+)")
 JS_ID_RE = re.compile(r"\(\s*['\"]?(\d{4,})['\"]?\s*[,)]")
+ARTICLE_LINK_RE = re.compile(r"commonSelectBoardArticle|inqire|Article", re.I)
 JS_FILE_RE = re.compile(r"\(\s*['\"](FILE_[\w]+)['\"]\s*,\s*['\"]?(\d+)['\"]?")
 EXT_RE = re.compile(r"\.(hwpx?|pdf|docx?|xlsx?|pptx?|zip|jpe?g|png|gif|txt|csv)\b", re.I)
 SIZE_SUFFIX_RE = re.compile(r"\s*[\[(]\s*\d[\d.,]*\s*[KMG]?B\s*[\])]\s*$", re.I)
@@ -45,13 +48,13 @@ NOISE_RE = re.compile(
     re.I,
 )
 
-# 상세 페이지에서 먼저 시도할 선택자. recon 결과를 보고 실제 사이트에 맞게 앞쪽에 추가하면 된다.
+# 상세 페이지에서 먼저 시도할 선택자. 맨 앞은 2026-10 실제 사이트에서 확인한 것, 나머지는 개편 대비 후보.
 TITLE_SELECTORS = [
-    "div.view_title", "div.bbs_view h3", "div.view_head h3", "div.board_view h3",
+    "h4.subject", "div.view_title", "div.bbs_view h3", "div.view_head h3", "div.board_view h3",
     "div.title_area h3", "th.title", "h3.title", "h4.title",
 ]
 BODY_SELECTORS = [
-    "div.view_cont", "div.view_con", "div.view_content", "div.bbs_view_cont",
+    "div#desc_pc", "div.desc", "div.view_cont", "div.view_con", "div.view_content", "div.bbs_view_cont",
     "div.board_view_cont", "div.cont_view", "div.viewContents", "td.view_cont", "td.cont",
 ]
 
@@ -114,16 +117,16 @@ def _clean(text: str | None) -> str:
 # ---------------------------------------------------------------- 파싱: 목록
 
 
-def _article_id(a: Tag) -> str | None:
+def _article_id(a: Tag, board_id: str) -> str | None:
+    """이 게시판 글로 가는 링크면 nttId. 메뉴의 다른 게시판 글, 페이지 이동 링크는 제외한다."""
     ref = f"{a.get('href') or ''} {a.get('onclick') or ''}"
-    m = NTT_RE.search(ref)
-    if m:
-        return m.group(1)
-    if "javascript" in ref.lower() or a.get("onclick"):
-        m = JS_ID_RE.search(ref)
-        if m:
-            return m.group(1)
-    return None
+    if not ARTICLE_LINK_RE.search(ref):
+        return None
+    bbs = BBS_RE.search(ref)
+    if bbs and bbs.group(1) != board_id:
+        return None
+    m = NTT_RE.search(ref) or JS_ID_RE.search(ref)
+    return m.group(1) if m else None
 
 
 def _column_index(table: Tag | None, keywords: tuple[str, ...]) -> int | None:
@@ -145,7 +148,7 @@ def parse_list(html: str, board_id: str, base: str = MOIS_BASE) -> list[ListItem
     items: list[ListItem] = []
     seen: set[str] = set()
     for a in soup.find_all("a"):
-        ntt_id = _article_id(a)
+        ntt_id = _article_id(a, board_id)
         if not ntt_id or ntt_id in seen:
             continue
         seen.add(ntt_id)
@@ -158,7 +161,7 @@ def parse_list(html: str, board_id: str, base: str = MOIS_BASE) -> list[ListItem
             cells = row.find_all(["td", "th"], recursive=False)
             title_cell = a.find_parent(["td", "th"])
             other_text = " ".join(c.get_text(" ", strip=True) for c in cells if c is not title_cell)
-            idx = _column_index(row.find_parent("table"), ("부서", "담당"))
+            idx = _column_index(row.find_parent("table"), ("부서", "담당", "작성자"))
             if idx is not None and idx < len(cells) and cells[idx] is not title_cell:
                 department = _clean(cells[idx].get_text(" ", strip=True)) or None
             if cells and cells[0] is not title_cell and not cells[0].get_text(strip=True).isdigit():
@@ -188,8 +191,8 @@ def _next_value(el: Tag) -> str | None:
         nxt = nxt.next_sibling
     if nxt is None:
         return None
-    value = nxt.get_text(" ", strip=True) if isinstance(nxt, Tag) else str(nxt).strip()
-    return _clean(value) or None
+    value = nxt.get_text(" ", strip=True) if isinstance(nxt, Tag) else str(nxt)
+    return _clean(value).strip(" :：|") or None
 
 
 def _labeled_value(soup: BeautifulSoup, labels: tuple[str, ...]) -> str | None:
@@ -294,7 +297,7 @@ def parse_article(html: str, base: str = MOIS_BASE) -> Article:
         title = _clean(og.get("content")) if og else None
 
     published = parse_date(_labeled_value(soup, ("등록일", "작성일", "게시일", "배포일")))
-    department = _labeled_value(soup, ("담당부서", "부서명", "부서"))
+    department = _labeled_value(soup, ("담당부서", "부서명", "부서", "작성자"))
 
     body, how = None, None
     for sel in BODY_SELECTORS:
@@ -306,6 +309,10 @@ def parse_article(html: str, base: str = MOIS_BASE) -> Article:
         stripped = BeautifulSoup(html, "lxml")
         _strip_noise(stripped)
         body, how = _main_block(stripped), "heuristic"
+
+    # 본문 안 HTML 주석(한글 편집기 JSON 등 수십 KB)은 저장할 필요가 없다
+    for c in body.find_all(string=lambda t: isinstance(t, Comment)):
+        c.extract()
 
     return Article(
         title=title,
@@ -462,9 +469,12 @@ def download_attachment(conn: sqlite3.Connection, http, settings: Settings, att:
             "UPDATE attachments SET local_path=?, sha256=?, size=?, file_type=?, status=?, error=? WHERE id=?",
             (str(dest), hashlib.sha256(resp.content).hexdigest(), len(resp.content), ftype, status, error, att["id"]),
         )
+        if status == "error":
+            release_deferred(conn, att["release_id"], att["filename"])
     except Exception as e:  # noqa: BLE001 — 한 파일 실패가 전체 수집을 멈추지 않도록
         log.warning("첨부 다운로드 실패 nttId=%s %s: %s", ntt_id, att["filename"], e)
         conn.execute("UPDATE attachments SET status='error', error=? WHERE id=?", (str(e), att["id"]))
+        release_deferred(conn, att["release_id"], att["filename"])
 
 
 def fetch_details(
@@ -496,10 +506,7 @@ def fetch_details(
             store_article(conn, row["id"], art, raw_path)
             conn.commit()
             if download:
-                for att in conn.execute(
-                    "SELECT * FROM attachments WHERE release_id = ? AND status IN ('pending','error') ORDER BY seq",
-                    (row["id"],),
-                ).fetchall():
+                for att in plan_downloads(conn, row["id"], retry_errors=True):
                     download_attachment(conn, http, settings, att, ntt_id)
                 conn.commit()
             ok += 1
@@ -513,17 +520,20 @@ def fetch_details(
 
 
 def download_pending(conn: sqlite3.Connection, http, settings: Settings, retry_errors: bool = False) -> int:
-    """상세는 받았지만 아직 내려받지 않은 첨부를 받는다 (fetch --no-download 후 사용)."""
+    """아직 받지 않은 첨부를 받는다 (fetch --no-download 후, 또는 다른 형식으로 대체할 때)."""
     statuses = ("pending", "error") if retry_errors else ("pending",)
-    rows = conn.execute(
-        f"""SELECT a.*, r.source_id AS ntt_id FROM attachments a JOIN releases r ON r.id = a.release_id
-            WHERE r.source = ? AND a.status IN ({",".join("?" * len(statuses))}) ORDER BY a.id""",
+    releases = conn.execute(
+        f"""SELECT DISTINCT r.id, r.source_id FROM releases r JOIN attachments a ON a.release_id = r.id
+            WHERE r.source = ? AND a.status IN ({",".join("?" * len(statuses))}) ORDER BY r.id""",
         (SOURCE, *statuses),
     ).fetchall()
-    for att in rows:
-        download_attachment(conn, http, settings, att, att["ntt_id"])
+    n = 0
+    for rel in releases:
+        for att in plan_downloads(conn, rel["id"], retry_errors=retry_errors):
+            download_attachment(conn, http, settings, att, rel["source_id"])
+            n += 1
         conn.commit()
-    return len(rows)
+    return n
 
 
 def reparse_raw(conn: sqlite3.Connection, base: str = MOIS_BASE) -> int:

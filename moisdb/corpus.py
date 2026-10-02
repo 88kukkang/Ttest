@@ -12,6 +12,7 @@ from __future__ import annotations
 import logging
 import re
 import sqlite3
+from collections import defaultdict
 from pathlib import Path
 
 from . import db
@@ -21,22 +22,31 @@ log = logging.getLogger(__name__)
 
 TYPE_PRIORITY = {t: i for i, t in enumerate(TEXT_TYPES)}  # hwpx > hwp > docx > pdf
 
-# 보도자료 서식에서 반복되는 머리말·꼬리말·연락처 줄 (분석 노이즈)
+# 보도자료 서식에서 반복되는 머리말·꼬리말 줄 (분석 노이즈)
 BOILERPLATE_LINE_RES = [
     re.compile(p)
     for p in (
+        r"^보\s*도\s*자\s*료$",
         r"^보\s*도\s*시\s*점",
         r"^배\s*포(\s*일\s*시|\s*시\s*점)?\s*[:：]?",
+        r"^\(?\s*(온라인|지면|방송)",
+        r"즉시\s*보도",
+        r"^\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?\s*\(.\)\s*(\d{1,2}:\d{2})?\s*$",  # '2026. 10. 2.(금) 15:00'
         r"^(담\s*당\s*부\s*서|책\s*임\s*자|담\s*당\s*자)",
         r"보도자료와 관련하여 보다 자세한 내용이나 취재를 원하시면",
-        r"^(과|팀|국|실|단|센터)장\s*\S{2,4}\s*$",
+        r"^(과|팀|국|실|단|센터)\s*장\s*\S{2,4}\s*$",
         r"^(사무관|주무관|서기관|연구관|연구사|행정관)\s*\S{2,4}\s*$",
         r"^[<〈(]?\s*끝\s*[>〉)]?\.?$",
-        r"^[※]?\s*(사진|붙임|참고)\s*[:：]?\s*$",
+        r"^[※]?\s*(사진|붙임|참고)\s*\d*\s*[:：]?\s*$",
         r"^\d+\s*/\s*\d+$",  # PDF 쪽번호 '3 / 10'
         r"^-\s*\d+\s*-$",  # 쪽번호 '- 3 -'
     )
 ]
+# 본문 끝의 연락처 표('담당 부서 / 책임자 과장 홍길동 (044-…) / 담당자 …')는 칸마다 한 줄이 되어
+# 부서명·직급·이름이 짧은 줄로 이어진다. '담당 부서'에서 시작해 '붙임' 또는 긴 문장이 나올 때까지 버린다.
+CONTACT_START_RE = re.compile(r"^담\s*당\s*부\s*서")
+APPENDIX_RE = re.compile(r"^(붙\s*임|참\s*고)(\s*\d+)?(\s|[.:：]|$)")
+CONTACT_LINE_MAX = 40
 PHONE_RE = re.compile(r"\(?0\d{1,2}\)?[-.\s]?\d{3,4}[-.\s]\d{4}")
 EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+(\.[\w-]+)+")
 URL_RE = re.compile(r"https?://\S+|www\.\S+")
@@ -44,15 +54,38 @@ URL_RE = re.compile(r"https?://\S+|www\.\S+")
 
 def clean_text(text: str) -> str:
     lines = []
+    in_contact = False
     for line in (text or "").splitlines():
         line = line.strip()
+        if CONTACT_START_RE.match(line):
+            in_contact = True
+            continue
+        if in_contact:
+            if APPENDIX_RE.match(line) or len(line) > CONTACT_LINE_MAX:
+                in_contact = False
+            else:
+                continue
         if not line or any(r.search(line) for r in BOILERPLATE_LINE_RES):
             continue
         line = URL_RE.sub(" ", EMAIL_RE.sub(" ", PHONE_RE.sub(" ", line)))
-        line = re.sub(r"\s+", " ", line).strip()
+        line = re.sub(r"\(\s*\)", " ", line)  # 전화번호를 지우고 남은 빈 괄호
+        line = re.sub(r"\s+", " ", line).strip(" ,")
         if line:
             lines.append(line)
     return "\n".join(lines)
+
+
+# 텍스트를 뽑을 수 없는 형식 — 내려받지 않는다
+NON_TEXT_EXTS = {
+    "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "svg", "webp",
+    "mp4", "avi", "mov", "wmv", "mp3", "wav", "zip", "alz", "7z",
+    "xls", "xlsx", "ppt", "pptx", "doc",
+}
+
+
+def file_ext(filename: str | None) -> str:
+    m = re.search(r"\.([A-Za-z0-9]{2,5})\s*$", filename or "")
+    return m.group(1).lower() if m else ""
 
 
 def _stem_key(filename: str | None) -> str:
@@ -71,6 +104,49 @@ def select_attachment_texts(attachments: list[sqlite3.Row | dict]) -> list[str]:
         if prev is None or TYPE_PRIORITY[a["file_type"]] < TYPE_PRIORITY[prev["file_type"]]:
             chosen[key] = a
     return [a["text"] for a in sorted(chosen.values(), key=lambda a: a["seq"])]
+
+
+def plan_downloads(conn: sqlite3.Connection, release_id: int, retry_errors: bool = False) -> list[sqlite3.Row]:
+    """이 글의 첨부 중 지금 내려받을 것을 고른다.
+
+    - 사진·영상·압축 등 텍스트를 뽑을 수 없는 형식은 'skipped'
+    - 같은 문서의 다른 형식(…hwpx / …pdf)은 우선순위가 가장 높은 하나만 받고 나머지는 'deferred'.
+      받은 파일이 다운로드·추출에 실패하면 release_deferred() 가 나머지를 'pending' 으로 되돌린다.
+    """
+    want = ("pending", "error") if retry_errors else ("pending",)
+    groups: dict[str, list[sqlite3.Row]] = defaultdict(list)
+    for a in conn.execute("SELECT * FROM attachments WHERE release_id = ? ORDER BY seq", (release_id,)):
+        if a["status"] in want and file_ext(a["filename"]) in NON_TEXT_EXTS:
+            conn.execute("UPDATE attachments SET status = 'skipped', error = '텍스트 추출 대상 형식 아님' WHERE id = ?",
+                         (a["id"],))
+            continue
+        groups[_stem_key(a["filename"])].append(a)
+
+    plan: list[sqlite3.Row] = []
+    for members in groups.values():
+        waiting = [m for m in members if m["status"] in want]
+        if not waiting:
+            continue
+        if any(m["status"] in ("downloaded", "extracted") for m in members):
+            best, rest = None, waiting
+        else:
+            waiting.sort(key=lambda m: TYPE_PRIORITY.get(file_ext(m["filename"]), len(TYPE_PRIORITY)))
+            best, rest = waiting[0], waiting[1:]
+            plan.append(best)
+        for m in rest:
+            conn.execute("UPDATE attachments SET status = 'deferred' WHERE id = ?", (m["id"],))
+    return sorted(plan, key=lambda a: a["seq"])
+
+
+def release_deferred(conn: sqlite3.Connection, release_id: int, filename: str | None) -> int:
+    """실패한 첨부와 같은 문서의 다른 형식을 다시 받을 대상으로 되돌린다."""
+    key = _stem_key(filename)
+    ids = [a["id"] for a in conn.execute(
+        "SELECT id, filename FROM attachments WHERE release_id = ? AND status = 'deferred'", (release_id,)
+    ) if _stem_key(a["filename"]) == key]
+    for att_id in ids:
+        conn.execute("UPDATE attachments SET status = 'pending' WHERE id = ?", (att_id,))
+    return len(ids)
 
 
 def _squash(text: str) -> str:
@@ -101,7 +177,7 @@ def extract_attachments(conn: sqlite3.Connection, retry_errors: bool = False) ->
     """
     types = ",".join("?" * len(TEXT_TYPES))
     rows = conn.execute(
-        f"""SELECT id, local_path, file_type, filename FROM attachments
+        f"""SELECT id, release_id, local_path, file_type, filename FROM attachments
             WHERE local_path IS NOT NULL
               AND (status = 'downloaded' OR (? AND status = 'error' AND file_type IN ({types})))""",
         (int(retry_errors), *TEXT_TYPES),
@@ -110,6 +186,7 @@ def extract_attachments(conn: sqlite3.Connection, retry_errors: bool = False) ->
     for row in rows:
         if row["file_type"] not in TYPE_PRIORITY:
             conn.execute("UPDATE attachments SET status='skipped' WHERE id=?", (row["id"],))
+            release_deferred(conn, row["release_id"], row["filename"])
             skipped += 1
             continue
         try:
@@ -118,6 +195,8 @@ def extract_attachments(conn: sqlite3.Connection, retry_errors: bool = False) ->
             ok += 1
         except Exception as e:  # noqa: BLE001
             conn.execute("UPDATE attachments SET status='error', error=? WHERE id=?", (str(e), row["id"]))
+            if release_deferred(conn, row["release_id"], row["filename"]):
+                log.info("[extract] %s 실패 → 같은 문서의 다른 형식을 내려받도록 표시", row["filename"])
             failed += 1
             log.warning("[extract] 실패 %s: %s", row["filename"], e)
     conn.commit()

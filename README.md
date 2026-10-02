@@ -84,9 +84,22 @@ moisdb/
 tests/                    합성 HTML·HWPX·PDF 로 전 과정을 오프라인 테스트 (pytest)
 ```
 
+## GitHub Actions 로 수집하기 (PC 없이)
+
+`ci/task.env` 의 `TASK=` 값을 바꿔 이 브랜치에 push 하면 `.github/workflows/moisdb-run.yml` 이 돈다.
+
+| TASK | 하는 일 | 결과 |
+|---|---|---|
+| `recon` | 목록·상세·첨부 몇 건으로 파서 점검 | `samples/` |
+| `collect` | 출범일 이후 전체 수집 → 추출 → 형태소 분석. 시간 제한(약 4.5시간)에 걸리면 다음 실행이 이어서 한다 | `dataset/`, `reports/stats.txt` |
+
+- `dataset/mois_press.sqlite3.xz` — 분석용 DB (압축 해제 후 `moisdb --data-dir <폴더> build-text` 로 검색 색인 재생성)
+- `dataset/mois_press.csv` — 보도자료 1건 = 1행 (엑셀)
+- `dataset/attachments.csv` — 첨부 목록과 처리 상태
+- 원본 HTML·첨부까지 포함한 전체 `data/` 는 실행 페이지의 Artifacts(`moisdb-data-full`, 30일 보관)
+
 ## 주의
 
-- 사이트 구조는 공개 자료와 전자정부프레임워크 관례로 **추정해 작성**했다. 테스트는 그 구조를 본뜬 합성 HTML 로 통과했지만,
-  실제 사이트와는 첫 `recon` 으로 반드시 대조할 것 ([DESIGN.md §7](docs/DESIGN.md#7-아직-검증하지-못한-가정-첫-실행-때-확인할-것)).
-- 요청 간격 기본 1.5초. 서버에 부담을 주지 않도록 낮추지 말 것.
+- 사이트 구조는 2026-10-02 실제 페이지로 확인했다([DESIGN.md §7](docs/DESIGN.md#7-실제-사이트-확인-결과-2026-10-02-github-actions-정찰)). 개편되면 `recon` 부터 다시.
+- 요청은 한 번에 하나씩, 간격 1초 이상(기본 1.5초, Actions 수집은 1.0초). 서버에 부담을 주지 않도록 더 낮추지 말 것.
 - 등록일은 게시판 등록일 기준이다(보도 시점과 하루 정도 다를 수 있음).

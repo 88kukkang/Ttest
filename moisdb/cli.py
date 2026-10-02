@@ -178,8 +178,17 @@ def cmd_collect(args, conn, settings):
     cmd_discover(args, conn, settings)
     cmd_fetch(args, conn, settings)
     cmd_extract(args, conn, settings)
+    _fallback_downloads(args, conn, settings)
     cmd_build_text(args, conn, settings)
     _try_tokenize(args, conn, settings)
+
+
+def _fallback_downloads(args, conn, settings):
+    """추출에 실패한 첨부(배포용 HWP 등) 대신 같은 문서의 다른 형식(PDF 등)을 받아 추출한다."""
+    if conn.execute("SELECT 1 FROM attachments WHERE status = 'pending' LIMIT 1").fetchone():
+        args.retry_errors = False
+        cmd_download(args, conn, settings)
+        cmd_extract(args, conn, settings)
 
 
 def cmd_update(args, conn, settings):
@@ -193,6 +202,7 @@ def cmd_update(args, conn, settings):
     cmd_fetch(args, conn, settings)
     cmd_download(args, conn, settings)  # 지난번에 실패한 첨부 재시도
     cmd_extract(args, conn, settings)
+    _fallback_downloads(args, conn, settings)
     cmd_build_text(args, conn, settings)
     _try_tokenize(args, conn, settings)
 
