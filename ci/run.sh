@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # GitHub Actions 작업 실행기. ci/task.env 의 TASK 값에 따라 동작한다.
+#   probe    러너에서 각 사이트 접속 가능 여부 점검
 #   recon    실제 사이트 구조 확인 (samples/ 에 원본과 파싱 결과)
 #   collect  출범일 이후 전체 수집 → dataset/ 내보내기. 시간 제한에 걸리면 다음 실행에서 이어서 한다
 #            (data/ 는 Actions 캐시로 실행 사이에 보존)
@@ -16,6 +17,17 @@ case "${TASK}" in
     echo "러너 공인 IP: $(curl -s --max-time 10 https://api.ipify.org || echo 알수없음)"
     curl -sS -o /dev/null -w "접속 확인: HTTP %{http_code}, %{time_total}s\n" --max-time 30 "$LIST_URL" || echo "접속 실패"
     python ci/recon.py 2>&1 | tee samples/recon_report.txt
+    ;;
+
+  probe)
+    # 접속 경로 점검: 어느 사이트가 이 러너에서 열리는지
+    echo "러너 공인 IP: $(curl -s --max-time 10 https://api.ipify.org || echo 알수없음)"
+    getent hosts www.mois.go.kr www.korea.kr apis.data.go.kr || true
+    for u in "$LIST_URL" "http://www.mois.go.kr/" "https://www.korea.kr/briefing/pressReleaseList.do" \
+             "https://apis.data.go.kr/1371000/pressReleaseService/pressReleaseList" "https://www.google.com/"; do
+      curl -sS -o /dev/null -w "HTTP %{http_code}  connect=%{time_connect}s total=%{time_total}s  $u\n" --max-time 25 "$u" \
+        || echo "실패  $u"
+    done
     ;;
 
   collect)
