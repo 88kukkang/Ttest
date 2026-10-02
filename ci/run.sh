@@ -34,12 +34,13 @@ case "${TASK}" in
     echo "러너 공인 IP: $(curl -s --max-time 10 https://api.ipify.org || echo 알수없음)"
     # 사이트가 응답하지 않으면 빈 결과를 내보내지 않고 바로 실패 처리한다
     up=""
-    for i in 1 2 3 4 5 6; do
-      code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 30 "$LIST_URL" 2>/dev/null)
+    # 행안부 방화벽이 일부 클라우드 IP 대역만 막는 것으로 보여, 막힌 러너면 빨리 실패하고 재실행(새 러너)한다
+    for i in 1 2 3; do
+      code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 20 "$LIST_URL" 2>/dev/null)
       if [ "$code" = "200" ]; then up=1; break; fi
-      echo "접속 확인 실패 ($i/6, HTTP=${code:-없음}) — 60초 후 재시도"; sleep 60
+      echo "접속 확인 실패 ($i/3, HTTP=${code:-없음}) — 20초 후 재시도"; sleep 20
     done
-    if [ -z "$up" ]; then echo "행안부 누리집에 접속할 수 없어 중단"; exit 1; fi
+    if [ -z "$up" ]; then echo "이 러너 IP 에서는 행안부 누리집에 접속할 수 없어 중단 — 재실행하면 다른 러너로 시도"; exit 1; fi
     mkdir -p data reports
     # 목록 전체 훑기는 한 번만. 끝까지 성공해야 표시 파일을 남기고, 이후에는 새 글만 확인한다
     if [ -f data/.discover_done ]; then
