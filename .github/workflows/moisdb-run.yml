@@ -31,7 +31,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git add -f samples dataset reports 2>/dev/null || true
+          for d in samples dataset reports; do if [ -e "$d" ]; then git add -f "$d"; fi; done
           if git diff --cached --quiet; then echo "커밋할 결과 없음"; exit 0; fi
           git commit -m "moisdb-run: $(grep '^TASK=' ci/task.env) 결과"
           for i in 1 2 3 4; do git pull --rebase origin "$GITHUB_REF_NAME" && git push && break; sleep $((2**i)); done
