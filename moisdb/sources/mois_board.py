@@ -21,6 +21,7 @@ from datetime import date
 from pathlib import Path
 from urllib.parse import unquote, urljoin
 
+import requests
 from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 
 from .. import db
@@ -485,8 +486,13 @@ def fetch_details(
     download: bool = True,
     retry_errors: bool = False,
     base: str = MOIS_BASE,
+    max_consecutive_failures: int = 5,
 ) -> tuple[int, int]:
-    """status='listed' 인 글의 상세 페이지를 받아 원본 저장 → 파싱 → 첨부 다운로드. (성공, 실패) 건수."""
+    """status='listed' 인 글의 상세 페이지를 받아 원본 저장 → 파싱 → 첨부 다운로드. (성공, 실패) 건수.
+
+    접속 오류(타임아웃 등)는 글 상태를 바꾸지 않아 다음 실행에서 그대로 다시 시도된다.
+    접속 오류가 연속으로 max_consecutive_failures 번 나면 사이트가 막힌 것으로 보고 멈춘다.
+    """
     statuses = ("listed", "error") if retry_errors else ("listed",)
     rows = conn.execute(
         f"""SELECT id, source_id, board, url, title FROM releases
@@ -494,7 +500,7 @@ def fetch_details(
             ORDER BY published_date DESC, id DESC {"LIMIT ?" if limit else ""}""",
         (SOURCE, *statuses, *([limit] if limit else [])),
     ).fetchall()
-    ok = fail = 0
+    ok = fail = consecutive = 0
     for i, row in enumerate(rows, start=1):
         ntt_id = row["source_id"]
         try:
@@ -510,7 +516,15 @@ def fetch_details(
                     download_attachment(conn, http, settings, att, ntt_id)
                 conn.commit()
             ok += 1
+            consecutive = 0
             log.info("[fetch] %d/%d nttId=%s 첨부 %d개 · %s", i, len(rows), ntt_id, len(art.attachments), row["title"])
+        except (requests.ConnectionError, requests.Timeout) as e:
+            fail += 1
+            consecutive += 1
+            log.warning("[fetch] 접속 실패 nttId=%s: %s", ntt_id, e)
+            if consecutive >= max_consecutive_failures:
+                log.error("[fetch] 연속 %d회 접속 실패 — 사이트가 응답하지 않아 중단 (다음 실행에서 이어서)", consecutive)
+                break
         except Exception as e:  # noqa: BLE001
             conn.execute("UPDATE releases SET status='error', error=? WHERE id=?", (str(e), row["id"]))
             conn.commit()

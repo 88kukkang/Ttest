@@ -100,3 +100,29 @@ def test_fallback_to_other_format_when_extraction_fails(env, fake_http):
     assert extract_attachments(conn) == (1, 0, 0)
     build_doc_text(conn)
     assert conn.execute("SELECT text_source FROM doc_text").fetchone()[0] == "body+attachments"
+
+
+class _DownHttp:
+    """상세 페이지 요청이 모두 타임아웃 나는 상황."""
+
+    def __init__(self, inner):
+        self.inner = inner
+        self.article_calls = 0
+
+    def get(self, url, params=None, **kw):
+        if "commonSelectBoardArticle" in url:
+            self.article_calls += 1
+            import requests
+
+            raise requests.ConnectTimeout("timed out")
+        return self.inner.get(url, params, **kw)
+
+
+def test_fetch_stops_when_site_unreachable_and_keeps_status(env, fake_http):
+    settings, conn = env
+    mois_board.discover(conn, fake_http, settings)
+    down = _DownHttp(fake_http)
+    ok, fail = mois_board.fetch_details(conn, down, settings, max_consecutive_failures=2)
+    assert (ok, fail, down.article_calls) == (0, 2, 2)  # 3건 중 2번 연속 실패 후 중단
+    statuses = {r[0] for r in conn.execute("SELECT status FROM releases")}
+    assert statuses == {"listed"}  # 접속 오류는 '실패'로 표시하지 않아 다음 실행에서 다시 시도
