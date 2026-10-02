@@ -1,0 +1,37 @@
+name: moisdb-run
+
+# ci/task.env 를 바꿔 push 하면 실행된다. 결과는 같은 브랜치에 커밋된다.
+on:
+  push:
+    branches: [claude/moi-press-release-database-ncgqwa]
+    paths: [ci/task.env]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: moisdb-run
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e ".[analysis]"
+      - name: Run task
+        run: bash ci/run.sh
+      - name: Commit results
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add -f samples dataset reports 2>/dev/null || true
+          if git diff --cached --quiet; then echo "커밋할 결과 없음"; exit 0; fi
+          git commit -m "moisdb-run: $(grep '^TASK=' ci/task.env) 결과"
+          for i in 1 2 3 4; do git pull --rebase origin "$GITHUB_REF_NAME" && git push && break; sleep $((2**i)); done
