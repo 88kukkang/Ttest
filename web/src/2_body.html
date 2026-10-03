@@ -2,7 +2,15 @@
   <header class="head">
     <span class="stamp">보도자료</span>
     <h1>행안부 보도자료 DB</h1>
-    <p class="scope">이재명 정부 출범(2025. 6. 4.)부터 <span class="js-last">2026. 10. 2.</span>까지 행정안전부 누리집에 올라온 보도자료 <span class="num js-total">1,786</span>건을 첨부 원문까지 모았습니다. 묻고, 찾고, 키워드로 훑어볼 수 있습니다.</p>
+    <p class="scope"><span class="js-first">2024. 1. 1.</span>부터 <span class="js-last">…</span>까지 행정안전부 누리집에 올라온 보도자료 <span class="num js-total">…</span>건을 첨부 원문까지 모았습니다. 묻고, 찾고, 키워드로 훑어볼 수 있습니다.</p>
+    <div class="period">
+      <span class="period-label" id="period-label">보는 기간</span>
+      <div class="modes" role="group" aria-labelledby="period-label">
+        <button type="button" id="period-all" aria-pressed="true">2024년부터 전체</button>
+        <button type="button" id="period-gov" aria-pressed="false">이재명 정부 출범 이후</button>
+      </div>
+      <span class="note">AI 질문·검색·클라우드·관계도에 함께 적용됩니다</span>
+    </div>
   </header>
 
   <nav class="tabs" role="tablist" aria-label="기능">
@@ -176,7 +184,7 @@
 
   <!-- ===== 분석 보고서 ===== -->
   <section class="panel-tab rep" id="panel-report" role="tabpanel" aria-labelledby="tab-report" hidden>
-    <p class="note warn">이 보고서는 2026. 10. 3.에 보도자료 1,786건으로 분석한 내용입니다. AI 질문·검색·클라우드·관계도에는 매일 새 보도자료가 더해집니다.</p>
+    <p class="note warn">이 보고서는 이재명 정부 출범(2025. 6. 4.)부터 2026. 10. 2.까지의 보도자료 1,786건을 2026. 10. 3.에 분석한 것으로, 위의 ‘보는 기간’과 상관없이 이 범위로 고정돼 있습니다. AI 질문·검색·클라우드·관계도는 고른 기간과 매일 들어오는 새 보도자료를 따릅니다.</p>
     <ul class="points">
       <li><span>출범 뒤 16개월 동안 행정안전부는 보도자료를 <b>1,786건</b> 냈다. 2025년 6월~2026년 9월 기준 한 달 평균 <b>약 111건</b>, 가장 많은 달은 2025년 9월(143건)이다.</span></li>
       <li><span>표기가 바뀌었다. ‘지방정부’가 나온 보도자료 비율이 2025년 9월 <b>1%</b>에서 10월 15%, 12월 <b>51%</b>로 뛰었고, 같은 기간 ‘지자체’·‘지방자치단체’는 줄었다.</span></li>

@@ -64,7 +64,7 @@ const S = (() => {
       const cx = m.l + band * i + band / 2, h = (vals[i] / yMax) * ih, y = m.t + ih - h;
       const hit = svgEl("rect", { x: m.l + band * i, y: 0, width: band, height: m.t + ih, class: "hit click", tabindex: 0, role: "button", "aria-label": `${monthLabel(mm)} ${vals[i]}건, 이 달만 보기` }, svg);
       svgEl("path", { d: colPath(cx - bw / 2, y, bw, h, 4), class: "mark", style: `fill:var(${inRange(mm) ? "--bar" : "--bar-dim"})` }, svg);
-      bindHover(hit, () => fillTip(monthLabel(mm) + (mm === PARTIAL ? " (이틀치)" : ""), [{ value: `${fmt(vals[i])}건`, label: `/ 그 달 ${fmt(totals.get(mm))}건` }]));
+      bindHover(hit, () => fillTip(monthLabel(mm) + partialLabel(mm), [{ value: `${fmt(vals[i])}건`, label: `/ 그 달 ${fmt(totals.get(mm))}건` }]));
       const pick = () => { monthOnly = monthOnly === mm ? null : mm; hideTip(); run(); };
       hit.addEventListener("click", pick);
       hit.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
@@ -120,6 +120,16 @@ const S = (() => {
     art.append(actions, full);
     return art;
   }
+  /** 기간·부서 선택 상자를 지금 기간의 자료로 채운다 (고른 부서는 남아 있으면 유지) */
+  function fill() {
+    fillMonthSelects("s-from", "s-to", MONTHS);
+    const dsel = $("s-dept"), prev = dsel.value;
+    dsel.length = 1;
+    dsel.options[0].textContent = `전체 부서 (${DEPT_COUNTS.length})`;
+    for (const [name, n] of DEPT_COUNTS) dsel.appendChild(new Option(`${name || "부서 미상"} (${n})`, name));
+    if (prev && DEPT_COUNTS.some(([name]) => name === prev)) dsel.value = prev;
+  }
+  function rescope() { if (!ready) return; fill(); monthOnly = null; run(); }
   function init() {
     const exBox = $("s-examples");
     for (const ex of EXAMPLES) {
@@ -136,9 +146,7 @@ const S = (() => {
         .then(() => toast(`${fmt(last.list.length)}건을 복사했습니다. 엑셀에 붙여넣으면 됩니다.`), () => toast("이 화면에서는 복사가 막혀 있습니다."));
     });
     docsReady.then(() => {
-      fillMonthSelects("s-from", "s-to", MONTHS);
-      $("s-dept").options[0].textContent = `전체 부서 (${DEPT_COUNTS.length})`;
-      for (const [name, n] of DEPT_COUNTS) $("s-dept").appendChild(new Option(`${name || "부서 미상"} (${n})`, name));
+      fill();
       const saved = store.get("moisdb.q");
       if (!$("s-q").value) $("s-q").value = saved != null ? saved : "지방정부";
       ready = true;
@@ -147,5 +155,5 @@ const S = (() => {
   }
   /** 다른 탭에서 '이 단어로 검색' */
   function query(q) { $("s-q").value = q; monthOnly = null; ["s-from", "s-to", "s-dept"].forEach((id) => ($(id).value = "")); run(); }
-  return { init, show() { hist(); }, resize() { hist(); }, query };
+  return { init, show() { hist(); }, resize() { hist(); }, query, rescope };
 })();

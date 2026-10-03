@@ -10,13 +10,15 @@ const AI = (() => {
     "‘지방정부’라는 표현은 언제부터 쓰기 시작했어?",
     "주민자치와 관련해 바뀐 제도가 있어?",
   ];
+  const range = () => `${DOCS.reduce((a, d) => (d.date < a ? d.date : a), "9999")} ~ ${DOCS.reduce((a, d) => (d.date > a ? d.date : a), "")}`;
   const rules = () => `너는 행정안전부 보도자료 데이터베이스를 검색해 질문에 답하는 도우미다.
 
 [데이터]
-행정안전부 누리집 보도자료 게시판에 ${DOCS.reduce((a, d) => (d.date < a ? d.date : a), "9999")} ~ ${DOCS.reduce((a, d) => (d.date > a ? d.date : a), "")}에 등록된 보도자료 ${fmt(DOCS.length)}건. 본문은 첨부 원문(HWPX·PDF)에서 뽑은 텍스트다. 이 기간 밖의 일, 다른 부처 자료, 인터넷 정보는 이 데이터에 없다.
+행정안전부 누리집 보도자료 게시판에 ${range()}에 등록된 보도자료 ${fmt(DOCS.length)}건. 본문은 첨부 원문(HWPX·PDF)에서 뽑은 텍스트다. 이 기간 밖의 일, 다른 부처 자료, 인터넷 정보는 이 데이터에 없다.
+${Period.gov ? "사용자가 '이재명 정부 출범(2025. 6. 4.) 이후'만 보도록 골라 두었다. 도구도 이 기간 안에서만 찾는다." : "이재명 정부 출범일은 2025-06-04다. 그 전은 이전 정부 시기다. '이재명 정부 들어', '새 정부 이후' 같은 질문은 from을 2025-06-04로 좁혀 찾고, 정부별로 비교해 달라는 질문은 출범일 앞뒤로 나눠 찾아라."}
 
 [도구]
-- search_releases: 단어 일치 검색. all(모두 포함), any(하나 이상 포함), none(제외), from/to(YYYY-MM), dept(부서명 일부), sort(relevance|date), limit(최대 20). 한국어는 같은 뜻도 표현이 여러 가지라서, 핵심어는 all에 두고 비슷한 말은 any로 넓게 묶어라. 예) "인구감소지역 혜택" → all ["인구감소지역"], any ["특례","우대","감면","지원","가점","인센티브","혜택"]. 결과가 너무 많으면 all을 늘려 좁히고, 0건이면 말을 바꿔 다시 찾아라.
+- search_releases: 단어 일치 검색. all(모두 포함), any(하나 이상 포함), none(제외), from/to(YYYY-MM 또는 YYYY-MM-DD), dept(부서명 일부), sort(relevance|date), limit(최대 20). 한국어는 같은 뜻도 표현이 여러 가지라서, 핵심어는 all에 두고 비슷한 말은 any로 넓게 묶어라. 예) "인구감소지역 혜택" → all ["인구감소지역"], any ["특례","우대","감면","지원","가점","인센티브","혜택"]. 결과가 너무 많으면 all을 늘려 좁히고, 0건이면 말을 바꿔 다시 찾아라.
 - read_release: id로 본문을 읽는다. 답의 근거는 반드시 실제로 읽은 본문에서 가져와라.
 - count_by_month: 조건에 맞는 보도자료 수를 월별로 센다. '언제부터', '얼마나 자주', '추이' 질문에 쓴다.
 
@@ -97,7 +99,7 @@ const AI = (() => {
 
   // ---- 도구 ----
   const strArr = (v) => (Array.isArray(v) ? v : v == null ? [] : [v]).map((x) => String(x).toLowerCase().trim()).filter(Boolean).slice(0, 12);
-  const ym = (v) => (typeof v === "string" && /^\d{4}-\d{2}$/.test(v.trim()) ? v.trim() : "");
+  const ym = (v) => (typeof v === "string" && /^\d{4}-\d{2}(-\d{2})?$/.test(v.trim()) ? v.trim() : "");
   const int = (v, dflt) => { const n = Math.floor(Number(v)); return Number.isFinite(n) ? n : dflt; };
   function describe(input) {
     const parts = [];
@@ -118,8 +120,8 @@ const AI = (() => {
     all: { type: "array", items: { type: "string" }, description: "모두 들어가야 하는 말" },
     any: { type: "array", items: { type: "string" }, description: "하나 이상 들어가야 하는 말(비슷한 말 묶음)" },
     none: { type: "array", items: { type: "string" }, description: "들어가면 안 되는 말" },
-    from: { type: "string", description: "시작 월 YYYY-MM" },
-    to: { type: "string", description: "끝 월 YYYY-MM" },
+    from: { type: "string", description: "시작 월 YYYY-MM 또는 시작일 YYYY-MM-DD" },
+    to: { type: "string", description: "끝 월 YYYY-MM 또는 끝 날 YYYY-MM-DD" },
     dept: { type: "string", description: "담당 부서 이름 일부 (예: 재난, 지방재정)" },
   };
   function makeTools(step, readMap) {
@@ -164,7 +166,7 @@ const AI = (() => {
           for (const d of DOCS) totals[d.month]++;
           for (const r of res) by[r.d.month]++;
           step(`월별 집계 ${describe(input)} → ${fmt(res.length)}건`);
-          return { total: res.length, by_month: by, month_totals: totals, note: `${PARTIAL}은 1~2일 이틀치` };
+          return { total: res.length, by_month: by, month_totals: totals, note: PARTIAL ? `${PARTIAL}은 ${PARTIAL_NOTE}만 있음` : "" };
         },
       },
     ];
@@ -174,7 +176,7 @@ const AI = (() => {
   async function withoutTools(sample, q, history, signal, step, readMap, onText) {
     step("검색어 정하는 중");
     const plan = await sample.json(
-      `행정안전부 보도자료(2025-06~2026-10)를 단어 일치로 검색해 다음 질문에 답하려 한다. 검색 계획을 JSON 하나로만 답하라.
+      `행정안전부 보도자료(${range()})를 단어 일치로 검색해 다음 질문에 답하려 한다. 검색 계획을 JSON 하나로만 답하라.
 형식: {"searches":[{"all":["핵심어"],"any":["비슷한 말", "..."]}]} (최대 3개, 비슷한 말은 any에 넓게)
 질문: ${q}`,
       { modelTier: "quick", signal },
@@ -300,5 +302,10 @@ const AI = (() => {
         return s;
       });
   }
-  return { init, ask, show() {}, resize() {} };
+  /** 기간 보기를 바꾸면, 이어지는 질문부터 새 범위로 찾는다는 걸 대화에 남긴다 */
+  function rescope() {
+    if (!turns.length) return;
+    $("ai-log").appendChild(el("p", "ai-mark", `여기부터는 ${Period.gov ? "이재명 정부 출범 이후" : "전체 기간"} 보도자료에서 찾습니다.`));
+  }
+  return { init, ask, rescope, show() {}, resize() {} };
 })();

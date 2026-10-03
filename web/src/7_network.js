@@ -279,5 +279,6 @@ const N = (() => {
     for (const id of ["n-from", "n-to", "n-dept", "n-n", "n-k", "n-common"]) $(id).addEventListener("change", render);
     $("n-reset").addEventListener("click", () => { if (svgSel && fitT) svgSel.transition().duration(300).call(zoom.transform, fitT); });
   }
-  return { init, show() { if (!started) start(); else if (needsRender) { needsRender = false; render(); } }, resize() { render(); }, center };
+  function rescope() { if (!D) return; fillCloudFilters("n", D); if (!$("panel-network").hidden) render(); else needsRender = true; }
+  return { init, show() { if (!started) start(); else if (needsRender) { needsRender = false; render(); } }, resize() { render(); }, center, rescope };
 })();

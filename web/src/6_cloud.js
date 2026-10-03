@@ -21,7 +21,7 @@ function wordDetail(prefix, D, term, sel, opts) {
       const on = (!from || m >= from) && (!to || m <= to);
       const hit = svgEl("rect", { x: band * i, y: 0, width: band, height: mt + ih, class: "hit", tabindex: 0, "aria-label": `${monthLabel(m)} ${counts[i]}건` }, svg);
       svgEl("path", { class: "mark", d: colPath(cx - bw / 2, y, bw, h, 4), style: `fill:var(${on ? "--bar" : "--bar-dim"})` }, svg);
-      bindHover(hit, () => fillTip(`${term} · ${monthLabel(m)}${m === PARTIAL ? " (이틀치)" : ""}`, [{ value: `${counts[i]}건` }]));
+      bindHover(hit, () => fillTip(`${term} · ${monthLabel(m)}${partialLabel(m)}`, [{ value: `${counts[i]}건` }]));
     });
     svgText(svg, 0, H - 4, tickLabel(D.months[0], true));
     svgText(svg, W, H - 4, tickLabel(D.months[D.months.length - 1], true), { "text-anchor": "end" });
@@ -39,13 +39,15 @@ function wordDetail(prefix, D, term, sel, opts) {
 }
 function fillCloudFilters(prefix, D) {
   fillMonthSelects(prefix + "-from", prefix + "-to", D.months);
-  const dsel = $(prefix + "-dept");
+  const dsel = $(prefix + "-dept"), prev = dsel.value;
+  dsel.length = 1;
   dsel.options[0].textContent = `전체 부서 (${D.deptCounts.length})`;
   for (const [i, n] of D.deptCounts) dsel.appendChild(new Option(`${D.depts[i] || "부서 미상"} (${n})`, String(i)));
+  if (prev && D.deptCounts.some(([i]) => String(i) === prev)) dsel.value = prev;
 }
 
 const C = (() => {
-  let D = null, words = [], sel = [], picked = null, drawSeq = 0, started = false, dirty = true;
+  let D = null, words = [], sel = [], picked = null, drawSeq = 0, started = false, dirty = true, stale = false;
   function compute() {
     const from = $("c-from").value, to = $("c-to").value, dept = $("c-dept").value;
     sel = D.docs.filter((d) => (!from || d.month >= from) && (!to || d.month <= to) && (dept === "" || d.dept === +dept));
@@ -155,7 +157,9 @@ const C = (() => {
   }
   return {
     init() {},
-    show() { if (!started) start(); else if (dirty) { draw(); if (picked) pick(picked); } },
+    show() { if (!started) start(); else if (stale) { stale = false; refresh(); } else if (dirty) { draw(); if (picked) pick(picked); } },
+    /** 기간 보기가 바뀌면 다시 센다. 숨어 있으면 보일 때 그린다 (숨은 캔버스는 크기를 못 잰다) */
+    rescope() { if (!D) return; fillCloudFilters("c", D); if (!$("panel-cloud").hidden) refresh(); else stale = true; },
     resize() { if (D) { draw(); if (picked) pick(picked); } },
     themeChanged() { dirty = true; },
   };

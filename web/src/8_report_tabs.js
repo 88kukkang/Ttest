@@ -4,6 +4,7 @@
 // =====================================================================
 const R = (() => {
   const RD = JSON.parse($("report-data").textContent);
+  const PARTIAL = "2026-10"; // 이 보고서를 만든 날 기준으로 이틀치뿐인 달
   const SHIFT = [{ k: "지방정부", v: "--s1" }, { k: "지자체", v: "--s2" }, { k: "지방자치단체", v: "--s3" }];
   const shiftData = SHIFT.map((s) => ({ ...s, pts: RD.term_shift[s.k].filter((p) => p.m !== PARTIAL) }));
   let built = false;
@@ -166,6 +167,28 @@ const Tabs = (() => {
   return { init, show };
 })();
 
+// ---- 보는 기간 단추 ----
+const PeriodUi = (() => {
+  function paint() {
+    $("period-all").setAttribute("aria-pressed", String(!Period.gov));
+    $("period-gov").setAttribute("aria-pressed", String(Period.gov));
+  }
+  function init() {
+    $("period-all").addEventListener("click", () => Period.set(false));
+    $("period-gov").addEventListener("click", () => Period.set(true));
+    Period.onChange(() => {
+      paint();
+      applyPeriodToDocs();
+      applyPeriodToCloud();
+      S.rescope(); C.rescope(); N.rescope(); AI.rescope();
+      if (DOCS.length) toast(`${Period.gov ? "이재명 정부 출범 이후" : "전체 기간"} 보도자료 ${fmt(DOCS.length)}건을 봅니다.`);
+    });
+    paint();
+  }
+  return { init };
+})();
+
+PeriodUi.init();
 AI.init(); Rules.init(); S.init(); C.init(); N.init(); R.init();
 Tabs.init();
 })();

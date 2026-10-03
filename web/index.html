@@ -67,6 +67,9 @@ button { font: inherit; }
 .head { display: grid; gap: 10px; }
 .stamp { width: fit-content; border: 2px solid var(--ink); padding: 1px 12px; font-family: var(--font-display); font-weight: 800; letter-spacing: 0.3em; font-size: var(--step-0); }
 .scope { color: var(--ink-2); font-size: var(--step--1); max-width: 74ch; }
+.period { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.period-label { font-size: var(--step--1); color: var(--ink-2); font-weight: 700; }
+.ai-mark { font-size: var(--step--1); color: var(--muted); text-align: center; border-top: 1px dashed var(--line); padding-top: 6px; }
 .prose { max-width: 66ch; color: var(--ink-2); }
 .note { font-size: var(--step--1); color: var(--muted); }
 .note.warn { color: var(--ink-2); background: var(--accent-soft); padding: 6px 10px; }
@@ -289,7 +292,15 @@ dialog#reader::backdrop { background: rgba(0, 0, 0, 0.45); }
   <header class="head">
     <span class="stamp">보도자료</span>
     <h1>행안부 보도자료 DB</h1>
-    <p class="scope">이재명 정부 출범(2025. 6. 4.)부터 <span class="js-last">2026. 10. 2.</span>까지 행정안전부 누리집에 올라온 보도자료 <span class="num js-total">1,786</span>건을 첨부 원문까지 모았습니다. 묻고, 찾고, 키워드로 훑어볼 수 있습니다.</p>
+    <p class="scope"><span class="js-first">2024. 1. 1.</span>부터 <span class="js-last">…</span>까지 행정안전부 누리집에 올라온 보도자료 <span class="num js-total">…</span>건을 첨부 원문까지 모았습니다. 묻고, 찾고, 키워드로 훑어볼 수 있습니다.</p>
+    <div class="period">
+      <span class="period-label" id="period-label">보는 기간</span>
+      <div class="modes" role="group" aria-labelledby="period-label">
+        <button type="button" id="period-all" aria-pressed="true">2024년부터 전체</button>
+        <button type="button" id="period-gov" aria-pressed="false">이재명 정부 출범 이후</button>
+      </div>
+      <span class="note">AI 질문·검색·클라우드·관계도에 함께 적용됩니다</span>
+    </div>
   </header>
 
   <nav class="tabs" role="tablist" aria-label="기능">
@@ -463,7 +474,7 @@ dialog#reader::backdrop { background: rgba(0, 0, 0, 0.45); }
 
   <!-- ===== 분석 보고서 ===== -->
   <section class="panel-tab rep" id="panel-report" role="tabpanel" aria-labelledby="tab-report" hidden>
-    <p class="note warn">이 보고서는 2026. 10. 3.에 보도자료 1,786건으로 분석한 내용입니다. AI 질문·검색·클라우드·관계도에는 매일 새 보도자료가 더해집니다.</p>
+    <p class="note warn">이 보고서는 이재명 정부 출범(2025. 6. 4.)부터 2026. 10. 2.까지의 보도자료 1,786건을 2026. 10. 3.에 분석한 것으로, 위의 ‘보는 기간’과 상관없이 이 범위로 고정돼 있습니다. AI 질문·검색·클라우드·관계도는 고른 기간과 매일 들어오는 새 보도자료를 따릅니다.</p>
     <ul class="points">
       <li><span>출범 뒤 16개월 동안 행정안전부는 보도자료를 <b>1,786건</b> 냈다. 2025년 6월~2026년 9월 기준 한 달 평균 <b>약 111건</b>, 가장 많은 달은 2025년 9월(143건)이다.</span></li>
       <li><span>표기가 바뀌었다. ‘지방정부’가 나온 보도자료 비율이 2025년 9월 <b>1%</b>에서 10월 15%, 12월 <b>51%</b>로 뛰었고, 같은 기간 ‘지자체’·‘지방자치단체’는 줄었다.</span></li>
@@ -538,7 +549,6 @@ dialog#reader::backdrop { background: rgba(0, 0, 0, 0.45); }
 // 공용 도구
 // =====================================================================
 const ARTICLE = "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=";
-const PARTIAL = "2026-10";
 const NS = "http://www.w3.org/2000/svg";
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => Number(n).toLocaleString("ko-KR");
@@ -629,9 +639,10 @@ function bindHover(node, content) {
 // ---- 월 선택 상자 채우기 ----
 function fillMonthSelects(fromId, toId, months) {
   for (const id of [fromId, toId]) {
-    const s = $(id);
+    const s = $(id), prev = s.value;
     s.replaceChildren(new Option(id === fromId ? "처음부터" : "끝까지", ""));
     for (const m of months) s.appendChild(new Option(monthLabel(m), m));
+    if (prev && months.includes(prev)) s.value = prev; // 기간 보기를 바꿔도 남아 있는 달이면 그대로
   }
 }
 
@@ -646,28 +657,58 @@ async function fetchB64Json(name) {
   for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
   return JSON.parse(await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"))).text());
 }
-let DOCS = [], DOC_BY_ID = new Map(), MONTHS = [], DEPT_COUNTS = [];
-const docsReady = fetchB64Json("docs.b64.txt").then((raw) => {
-  DOCS = raw.docs.map(([id, date, dept, title, body]) => ({ id, date, month: date.slice(0, 7), dept, title, body, lt: title.toLowerCase(), lb: body.toLowerCase() }));
-  DOC_BY_ID = new Map(DOCS.map((d) => [d.id, d]));
+// ---- 보는 기간: 전체(수집 시작일부터) / 이재명 정부 출범 이후. 모든 탭과 AI 검색에 함께 걸린다 ----
+const GOV_START = "2025-06-04";
+const Period = (() => {
+  let gov = store.get("moisdb.period") === "gov";
+  const subs = [];
+  return {
+    get gov() { return gov; },
+    inScope: (date) => !gov || date >= GOV_START,
+    set(v) { if (v === gov) return; gov = v; store.set("moisdb.period", v ? "gov" : "all"); for (const f of subs) f(); },
+    onChange(f) { subs.push(f); },
+  };
+})();
+
+// 보도자료: ALL_DOCS 는 전부, DOCS·MONTHS·DEPT_COUNTS 는 지금 기간 안. DOC_BY_ID 는 기간과 상관없이 읽기 창이 쓴다
+let ALL_DOCS = [], DOCS = [], DOC_BY_ID = new Map(), MONTHS = [], DEPT_COUNTS = [];
+let PARTIAL = "", PARTIAL_NOTE = ""; // 아직 끝나지 않은 마지막 달과 그 표시 ("2일까지")
+const partialLabel = (m) => (m === PARTIAL ? ` (${PARTIAL_NOTE})` : "");
+function applyPeriodToDocs() {
+  DOCS = ALL_DOCS.filter((d) => Period.inScope(d.date));
   MONTHS = [...new Set(DOCS.map((d) => d.month))].sort();
   const cnt = new Map();
   for (const d of DOCS) cnt.set(d.dept, (cnt.get(d.dept) || 0) + 1);
   DEPT_COUNTS = [...cnt].sort((a, b) => b[1] - a[1]);
+  if (!DOCS.length) return;
+  const first = DOCS.reduce((a, d) => (d.date < a ? d.date : a), "9999"), last = DOCS.reduce((a, d) => (d.date > a ? d.date : a), "");
   document.querySelectorAll(".js-total").forEach((n) => (n.textContent = fmt(DOCS.length)));
-  const lastDate = DOCS.reduce((a, d) => (d.date > a ? d.date : a), "");
-  document.querySelectorAll(".js-last").forEach((n) => (n.textContent = dateLabel(lastDate)));
+  document.querySelectorAll(".js-first").forEach((n) => (n.textContent = dateLabel(first)));
+  document.querySelectorAll(".js-last").forEach((n) => (n.textContent = dateLabel(last)));
+}
+const docsReady = fetchB64Json("docs.b64.txt").then((raw) => {
+  ALL_DOCS = raw.docs.map(([id, date, dept, title, body]) => ({ id, date, month: date.slice(0, 7), dept, title, body, lt: title.toLowerCase(), lb: body.toLowerCase() }));
+  DOC_BY_ID = new Map(ALL_DOCS.map((d) => [d.id, d]));
+  const last = ALL_DOCS.reduce((a, d) => (d.date > a ? d.date : a), "");
+  const [y, m, dd] = last.split("-").map(Number);
+  if (dd < new Date(y, m, 0).getDate()) { PARTIAL = last.slice(0, 7); PARTIAL_NOTE = `${dd}일까지`; }
+  applyPeriodToDocs();
 });
 let cloudPromise = null, CLOUD = null;
+function applyPeriodToCloud() {
+  if (!CLOUD) return;
+  const docs = CLOUD.allDocs.filter((d) => Period.inScope(d.date));
+  const totalDf = new Uint32Array(CLOUD.terms.length);
+  for (const d of docs) for (const t of d.terms) totalDf[t]++;
+  const cnt = new Map();
+  for (const d of docs) cnt.set(d.dept, (cnt.get(d.dept) || 0) + 1);
+  Object.assign(CLOUD, { docs, totalDf, months: [...new Set(docs.map((d) => d.month))].sort(), deptCounts: [...cnt].sort((a, b) => b[1] - a[1]) });
+}
 function cloudReady() {
   return (cloudPromise ||= fetchB64Json("cloud.b64.txt").then((raw) => {
-    const docs = raw.docs.map(([id, date, dept, title, terms]) => ({ id, date, month: date.slice(0, 7), dept, title, terms, termSet: new Set(terms) }));
-    const totalDf = new Uint32Array(raw.terms.length);
-    for (const d of docs) for (const t of d.terms) totalDf[t]++;
-    const months = [...new Set(docs.map((d) => d.month))].sort();
-    const cnt = new Map();
-    for (const d of docs) cnt.set(d.dept, (cnt.get(d.dept) || 0) + 1);
-    CLOUD = { terms: raw.terms, depts: raw.depts, docs, totalDf, months, termIndex: new Map(raw.terms.map((t, i) => [t, i])), deptCounts: [...cnt].sort((a, b) => b[1] - a[1]) };
+    const allDocs = raw.docs.map(([id, date, dept, title, terms]) => ({ id, date, month: date.slice(0, 7), dept, title, terms, termSet: new Set(terms) }));
+    CLOUD = { terms: raw.terms, depts: raw.depts, allDocs, termIndex: new Map(raw.terms.map((t, i) => [t, i])) };
+    applyPeriodToCloud();
     return CLOUD;
   }));
 }
@@ -693,8 +734,8 @@ function parseQuery(q) {
 function findDocs({ all = [], any = [], none = [], from = "", to = "", dept = "", deptLike = "", scope = "all" }) {
   const out = [];
   for (const d of DOCS) {
-    if (from && d.month < from) continue;
-    if (to && d.month > to) continue;
+    if (from && (from.length > 7 ? d.date < from : d.month < from)) continue;
+    if (to && (to.length > 7 ? d.date > to : d.month > to)) continue;
     if (dept && d.dept !== dept) continue;
     if (deptLike && !d.dept.includes(deptLike)) continue;
     let ok = true, score = 0, hits = 0;
@@ -767,13 +808,15 @@ const AI = (() => {
     "‘지방정부’라는 표현은 언제부터 쓰기 시작했어?",
     "주민자치와 관련해 바뀐 제도가 있어?",
   ];
+  const range = () => `${DOCS.reduce((a, d) => (d.date < a ? d.date : a), "9999")} ~ ${DOCS.reduce((a, d) => (d.date > a ? d.date : a), "")}`;
   const rules = () => `너는 행정안전부 보도자료 데이터베이스를 검색해 질문에 답하는 도우미다.
 
 [데이터]
-행정안전부 누리집 보도자료 게시판에 ${DOCS.reduce((a, d) => (d.date < a ? d.date : a), "9999")} ~ ${DOCS.reduce((a, d) => (d.date > a ? d.date : a), "")}에 등록된 보도자료 ${fmt(DOCS.length)}건. 본문은 첨부 원문(HWPX·PDF)에서 뽑은 텍스트다. 이 기간 밖의 일, 다른 부처 자료, 인터넷 정보는 이 데이터에 없다.
+행정안전부 누리집 보도자료 게시판에 ${range()}에 등록된 보도자료 ${fmt(DOCS.length)}건. 본문은 첨부 원문(HWPX·PDF)에서 뽑은 텍스트다. 이 기간 밖의 일, 다른 부처 자료, 인터넷 정보는 이 데이터에 없다.
+${Period.gov ? "사용자가 '이재명 정부 출범(2025. 6. 4.) 이후'만 보도록 골라 두었다. 도구도 이 기간 안에서만 찾는다." : "이재명 정부 출범일은 2025-06-04다. 그 전은 이전 정부 시기다. '이재명 정부 들어', '새 정부 이후' 같은 질문은 from을 2025-06-04로 좁혀 찾고, 정부별로 비교해 달라는 질문은 출범일 앞뒤로 나눠 찾아라."}
 
 [도구]
-- search_releases: 단어 일치 검색. all(모두 포함), any(하나 이상 포함), none(제외), from/to(YYYY-MM), dept(부서명 일부), sort(relevance|date), limit(최대 20). 한국어는 같은 뜻도 표현이 여러 가지라서, 핵심어는 all에 두고 비슷한 말은 any로 넓게 묶어라. 예) "인구감소지역 혜택" → all ["인구감소지역"], any ["특례","우대","감면","지원","가점","인센티브","혜택"]. 결과가 너무 많으면 all을 늘려 좁히고, 0건이면 말을 바꿔 다시 찾아라.
+- search_releases: 단어 일치 검색. all(모두 포함), any(하나 이상 포함), none(제외), from/to(YYYY-MM 또는 YYYY-MM-DD), dept(부서명 일부), sort(relevance|date), limit(최대 20). 한국어는 같은 뜻도 표현이 여러 가지라서, 핵심어는 all에 두고 비슷한 말은 any로 넓게 묶어라. 예) "인구감소지역 혜택" → all ["인구감소지역"], any ["특례","우대","감면","지원","가점","인센티브","혜택"]. 결과가 너무 많으면 all을 늘려 좁히고, 0건이면 말을 바꿔 다시 찾아라.
 - read_release: id로 본문을 읽는다. 답의 근거는 반드시 실제로 읽은 본문에서 가져와라.
 - count_by_month: 조건에 맞는 보도자료 수를 월별로 센다. '언제부터', '얼마나 자주', '추이' 질문에 쓴다.
 
@@ -854,7 +897,7 @@ const AI = (() => {
 
   // ---- 도구 ----
   const strArr = (v) => (Array.isArray(v) ? v : v == null ? [] : [v]).map((x) => String(x).toLowerCase().trim()).filter(Boolean).slice(0, 12);
-  const ym = (v) => (typeof v === "string" && /^\d{4}-\d{2}$/.test(v.trim()) ? v.trim() : "");
+  const ym = (v) => (typeof v === "string" && /^\d{4}-\d{2}(-\d{2})?$/.test(v.trim()) ? v.trim() : "");
   const int = (v, dflt) => { const n = Math.floor(Number(v)); return Number.isFinite(n) ? n : dflt; };
   function describe(input) {
     const parts = [];
@@ -875,8 +918,8 @@ const AI = (() => {
     all: { type: "array", items: { type: "string" }, description: "모두 들어가야 하는 말" },
     any: { type: "array", items: { type: "string" }, description: "하나 이상 들어가야 하는 말(비슷한 말 묶음)" },
     none: { type: "array", items: { type: "string" }, description: "들어가면 안 되는 말" },
-    from: { type: "string", description: "시작 월 YYYY-MM" },
-    to: { type: "string", description: "끝 월 YYYY-MM" },
+    from: { type: "string", description: "시작 월 YYYY-MM 또는 시작일 YYYY-MM-DD" },
+    to: { type: "string", description: "끝 월 YYYY-MM 또는 끝 날 YYYY-MM-DD" },
     dept: { type: "string", description: "담당 부서 이름 일부 (예: 재난, 지방재정)" },
   };
   function makeTools(step, readMap) {
@@ -921,7 +964,7 @@ const AI = (() => {
           for (const d of DOCS) totals[d.month]++;
           for (const r of res) by[r.d.month]++;
           step(`월별 집계 ${describe(input)} → ${fmt(res.length)}건`);
-          return { total: res.length, by_month: by, month_totals: totals, note: `${PARTIAL}은 1~2일 이틀치` };
+          return { total: res.length, by_month: by, month_totals: totals, note: PARTIAL ? `${PARTIAL}은 ${PARTIAL_NOTE}만 있음` : "" };
         },
       },
     ];
@@ -931,7 +974,7 @@ const AI = (() => {
   async function withoutTools(sample, q, history, signal, step, readMap, onText) {
     step("검색어 정하는 중");
     const plan = await sample.json(
-      `행정안전부 보도자료(2025-06~2026-10)를 단어 일치로 검색해 다음 질문에 답하려 한다. 검색 계획을 JSON 하나로만 답하라.
+      `행정안전부 보도자료(${range()})를 단어 일치로 검색해 다음 질문에 답하려 한다. 검색 계획을 JSON 하나로만 답하라.
 형식: {"searches":[{"all":["핵심어"],"any":["비슷한 말", "..."]}]} (최대 3개, 비슷한 말은 any에 넓게)
 질문: ${q}`,
       { modelTier: "quick", signal },
@@ -1057,7 +1100,12 @@ const AI = (() => {
         return s;
       });
   }
-  return { init, ask, show() {}, resize() {} };
+  /** 기간 보기를 바꾸면, 이어지는 질문부터 새 범위로 찾는다는 걸 대화에 남긴다 */
+  function rescope() {
+    if (!turns.length) return;
+    $("ai-log").appendChild(el("p", "ai-mark", `여기부터는 ${Period.gov ? "이재명 정부 출범 이후" : "전체 기간"} 보도자료에서 찾습니다.`));
+  }
+  return { init, ask, rescope, show() {}, resize() {} };
 })();
 // =====================================================================
 // AI 규칙: 이 페이지를 쓰는 사람들이 함께 고치는 규칙 (db 능력).
@@ -1410,7 +1458,7 @@ const S = (() => {
       const cx = m.l + band * i + band / 2, h = (vals[i] / yMax) * ih, y = m.t + ih - h;
       const hit = svgEl("rect", { x: m.l + band * i, y: 0, width: band, height: m.t + ih, class: "hit click", tabindex: 0, role: "button", "aria-label": `${monthLabel(mm)} ${vals[i]}건, 이 달만 보기` }, svg);
       svgEl("path", { d: colPath(cx - bw / 2, y, bw, h, 4), class: "mark", style: `fill:var(${inRange(mm) ? "--bar" : "--bar-dim"})` }, svg);
-      bindHover(hit, () => fillTip(monthLabel(mm) + (mm === PARTIAL ? " (이틀치)" : ""), [{ value: `${fmt(vals[i])}건`, label: `/ 그 달 ${fmt(totals.get(mm))}건` }]));
+      bindHover(hit, () => fillTip(monthLabel(mm) + partialLabel(mm), [{ value: `${fmt(vals[i])}건`, label: `/ 그 달 ${fmt(totals.get(mm))}건` }]));
       const pick = () => { monthOnly = monthOnly === mm ? null : mm; hideTip(); run(); };
       hit.addEventListener("click", pick);
       hit.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
@@ -1466,6 +1514,16 @@ const S = (() => {
     art.append(actions, full);
     return art;
   }
+  /** 기간·부서 선택 상자를 지금 기간의 자료로 채운다 (고른 부서는 남아 있으면 유지) */
+  function fill() {
+    fillMonthSelects("s-from", "s-to", MONTHS);
+    const dsel = $("s-dept"), prev = dsel.value;
+    dsel.length = 1;
+    dsel.options[0].textContent = `전체 부서 (${DEPT_COUNTS.length})`;
+    for (const [name, n] of DEPT_COUNTS) dsel.appendChild(new Option(`${name || "부서 미상"} (${n})`, name));
+    if (prev && DEPT_COUNTS.some(([name]) => name === prev)) dsel.value = prev;
+  }
+  function rescope() { if (!ready) return; fill(); monthOnly = null; run(); }
   function init() {
     const exBox = $("s-examples");
     for (const ex of EXAMPLES) {
@@ -1482,9 +1540,7 @@ const S = (() => {
         .then(() => toast(`${fmt(last.list.length)}건을 복사했습니다. 엑셀에 붙여넣으면 됩니다.`), () => toast("이 화면에서는 복사가 막혀 있습니다."));
     });
     docsReady.then(() => {
-      fillMonthSelects("s-from", "s-to", MONTHS);
-      $("s-dept").options[0].textContent = `전체 부서 (${DEPT_COUNTS.length})`;
-      for (const [name, n] of DEPT_COUNTS) $("s-dept").appendChild(new Option(`${name || "부서 미상"} (${n})`, name));
+      fill();
       const saved = store.get("moisdb.q");
       if (!$("s-q").value) $("s-q").value = saved != null ? saved : "지방정부";
       ready = true;
@@ -1493,7 +1549,7 @@ const S = (() => {
   }
   /** 다른 탭에서 '이 단어로 검색' */
   function query(q) { $("s-q").value = q; monthOnly = null; ["s-from", "s-to", "s-dept"].forEach((id) => ($(id).value = "")); run(); }
-  return { init, show() { hist(); }, resize() { hist(); }, query };
+  return { init, show() { hist(); }, resize() { hist(); }, query, rescope };
 })();
 
 // =====================================================================
@@ -1518,7 +1574,7 @@ function wordDetail(prefix, D, term, sel, opts) {
       const on = (!from || m >= from) && (!to || m <= to);
       const hit = svgEl("rect", { x: band * i, y: 0, width: band, height: mt + ih, class: "hit", tabindex: 0, "aria-label": `${monthLabel(m)} ${counts[i]}건` }, svg);
       svgEl("path", { class: "mark", d: colPath(cx - bw / 2, y, bw, h, 4), style: `fill:var(${on ? "--bar" : "--bar-dim"})` }, svg);
-      bindHover(hit, () => fillTip(`${term} · ${monthLabel(m)}${m === PARTIAL ? " (이틀치)" : ""}`, [{ value: `${counts[i]}건` }]));
+      bindHover(hit, () => fillTip(`${term} · ${monthLabel(m)}${partialLabel(m)}`, [{ value: `${counts[i]}건` }]));
     });
     svgText(svg, 0, H - 4, tickLabel(D.months[0], true));
     svgText(svg, W, H - 4, tickLabel(D.months[D.months.length - 1], true), { "text-anchor": "end" });
@@ -1536,13 +1592,15 @@ function wordDetail(prefix, D, term, sel, opts) {
 }
 function fillCloudFilters(prefix, D) {
   fillMonthSelects(prefix + "-from", prefix + "-to", D.months);
-  const dsel = $(prefix + "-dept");
+  const dsel = $(prefix + "-dept"), prev = dsel.value;
+  dsel.length = 1;
   dsel.options[0].textContent = `전체 부서 (${D.deptCounts.length})`;
   for (const [i, n] of D.deptCounts) dsel.appendChild(new Option(`${D.depts[i] || "부서 미상"} (${n})`, String(i)));
+  if (prev && D.deptCounts.some(([i]) => String(i) === prev)) dsel.value = prev;
 }
 
 const C = (() => {
-  let D = null, words = [], sel = [], picked = null, drawSeq = 0, started = false, dirty = true;
+  let D = null, words = [], sel = [], picked = null, drawSeq = 0, started = false, dirty = true, stale = false;
   function compute() {
     const from = $("c-from").value, to = $("c-to").value, dept = $("c-dept").value;
     sel = D.docs.filter((d) => (!from || d.month >= from) && (!to || d.month <= to) && (dept === "" || d.dept === +dept));
@@ -1652,7 +1710,9 @@ const C = (() => {
   }
   return {
     init() {},
-    show() { if (!started) start(); else if (dirty) { draw(); if (picked) pick(picked); } },
+    show() { if (!started) start(); else if (stale) { stale = false; refresh(); } else if (dirty) { draw(); if (picked) pick(picked); } },
+    /** 기간 보기가 바뀌면 다시 센다. 숨어 있으면 보일 때 그린다 (숨은 캔버스는 크기를 못 잰다) */
+    rescope() { if (!D) return; fillCloudFilters("c", D); if (!$("panel-cloud").hidden) refresh(); else stale = true; },
     resize() { if (D) { draw(); if (picked) pick(picked); } },
     themeChanged() { dirty = true; },
   };
@@ -1938,7 +1998,8 @@ const N = (() => {
     for (const id of ["n-from", "n-to", "n-dept", "n-n", "n-k", "n-common"]) $(id).addEventListener("change", render);
     $("n-reset").addEventListener("click", () => { if (svgSel && fitT) svgSel.transition().duration(300).call(zoom.transform, fitT); });
   }
-  return { init, show() { if (!started) start(); else if (needsRender) { needsRender = false; render(); } }, resize() { render(); }, center };
+  function rescope() { if (!D) return; fillCloudFilters("n", D); if (!$("panel-network").hidden) render(); else needsRender = true; }
+  return { init, show() { if (!started) start(); else if (needsRender) { needsRender = false; render(); } }, resize() { render(); }, center, rescope };
 })();
 
 // =====================================================================
@@ -1946,6 +2007,7 @@ const N = (() => {
 // =====================================================================
 const R = (() => {
   const RD = JSON.parse($("report-data").textContent);
+  const PARTIAL = "2026-10"; // 이 보고서를 만든 날 기준으로 이틀치뿐인 달
   const SHIFT = [{ k: "지방정부", v: "--s1" }, { k: "지자체", v: "--s2" }, { k: "지방자치단체", v: "--s3" }];
   const shiftData = SHIFT.map((s) => ({ ...s, pts: RD.term_shift[s.k].filter((p) => p.m !== PARTIAL) }));
   let built = false;
@@ -2108,6 +2170,28 @@ const Tabs = (() => {
   return { init, show };
 })();
 
+// ---- 보는 기간 단추 ----
+const PeriodUi = (() => {
+  function paint() {
+    $("period-all").setAttribute("aria-pressed", String(!Period.gov));
+    $("period-gov").setAttribute("aria-pressed", String(Period.gov));
+  }
+  function init() {
+    $("period-all").addEventListener("click", () => Period.set(false));
+    $("period-gov").addEventListener("click", () => Period.set(true));
+    Period.onChange(() => {
+      paint();
+      applyPeriodToDocs();
+      applyPeriodToCloud();
+      S.rescope(); C.rescope(); N.rescope(); AI.rescope();
+      if (DOCS.length) toast(`${Period.gov ? "이재명 정부 출범 이후" : "전체 기간"} 보도자료 ${fmt(DOCS.length)}건을 봅니다.`);
+    });
+    paint();
+  }
+  return { init };
+})();
+
+PeriodUi.init();
 AI.init(); Rules.init(); S.init(); C.init(); N.init(); R.init();
 Tabs.init();
 })();

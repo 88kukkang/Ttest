@@ -4,7 +4,6 @@
 // 공용 도구
 // =====================================================================
 const ARTICLE = "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=";
-const PARTIAL = "2026-10";
 const NS = "http://www.w3.org/2000/svg";
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => Number(n).toLocaleString("ko-KR");
@@ -95,9 +94,10 @@ function bindHover(node, content) {
 // ---- 월 선택 상자 채우기 ----
 function fillMonthSelects(fromId, toId, months) {
   for (const id of [fromId, toId]) {
-    const s = $(id);
+    const s = $(id), prev = s.value;
     s.replaceChildren(new Option(id === fromId ? "처음부터" : "끝까지", ""));
     for (const m of months) s.appendChild(new Option(monthLabel(m), m));
+    if (prev && months.includes(prev)) s.value = prev; // 기간 보기를 바꿔도 남아 있는 달이면 그대로
   }
 }
 
@@ -112,28 +112,58 @@ async function fetchB64Json(name) {
   for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
   return JSON.parse(await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"))).text());
 }
-let DOCS = [], DOC_BY_ID = new Map(), MONTHS = [], DEPT_COUNTS = [];
-const docsReady = fetchB64Json("docs.b64.txt").then((raw) => {
-  DOCS = raw.docs.map(([id, date, dept, title, body]) => ({ id, date, month: date.slice(0, 7), dept, title, body, lt: title.toLowerCase(), lb: body.toLowerCase() }));
-  DOC_BY_ID = new Map(DOCS.map((d) => [d.id, d]));
+// ---- 보는 기간: 전체(수집 시작일부터) / 이재명 정부 출범 이후. 모든 탭과 AI 검색에 함께 걸린다 ----
+const GOV_START = "2025-06-04";
+const Period = (() => {
+  let gov = store.get("moisdb.period") === "gov";
+  const subs = [];
+  return {
+    get gov() { return gov; },
+    inScope: (date) => !gov || date >= GOV_START,
+    set(v) { if (v === gov) return; gov = v; store.set("moisdb.period", v ? "gov" : "all"); for (const f of subs) f(); },
+    onChange(f) { subs.push(f); },
+  };
+})();
+
+// 보도자료: ALL_DOCS 는 전부, DOCS·MONTHS·DEPT_COUNTS 는 지금 기간 안. DOC_BY_ID 는 기간과 상관없이 읽기 창이 쓴다
+let ALL_DOCS = [], DOCS = [], DOC_BY_ID = new Map(), MONTHS = [], DEPT_COUNTS = [];
+let PARTIAL = "", PARTIAL_NOTE = ""; // 아직 끝나지 않은 마지막 달과 그 표시 ("2일까지")
+const partialLabel = (m) => (m === PARTIAL ? ` (${PARTIAL_NOTE})` : "");
+function applyPeriodToDocs() {
+  DOCS = ALL_DOCS.filter((d) => Period.inScope(d.date));
   MONTHS = [...new Set(DOCS.map((d) => d.month))].sort();
   const cnt = new Map();
   for (const d of DOCS) cnt.set(d.dept, (cnt.get(d.dept) || 0) + 1);
   DEPT_COUNTS = [...cnt].sort((a, b) => b[1] - a[1]);
+  if (!DOCS.length) return;
+  const first = DOCS.reduce((a, d) => (d.date < a ? d.date : a), "9999"), last = DOCS.reduce((a, d) => (d.date > a ? d.date : a), "");
   document.querySelectorAll(".js-total").forEach((n) => (n.textContent = fmt(DOCS.length)));
-  const lastDate = DOCS.reduce((a, d) => (d.date > a ? d.date : a), "");
-  document.querySelectorAll(".js-last").forEach((n) => (n.textContent = dateLabel(lastDate)));
+  document.querySelectorAll(".js-first").forEach((n) => (n.textContent = dateLabel(first)));
+  document.querySelectorAll(".js-last").forEach((n) => (n.textContent = dateLabel(last)));
+}
+const docsReady = fetchB64Json("docs.b64.txt").then((raw) => {
+  ALL_DOCS = raw.docs.map(([id, date, dept, title, body]) => ({ id, date, month: date.slice(0, 7), dept, title, body, lt: title.toLowerCase(), lb: body.toLowerCase() }));
+  DOC_BY_ID = new Map(ALL_DOCS.map((d) => [d.id, d]));
+  const last = ALL_DOCS.reduce((a, d) => (d.date > a ? d.date : a), "");
+  const [y, m, dd] = last.split("-").map(Number);
+  if (dd < new Date(y, m, 0).getDate()) { PARTIAL = last.slice(0, 7); PARTIAL_NOTE = `${dd}일까지`; }
+  applyPeriodToDocs();
 });
 let cloudPromise = null, CLOUD = null;
+function applyPeriodToCloud() {
+  if (!CLOUD) return;
+  const docs = CLOUD.allDocs.filter((d) => Period.inScope(d.date));
+  const totalDf = new Uint32Array(CLOUD.terms.length);
+  for (const d of docs) for (const t of d.terms) totalDf[t]++;
+  const cnt = new Map();
+  for (const d of docs) cnt.set(d.dept, (cnt.get(d.dept) || 0) + 1);
+  Object.assign(CLOUD, { docs, totalDf, months: [...new Set(docs.map((d) => d.month))].sort(), deptCounts: [...cnt].sort((a, b) => b[1] - a[1]) });
+}
 function cloudReady() {
   return (cloudPromise ||= fetchB64Json("cloud.b64.txt").then((raw) => {
-    const docs = raw.docs.map(([id, date, dept, title, terms]) => ({ id, date, month: date.slice(0, 7), dept, title, terms, termSet: new Set(terms) }));
-    const totalDf = new Uint32Array(raw.terms.length);
-    for (const d of docs) for (const t of d.terms) totalDf[t]++;
-    const months = [...new Set(docs.map((d) => d.month))].sort();
-    const cnt = new Map();
-    for (const d of docs) cnt.set(d.dept, (cnt.get(d.dept) || 0) + 1);
-    CLOUD = { terms: raw.terms, depts: raw.depts, docs, totalDf, months, termIndex: new Map(raw.terms.map((t, i) => [t, i])), deptCounts: [...cnt].sort((a, b) => b[1] - a[1]) };
+    const allDocs = raw.docs.map(([id, date, dept, title, terms]) => ({ id, date, month: date.slice(0, 7), dept, title, terms, termSet: new Set(terms) }));
+    CLOUD = { terms: raw.terms, depts: raw.depts, allDocs, termIndex: new Map(raw.terms.map((t, i) => [t, i])) };
+    applyPeriodToCloud();
     return CLOUD;
   }));
 }
@@ -159,8 +189,8 @@ function parseQuery(q) {
 function findDocs({ all = [], any = [], none = [], from = "", to = "", dept = "", deptLike = "", scope = "all" }) {
   const out = [];
   for (const d of DOCS) {
-    if (from && d.month < from) continue;
-    if (to && d.month > to) continue;
+    if (from && (from.length > 7 ? d.date < from : d.month < from)) continue;
+    if (to && (to.length > 7 ? d.date > to : d.month > to)) continue;
     if (dept && d.dept !== dept) continue;
     if (deptLike && !d.dept.includes(deptLike)) continue;
     let ok = true, score = 0, hits = 0;
