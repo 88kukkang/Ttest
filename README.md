@@ -115,13 +115,14 @@ tests/                    합성 HTML·HWPX·PDF 로 전 과정을 오프라인 
 
 ## 매일 자동 갱신
 
-매일 09:45(한국 시간)에 예약된 Claude 세션이 `ci/routine_update.sh` 를 실행한다.
+매일 09:50(한국 시간)에 예약된 Claude 세션이 `ci/routine_update.sh` 를 실행한다.
 
 1. `ci/task.env` 의 RUN 값을 올려 push → GitHub Actions 가 `TASK=update` 로 새 보도자료만 수집
    (막힌 러너면 최대 3번까지 새 러너로 재시도)
 2. Actions 가 DB·CSV·웹 페이지와 데이터를 묶어 릴리스 **data-latest** 에 덮어씀
    → 최신 CSV/DB 는 저장소 Releases 의 `moisdb-latest.tar.gz` 에서 받는다 (`dataset/` 폴더는 2026-10-03 스냅숏)
-3. 새 글이 있으면 아티팩트 페이지를 다시 올리고 `web/published.json` 에 기록
+3. 새 글이 있으면 `python3 ci/check_web_data.py build/latest/web` 로 데이터(건수·기간·최근 제목·이상 문자열)를 점검한 뒤
+   저장소의 `web/index.html` 과 새 데이터 파일로 아티팩트 페이지를 다시 올리고 `web/published.json` 에 기록
 
 ## 주의
 
