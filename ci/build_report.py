@@ -14,30 +14,44 @@ import sys
 from pathlib import Path
 
 from moisdb import db
-from moisdb.analysis.keywords import distinctive_by_period, distinctive_terms, load_corpus, period_of, top_terms
+from moisdb.analysis.keywords import Doc, distinctive_by_period, distinctive_terms, load_corpus, period_of, top_terms
 from moisdb.config import GOV_START
 
 OUT = Path("reports/report_data.json")
 SHIFT = ["지방정부", "지방자치단체", "지자체"]  # 표기 변화: 보도자료에 한 번이라도 나온 비율
-TOPICS = [  # (이름, 이 가운데 하나라도 나오면 그 주제로 센다)
-    ("민생회복 소비쿠폰", ["소비쿠폰"]),
-    ("국가정보자원관리원", ["국가정보자원관리원", "국정자원"]),
+TOPICS = [  # (이름, 이 가운데 하나라도 나오면 그 주제로 센다). 2024-01~2026-10 의 월별 특징어를 보고 고름
+    ("디지털플랫폼정부", ["디지털플랫폼정부"]),
     ("인공지능·AI", ["인공지능", "AI"]),
+    ("지역사랑상품권", ["지역사랑상품권"]),
+    ("민생회복 소비쿠폰", ["소비쿠폰"]),
+    ("유가·피해지원금", ["유가", "피해지원금"]),
+    ("의료 공백·비상진료", ["비상진료", "비상진료체계", "전공의"]),
+    ("제주항공 여객기 사고", ["제주항공", "여객기"]),
+    ("국가정보자원관리원", ["국가정보자원관리원", "국정자원"]),
+    ("산불", ["산불"]),
     ("호우", ["호우"]),
     ("폭염", ["폭염"]),
     ("한파·대설", ["한파", "대설"]),
-    ("산불", ["산불"]),
     ("선거", ["지방선거", "국회의원선거", "총선", "대통령선거", "대선"]),
     ("통합특별시", ["통합특별시", "전남광주통합특별시"]),
-    ("유가·피해지원금", ["유가", "피해지원금"]),
     ("주민자치", ["주민자치", "주민자치회"]),
-    ("중대범죄수사청", ["중대범죄수사청", "중수청"]),
 ]
+# 보고서 단어 비교에서 뺄 말. 사람 이름은 누가 그 자리에 있었는지를 보여줄 뿐 정책 변화가 아니고,
+# 2024년 보도자료 서식의 머리말(개요·주요내용 등)은 내용이 아니라 서식이 바뀐 흔적이다.
+# 이름은 '이름 + 직함' 꼴로 자주 나오는 말을 뽑아 사람이 확인했다 (형태소 분석기가 자른 조각 포함: 이한·김광·병권·박형)
+PEOPLE = {
+    "이상민", "고기동", "이한경", "이한", "한순기", "김광용", "김광", "김민재", "윤호중", "최병관", "이용석",
+    "오병권", "병권", "황규철", "진명기", "이병철", "임상규", "여중협", "안채명", "임철언", "박형배", "박형",
+    "최상목", "한덕수", "이주호",
+    "이재명", "윤석열", "문재인", "박근혜", "이명박", "노무현", "김대중", "김영삼", "노태우", "전두환", "박정희",
+}
+FORMAT_WORDS = {"개요", "주요내용", "추진배경", "배경", "향후계획", "참석대상"}
+EXCLUDE = PEOPLE | FORMAT_WORDS
 
 
 def build(path: str) -> dict:
     conn = db.connect(path)
-    docs = load_corpus(conn)
+    docs = [Doc(d.id, d.date, d.department, d.title, [t for t in d.tokens if t not in EXCLUDE]) for d in load_corpus(conn)]
     gov = GOV_START.isoformat()
     months = sorted({period_of(d.date) for d in docs})
     by_m = collections.defaultdict(list)
