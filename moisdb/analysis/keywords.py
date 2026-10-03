@@ -122,10 +122,9 @@ def log_odds(target: Counter, reference: Counter, prior_total: float = 500.0) ->
 def distinctive_terms(target_docs: list[Doc], ref_docs: list[Doc], n: int = 20, min_df: int = 2) -> list[dict]:
     t_df, r_df = doc_freq(target_docs), doc_freq(ref_docs)
     scores = log_odds(t_df, r_df)
-    ranked = sorted(
+    ranked = sorted(  # 점수가 같으면 문서 수가 많은 말, 그다음 가나다순 (실행마다 순서가 같게)
         ((term, z, d) for term, (z, d) in scores.items() if t_df.get(term, 0) >= min_df),
-        key=lambda x: x[1],
-        reverse=True,
+        key=lambda x: (-x[1], -t_df[x[0]], x[0]),
     )
     return [{"term": term, "z": round(z, 2), "df": t_df[term], "ref_df": r_df.get(term, 0)}
             for term, z, _ in ranked[:n]]

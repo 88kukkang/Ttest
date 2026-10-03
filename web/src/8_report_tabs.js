@@ -1,10 +1,19 @@
 
 // =====================================================================
-// 분석 보고서 탭 (2026-10-03 기준 고정 분석, 페이지 안 JSON)
+// 분석 보고서 탭 (ci/build_report.py 로 만든 고정 분석, 페이지 안 JSON)
 // =====================================================================
 const R = (() => {
   const RD = JSON.parse($("report-data").textContent);
-  const PARTIAL = "2026-10"; // 이 보고서를 만든 날 기준으로 이틀치뿐인 달
+  // 보고서 마지막 날이 달 중간이면 그 달은 덜 찬 달
+  const [ly, lm, ld] = RD.last.split("-").map(Number);
+  const PARTIAL = ld < new Date(ly, lm, 0).getDate() ? RD.last.slice(0, 7) : "", PNOTE = `${ld}일까지`;
+  const plabel = (m) => (m === PARTIAL ? ` (${PNOTE})` : "");
+  const GOV_M = (RD.gov_start || "").slice(0, 7); // 출범한 달: 시간 차트에 세로 점선
+  /** 막대 차트: 출범한 달 막대의 왼쪽 경계에 점선과 '출범' 표시 */
+  function govMarker(svg, x, y1, y2, label = true) {
+    svgEl("line", { x1: x, x2: x, y1, y2, class: "gov-mark" }, svg);
+    if (label) svgText(svg, x + 4, y1 + 10, "이재명 정부 출범", { class: "gov-label" });
+  }
   const SHIFT = [{ k: "지방정부", v: "--s1" }, { k: "지자체", v: "--s2" }, { k: "지방자치단체", v: "--s3" }];
   const shiftData = SHIFT.map((s) => ({ ...s, pts: RD.term_shift[s.k].filter((p) => p.m !== PARTIAL) }));
   let built = false;
@@ -23,9 +32,10 @@ const R = (() => {
     const maxI = data.reduce((a, d, i) => (d.n > data[a].n ? i : a), 0);
     data.forEach((d, i) => {
       const cx = m.l + band * i + band / 2, hh = (d.n / yMax) * ih, y = m.t + ih - hh, partial = d.m === PARTIAL;
+      if (d.m === GOV_M && i > 0) govMarker(svg, m.l + band * i, m.t - 14, m.t + ih);
       const hit = svgEl("rect", { x: m.l + band * i, y: m.t, width: band, height: ih, class: "hit", tabindex: 0, "aria-label": `${monthLabel(d.m)} ${d.n}건` }, svg);
       svgEl("path", { d: colPath(cx - bw / 2, y, bw, hh, 4), class: "mark", style: `fill:var(${partial ? "--bar-partial" : "--bar"})` }, svg);
-      bindHover(hit, () => fillTip(monthLabel(d.m) + (partial ? " (이틀치)" : ""), [{ value: fmt(d.n) + "건" }]));
+      bindHover(hit, () => fillTip(monthLabel(d.m) + plabel(d.m), [{ value: fmt(d.n) + "건" }]));
       if (i % step === 0) svgText(svg, cx, H - 8, tickLabel(d.m, i === 0), { "text-anchor": "middle" });
       if (i === maxI) svgText(svg, cx, y - 6, String(d.n), { "text-anchor": "middle", class: "val num" });
     });
@@ -35,7 +45,8 @@ const R = (() => {
     const box = $("r-shift");
     const W = Math.max(280, box.clientWidth), H = 260, m = { l: 38, r: 76, t: 14, b: 26 };
     const iw = W - m.l - m.r, ih = H - m.t - m.b;
-    const months = shiftData[0].pts.map((p) => p.m), n = months.length, yMax = 0.6;
+    const months = shiftData[0].pts.map((p) => p.m), n = months.length;
+    const yMax = Math.max(0.2, Math.ceil(Math.max(...shiftData.flatMap((s) => s.pts.map((p) => p.s))) / 0.2 - 1e-9) * 0.2);
     const X = (i) => m.l + (i / (n - 1)) * iw, Y = (s) => m.t + ih - (s / yMax) * ih;
     const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": "지방정부·지자체·지방자치단체 표기 비율" });
     for (let v = 0; v <= yMax + 1e-9; v += 0.2) {
@@ -44,6 +55,8 @@ const R = (() => {
     }
     const step = iw / (n - 1) < 32 ? 2 : 1;
     months.forEach((mm, i) => { if (i % step === 0) svgText(svg, X(i), H - 8, tickLabel(mm, i === 0), { "text-anchor": "middle" }); });
+    const gi = months.indexOf(GOV_M);
+    if (gi > 0) govMarker(svg, (X(gi - 1) + X(gi)) / 2, m.t, m.t + ih);
     const cross = svgEl("line", { y1: m.t, y2: m.t + ih, class: "base", visibility: "hidden" }, svg);
     for (const s of shiftData) svgEl("polyline", { points: s.pts.map((p, i) => `${X(i)},${Y(p.s)}`).join(" "), fill: "none", "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round", style: `stroke:var(${s.v})` }, svg);
     for (const s of shiftData) svgEl("circle", { cx: X(n - 1), cy: Y(s.pts[n - 1].s), r: 4, "stroke-width": 2, style: `fill:var(${s.v});stroke:var(--paper)` }, svg);
@@ -81,6 +94,7 @@ const R = (() => {
       svgEl("line", { x1: 0, x2: W, y1: mt + ih, y2: mt + ih, class: "base" }, svg);
       pts.forEach((p, i) => {
         const cx = band * i + band / 2, hh = (p.s / max) * ih, y = mt + ih - hh;
+        if (p.m === GOV_M && i > 0) govMarker(svg, band * i, mt - 4, mt + ih, false);
         const hit = svgEl("rect", { x: band * i, y: 0, width: band, height: H - mb, class: "hit", tabindex: 0, "aria-label": `${monthLabel(p.m)} ${p.k}건, ${pct(p.s)}` }, svg);
         svgEl("path", { d: colPath(cx - bw / 2, y, bw, hh, 4), class: "mark", style: "fill:var(--bar)" }, svg);
         bindHover(hit, () => fillTip(`${t.name} · ${monthLabel(p.m)}`, [{ value: pct(p.s), label: `${p.k}건 / ${p.n}건` }]));
@@ -102,18 +116,19 @@ const R = (() => {
   }
   function build() {
     built = true;
-    $("r-volume-table").appendChild(table(["월", "보도자료"], RD.monthly_counts.map((d) => [monthLabel(d.m) + (d.m === PARTIAL ? " (이틀치)" : ""), fmt(d.n)])));
+    $("r-volume-table").appendChild(table(["월", "보도자료"], RD.monthly_counts.map((d) => [monthLabel(d.m) + plabel(d.m), fmt(d.n)])));
     for (const { m, n } of RD.monthly_counts) {
       const row = el("div", "ledger-row"), left = el("div", "ledger-month"), chips = el("div", "chips");
-      left.append(el("b", null, monthLabel(m)), el("span", "num", `${fmt(n)}건${m === PARTIAL ? " · 이틀치" : ""}`));
+      left.append(el("b", null, monthLabel(m)), el("span", "num", `${fmt(n)}건${m === PARTIAL ? ` · ${PNOTE}` : ""}`));
+      if (m === GOV_M) row.classList.add("gov-row");
       (RD.distinctive[m] || []).slice(0, 6).forEach((t, i) => { const c = el("span", "chip" + (i === 0 ? " first" : ""), t.t); c.title = `${t.df}건에 등장`; chips.appendChild(c); });
       row.append(left, chips); $("r-ledger").appendChild(row);
     }
     for (const s of SHIFT) { const item = el("span"), k = el("span", "key"); k.style.borderTopColor = `var(${s.v})`; item.append(k, document.createTextNode(s.k)); $("r-shift-legend").appendChild(item); }
     $("r-shift-table").appendChild(table(["월", ...SHIFT.map((s) => s.k)], shiftData[0].pts.map((p, i) => [monthLabel(p.m), ...shiftData.map((s) => `${pct(s.pts[i].s)} (${s.pts[i].k}건)`)])));
-    $("r-n-early").textContent = fmt(RD.early_n); $("r-n-recent").textContent = fmt(RD.recent_n);
-    $("r-rising").appendChild(table(["단어", "초기", "최근"], RD.rising.slice(0, 12).map((r) => [r.term, fmt(r.ref_df), fmt(r.df)])));
-    $("r-falling").appendChild(table(["단어", "초기", "최근"], RD.falling.slice(0, 12).map((r) => [r.term, fmt(r.df), fmt(r.ref_df)])));
+    $("r-n-early").textContent = fmt(RD.pre_n); $("r-n-recent").textContent = fmt(RD.post_n);
+    $("r-rising").appendChild(table(["단어", "출범 전", "출범 후"], RD.rising.slice(0, 12).map((r) => [r.term, fmt(r.ref_df), fmt(r.df)])));
+    $("r-falling").appendChild(table(["단어", "출범 전", "출범 후"], RD.falling.slice(0, 12).map((r) => [r.term, fmt(r.df), fmt(r.ref_df)])));
     barList("r-terms", RD.top.map((r) => ({ k: r.term, v: r.df })));
     barList("r-depts", RD.departments.map((r) => ({ k: r.d, v: r.n })));
   }
