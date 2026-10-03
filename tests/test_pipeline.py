@@ -6,7 +6,7 @@ import pytest
 
 from moisdb import db
 from moisdb.cli import main
-from moisdb.config import Settings
+from moisdb.config import GOV_START, Settings
 from moisdb.corpus import build_doc_text, extract_attachments
 from moisdb.sources import mois_board
 
@@ -21,21 +21,21 @@ def env(tmp_path):
 
 def test_discover_stops_at_start_date(env, fake_http):
     settings, conn = env
-    assert mois_board.discover(conn, fake_http, settings) == 3
+    assert mois_board.discover(conn, fake_http, settings, start=GOV_START) == 3
     pages = [p["pageIndex"] for _, p in fake_http.calls]
     assert pages == [1, 2]  # 2쪽이 모두 출범일 이전이라 3쪽은 요청하지 않음
     ids = {r["source_id"] for r in conn.execute("SELECT source_id FROM releases")}
     assert ids == {"120105", "120101", "120090"}  # 고정 공지(2024)와 출범 전 글은 제외
     # 다시 돌려도 중복 없이, until_known 이면 첫 쪽에서 멈춘다
     fake_http.calls.clear()
-    assert mois_board.discover(conn, fake_http, settings, until_known=True) == 0
+    assert mois_board.discover(conn, fake_http, settings, start=GOV_START, until_known=True) == 0
     assert len(fake_http.calls) == 1
 
 
 def test_full_pipeline(env, fake_http):
     pytest.importorskip("kiwipiepy")
     settings, conn = env
-    mois_board.discover(conn, fake_http, settings)
+    mois_board.discover(conn, fake_http, settings, start=GOV_START)
     ok, fail = mois_board.fetch_details(conn, fake_http, settings, limit=1)
     assert (ok, fail) == (1, 0)
 
@@ -72,7 +72,7 @@ def test_full_pipeline(env, fake_http):
 
 def test_cli_search_and_stats(env, fake_http, capsys):
     settings, conn = env
-    mois_board.discover(conn, fake_http, settings)
+    mois_board.discover(conn, fake_http, settings, start=GOV_START)
     mois_board.fetch_details(conn, fake_http, settings, limit=1)
     extract_attachments(conn)
     build_doc_text(conn)
@@ -88,7 +88,7 @@ def test_cli_search_and_stats(env, fake_http, capsys):
 
 def test_fallback_to_other_format_when_extraction_fails(env, fake_http):
     settings, conn = env
-    mois_board.discover(conn, fake_http, settings)
+    mois_board.discover(conn, fake_http, settings, start=GOV_START)
     mois_board.fetch_details(conn, fake_http, settings, limit=1)
     # 받은 HWPX 가 깨져 있다고 가정 → 추출 실패 → 같은 이름의 PDF 를 대신 받는다
     hwpx = conn.execute("SELECT local_path FROM attachments WHERE seq = 1").fetchone()[0]
@@ -120,7 +120,7 @@ class _DownHttp:
 
 def test_fetch_stops_when_site_unreachable_and_keeps_status(env, fake_http):
     settings, conn = env
-    mois_board.discover(conn, fake_http, settings)
+    mois_board.discover(conn, fake_http, settings, start=GOV_START)
     down = _DownHttp(fake_http)
     ok, fail = mois_board.fetch_details(conn, down, settings, max_consecutive_failures=2)
     assert (ok, fail, down.article_calls) == (0, 2, 2)  # 3건 중 2번 연속 실패 후 중단

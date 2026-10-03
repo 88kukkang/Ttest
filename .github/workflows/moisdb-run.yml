@@ -2,6 +2,7 @@ name: moisdb-run
 
 # ci/task.env 를 바꿔 push 하면 실행된다.
 #   update  : 매일 갱신 (예약 실행이 RUN 값을 올려 push). 결과는 릴리스 data-latest 에 덮어쓴다.
+#   backfill: 수집 시작일을 앞당긴 뒤 한 번 (옛 글 채우기). 결과는 update 와 같이 릴리스에 올린다.
 #   collect : 처음 전체 수집 / recon, probe : 점검
 on:
   push:

@@ -7,8 +7,10 @@ from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
-# 이재명 정부 출범일. 이 날짜(포함) 이후 등록된 보도자료만 수집한다.
-START_DATE = date(2025, 6, 4)
+# 수집 시작일. 이 날짜(포함) 이후 등록된 보도자료만 수집한다.
+START_DATE = date(2024, 1, 1)
+# 이재명 정부 출범일. 웹 페이지의 '출범 이후' 보기와 분석 보고서의 기준.
+GOV_START = date(2025, 6, 4)
 
 MOIS_BASE = "https://www.mois.go.kr"
 LIST_PATH = "/frt/bbs/type010/commonSelectBoardList.do"
