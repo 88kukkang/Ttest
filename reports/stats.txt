@@ -1,0 +1,47 @@
+DB: data/mois.sqlite3
+
+[보도자료 상태]
+source  status   n     first       last      
+------  -------  ----  ----------  ----------
+mois    fetched  1786  2025-06-04  2026-10-02
+
+[첨부 상태·형식]
+status     file_type  n   
+---------  ---------  ----
+deferred   -          1769
+extracted  hwpx       1705
+extracted  pdf        105 
+extracted  hwp        84  
+skipped    -          2   
+
+[분석 텍스트 출처]
+text_source       n    avg_chars
+----------------  ---  ---------
+attachments       819  4066     
+body              1    210      
+body+attachments  966  2288     
+
+[월별 건수 (행안부 누리집)]
+month    n  
+-------  ---
+2025-06  63 
+2025-07  119
+2025-08  93 
+2025-09  143
+2025-10  103
+2025-11  95 
+2025-12  129
+2026-01  83 
+2026-02  95 
+2026-03  125
+2026-04  114
+2026-05  106
+2026-06  137
+2026-07  130
+2026-08  115
+2026-09  125
+2026-10  11 
+내보내기 완료. 상세 미수집(listed/error) 0건
+  dataset/attachments.csv  0.9 MB
+  dataset/mois_press.csv  12.1 MB
+  dataset/mois_press.sqlite3.xz  3.4 MB
