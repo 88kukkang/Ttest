@@ -1,6 +1,8 @@
 name: moisdb-run
 
-# ci/task.env 를 바꿔 push 하면 실행된다. 결과(dataset/, reports/, samples/)는 같은 브랜치에 커밋된다.
+# ci/task.env 를 바꿔 push 하면 실행된다.
+#   update  : 매일 갱신 (예약 실행이 RUN 값을 올려 push). 결과는 릴리스 data-latest 에 덮어쓴다.
+#   collect : 처음 전체 수집 / recon, probe : 점검
 on:
   push:
     branches: [claude/moi-press-release-database-ncgqwa]
@@ -24,33 +26,42 @@ jobs:
           python-version: "3.11"
       - name: Install
         run: pip install -e ".[analysis]"
+      - name: Read task
+        run: grep '^TASK=' ci/task.env >> "$GITHUB_ENV"
+      # 실행 사이에는 DB 만 이어 쓴다 (원본 HTML·첨부는 추출이 끝나면 필요 없음)
       - name: Restore collected data
         uses: actions/cache/restore@v4
         with:
-          path: data
-          key: moisdb-data-${{ github.run_id }}
-          restore-keys: moisdb-data-
+          path: |
+            data/mois.sqlite3
+            data/.discover_done
+          key: moisdb-db-${{ github.run_id }}
+          restore-keys: moisdb-db-
       - name: Run task
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: bash ci/run.sh
       - name: Save collected data
         if: always() && hashFiles('data/mois.sqlite3') != ''
         uses: actions/cache/save@v4
         with:
-          path: data
-          key: moisdb-data-${{ github.run_id }}
-      - name: Upload full data (원본 HTML·첨부 포함)
-        if: always() && hashFiles('data/mois.sqlite3') != ''
+          path: |
+            data/mois.sqlite3
+            data/.discover_done
+          key: moisdb-db-${{ github.run_id }}
+      - name: Upload full data (원본 HTML·첨부 포함, 전체 수집 때만)
+        if: always() && env.TASK == 'collect' && hashFiles('data/mois.sqlite3') != ''
         uses: actions/upload-artifact@v4
         with:
           name: moisdb-data-full
           path: data
           retention-days: 30
-      - name: Commit results
-        if: always()
+      - name: Commit recon samples
+        if: always() && env.TASK == 'recon'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          for d in samples dataset reports; do if [ -e "$d" ]; then git add -f "$d"; fi; done
+          if [ -e samples ]; then git add -f samples; fi
           if git diff --cached --quiet; then echo "커밋할 결과 없음"; exit 0; fi
-          git commit -m "moisdb-run: $(grep '^TASK=' ci/task.env) 결과"
+          git commit -m "moisdb-run: recon 결과"
           for i in 1 2 3 4; do git pull --rebase origin "$GITHUB_REF_NAME" && git push && break; sleep $((2**i)); done

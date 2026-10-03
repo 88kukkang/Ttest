@@ -1,0 +1,214 @@
+<main class="sheet">
+  <header class="head">
+    <span class="stamp">보도자료</span>
+    <h1>행안부 보도자료 DB</h1>
+    <p class="scope">이재명 정부 출범(2025. 6. 4.)부터 <span class="js-last">2026. 10. 2.</span>까지 행정안전부 누리집에 올라온 보도자료 <span class="num js-total">1,786</span>건을 첨부 원문까지 모았습니다. 묻고, 찾고, 키워드로 훑어볼 수 있습니다.</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="기능">
+    <button role="tab" id="tab-ai" aria-controls="panel-ai" aria-selected="true">AI에게 묻기</button>
+    <button role="tab" id="tab-search" aria-controls="panel-search" aria-selected="false">검색</button>
+    <button role="tab" id="tab-cloud" aria-controls="panel-cloud" aria-selected="false">키워드 클라우드</button>
+    <button role="tab" id="tab-network" aria-controls="panel-network" aria-selected="false">관계도</button>
+    <button role="tab" id="tab-report" aria-controls="panel-report" aria-selected="false">분석 보고서</button>
+  </nav>
+
+  <!-- ===== AI에게 묻기 ===== -->
+  <section class="panel-tab" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai">
+    <p class="prose">보도자료에 관해 평소 말로 물어보세요. Claude가 보도자료를 직접 검색하고 본문을 읽은 뒤, 근거 보도자료 링크를 달아 답합니다. 한 질문에 30초~1분 반쯤 걸립니다.</p>
+    <div class="ai-off" id="ai-off" hidden></div>
+    <form class="qrow" id="ai-form">
+      <textarea id="ai-q" rows="2" placeholder="예: 인구감소지역에 별도 혜택을 주는 것과 관련된 보도자료는?" aria-label="질문"></textarea>
+      <button class="btn" type="submit" id="ai-send">묻기</button>
+    </form>
+    <div class="chips-row" id="ai-examples"><span>예시</span></div>
+    <div class="ai-bar">
+      <span class="note">Claude 사용량은 각자 계정에서 빠집니다. 처음 물을 때 허용 여부를 묻는 창이 뜹니다.</span>
+      <span>
+        <button class="btn-ghost" type="button" id="ai-stop" hidden>멈추기</button>
+        <button class="btn-ghost" type="button" id="ai-new" hidden>새 대화</button>
+      </span>
+    </div>
+    <div class="ai-log" id="ai-log" aria-live="polite"></div>
+  </section>
+
+  <!-- ===== 검색 ===== -->
+  <section class="panel-tab" id="panel-search" role="tabpanel" aria-labelledby="tab-search" hidden>
+    <form class="qrow" id="s-form" role="search">
+      <input id="s-q" type="search" autocomplete="off" placeholder="검색어 (예: 지방정부, 소비쿠폰, “국가정보자원관리원 화재”)" aria-label="검색어">
+      <button class="btn" type="submit">검색</button>
+    </form>
+    <p class="help">띄어 쓴 단어는 모두 들어간 글만 찾습니다. <code>"큰따옴표"</code>는 구절 그대로, <code>-단어</code>는 그 단어가 든 글을 뺍니다.</p>
+    <div class="chips-row" id="s-examples"><span>예시</span></div>
+    <div class="filters">
+      <label class="field" for="s-from">시작<select id="s-from"></select></label>
+      <label class="field" for="s-to">끝<select id="s-to"></select></label>
+      <label class="field dept" for="s-dept">부서<select id="s-dept"><option value="">전체 부서</option></select></label>
+      <label class="field" for="s-scope">검색 범위<select id="s-scope"><option value="all">제목 + 본문</option><option value="title">제목만</option></select></label>
+      <label class="field" for="s-sort">정렬<select id="s-sort"><option value="date">최신순</option><option value="score">많이 나온 순</option></select></label>
+    </div>
+    <div class="summary" aria-live="polite">
+      <div><strong class="num" id="s-count">…</strong> <span class="sub" id="s-count-sub">보도자료를 불러오는 중입니다 (약 4MB).</span></div>
+      <button class="btn-ghost" id="s-copy" type="button" disabled>결과 목록 복사</button>
+    </div>
+    <div>
+      <span class="note" id="s-hist-label">월별 건수 · 막대를 누르면 그 달만 봅니다</span>
+      <div class="chart" id="s-hist"></div>
+    </div>
+    <div class="results" id="s-results"><p class="empty">불러오는 중…</p></div>
+  </section>
+
+  <!-- ===== 키워드 클라우드 ===== -->
+  <section class="panel-tab" id="panel-cloud" role="tabpanel" aria-labelledby="tab-cloud" hidden>
+    <p class="prose">글자가 클수록 그 단어가 나온 보도자료가 많습니다. 단어를 누르면 언제, 어떤 보도자료에 나왔는지 보여줍니다.</p>
+    <div class="filters">
+      <label class="field" for="c-from">시작<select id="c-from"></select></label>
+      <label class="field" for="c-to">끝<select id="c-to"></select></label>
+      <label class="field dept" for="c-dept">부서<select id="c-dept"><option value="">전체 부서</option></select></label>
+      <label class="field" for="c-basis">기준<select id="c-basis"><option value="df">많이 나온 말</option><option value="z">이 범위에서 두드러진 말</option></select></label>
+      <label class="field" for="c-palette">색<select id="c-palette"><option value="multi">여러 색</option><option value="mono">한 색 (클수록 진하게)</option></select></label>
+    </div>
+    <p class="note warn" id="c-note" hidden></p>
+    <div class="board">
+      <div class="board-band">
+        <div><h3>키워드 클라우드</h3><span class="meta num" id="c-meta">불러오는 중…</span></div>
+        <div class="board-tools">
+          <select id="c-topn" aria-label="단어 수"><option value="50">50</option><option value="100" selected>100</option><option value="200">200</option></select>
+          <button class="btn-ghost" id="c-copy" type="button">이미지 복사</button>
+        </div>
+      </div>
+      <div class="stage cloud-stage" id="c-stage">
+        <span class="drawing" id="c-drawing" hidden>그리는 중…</span>
+        <canvas id="c-canvas" role="img" aria-label="키워드 클라우드"></canvas>
+      </div>
+    </div>
+    <div class="detail" aria-live="polite">
+      <div class="sel-head">
+        <span class="label">고른 단어</span>
+        <strong id="c-term">—</strong>
+        <span class="figs num" id="c-figs"></span>
+        <div class="sel-actions" id="c-actions"></div>
+        <div class="chart" id="c-chart"></div>
+        <span class="note">월별로 이 단어가 나온 보도자료 수 (부서 조건 반영, 고른 기간은 진하게)</span>
+      </div>
+      <div><p class="docs-title" id="c-docs-title"></p><ul class="docs" id="c-docs"></ul></div>
+    </div>
+    <details><summary>표로 보기 (클라우드에 그린 단어 전체)</summary><div class="table-wrap tall" id="c-table"></div></details>
+    <p class="caption">색은 단어를 구분하기 위한 것이고 따로 뜻은 없습니다. ‘두드러진 말’은 고른 범위를 나머지 보도자료와 견준 로그오즈비(z값)로 크기를 정합니다.</p>
+  </section>
+
+  <!-- ===== 관계도 ===== -->
+  <section class="panel-tab" id="panel-network" role="tabpanel" aria-labelledby="tab-network" hidden>
+    <p class="prose">같은 보도자료에 함께 자주 나온 단어끼리 이었습니다. 선이 굵을수록 함께 나오는 정도가 강하고, 같은 색은 서로 촘촘히 엮인 단어 묶음입니다. 원 크기는 그 단어가 나온 보도자료 수입니다.</p>
+    <div class="modes" role="group" aria-label="보기 방식">
+      <button type="button" id="n-mode-net" aria-pressed="true">전체 관계망</button>
+      <button type="button" id="n-mode-ego" aria-pressed="false">중심어 연관어</button>
+    </div>
+    <form class="centerbox" id="n-centerbox" hidden>
+      <label for="n-center" class="note">중심어</label>
+      <input id="n-center" type="text" autocomplete="off" value="인공지능" list="n-terms">
+      <datalist id="n-terms"></datalist>
+      <button class="btn" type="submit">보기</button>
+      <span class="note">예시</span>
+    </form>
+    <div class="filters">
+      <label class="field" for="n-from">시작<select id="n-from"></select></label>
+      <label class="field" for="n-to">끝<select id="n-to"></select></label>
+      <label class="field dept" for="n-dept">부서<select id="n-dept"><option value="">전체 부서</option></select></label>
+      <label class="field" for="n-n">단어 수<select id="n-n"><option value="30">30</option><option value="50" selected>50</option><option value="80">80</option></select></label>
+      <label class="field" for="n-k">단어마다 잇는 선<select id="n-k"><option value="2">2개</option><option value="3" selected>3개</option><option value="5">5개</option></select></label>
+      <label class="check" for="n-common"><input type="checkbox" id="n-common" checked>보도자료 절반 이상에 나오는 말(정부·국민·지원 등) 빼기</label>
+    </div>
+    <p class="note warn" id="n-msg" hidden></p>
+    <div class="board">
+      <div class="board-band">
+        <div><h3 id="n-title">전체 관계망</h3><span class="meta num" id="n-meta">불러오는 중…</span></div>
+        <button class="btn-ghost" id="n-reset" type="button">처음 배치로</button>
+      </div>
+      <div class="stage net-stage" id="n-stage"></div>
+      <div class="legend" id="n-legend"></div>
+    </div>
+    <p class="note">끌어서 단어를 옮기고, 휠·두 손가락으로 확대할 수 있습니다. 단어나 선을 누르면 아래에 함께 나온 보도자료가 나옵니다.</p>
+    <div class="detail" aria-live="polite">
+      <div class="sel-head">
+        <span class="label" id="n-sel-label">고른 단어</span>
+        <strong id="n-sel-name">—</strong>
+        <span class="figs num" id="n-sel-figs"></span>
+        <div class="sel-actions" id="n-sel-actions"></div>
+        <div class="bars" id="n-sel-bars"></div>
+      </div>
+      <div><p class="docs-title" id="n-docs-title"></p><ul class="docs" id="n-docs"></ul></div>
+    </div>
+    <details><summary>표로 보기 (그린 연결 전체)</summary><div class="table-wrap tall" id="n-table"></div></details>
+    <p class="caption">연결 강도는 코사인 계수(함께 나온 보도자료 수 ÷ √두 단어 보도자료 수의 곱)이고, 단어마다 가장 강한 연결 몇 개만 남겼습니다(3건 이상 함께 나온 경우). 묶음은 루뱅 알고리즘 1단계로 나눴습니다. 중심어 연관어는 ‘함께 나온 수 × log(1 + 향상도)’ 순입니다.</p>
+  </section>
+
+  <!-- ===== 분석 보고서 ===== -->
+  <section class="panel-tab rep" id="panel-report" role="tabpanel" aria-labelledby="tab-report" hidden>
+    <p class="note warn">이 보고서는 2026. 10. 3.에 보도자료 1,786건으로 분석한 내용입니다. AI 질문·검색·클라우드·관계도에는 매일 새 보도자료가 더해집니다.</p>
+    <ul class="points">
+      <li><span>출범 뒤 16개월 동안 행정안전부는 보도자료를 <b>1,786건</b> 냈다. 2025년 6월~2026년 9월 기준 한 달 평균 <b>약 111건</b>, 가장 많은 달은 2025년 9월(143건)이다.</span></li>
+      <li><span>표기가 바뀌었다. ‘지방정부’가 나온 보도자료 비율이 2025년 9월 <b>1%</b>에서 10월 15%, 12월 <b>51%</b>로 뛰었고, 같은 기간 ‘지자체’·‘지방자치단체’는 줄었다.</span></li>
+      <li><span>달마다 두드러진 이슈가 뚜렷하다.</span></li>
+      <li class="sub"><span>2025년 7월 민생회복 소비쿠폰, 8월 호우·긴급재난문자, 10월 국가정보자원관리원 화재 뒤 시스템 복구</span></li>
+      <li class="sub"><span>2026년 1월 한파, 3월 BTS 광화문 공연 안전관리, 4월 고유가 피해지원금, 5월 지방선거, 6월 이후 전남광주통합특별시</span></li>
+      <li><span>인공지능·AI는 특정 달에 몰리지 않고 내내 나온다. 전체 보도자료의 <b>22%</b>(400건)에 등장한다.</span></li>
+    </ul>
+    <section>
+      <div class="section-head"><span class="kicker">월별 보도자료 수</span><p class="h2">한 달에 100건 안팎</p></div>
+      <div class="chart" id="r-volume"></div>
+      <p class="caption">2026년 10월은 1~2일 이틀치(11건)라 옅게 표시했다. 2025년 6월은 4일부터 센 값이다.</p>
+      <details><summary>표로 보기</summary><div class="table-wrap" id="r-volume-table"></div></details>
+    </section>
+    <section>
+      <div class="section-head"><span class="kicker">달마다 두드러진 키워드</span><p class="h2">그 달에 유독 많이 나온 말</p></div>
+      <p class="prose">각 달의 보도자료를 나머지 기간 전체와 견줘, 그 달에 치우쳐 나온 단어를 6개씩 골랐다(로그오즈비, 3건 이상). 맨 앞이 가장 두드러진 말이다. 실장·직무대행 같은 인명이 끼는 달도 있다.</p>
+      <div class="ledger" id="r-ledger"></div>
+    </section>
+    <section>
+      <div class="section-head"><span class="kicker">표기 변화</span><p class="h2">‘지자체’에서 ‘지방정부’로</p></div>
+      <div class="legend" id="r-shift-legend"></div>
+      <div class="chart" id="r-shift"></div>
+      <p class="caption">그 달 보도자료 가운데 해당 표기가 한 번이라도 나온 비율. 이틀치뿐인 2026년 10월은 뺐다.</p>
+      <details><summary>표로 보기</summary><div class="table-wrap" id="r-shift-table"></div></details>
+    </section>
+    <section>
+      <div class="section-head"><span class="kicker">주제별 흐름</span><p class="h2">주요 이슈가 언제 몰렸나</p></div>
+      <p class="prose">주제어가 나온 보도자료의 월별 비율. 막대 높이는 주제마다 따로 맞췄으니 주제끼리는 최고치 숫자로 비교하면 된다. 오른쪽 위 숫자는 기간 전체에서 그 주제가 나온 보도자료 수다.</p>
+      <div class="multiples" id="r-topics"></div>
+    </section>
+    <section>
+      <div class="section-head"><span class="kicker">초기와 최근 비교</span><p class="h2">늘어난 말, 줄어든 말</p></div>
+      <p class="prose">출범 초기(2025년 6~12월, <span class="num" id="r-n-early">745</span>건)와 최근(2026년 4월~10월 2일, <span class="num" id="r-n-recent">738</span>건)을 견줬다. 두 기간의 보도자료 수가 비슷해 건수를 그대로 비교해도 된다.</p>
+      <div class="two-col">
+        <div class="table-wrap"><h3>최근에 늘어난 말</h3><div id="r-rising"></div></div>
+        <div class="table-wrap"><h3>초기에 많았던 말</h3><div id="r-falling"></div></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-head"><span class="kicker">기간 전체</span><p class="h2">가장 많이 쓴 말, 가장 많이 낸 부서</p></div>
+      <div class="two-col">
+        <div><h3>상위 키워드 30</h3><div class="bars" id="r-terms"></div></div>
+        <div><h3>보도자료를 많이 낸 부서 15</h3><div class="bars" id="r-depts"></div></div>
+      </div>
+    </section>
+  </section>
+
+  <footer class="foot">
+    <p>수집: 행정안전부 누리집 보도자료 게시판(등록일 기준). 본문은 첨부 원문(HWPX·HWP·PDF)에서 뽑아 보도시점·연락처 줄을 지운 텍스트. 단어는 형태소 분석기 Kiwi로 뽑은 명사이며 ‘추진’·‘개최’ 같은 행정 용어와 기관명은 뺐습니다.</p>
+    <p>데이터와 코드: <a href="https://github.com/88kukkang/Ttest/tree/claude/moi-press-release-database-ncgqwa">github.com/88kukkang/Ttest</a></p>
+  </footer>
+</main>
+<dialog id="reader" aria-labelledby="reader-title">
+  <div class="reader-head">
+    <span class="reader-meta num" id="reader-meta"></span>
+    <h3 id="reader-title"></h3>
+    <div class="reader-actions">
+      <a id="reader-orig" target="_blank" rel="noopener">행안부 누리집 원문 열기 ↗</a>
+      <button class="btn-ghost" type="button" id="reader-close">닫기</button>
+    </div>
+  </div>
+  <div class="reader-body" id="reader-body"></div>
+</dialog>
+<div id="tip" hidden></div>
+<div id="toast" hidden></div>

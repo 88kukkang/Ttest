@@ -247,12 +247,21 @@ table.data td { font-variant-numeric: tabular-nums; }
 #tip .t-row { display: flex; align-items: center; gap: 6px; }
 #toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--tip-bg); color: var(--tip-ink); padding: 8px 14px; border-radius: 6px; font-size: var(--step--1); z-index: 21; max-width: calc(100% - 32px); }
 @media (prefers-reduced-motion: no-preference) { .bar-fill { transition: width 0.4s ease; } }
+
+/* 본문 읽기 창 */
+dialog#reader { width: min(780px, calc(100% - 32px)); max-height: 86vh; padding: 0; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); }
+dialog#reader::backdrop { background: rgba(0, 0, 0, 0.45); }
+.reader-head { display: grid; gap: 6px; padding: 16px 20px 12px; border-bottom: 1px solid var(--line); }
+.reader-meta { font-size: var(--step--1); color: var(--muted); }
+.reader-head h3 { font-family: var(--font-display); font-weight: 800; font-size: var(--step-2); line-height: 1.35; text-wrap: balance; }
+.reader-actions { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; font-size: var(--step--1); }
+.reader-body { white-space: pre-wrap; overflow-wrap: anywhere; overflow-y: auto; max-height: calc(86vh - 150px); padding: 16px 20px 24px; font-size: var(--step-0); line-height: 1.75; }
 </style>
 <main class="sheet">
   <header class="head">
     <span class="stamp">보도자료</span>
     <h1>행안부 보도자료 DB</h1>
-    <p class="scope">이재명 정부 출범(2025. 6. 4.)부터 2026. 10. 2.까지 행정안전부 누리집에 올라온 보도자료 <span class="num js-total">1,786</span>건을 첨부 원문까지 모았습니다. 묻고, 찾고, 키워드로 훑어볼 수 있습니다.</p>
+    <p class="scope">이재명 정부 출범(2025. 6. 4.)부터 <span class="js-last">2026. 10. 2.</span>까지 행정안전부 누리집에 올라온 보도자료 <span class="num js-total">1,786</span>건을 첨부 원문까지 모았습니다. 묻고, 찾고, 키워드로 훑어볼 수 있습니다.</p>
   </header>
 
   <nav class="tabs" role="tablist" aria-label="기능">
@@ -395,6 +404,7 @@ table.data td { font-variant-numeric: tabular-nums; }
 
   <!-- ===== 분석 보고서 ===== -->
   <section class="panel-tab rep" id="panel-report" role="tabpanel" aria-labelledby="tab-report" hidden>
+    <p class="note warn">이 보고서는 2026. 10. 3.에 보도자료 1,786건으로 분석한 내용입니다. AI 질문·검색·클라우드·관계도에는 매일 새 보도자료가 더해집니다.</p>
     <ul class="points">
       <li><span>출범 뒤 16개월 동안 행정안전부는 보도자료를 <b>1,786건</b> 냈다. 2025년 6월~2026년 9월 기준 한 달 평균 <b>약 111건</b>, 가장 많은 달은 2025년 9월(143건)이다.</span></li>
       <li><span>표기가 바뀌었다. ‘지방정부’가 나온 보도자료 비율이 2025년 9월 <b>1%</b>에서 10월 15%, 12월 <b>51%</b>로 뛰었고, 같은 기간 ‘지자체’·‘지방자치단체’는 줄었다.</span></li>
@@ -448,6 +458,17 @@ table.data td { font-variant-numeric: tabular-nums; }
     <p>데이터와 코드: <a href="https://github.com/88kukkang/Ttest/tree/claude/moi-press-release-database-ncgqwa">github.com/88kukkang/Ttest</a></p>
   </footer>
 </main>
+<dialog id="reader" aria-labelledby="reader-title">
+  <div class="reader-head">
+    <span class="reader-meta num" id="reader-meta"></span>
+    <h3 id="reader-title"></h3>
+    <div class="reader-actions">
+      <a id="reader-orig" target="_blank" rel="noopener">행안부 누리집 원문 열기 ↗</a>
+      <button class="btn-ghost" type="button" id="reader-close">닫기</button>
+    </div>
+  </div>
+  <div class="reader-body" id="reader-body"></div>
+</dialog>
 <div id="tip" hidden></div>
 <div id="toast" hidden></div>
 <script type="application/json" id="report-data">{"n_docs": 1786, "first": "2025-06-04", "last": "2026-10-02", "n_depts": 188, "attachments": {"hwp": 84, "hwpx": 1705, "pdf": 105}, "early_n": 745, "recent_n": 738, "monthly_counts": [{"m": "2025-06", "n": 63}, {"m": "2025-07", "n": 119}, {"m": "2025-08", "n": 93}, {"m": "2025-09", "n": 143}, {"m": "2025-10", "n": 103}, {"m": "2025-11", "n": 95}, {"m": "2025-12", "n": 129}, {"m": "2026-01", "n": 83}, {"m": "2026-02", "n": 95}, {"m": "2026-03", "n": 125}, {"m": "2026-04", "n": 114}, {"m": "2026-05", "n": 106}, {"m": "2026-06", "n": 137}, {"m": "2026-07", "n": 130}, {"m": "2026-08", "n": 115}, {"m": "2026-09", "n": 125}, {"m": "2026-10", "n": 11}], "distinctive": {"2025-06": [{"t": "직무대행", "df": 11, "z": 7.19}, {"t": "디지털정부혁신", "df": 7, "z": 6.11}, {"t": "디지털정부혁신실장", "df": 7, "z": 6.03}, {"t": "이용석", "df": 7, "z": 6.03}, {"t": "대행", "df": 12, "z": 5.96}, {"t": "정체전선", "df": 4, "z": 4.8}, {"t": "재발", "df": 9, "z": 4.62}, {"t": "영국", "df": 5, "z": 4.46}, {"t": "초점", "df": 5, "z": 4.37}, {"t": "지방자치단체", "df": 16, "z": 4.36}], "2025-07": [{"t": "소비쿠폰", "df": 26, "z": 9.32}, {"t": "민생회복", "df": 26, "z": 9.15}, {"t": "지자체", "df": 42, "z": 6.55}, {"t": "피해지역", "df": 18, "z": 6.13}, {"t": "물놀이", "df": 13, "z": 6.02}, {"t": "폭염", "df": 24, "z": 5.75}, {"t": "지역사랑상품권", "df": 18, "z": 5.72}, {"t": "지방자치단체", "df": 29, "z": 5.56}, {"t": "뱅크", "df": 11, "z": 5.53}, {"t": "직무대행", "df": 11, "z": 5.3}], "2025-08": [{"t": "긴급재난문자", "df": 10, "z": 5.59}, {"t": "지자체", "df": 34, "z": 5.34}, {"t": "위험기상", "df": 7, "z": 5.04}, {"t": "외출", "df": 12, "z": 4.95}, {"t": "마을방송", "df": 9, "z": 4.51}, {"t": "펜션", "df": 5, "z": 4.46}, {"t": "민방위", "df": 10, "z": 4.38}, {"t": "접근금지", "df": 5, "z": 4.24}, {"t": "호우", "df": 25, "z": 4.21}, {"t": "상공", "df": 4, "z": 4.15}], "2025-09": [{"t": "추석", "df": 26, "z": 7.82}, {"t": "통계청", "df": 14, "z": 6.61}, {"t": "지방자치단체", "df": 36, "z": 5.89}, {"t": "기재부", "df": 10, "z": 5.44}, {"t": "디지털예산회계시스템", "df": 8, "z": 5.17}, {"t": "등록시스템", "df": 8, "z": 5.17}, {"t": "환경부", "df": 21, "z": 5.12}, {"t": "모바일메시지시스템", "df": 8, "z": 5.11}, {"t": "국회답변", "df": 8, "z": 5.11}, {"t": "노인맞춤", "df": 8, "z": 5.11}], "2025-10": [{"t": "국가정보자원관리원", "df": 32, "z": 8.2}, {"t": "하모니", "df": 17, "z": 7.1}, {"t": "하모니시스템", "df": 16, "z": 6.93}, {"t": "하도급지킴이", "df": 16, "z": 6.93}, {"t": "Census", "df": 16, "z": 6.93}, {"t": "통합재난문자시스템", "df": 16, "z": 6.93}, {"t": "농림어업", "df": 16, "z": 6.9}, {"t": "수발", "df": 16, "z": 6.9}, {"t": "수발신", "df": 16, "z": 6.9}, {"t": "GPKI", "df": 16, "z": 6.9}], "2025-11": [{"t": "이관", "df": 16, "z": 6.01}, {"t": "기자단", "df": 11, "z": 5.95}, {"t": "희귀", "df": 10, "z": 5.67}, {"t": "정보공개시스템", "df": 10, "z": 5.64}, {"t": "휴먼", "df": 10, "z": 5.64}, {"t": "계측", "df": 10, "z": 5.63}, {"t": "RPA", "df": 10, "z": 5.51}, {"t": "국가통계포털", "df": 10, "z": 5.49}, {"t": "화학물질안전원", "df": 10, "z": 5.49}, {"t": "개인정보보호위원회", "df": 13, "z": 5.41}], "2025-12": [{"t": "시상식", "df": 14, "z": 5.26}, {"t": "연말연시", "df": 10, "z": 5.2}, {"t": "제설", "df": 11, "z": 4.93}, {"t": "수상", "df": 21, "z": 4.83}, {"t": "겨울", "df": 10, "z": 4.72}, {"t": "서울특별시", "df": 17, "z": 4.31}, {"t": "대전환", "df": 9, "z": 4.22}, {"t": "서구", "df": 13, "z": 4.18}, {"t": "추위", "df": 6, "z": 4.18}, {"t": "국민주권정부", "df": 12, "z": 4.16}], "2026-01": [{"t": "한파", "df": 12, "z": 6.49}, {"t": "한파쉼터", "df": 8, "z": 6.02}, {"t": "업무보고", "df": 6, "z": 5.39}, {"t": "겨울철", "df": 9, "z": 4.82}, {"t": "노숙인", "df": 6, "z": 4.73}, {"t": "역점", "df": 5, "z": 4.71}, {"t": "대설", "df": 8, "z": 4.62}, {"t": "제설", "df": 7, "z": 4.56}, {"t": "병권", "df": 6, "z": 4.54}, {"t": "오병권", "df": 6, "z": 4.45}], "2026-02": [{"t": "연휴", "df": 17, "z": 7.43}, {"t": "명절", "df": 15, "z": 6.12}, {"t": "일제", "df": 10, "z": 5.01}, {"t": "진화", "df": 11, "z": 4.68}, {"t": "입산", "df": 5, "z": 4.67}, {"t": "산림청", "df": 14, "z": 4.5}, {"t": "ASF", "df": 4, "z": 4.48}, {"t": "실화", "df": 4, "z": 4.48}, {"t": "불씨", "df": 5, "z": 4.45}, {"t": "지역번호", "df": 4, "z": 4.43}], "2026-03": [{"t": "공장", "df": 14, "z": 6.11}, {"t": "대덕구", "df": 11, "z": 5.58}, {"t": "봄철", "df": 11, "z": 5.25}, {"t": "방침", "df": 31, "z": 4.78}, {"t": "BTS", "df": 6, "z": 4.66}, {"t": "방탄소년단", "df": 5, "z": 4.31}, {"t": "거대", "df": 5, "z": 4.25}, {"t": "컴백", "df": 6, "z": 4.16}, {"t": "대전광역시", "df": 9, "z": 4.15}, {"t": "반입", "df": 5, "z": 4.14}], "2026-04": [{"t": "유가", "df": 23, "z": 8.75}, {"t": "피해지원금", "df": 18, "z": 7.84}, {"t": "중동", "df": 14, "z": 6.87}, {"t": "중동전쟁", "df": 10, "z": 6.31}, {"t": "전쟁", "df": 14, "z": 6.01}, {"t": "취소", "df": 9, "z": 4.7}, {"t": "지원금", "df": 18, "z": 4.61}, {"t": "이병철", "df": 5, "z": 4.43}, {"t": "컨설팅", "df": 16, "z": 4.41}, {"t": "자문단", "df": 7, "z": 4.35}], "2026-05": [{"t": "피해지원금", "df": 17, "z": 8.21}, {"t": "유가", "df": 17, "z": 7.36}, {"t": "선불", "df": 16, "z": 7.18}, {"t": "이용통계", "df": 10, "z": 6.72}, {"t": "지방선거", "df": 10, "z": 6.0}, {"t": "신청자", "df": 13, "z": 5.9}, {"t": "지원금", "df": 19, "z": 5.88}, {"t": "지급대상자", "df": 11, "z": 5.77}, {"t": "누계", "df": 7, "z": 5.65}, {"t": "선거", "df": 12, "z": 5.6}], "2026-06": [{"t": "프랑스", "df": 8, "z": 5.01}, {"t": "여름철", "df": 18, "z": 4.31}, {"t": "간담회", "df": 18, "z": 4.27}, {"t": "특별법", "df": 12, "z": 4.05}, {"t": "출범", "df": 22, "z": 3.93}, {"t": "전남광주통합특별시", "df": 10, "z": 3.92}, {"t": "태양광", "df": 8, "z": 3.83}, {"t": "지부", "df": 4, "z": 3.72}, {"t": "독서", "df": 4, "z": 3.72}, {"t": "경험", "df": 31, "z": 3.69}], "2026-07": [{"t": "예찰", "df": 17, "z": 5.53}, {"t": "무더위쉼터", "df": 13, "z": 5.49}, {"t": "지하차도", "df": 14, "z": 5.4}, {"t": "주민대피지원단", "df": 9, "z": 5.39}, {"t": "행동", "df": 33, "z": 5.34}, {"t": "여름", "df": 18, "z": 5.25}, {"t": "요령", "df": 34, "z": 5.25}, {"t": "특보", "df": 18, "z": 5.07}, {"t": "기상정보", "df": 11, "z": 5.06}, {"t": "지방정부", "df": 70, "z": 4.99}], "2026-08": [{"t": "전남광주", "df": 13, "z": 6.34}, {"t": "거제", "df": 12, "z": 5.83}, {"t": "장기화", "df": 10, "z": 5.15}, {"t": "거제시", "df": 7, "z": 4.85}, {"t": "중대", "df": 16, "z": 4.52}, {"t": "냉방", "df": 10, "z": 4.44}, {"t": "수사관", "df": 6, "z": 4.3}, {"t": "일상", "df": 41, "z": 4.28}, {"t": "폭염", "df": 22, "z": 4.18}, {"t": "피해조사", "df": 6, "z": 4.18}], "2026-09": [{"t": "추석", "df": 21, "z": 6.6}, {"t": "명절", "df": 20, "z": 6.08}, {"t": "인공지능정부실장", "df": 13, "z": 5.96}, {"t": "황규철", "df": 13, "z": 5.8}, {"t": "진명기", "df": 10, "z": 5.06}, {"t": "벡스코", "df": 7, "z": 4.83}, {"t": "한가위", "df": 6, "z": 4.51}, {"t": "MOU", "df": 11, "z": 4.34}, {"t": "박람회", "df": 12, "z": 4.33}, {"t": "자치혁신실장", "df": 10, "z": 4.3}], "2026-10": [{"t": "전남광주", "df": 3, "z": 4.0}, {"t": "시청", "df": 3, "z": 3.7}, {"t": "사후", "df": 3, "z": 3.07}, {"t": "위원장", "df": 4, "z": 3.05}, {"t": "마무리", "df": 4, "z": 2.9}, {"t": "대체", "df": 4, "z": 2.9}, {"t": "운행", "df": 3, "z": 2.83}, {"t": "검토", "df": 6, "z": 2.74}, {"t": "구체화", "df": 3, "z": 2.7}, {"t": "거리", "df": 3, "z": 2.7}]}, "term_shift": {"지방정부": [{"m": "2025-06", "k": 1, "n": 63, "s": 0.0159}, {"m": "2025-07", "k": 3, "n": 119, "s": 0.0252}, {"m": "2025-08", "k": 1, "n": 93, "s": 0.0108}, {"m": "2025-09", "k": 2, "n": 143, "s": 0.014}, {"m": "2025-10", "k": 15, "n": 103, "s": 0.1456}, {"m": "2025-11", "k": 36, "n": 95, "s": 0.3789}, {"m": "2025-12", "k": 66, "n": 129, "s": 0.5116}, {"m": "2026-01", "k": 36, "n": 83, "s": 0.4337}, {"m": "2026-02", "k": 47, "n": 95, "s": 0.4947}, {"m": "2026-03", "k": 65, "n": 125, "s": 0.52}, {"m": "2026-04", "k": 57, "n": 114, "s": 0.5}, {"m": "2026-05", "k": 46, "n": 106, "s": 0.434}, {"m": "2026-06", "k": 56, "n": 137, "s": 0.4088}, {"m": "2026-07", "k": 70, "n": 130, "s": 0.5385}, {"m": "2026-08", "k": 63, "n": 115, "s": 0.5478}, {"m": "2026-09", "k": 64, "n": 125, "s": 0.512}, {"m": "2026-10", "k": 4, "n": 11, "s": 0.3636}], "지방자치단체": [{"m": "2025-06", "k": 16, "n": 63, "s": 0.254}, {"m": "2025-07", "k": 29, "n": 119, "s": 0.2437}, {"m": "2025-08", "k": 17, "n": 93, "s": 0.1828}, {"m": "2025-09", "k": 36, "n": 143, "s": 0.2517}, {"m": "2025-10", "k": 22, "n": 103, "s": 0.2136}, {"m": "2025-11", "k": 2, "n": 95, "s": 0.0211}, {"m": "2025-12", "k": 10, "n": 129, "s": 0.0775}, {"m": "2026-01", "k": 1, "n": 83, "s": 0.012}, {"m": "2026-02", "k": 3, "n": 95, "s": 0.0316}, {"m": "2026-03", "k": 6, "n": 125, "s": 0.048}, {"m": "2026-04", "k": 3, "n": 114, "s": 0.0263}, {"m": "2026-05", "k": 4, "n": 106, "s": 0.0377}, {"m": "2026-06", "k": 10, "n": 137, "s": 0.073}, {"m": "2026-07", "k": 4, "n": 130, "s": 0.0308}, {"m": "2026-08", "k": 6, "n": 115, "s": 0.0522}, {"m": "2026-09", "k": 9, "n": 125, "s": 0.072}, {"m": "2026-10", "k": 1, "n": 11, "s": 0.0909}], "지자체": [{"m": "2025-06", "k": 13, "n": 63, "s": 0.2063}, {"m": "2025-07", "k": 42, "n": 119, "s": 0.3529}, {"m": "2025-08", "k": 34, "n": 93, "s": 0.3656}, {"m": "2025-09", "k": 43, "n": 143, "s": 0.3007}, {"m": "2025-10", "k": 37, "n": 103, "s": 0.3592}, {"m": "2025-11", "k": 18, "n": 95, "s": 0.1895}, {"m": "2025-12", "k": 17, "n": 129, "s": 0.1318}, {"m": "2026-01", "k": 8, "n": 83, "s": 0.0964}, {"m": "2026-02", "k": 6, "n": 95, "s": 0.0632}, {"m": "2026-03", "k": 4, "n": 125, "s": 0.032}, {"m": "2026-04", "k": 6, "n": 114, "s": 0.0526}, {"m": "2026-05", "k": 4, "n": 106, "s": 0.0377}, {"m": "2026-06", "k": 7, "n": 137, "s": 0.0511}, {"m": "2026-07", "k": 1, "n": 130, "s": 0.0077}, {"m": "2026-08", "k": 7, "n": 115, "s": 0.0609}, {"m": "2026-09", "k": 16, "n": 125, "s": 0.128}, {"m": "2026-10", "k": 2, "n": 11, "s": 0.1818}]}, "topics": [{"name": "민생회복 소비쿠폰", "terms": ["소비쿠폰"], "series": [{"m": "2025-06", "k": 3, "n": 63, "s": 0.0476}, {"m": "2025-07", "k": 26, "n": 119, "s": 0.2185}, {"m": "2025-08", "k": 7, "n": 93, "s": 0.0753}, {"m": "2025-09", "k": 17, "n": 143, "s": 0.1189}, {"m": "2025-10", "k": 1, "n": 103, "s": 0.0097}, {"m": "2025-11", "k": 2, "n": 95, "s": 0.0211}, {"m": "2025-12", "k": 4, "n": 129, "s": 0.031}, {"m": "2026-01", "k": 0, "n": 83, "s": 0.0}, {"m": "2026-02", "k": 0, "n": 95, "s": 0.0}, {"m": "2026-03", "k": 0, "n": 125, "s": 0.0}, {"m": "2026-04", "k": 3, "n": 114, "s": 0.0263}, {"m": "2026-05", "k": 1, "n": 106, "s": 0.0094}, {"m": "2026-06", "k": 1, "n": 137, "s": 0.0073}, {"m": "2026-07", "k": 0, "n": 130, "s": 0.0}, {"m": "2026-08", "k": 0, "n": 115, "s": 0.0}, {"m": "2026-09", "k": 0, "n": 125, "s": 0.0}, {"m": "2026-10", "k": 0, "n": 11, "s": 0.0}], "total": 65}, {"name": "국가정보자원관리원", "terms": ["국가정보자원관리원", "국정자원"], "series": [{"m": "2025-06", "k": 2, "n": 63, "s": 0.0317}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 1, "n": 93, "s": 0.0108}, {"m": "2025-09", "k": 16, "n": 143, "s": 0.1119}, {"m": "2025-10", "k": 32, "n": 103, "s": 0.3107}, {"m": "2025-11", "k": 13, "n": 95, "s": 0.1368}, {"m": "2025-12", "k": 2, "n": 129, "s": 0.0155}, {"m": "2026-01", "k": 0, "n": 83, "s": 0.0}, {"m": "2026-02", "k": 1, "n": 95, "s": 0.0105}, {"m": "2026-03", "k": 1, "n": 125, "s": 0.008}, {"m": "2026-04", "k": 2, "n": 114, "s": 0.0175}, {"m": "2026-05", "k": 2, "n": 106, "s": 0.0189}, {"m": "2026-06", "k": 3, "n": 137, "s": 0.0219}, {"m": "2026-07", "k": 2, "n": 130, "s": 0.0154}, {"m": "2026-08", "k": 1, "n": 115, "s": 0.0087}, {"m": "2026-09", "k": 5, "n": 125, "s": 0.04}, {"m": "2026-10", "k": 1, "n": 11, "s": 0.0909}], "total": 84}, {"name": "인공지능·AI", "terms": ["인공지능", "AI"], "series": [{"m": "2025-06", "k": 13, "n": 63, "s": 0.2063}, {"m": "2025-07", "k": 13, "n": 119, "s": 0.1092}, {"m": "2025-08", "k": 15, "n": 93, "s": 0.1613}, {"m": "2025-09", "k": 31, "n": 143, "s": 0.2168}, {"m": "2025-10", "k": 19, "n": 103, "s": 0.1845}, {"m": "2025-11", "k": 35, "n": 95, "s": 0.3684}, {"m": "2025-12", "k": 42, "n": 129, "s": 0.3256}, {"m": "2026-01", "k": 18, "n": 83, "s": 0.2169}, {"m": "2026-02", "k": 16, "n": 95, "s": 0.1684}, {"m": "2026-03", "k": 32, "n": 125, "s": 0.256}, {"m": "2026-04", "k": 22, "n": 114, "s": 0.193}, {"m": "2026-05", "k": 23, "n": 106, "s": 0.217}, {"m": "2026-06", "k": 32, "n": 137, "s": 0.2336}, {"m": "2026-07", "k": 21, "n": 130, "s": 0.1615}, {"m": "2026-08", "k": 26, "n": 115, "s": 0.2261}, {"m": "2026-09", "k": 39, "n": 125, "s": 0.312}, {"m": "2026-10", "k": 3, "n": 11, "s": 0.2727}], "total": 400}, {"name": "호우", "terms": ["호우"], "series": [{"m": "2025-06", "k": 10, "n": 63, "s": 0.1587}, {"m": "2025-07", "k": 27, "n": 119, "s": 0.2269}, {"m": "2025-08", "k": 25, "n": 93, "s": 0.2688}, {"m": "2025-09", "k": 20, "n": 143, "s": 0.1399}, {"m": "2025-10", "k": 3, "n": 103, "s": 0.0291}, {"m": "2025-11", "k": 1, "n": 95, "s": 0.0105}, {"m": "2025-12", "k": 8, "n": 129, "s": 0.062}, {"m": "2026-01", "k": 5, "n": 83, "s": 0.0602}, {"m": "2026-02", "k": 4, "n": 95, "s": 0.0421}, {"m": "2026-03", "k": 4, "n": 125, "s": 0.032}, {"m": "2026-04", "k": 8, "n": 114, "s": 0.0702}, {"m": "2026-05", "k": 12, "n": 106, "s": 0.1132}, {"m": "2026-06", "k": 14, "n": 137, "s": 0.1022}, {"m": "2026-07", "k": 28, "n": 130, "s": 0.2154}, {"m": "2026-08", "k": 24, "n": 115, "s": 0.2087}, {"m": "2026-09", "k": 15, "n": 125, "s": 0.12}, {"m": "2026-10", "k": 2, "n": 11, "s": 0.1818}], "total": 210}, {"name": "폭염", "terms": ["폭염"], "series": [{"m": "2025-06", "k": 7, "n": 63, "s": 0.1111}, {"m": "2025-07", "k": 24, "n": 119, "s": 0.2017}, {"m": "2025-08", "k": 8, "n": 93, "s": 0.086}, {"m": "2025-09", "k": 4, "n": 143, "s": 0.028}, {"m": "2025-10", "k": 1, "n": 103, "s": 0.0097}, {"m": "2025-11", "k": 0, "n": 95, "s": 0.0}, {"m": "2025-12", "k": 4, "n": 129, "s": 0.031}, {"m": "2026-01", "k": 3, "n": 83, "s": 0.0361}, {"m": "2026-02", "k": 1, "n": 95, "s": 0.0105}, {"m": "2026-03", "k": 1, "n": 125, "s": 0.008}, {"m": "2026-04", "k": 5, "n": 114, "s": 0.0439}, {"m": "2026-05", "k": 6, "n": 106, "s": 0.0566}, {"m": "2026-06", "k": 14, "n": 137, "s": 0.1022}, {"m": "2026-07", "k": 21, "n": 130, "s": 0.1615}, {"m": "2026-08", "k": 22, "n": 115, "s": 0.1913}, {"m": "2026-09", "k": 7, "n": 125, "s": 0.056}, {"m": "2026-10", "k": 0, "n": 11, "s": 0.0}], "total": 128}, {"name": "한파·대설", "terms": ["한파", "대설"], "series": [{"m": "2025-06", "k": 2, "n": 63, "s": 0.0317}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 0, "n": 93, "s": 0.0}, {"m": "2025-09", "k": 2, "n": 143, "s": 0.014}, {"m": "2025-10", "k": 2, "n": 103, "s": 0.0194}, {"m": "2025-11", "k": 5, "n": 95, "s": 0.0526}, {"m": "2025-12", "k": 16, "n": 129, "s": 0.124}, {"m": "2026-01", "k": 13, "n": 83, "s": 0.1566}, {"m": "2026-02", "k": 8, "n": 95, "s": 0.0842}, {"m": "2026-03", "k": 3, "n": 125, "s": 0.024}, {"m": "2026-04", "k": 2, "n": 114, "s": 0.0175}, {"m": "2026-05", "k": 0, "n": 106, "s": 0.0}, {"m": "2026-06", "k": 3, "n": 137, "s": 0.0219}, {"m": "2026-07", "k": 0, "n": 130, "s": 0.0}, {"m": "2026-08", "k": 1, "n": 115, "s": 0.0087}, {"m": "2026-09", "k": 1, "n": 125, "s": 0.008}, {"m": "2026-10", "k": 0, "n": 11, "s": 0.0}], "total": 58}, {"name": "산불", "terms": ["산불"], "series": [{"m": "2025-06", "k": 5, "n": 63, "s": 0.0794}, {"m": "2025-07", "k": 7, "n": 119, "s": 0.0588}, {"m": "2025-08", "k": 7, "n": 93, "s": 0.0753}, {"m": "2025-09", "k": 12, "n": 143, "s": 0.0839}, {"m": "2025-10", "k": 3, "n": 103, "s": 0.0291}, {"m": "2025-11", "k": 9, "n": 95, "s": 0.0947}, {"m": "2025-12", "k": 9, "n": 129, "s": 0.0698}, {"m": "2026-01", "k": 16, "n": 83, "s": 0.1928}, {"m": "2026-02", "k": 16, "n": 95, "s": 0.1684}, {"m": "2026-03", "k": 10, "n": 125, "s": 0.08}, {"m": "2026-04", "k": 9, "n": 114, "s": 0.0789}, {"m": "2026-05", "k": 7, "n": 106, "s": 0.066}, {"m": "2026-06", "k": 9, "n": 137, "s": 0.0657}, {"m": "2026-07", "k": 10, "n": 130, "s": 0.0769}, {"m": "2026-08", "k": 13, "n": 115, "s": 0.113}, {"m": "2026-09", "k": 13, "n": 125, "s": 0.104}, {"m": "2026-10", "k": 1, "n": 11, "s": 0.0909}], "total": 156}, {"name": "지방선거", "terms": ["지방선거"], "series": [{"m": "2025-06", "k": 0, "n": 63, "s": 0.0}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 0, "n": 93, "s": 0.0}, {"m": "2025-09", "k": 1, "n": 143, "s": 0.007}, {"m": "2025-10", "k": 1, "n": 103, "s": 0.0097}, {"m": "2025-11", "k": 0, "n": 95, "s": 0.0}, {"m": "2025-12", "k": 0, "n": 129, "s": 0.0}, {"m": "2026-01", "k": 1, "n": 83, "s": 0.012}, {"m": "2026-02", "k": 2, "n": 95, "s": 0.0211}, {"m": "2026-03", "k": 7, "n": 125, "s": 0.056}, {"m": "2026-04", "k": 3, "n": 114, "s": 0.0263}, {"m": "2026-05", "k": 10, "n": 106, "s": 0.0943}, {"m": "2026-06", "k": 3, "n": 137, "s": 0.0219}, {"m": "2026-07", "k": 0, "n": 130, "s": 0.0}, {"m": "2026-08", "k": 1, "n": 115, "s": 0.0087}, {"m": "2026-09", "k": 0, "n": 125, "s": 0.0}, {"m": "2026-10", "k": 0, "n": 11, "s": 0.0}], "total": 29}, {"name": "통합특별시", "terms": ["통합특별시", "전남광주통합특별시"], "series": [{"m": "2025-06", "k": 0, "n": 63, "s": 0.0}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 0, "n": 93, "s": 0.0}, {"m": "2025-09", "k": 0, "n": 143, "s": 0.0}, {"m": "2025-10", "k": 0, "n": 103, "s": 0.0}, {"m": "2025-11", "k": 0, "n": 95, "s": 0.0}, {"m": "2025-12", "k": 2, "n": 129, "s": 0.0155}, {"m": "2026-01", "k": 3, "n": 83, "s": 0.0361}, {"m": "2026-02", "k": 1, "n": 95, "s": 0.0105}, {"m": "2026-03", "k": 5, "n": 125, "s": 0.04}, {"m": "2026-04", "k": 0, "n": 114, "s": 0.0}, {"m": "2026-05", "k": 2, "n": 106, "s": 0.0189}, {"m": "2026-06", "k": 10, "n": 137, "s": 0.073}, {"m": "2026-07", "k": 7, "n": 130, "s": 0.0538}, {"m": "2026-08", "k": 9, "n": 115, "s": 0.0783}, {"m": "2026-09", "k": 8, "n": 125, "s": 0.064}, {"m": "2026-10", "k": 1, "n": 11, "s": 0.0909}], "total": 48}, {"name": "유가·피해지원금", "terms": ["유가", "피해지원금"], "series": [{"m": "2025-06", "k": 0, "n": 63, "s": 0.0}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 2, "n": 93, "s": 0.0215}, {"m": "2025-09", "k": 0, "n": 143, "s": 0.0}, {"m": "2025-10", "k": 0, "n": 103, "s": 0.0}, {"m": "2025-11", "k": 0, "n": 95, "s": 0.0}, {"m": "2025-12", "k": 0, "n": 129, "s": 0.0}, {"m": "2026-01", "k": 0, "n": 83, "s": 0.0}, {"m": "2026-02", "k": 0, "n": 95, "s": 0.0}, {"m": "2026-03", "k": 5, "n": 125, "s": 0.04}, {"m": "2026-04", "k": 24, "n": 114, "s": 0.2105}, {"m": "2026-05", "k": 17, "n": 106, "s": 0.1604}, {"m": "2026-06", "k": 5, "n": 137, "s": 0.0365}, {"m": "2026-07", "k": 2, "n": 130, "s": 0.0154}, {"m": "2026-08", "k": 3, "n": 115, "s": 0.0261}, {"m": "2026-09", "k": 0, "n": 125, "s": 0.0}, {"m": "2026-10", "k": 0, "n": 11, "s": 0.0}], "total": 58}, {"name": "주민자치", "terms": ["주민자치", "주민자치회"], "series": [{"m": "2025-06", "k": 0, "n": 63, "s": 0.0}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 1, "n": 93, "s": 0.0108}, {"m": "2025-09", "k": 2, "n": 143, "s": 0.014}, {"m": "2025-10", "k": 2, "n": 103, "s": 0.0194}, {"m": "2025-11", "k": 6, "n": 95, "s": 0.0632}, {"m": "2025-12", "k": 3, "n": 129, "s": 0.0233}, {"m": "2026-01", "k": 2, "n": 83, "s": 0.0241}, {"m": "2026-02", "k": 1, "n": 95, "s": 0.0105}, {"m": "2026-03", "k": 3, "n": 125, "s": 0.024}, {"m": "2026-04", "k": 0, "n": 114, "s": 0.0}, {"m": "2026-05", "k": 0, "n": 106, "s": 0.0}, {"m": "2026-06", "k": 7, "n": 137, "s": 0.0511}, {"m": "2026-07", "k": 2, "n": 130, "s": 0.0154}, {"m": "2026-08", "k": 3, "n": 115, "s": 0.0261}, {"m": "2026-09", "k": 0, "n": 125, "s": 0.0}, {"m": "2026-10", "k": 0, "n": 11, "s": 0.0}], "total": 32}, {"name": "중대범죄수사청", "terms": ["중대범죄수사청", "중수청"], "series": [{"m": "2025-06", "k": 0, "n": 63, "s": 0.0}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 0, "n": 93, "s": 0.0}, {"m": "2025-09", "k": 2, "n": 143, "s": 0.014}, {"m": "2025-10", "k": 1, "n": 103, "s": 0.0097}, {"m": "2025-11", "k": 1, "n": 95, "s": 0.0105}, {"m": "2025-12", "k": 1, "n": 129, "s": 0.0078}, {"m": "2026-01", "k": 1, "n": 83, "s": 0.012}, {"m": "2026-02", "k": 1, "n": 95, "s": 0.0105}, {"m": "2026-03", "k": 2, "n": 125, "s": 0.016}, {"m": "2026-04", "k": 1, "n": 114, "s": 0.0088}, {"m": "2026-05", "k": 0, "n": 106, "s": 0.0}, {"m": "2026-06", "k": 4, "n": 137, "s": 0.0292}, {"m": "2026-07", "k": 1, "n": 130, "s": 0.0077}, {"m": "2026-08", "k": 7, "n": 115, "s": 0.0609}, {"m": "2026-09", "k": 4, "n": 125, "s": 0.032}, {"m": "2026-10", "k": 1, "n": 11, "s": 0.0909}], "total": 27}], "top": [{"term": "정부", "df": 1106, "df_ratio": 0.6193, "tf": 4790}, {"term": "국민", "df": 1104, "df_ratio": 0.6181, "tf": 5862}, {"term": "기관", "df": 1046, "df_ratio": 0.5857, "tf": 5294}, {"term": "지원", "df": 1031, "df_ratio": 0.5773, "tf": 10062}, {"term": "지역", "df": 1011, "df_ratio": 0.5661, "tf": 6591}, {"term": "안전", "df": 997, "df_ratio": 0.5582, "tf": 7488}, {"term": "운영", "df": 991, "df_ratio": 0.5549, "tf": 3750}, {"term": "관리", "df": 989, "df_ratio": 0.5538, "tf": 14624}, {"term": "현장", "df": 964, "df_ratio": 0.5398, "tf": 2961}, {"term": "체계", "df": 760, "df_ratio": 0.4255, "tf": 2420}, {"term": "대응", "df": 745, "df_ratio": 0.4171, "tf": 2629}, {"term": "재난", "df": 738, "df_ratio": 0.4132, "tf": 5119}, {"term": "발생", "df": 705, "df_ratio": 0.3947, "tf": 2043}, {"term": "참여", "df": 689, "df_ratio": 0.3858, "tf": 2272}, {"term": "지방", "df": 673, "df_ratio": 0.3768, "tf": 4082}, {"term": "정책", "df": 672, "df_ratio": 0.3763, "tf": 2715}, {"term": "행정", "df": 663, "df_ratio": 0.3712, "tf": 4365}, {"term": "주민", "df": 648, "df_ratio": 0.3628, "tf": 3561}, {"term": "점검", "df": 632, "df_ratio": 0.3539, "tf": 2689}, {"term": "지방정부", "df": 632, "df_ratio": 0.3539, "tf": 2183}, {"term": "협력", "df": 619, "df_ratio": 0.3466, "tf": 1963}, {"term": "시설", "df": 618, "df_ratio": 0.346, "tf": 2605}, {"term": "확대", "df": 603, "df_ratio": 0.3376, "tf": 2057}, {"term": "정보", "df": 601, "df_ratio": 0.3365, "tf": 18917}, {"term": "전국", "df": 567, "df_ratio": 0.3175, "tf": 1570}, {"term": "사회", "df": 566, "df_ratio": 0.3169, "tf": 3638}, {"term": "피해", "df": 558, "df_ratio": 0.3124, "tf": 2772}, {"term": "기반", "df": 556, "df_ratio": 0.3113, "tf": 2461}, {"term": "개선", "df": 550, "df_ratio": 0.308, "tf": 1835}, {"term": "서비스", "df": 537, "df_ratio": 0.3007, "tf": 6786}], "rising": [{"term": "지방정부", "z": 12.01, "df": 360, "ref_df": 124}, {"term": "방침", "z": 7.5, "df": 128, "ref_df": 39}, {"term": "출범", "z": 6.02, "df": 81, "ref_df": 24}, {"term": "본격", "z": 5.99, "df": 130, "ref_df": 62}, {"term": "실질", "z": 5.98, "df": 141, "ref_df": 71}, {"term": "체감", "z": 5.57, "df": 141, "ref_df": 77}, {"term": "핵심", "z": 5.11, "df": 139, "ref_df": 82}, {"term": "발굴", "z": 4.96, "df": 158, "ref_df": 101}, {"term": "경험", "z": 4.88, "df": 127, "ref_df": 75}, {"term": "지원금", "z": 4.77, "df": 68, "ref_df": 28}, {"term": "유가", "z": 4.76, "df": 50, "ref_df": 2}, {"term": "일상", "z": 4.75, "df": 152, "ref_df": 99}, {"term": "현장", "z": 4.72, "df": 422, "ref_df": 362}, {"term": "부담", "z": 4.71, "df": 102, "ref_df": 56}, {"term": "밀착", "z": 4.63, "df": 53, "ref_df": 18}], "falling": [{"term": "지자체", "z": 8.18, "df": 204, "ref_df": 43}, {"term": "지방자치단체", "z": 5.84, "df": 132, "ref_df": 37}, {"term": "소비쿠폰", "z": 4.95, "df": 60, "ref_df": 5}, {"term": "민생회복", "z": 4.68, "df": 58, "ref_df": 9}, {"term": "국가정보자원관리원", "z": 4.53, "df": 66, "ref_df": 15}, {"term": "자치단체", "z": 4.32, "df": 47, "ref_df": 6}, {"term": "배출", "z": 4.27, "df": 46, "ref_df": 6}, {"term": "관세청", "z": 4.24, "df": 44, "ref_df": 4}, {"term": "목록", "z": 4.2, "df": 55, "ref_df": 12}, {"term": "빅데이터", "z": 4.16, "df": 49, "ref_df": 9}, {"term": "이벤트", "z": 4.08, "df": 46, "ref_df": 8}, {"term": "환경부", "z": 4.07, "df": 66, "ref_df": 19}, {"term": "자치", "z": 3.94, "df": 174, "ref_df": 86}, {"term": "메인", "z": 3.94, "df": 39, "ref_df": 5}, {"term": "GIS", "z": 3.89, "df": 37, "ref_df": 3}], "departments": [{"d": "자연재난대응과", "n": 89}, {"d": "기후재난관리과", "n": 75}, {"d": "재정정책과", "n": 74}, {"d": "디지털정부기획과", "n": 53}, {"d": "자치행정과", "n": 50}, {"d": "재난관리정책과", "n": 40}, {"d": "균형발전진흥과", "n": 40}, {"d": "국토산업재난대응과", "n": 35}, {"d": "예방안전제도과", "n": 34}, {"d": "안전개선과", "n": 34}, {"d": "혁신기획과", "n": 32}, {"d": "재난안전점검과", "n": 30}, {"d": "복구지원과", "n": 29}, {"d": "환경산림재난대응과", "n": 25}, {"d": "재난안전산업과", "n": 24}]}</script>
@@ -481,7 +502,45 @@ function table(headers, rows, cls = "data") {
   for (const r of rows) { const tr = tb.insertRow(); for (const c of r) tr.insertCell().textContent = c; }
   return t;
 }
-function articleLink(d) { const a = el("a", null, d.title); a.href = ARTICLE + d.id; a.target = "_blank"; a.rel = "noopener"; return a; }
+/** 보도자료 제목 링크: 누르면 페이지 안 읽기 창으로 본문, Ctrl/⌘/가운데 클릭은 행안부 원문 */
+function articleLink(d, terms = [], content = null) {
+  const a = el("a"); a.href = ARTICLE + d.id; a.target = "_blank"; a.rel = "noopener";
+  a.appendChild(content || document.createTextNode(d.title));
+  a.addEventListener("click", (e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; e.preventDefault(); Reader.open(d.id, terms); });
+  return a;
+}
+const Reader = (() => {
+  const dlg = $("reader");
+  $("reader-close").addEventListener("click", () => dlg.close());
+  dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+  async function open(id, terms = []) {
+    await docsReady;
+    const d = DOC_BY_ID.get(String(id));
+    if (!d) { window.open(ARTICLE + id, "_blank", "noopener"); return; }
+    $("reader-meta").textContent = `${dateLabel(d.date)} · ${d.dept || "부서 미상"} · 본문 ${fmt(d.body.length)}자`;
+    $("reader-title").textContent = d.title;
+    $("reader-orig").href = ARTICLE + d.id;
+    const body = $("reader-body");
+    body.replaceChildren(terms.length ? highlighted(d.body, d.lb, terms) : document.createTextNode(d.body));
+    hideTip();
+    if (typeof dlg.showModal === "function") { if (!dlg.open) dlg.showModal(); } else dlg.setAttribute("open", "");
+    body.scrollTop = 0;
+    const first = body.querySelector("mark");
+    if (first) first.scrollIntoView({ block: "center" });
+  }
+  return { open };
+})();
+/** 본문 안 행안부 원문 링크(nttId=…)를 읽기 창으로 연다 (AI 답변용) */
+function routeArticleClicks(container, termsFn = () => []) {
+  container.addEventListener("click", (e) => {
+    const a = e.target.closest && e.target.closest("a[href]");
+    if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+    const m = a.href.match(/[?&]nttId=(\d+)/);
+    if (!m || !a.href.startsWith("https://www.mois.go.kr/")) return;
+    e.preventDefault();
+    Reader.open(m[1], termsFn());
+  });
+}
 
 // ---- 툴팁: 값이 굵게, 이름은 보조 ----
 const tip = $("tip");
@@ -541,6 +600,8 @@ const docsReady = fetchB64Json("docs.b64.txt").then((raw) => {
   for (const d of DOCS) cnt.set(d.dept, (cnt.get(d.dept) || 0) + 1);
   DEPT_COUNTS = [...cnt].sort((a, b) => b[1] - a[1]);
   document.querySelectorAll(".js-total").forEach((n) => (n.textContent = fmt(DOCS.length)));
+  const lastDate = DOCS.reduce((a, d) => (d.date > a ? d.date : a), "");
+  document.querySelectorAll(".js-last").forEach((n) => (n.textContent = dateLabel(lastDate)));
 });
 let cloudPromise = null, CLOUD = null;
 function cloudReady() {
@@ -651,10 +712,10 @@ const AI = (() => {
     "‘지방정부’라는 표현은 언제부터 쓰기 시작했어?",
     "주민자치와 관련해 바뀐 제도가 있어?",
   ];
-  const RULES = `너는 행정안전부 보도자료 데이터베이스를 검색해 질문에 답하는 도우미다.
+  const rules = () => `너는 행정안전부 보도자료 데이터베이스를 검색해 질문에 답하는 도우미다.
 
 [데이터]
-행정안전부 누리집 보도자료 게시판에 2025-06-04 ~ 2026-10-02에 등록된 보도자료 1,786건. 본문은 첨부 원문(HWPX·PDF)에서 뽑은 텍스트다. 이 기간 밖의 일, 다른 부처 자료, 인터넷 정보는 이 데이터에 없다.
+행정안전부 누리집 보도자료 게시판에 ${DOCS.reduce((a, d) => (d.date < a ? d.date : a), "9999")} ~ ${DOCS.reduce((a, d) => (d.date > a ? d.date : a), "")}에 등록된 보도자료 ${fmt(DOCS.length)}건. 본문은 첨부 원문(HWPX·PDF)에서 뽑은 텍스트다. 이 기간 밖의 일, 다른 부처 자료, 인터넷 정보는 이 데이터에 없다.
 
 [도구]
 - search_releases: 단어 일치 검색. all(모두 포함), any(하나 이상 포함), none(제외), from/to(YYYY-MM), dept(부서명 일부), sort(relevance|date), limit(최대 20). 한국어는 같은 뜻도 표현이 여러 가지라서, 핵심어는 all에 두고 비슷한 말은 any로 넓게 묶어라. 예) "인구감소지역 혜택" → all ["인구감소지역"], any ["특례","우대","감면","지원","가점","인센티브","혜택"]. 결과가 너무 많으면 all을 늘려 좁히고, 0건이면 말을 바꿔 다시 찾아라.
@@ -824,7 +885,7 @@ const AI = (() => {
       return `### ${dateLabel(r.d.date)} ${r.d.title}\nurl: ${ARTICLE + r.d.id}\n부서: ${r.d.dept}\n${r.d.body.slice(0, 600).replace(/\s+/g, " ")}\n…\n${wins}`;
     }).join("\n\n");
     step(`관련 보도자료 ${top.length}건으로 답하는 중`);
-    const turnsNoTools = [{ role: "user", content: RULES.replace(/\[도구\][\s\S]*?\[답변 형식\]/, "[답변 형식]") }, ...history.slice(0, -1),
+    const turnsNoTools = [{ role: "user", content: rules().replace(/\[도구\][\s\S]*?\[답변 형식\]/, "[답변 형식]") }, ...history.slice(0, -1),
       { role: "user", content: `질문: ${q}\n\n아래는 검색으로 찾은 보도자료 발췌다. 이 자료만 근거로 답하라.\n\n${material}` }];
     const { text } = await sample(turnsNoTools, { signal, onText, cache: false });
     return text;
@@ -851,6 +912,7 @@ const AI = (() => {
     body.appendChild(el("p", "thinking", "생각하는 중…"));
     aEl.append(steps, body);
     log.append(qEl, aEl);
+    routeArticleClicks(body);
     qEl.scrollIntoView({ block: "nearest" });
     const step = (text) => { steps.querySelectorAll("li").forEach((li) => li.classList.add("done")); steps.appendChild(el("li", null, text)); };
     const readMap = new Map();
@@ -864,7 +926,7 @@ const AI = (() => {
       let text, truncated = false;
       if (toolsOK) {
         try {
-          const r = await sample([{ role: "user", content: RULES }, ...history], { signal: ctl.signal, tools: makeTools(step, readMap), onText });
+          const r = await sample([{ role: "user", content: rules() }, ...history], { signal: ctl.signal, tools: makeTools(step, readMap), onText });
           text = r.text; truncated = r.truncated;
         } catch (e) {
           if (e && e.code === "tools_unavailable") { toolsOK = false; text = await withoutTools(sample, q, history, ctl.signal, step, readMap, onText); }
@@ -1027,9 +1089,7 @@ const S = (() => {
     meta.append(el("span", "num", dateLabel(d.date)), el("span", null, d.dept || "부서 미상"));
     if (terms.length) meta.appendChild(el("span", "count num", `검색어 ${fmt(r.hits)}회`));
     const h = el("h4");
-    const a = el("a"); a.href = ARTICLE + d.id; a.target = "_blank"; a.rel = "noopener";
-    a.appendChild(terms.length ? highlighted(d.title, d.lt, terms) : document.createTextNode(d.title));
-    h.appendChild(a);
+    h.appendChild(articleLink(d, terms, terms.length ? highlighted(d.title, d.lt, terms) : null));
     art.append(meta, h);
     const sn = el("div", "snips");
     if (terms.length) {
@@ -1051,7 +1111,8 @@ const S = (() => {
       if (open && !full.childNodes.length) full.appendChild(terms.length ? highlighted(d.body, d.lb, terms) : document.createTextNode(d.body));
       full.hidden = !open; btn.textContent = open ? "본문 접기" : "본문 펼치기"; btn.setAttribute("aria-expanded", String(open));
     });
-    actions.appendChild(btn);
+    const orig = el("a", "btn-ghost", "행안부 원문 ↗"); orig.href = ARTICLE + d.id; orig.target = "_blank"; orig.rel = "noopener";
+    actions.append(btn, orig);
     art.append(actions, full);
     return art;
   }
@@ -1118,7 +1179,7 @@ function wordDetail(prefix, D, term, sel, opts) {
   const ul = $(prefix + "-docs"); ul.replaceChildren();
   for (const d of inSel.slice(0, 6)) {
     const li = el("li");
-    li.append(el("span", "d-meta num", `${dateLabel(d.date)} · ${D.depts[d.dept] || "부서 미상"}`), articleLink(d));
+    li.append(el("span", "d-meta num", `${dateLabel(d.date)} · ${D.depts[d.dept] || "부서 미상"}`), articleLink(d, [term.toLowerCase()]));
     ul.appendChild(li);
   }
   return inSel.length;
@@ -1456,11 +1517,11 @@ const N = (() => {
     const keep = selected && selected.type === "node" && nodes.find((d) => d.term === selected.term);
     selectNode(keep || (graph.center >= 0 ? nodes[0] : nodes.reduce((a, b) => (b.df > a.df ? b : a))));
   }
-  function docList(filterFn, title) {
+  function docList(filterFn, title, terms = []) {
     const list = sel.filter(filterFn);
     $("n-docs-title").textContent = `${title} (${fmt(list.length)}건 중 최근 ${Math.min(6, list.length)}건)`;
     const ul = $("n-docs"); ul.replaceChildren();
-    for (const d of list.slice(0, 6)) { const li = el("li"); li.append(el("span", "d-meta num", `${dateLabel(d.date)} · ${D.depts[d.dept] || "부서 미상"}`), articleLink(d)); ul.appendChild(li); }
+    for (const d of list.slice(0, 6)) { const li = el("li"); li.append(el("span", "d-meta num", `${dateLabel(d.date)} · ${D.depts[d.dept] || "부서 미상"}`), articleLink(d, terms)); ul.appendChild(li); }
   }
   function selectNode(d) {
     selected = { type: "node", term: d.term };
@@ -1483,7 +1544,7 @@ const N = (() => {
       row.append(nameBtn, track, el("span", "v", fmt(r.c)));
       bars.appendChild(row);
     }
-    docList((doc) => doc.termSet.has(d.t), `‘${d.term}’이(가) 나온 보도자료`);
+    docList((doc) => doc.termSet.has(d.t), `‘${d.term}’이(가) 나온 보도자료`, [d.term.toLowerCase()]);
   }
   function selectEdge(l) {
     selected = { type: "edge" };
@@ -1492,7 +1553,7 @@ const N = (() => {
     $("n-sel-name").textContent = `${l.source.term} + ${l.target.term}`;
     $("n-sel-figs").textContent = `함께 나온 보도자료 ${fmt(l.co)}건 · 연결 강도 ${l.w.toFixed(3)}`;
     $("n-sel-actions").replaceChildren(); $("n-sel-bars").replaceChildren();
-    docList((doc) => doc.termSet.has(l.source.t) && doc.termSet.has(l.target.t), "두 단어가 함께 나온 보도자료");
+    docList((doc) => doc.termSet.has(l.source.t) && doc.termSet.has(l.target.t), "두 단어가 함께 나온 보도자료", [l.source.term.toLowerCase(), l.target.term.toLowerCase()]);
   }
   function setMode(m) { setModeUi(m); render(); }
   function setModeUi(m) {
