@@ -1,0 +1,426 @@
+<title>행안부 보도자료 검색</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@800&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* 레이아웃: 키워드 보고서와 같은 보도자료 서식 한 장. 검색창·필터 → 월별 분포 → 결과 목록 순서 */
+:root {
+  --bg: #eef0f2; --paper: #ffffff; --ink: #15181c; --ink-2: #4a515a; --muted: #7b828b;
+  --line: #e1e4e8; --axis: #c5cad0; --accent: #2a78d6; --accent-soft: #e8f1fc;
+  --mark-bg: #ffe28a; --mark-ink: #15181c;
+  --bar: #2a78d6; --bar-dim: #b7d3f6;
+  --tip-bg: #15181c; --tip-ink: #ffffff;
+  --font-display: "Nanum Myeongjo", "Noto Serif KR", "Batang", serif;
+  --font-body: "Noto Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --step--1: 0.8125rem; --step-0: 0.9375rem; --step-1: 1.0625rem; --step-2: 1.375rem; --step-3: clamp(1.7rem, 4vw, 2.3rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1013; --paper: #171a1e; --ink: #f1f3f5; --ink-2: #b9bfc7; --muted: #8b929b;
+    --line: #2a2f35; --axis: #3b4149; --accent: #6da7ec; --accent-soft: #1a2738;
+    --mark-bg: #6b5410; --mark-ink: #fff4cf; --bar: #3987e5; --bar-dim: #1f3a5c;
+    --tip-bg: #f1f3f5; --tip-ink: #15181c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1013; --paper: #171a1e; --ink: #f1f3f5; --ink-2: #b9bfc7; --muted: #8b929b;
+  --line: #2a2f35; --axis: #3b4149; --accent: #6da7ec; --accent-soft: #1a2738;
+  --mark-bg: #6b5410; --mark-ink: #fff4cf; --bar: #3987e5; --bar-dim: #1f3a5c;
+  --tip-bg: #f1f3f5; --tip-ink: #15181c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: var(--step-0); line-height: 1.65; padding-inline: 16px; padding-block: 24px 48px; }
+.sheet { max-width: 1000px; margin: 0 auto; background: var(--paper); border: 1px solid var(--line); padding: clamp(18px, 4vw, 44px); display: grid; gap: 28px; }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: var(--step-3); line-height: 1.2; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+.head { display: grid; gap: 10px; }
+.stamp { width: fit-content; border: 2px solid var(--ink); padding: 1px 10px; font-family: var(--font-display); font-weight: 800; letter-spacing: 0.3em; font-size: var(--step-0); }
+.scope { color: var(--ink-2); font-size: var(--step--1); }
+
+.searchbox { display: grid; gap: 10px; }
+.qrow { display: flex; gap: 8px; }
+.qrow input { flex: 1; min-width: 0; font: inherit; font-size: var(--step-1); padding: 10px 14px; border: 2px solid var(--ink); border-radius: 0; background: var(--paper); color: var(--ink); }
+.qrow input::placeholder { color: var(--muted); }
+button { font: inherit; cursor: pointer; }
+.btn { padding: 8px 16px; border: 2px solid var(--ink); background: var(--ink); color: var(--paper); font-weight: 700; }
+.btn-ghost { padding: 6px 12px; border: 1px solid var(--line); background: var(--paper); color: var(--ink-2); font-size: var(--step--1); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--ink); }
+.help { font-size: var(--step--1); color: var(--muted); }
+.help code { font-family: inherit; background: var(--accent-soft); color: var(--ink); padding: 0 4px; }
+.examples { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: var(--step--1); color: var(--muted); }
+.ex { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; background: var(--paper); color: var(--ink-2); font-size: var(--step--1); }
+.ex:hover { border-color: var(--accent); color: var(--ink); }
+
+.filters { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding-block: 12px; }
+.field { display: grid; gap: 2px; font-size: var(--step--1); color: var(--muted); min-width: 0; }
+.field select { font: inherit; font-size: var(--step--1); color: var(--ink); background: var(--paper); border: 1px solid var(--axis); padding: 5px 8px; max-width: 100%; }
+.field.dept select { max-width: 15em; }
+
+.summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; }
+.summary strong { font-size: var(--step-2); font-family: var(--font-display); }
+.summary .sub { color: var(--muted); font-size: var(--step--1); }
+.active-month { display: inline-flex; gap: 6px; align-items: center; font-size: var(--step--1); background: var(--accent-soft); padding: 2px 4px 2px 10px; }
+.active-month button { border: 0; background: transparent; color: var(--ink-2); padding: 0 6px; }
+.hist { display: grid; gap: 4px; }
+.hist-label { font-size: var(--step--1); color: var(--muted); }
+.chart { position: relative; width: 100%; min-width: 0; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart text { fill: var(--muted); font-family: var(--font-body); font-size: 11px; }
+.chart .val { fill: var(--ink); font-weight: 700; font-size: 12px; }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .base { stroke: var(--axis); stroke-width: 1; }
+.hit { fill: transparent; cursor: pointer; }
+.mark { pointer-events: none; }
+.hit:hover + .mark, .hit:focus + .mark { opacity: 0.75; }
+
+.results { display: grid; gap: 0; border-top: 2px solid var(--ink); }
+.item { display: grid; gap: 6px; padding-block: 16px; border-bottom: 1px solid var(--line); min-width: 0; }
+.item-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: var(--step--1); color: var(--muted); }
+.item-meta .count { color: var(--ink-2); font-weight: 500; }
+.item h2 { font-size: var(--step-1); font-weight: 700; margin: 0; line-height: 1.45; text-wrap: pretty; }
+.item h2 a { color: var(--ink); text-decoration: none; }
+.item h2 a:hover { color: var(--accent); text-decoration: underline; }
+.snips { display: grid; gap: 4px; font-size: var(--step--1); color: var(--ink-2); min-width: 0; }
+.snips p { overflow-wrap: anywhere; }
+mark { background: var(--mark-bg); color: var(--mark-ink); padding: 0 1px; }
+.item-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.full { white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--step--1); color: var(--ink-2); background: var(--bg); padding: 14px 16px; max-height: 32rem; overflow-y: auto; border-left: 3px solid var(--axis); }
+.more-row { display: flex; justify-content: center; padding-top: 16px; }
+.status { color: var(--muted); font-size: var(--step--1); padding-block: 16px; }
+.empty { padding-block: 24px; color: var(--ink-2); }
+.foot { font-size: var(--step--1); color: var(--muted); display: grid; gap: 4px; }
+
+#tip { position: fixed; z-index: 10; pointer-events: none; background: var(--tip-bg); color: var(--tip-ink); padding: 7px 10px; border-radius: 6px; font-size: 12px; line-height: 1.5; box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
+#tip .t { opacity: 0.75; }
+#tip b { font-variant-numeric: tabular-nums; }
+#toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--tip-bg); color: var(--tip-ink); padding: 8px 14px; border-radius: 6px; font-size: var(--step--1); z-index: 11; }
+</style>
+
+<main class="sheet">
+  <header class="head">
+    <span class="stamp">검색</span>
+    <h1>행안부 보도자료 검색</h1>
+    <p class="scope">이재명 정부 출범(2025. 6. 4.)부터 2026. 10. 2.까지 행정안전부 누리집에 올라온 보도자료 <span class="num" id="total">1,786</span>건의 제목과 본문(첨부 원문)을 검색합니다.</p>
+  </header>
+
+  <form class="searchbox" id="form" role="search">
+    <div class="qrow">
+      <input id="q" type="search" autocomplete="off" placeholder="검색어 (예: 지방정부, 소비쿠폰, “국가정보자원관리원 화재”)" aria-label="검색어">
+      <button class="btn" type="submit">검색</button>
+    </div>
+    <p class="help">띄어 쓴 단어는 모두 들어간 글만 찾습니다. <code>"큰따옴표"</code>는 구절 그대로, <code>-단어</code>는 그 단어가 든 글을 뺍니다.</p>
+    <div class="examples"><span>예시</span></div>
+  </form>
+
+  <div class="filters">
+    <label class="field" for="from">시작<select id="from"></select></label>
+    <label class="field" for="to">끝<select id="to"></select></label>
+    <label class="field dept" for="dept">부서<select id="dept"><option value="">전체 부서</option></select></label>
+    <label class="field" for="scope">검색 범위<select id="scope"><option value="all">제목 + 본문</option><option value="title">제목만</option></select></label>
+    <label class="field" for="sort">정렬<select id="sort"><option value="date">최신순</option><option value="score">많이 나온 순</option></select></label>
+  </div>
+
+  <section class="summary" aria-live="polite">
+    <div><strong class="num" id="count">…</strong> <span class="sub" id="count-sub">보도자료를 불러오는 중입니다 (약 4MB).</span></div>
+    <button class="btn-ghost" id="copy" type="button" disabled>결과 목록 복사</button>
+  </section>
+
+  <section class="hist" aria-label="검색 결과 월별 분포">
+    <span class="hist-label" id="hist-label">월별 건수 · 막대를 누르면 그 달만 봅니다</span>
+    <div class="chart" id="hist"></div>
+  </section>
+
+  <section class="results" id="results"><p class="status">불러오는 중…</p></section>
+
+  <footer class="foot">
+    <p>본문은 첨부 원문(HWPX·HWP·PDF)에서 뽑아 보도시점·연락처 줄을 지운 텍스트입니다. 제목을 누르면 행안부 누리집 원문으로 이동합니다.</p>
+    <p>데이터와 코드: <a href="https://github.com/88kukkang/Ttest/tree/claude/moi-press-release-database-ncgqwa">github.com/88kukkang/Ttest</a></p>
+  </footer>
+</main>
+<div id="tip" hidden></div>
+<div id="toast" hidden></div>
+
+<script>
+(() => {
+  const ARTICLE = "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=";
+  const PAGE = 30;
+  const EXAMPLES = ["지방정부", "소비쿠폰", "\"국가정보자원관리원 화재\"", "인공지능", "통합특별시", "고유가 피해지원금", "산불 -훈련"];
+  const $ = (id) => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const fmt = (n) => n.toLocaleString("ko-KR");
+  const monthLabel = (m) => { const [y, mo] = m.split("-"); return `${y}년 ${+mo}월`; };
+  const dateLabel = (d) => { const [y, m, dd] = d.split("-"); return `${y}. ${+m}. ${+dd}.`; };
+  const tickLabel = (m, first) => { const [y, mo] = m.split("-"); return first || mo === "01" ? `${y.slice(2)}.${+mo}` : `${+mo}`; };
+
+  let docs = [], months = [], shown = PAGE, lastResult = null, monthOnly = null;
+
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function svgEl(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+  function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => (t.hidden = true), 2200); }
+  const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+
+  // ---- 검색어 해석: 띄어쓰기 = AND, "구절", -제외 ----
+  function parseQuery(q) {
+    q = q.replace(/[“”]/g, '"');
+    const terms = [], excludes = [];
+    const re = /(-?)"([^"]+)"|(-?)(\S+)/g;
+    let m;
+    while ((m = re.exec(q))) {
+      const neg = m[1] || m[3];
+      const t = (m[2] != null ? m[2] : m[4] || "").toLowerCase().trim();
+      if (!t || t === "-") continue;
+      (neg ? excludes : terms).push(t);
+    }
+    return { terms, excludes };
+  }
+  function countOcc(s, t) { let n = 0, i = s.indexOf(t); while (i !== -1) { n++; i = s.indexOf(t, i + t.length); } return n; }
+
+  // ---- 검색 ----
+  function run() {
+    const q = $("q").value;
+    store.set("moisdb.q", q);
+    const { terms, excludes } = parseQuery(q);
+    const scope = $("scope").value, dept = $("dept").value;
+    const from = $("from").value, to = $("to").value;
+    const base = [];
+    for (const d of docs) {
+      if (dept && d.dept !== dept) continue;
+      const hay = scope === "title" ? d.lt : d.lt + "\n" + d.lb;
+      let ok = true, score = 0;
+      for (const t of terms) {
+        const inTitle = countOcc(d.lt, t);
+        const inBody = scope === "title" ? 0 : countOcc(d.lb, t);
+        if (!inTitle && !inBody) { ok = false; break; }
+        score += inBody + inTitle * 5;
+      }
+      if (!ok) continue;
+      if (excludes.some((t) => hay.includes(t))) continue;
+      base.push({ d, score, hits: terms.reduce((a, t) => a + countOcc(d.lt, t) + (scope === "title" ? 0 : countOcc(d.lb, t)), 0) });
+    }
+    // 월별 분포는 기간 필터 전 결과로 그린다 (어느 달에 몰렸는지 한눈에)
+    const byMonth = new Map(months.map((m) => [m, 0]));
+    for (const r of base) byMonth.set(r.d.month, (byMonth.get(r.d.month) || 0) + 1);
+    const inRange = (m) => (monthOnly ? m === monthOnly : (!from || m >= from) && (!to || m <= to));
+    const list = base.filter((r) => inRange(r.d.month));
+    if ($("sort").value === "score" && terms.length) list.sort((a, b) => b.score - a.score || (a.d.date < b.d.date ? 1 : -1));
+    lastResult = { list, terms, q: q.trim(), byMonth, inRange };
+    shown = PAGE;
+    renderSummary();
+    renderHist();
+    renderList();
+  }
+
+  function renderSummary() {
+    const { list, q } = lastResult;
+    $("count").textContent = fmt(list.length) + "건";
+    const parts = [];
+    parts.push(q ? `‘${q}’ 검색 결과` : "전체 보도자료");
+    if ($("dept").value) parts.push($("dept").value);
+    if (monthOnly) parts.push(monthLabel(monthOnly) + "만");
+    $("count-sub").textContent = parts.join(" · ") + ` (전체 ${fmt(docs.length)}건 중)`;
+    $("copy").disabled = list.length === 0;
+    const label = $("hist-label");
+    label.replaceChildren(document.createTextNode("월별 건수 · 막대를 누르면 그 달만 봅니다"));
+    if (monthOnly) {
+      const chip = el("span", "active-month", `${monthLabel(monthOnly)}만 보는 중`);
+      const x = el("button", null, "해제"); x.type = "button"; x.addEventListener("click", () => { monthOnly = null; run(); });
+      chip.appendChild(x);
+      label.append(" ", chip);
+    }
+  }
+
+  // ---- 월별 분포 막대 ----
+  const tip = $("tip");
+  function showTip(title, value, x, y) {
+    tip.replaceChildren(el("div", "t", title), el("b", null, value));
+    tip.hidden = false;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let left = x + 14, top = y - h - 12;
+    if (left + w > innerWidth - 8) left = x - w - 14;
+    if (top < 8) top = y + 18;
+    tip.style.left = Math.max(8, left) + "px"; tip.style.top = top + "px";
+  }
+  function colPath(x, y, w, h, r) { if (h <= 0) return ""; r = Math.min(r, w / 2, h); return `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`; }
+  function renderHist() {
+    const box = $("hist");
+    if (!lastResult) return;
+    const { byMonth, inRange } = lastResult;
+    const W = Math.max(280, box.clientWidth), H = 120, m = { l: 30, r: 6, t: 18, b: 22 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b, n = months.length;
+    const vals = months.map((mm) => byMonth.get(mm) || 0);
+    const raw = Math.max(1, ...vals);
+    let tickStep = raw <= 5 ? 1 : raw <= 20 ? 5 : raw <= 50 ? 10 : raw <= 100 ? 25 : 50;
+    while (Math.ceil(raw / tickStep) > 3) tickStep *= 2;  // 눈금은 0 포함 최대 4개, 모두 정수
+    const yMax = Math.ceil(raw / tickStep) * tickStep;
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": "검색 결과 월별 건수" });
+    for (let v = 0; v <= yMax; v += tickStep) {
+      const y = m.t + ih - (v / yMax) * ih;
+      svgEl("line", { x1: m.l, x2: W - m.r, y1: y, y2: y, class: v === 0 ? "base" : "grid" }, svg);
+      const t = svgEl("text", { x: m.l - 6, y: y + 4, "text-anchor": "end", class: "num" }, svg); t.textContent = v;
+    }
+    const band = iw / n, bw = Math.min(24, band * 0.62), step = band < 30 ? 2 : 1;
+    const maxI = vals.indexOf(raw);
+    months.forEach((mm, i) => {
+      const cx = m.l + band * i + band / 2, h = (vals[i] / yMax) * ih, y = m.t + ih - h;
+      const hit = svgEl("rect", { x: m.l + band * i, y: 0, width: band, height: m.t + ih, class: "hit", tabindex: 0, role: "button", "aria-label": `${monthLabel(mm)} ${vals[i]}건, 이 달만 보기` }, svg);
+      svgEl("path", { d: colPath(cx - bw / 2, y, bw, h, 4), class: "mark", style: `fill:var(${inRange(mm) ? "--bar" : "--bar-dim"})` }, svg);
+      const total = docs.filter((d) => d.month === mm).length;
+      const tipText = () => [monthLabel(mm) + (mm === "2026-10" ? " (이틀치)" : ""), `${fmt(vals[i])}건 / 그 달 ${fmt(total)}건`];
+      hit.addEventListener("pointermove", (e) => { const [a, b] = tipText(); showTip(a, b, e.clientX, e.clientY); });
+      hit.addEventListener("pointerleave", () => (tip.hidden = true));
+      hit.addEventListener("focus", () => { const r = hit.getBoundingClientRect(); const [a, b] = tipText(); showTip(a, b, r.left + r.width / 2, r.top + 10); });
+      hit.addEventListener("blur", () => (tip.hidden = true));
+      const pick = () => { monthOnly = monthOnly === mm ? null : mm; tip.hidden = true; run(); };
+      hit.addEventListener("click", pick);
+      hit.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+      if (i % step === 0) { const t = svgEl("text", { x: cx, y: H - 6, "text-anchor": "middle" }, svg); t.textContent = tickLabel(mm, i === 0); }
+      if (i === maxI && raw > 0 && vals[i] > 0) { const t = svgEl("text", { x: cx, y: y - 5, "text-anchor": "middle", class: "val num" }, svg); t.textContent = vals[i]; }
+    });
+    box.replaceChildren(svg);
+  }
+
+  // ---- 강조 표시: 텍스트 노드 + <mark> 로만 조립 ----
+  function ranges(lower, terms) {
+    const rs = [];
+    for (const t of terms) { let i = lower.indexOf(t); while (i !== -1) { rs.push([i, i + t.length]); i = lower.indexOf(t, i + t.length); } }
+    rs.sort((a, b) => a[0] - b[0]);
+    const out = [];
+    for (const r of rs) { const last = out[out.length - 1]; if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]); else out.push(r.slice()); }
+    return out;
+  }
+  function highlighted(text, lower, terms, start = 0, end = text.length) {
+    const frag = document.createDocumentFragment();
+    let pos = start;
+    for (const [a, b] of ranges(lower.slice(start, end), terms)) {
+      const s = a + start, e = b + start;
+      if (s > pos) frag.appendChild(document.createTextNode(text.slice(pos, s)));
+      frag.appendChild(el("mark", null, text.slice(s, e)));
+      pos = e;
+    }
+    if (pos < end) frag.appendChild(document.createTextNode(text.slice(pos, end)));
+    return frag;
+  }
+  function snippets(d, terms, max = 3, pad = 48) {
+    const rs = ranges(d.lb, terms);
+    const wins = [];
+    for (const [a, b] of rs) {
+      const s = Math.max(0, a - pad), e = Math.min(d.body.length, b + pad);
+      const last = wins[wins.length - 1];
+      if (last && s <= last[1]) last[1] = Math.max(last[1], e); else wins.push([s, e]);
+      if (wins.length > max) break;
+    }
+    return wins.slice(0, max).map(([s, e]) => {
+      const p = el("p");
+      if (s > 0) p.appendChild(document.createTextNode("… "));
+      p.appendChild(highlighted(d.body.replace(/\n/g, " "), d.lb.replace(/\n/g, " "), terms, s, e));
+      if (e < d.body.length) p.appendChild(document.createTextNode(" …"));
+      return p;
+    });
+  }
+
+  function renderList() {
+    const box = $("results");
+    box.replaceChildren();
+    const { list, terms } = lastResult;
+    if (!list.length) {
+      box.appendChild(el("p", "empty", "찾는 글이 없습니다. 검색어를 줄이거나 기간·부서 필터를 넓혀 보세요."));
+      return;
+    }
+    for (const r of list.slice(0, shown)) box.appendChild(item(r, terms));
+    if (list.length > shown) {
+      const row = el("div", "more-row");
+      const more = el("button", "btn-ghost", `더 보기 (${fmt(Math.min(PAGE, list.length - shown))}건 더 · 남은 ${fmt(list.length - shown)}건)`);
+      more.type = "button";
+      more.addEventListener("click", () => { shown += PAGE; renderList(); });
+      row.appendChild(more);
+      box.appendChild(row);
+    }
+  }
+  function item(r, terms) {
+    const { d } = r;
+    const art = el("article", "item");
+    const meta = el("div", "item-meta");
+    meta.append(el("span", "num", dateLabel(d.date)), el("span", null, d.dept || "부서 미상"));
+    if (terms.length) meta.appendChild(el("span", "count num", `검색어 ${fmt(r.hits)}회`));
+    const h = el("h2");
+    const a = el("a"); a.href = ARTICLE + d.id; a.target = "_blank"; a.rel = "noopener";
+    a.appendChild(terms.length ? highlighted(d.title, d.lt, terms) : document.createTextNode(d.title));
+    h.appendChild(a);
+    art.append(meta, h);
+    if (terms.length) {
+      const sn = snippets(d, terms);
+      if (sn.length) { const box = el("div", "snips"); box.append(...sn); art.appendChild(box); }
+    } else {
+      const box = el("div", "snips"); box.appendChild(el("p", null, d.body.slice(0, 140).replace(/\n/g, " ") + (d.body.length > 140 ? " …" : ""))); art.appendChild(box);
+    }
+    const actions = el("div", "item-actions");
+    const btn = el("button", "btn-ghost", "본문 펼치기"); btn.type = "button"; btn.setAttribute("aria-expanded", "false");
+    const full = el("div", "full"); full.hidden = true;
+    btn.addEventListener("click", () => {
+      const open = full.hidden;
+      if (open && !full.childNodes.length) full.appendChild(terms.length ? highlighted(d.body, d.lb, terms) : document.createTextNode(d.body));
+      full.hidden = !open; btn.textContent = open ? "본문 접기" : "본문 펼치기"; btn.setAttribute("aria-expanded", String(open));
+    });
+    actions.appendChild(btn);
+    art.append(actions, full);
+    return art;
+  }
+
+  // ---- 결과 목록 복사 (엑셀에 붙여넣기 좋은 탭 구분) ----
+  $("copy").addEventListener("click", () => {
+    const rows = [["등록일", "부서", "제목", "검색어 횟수", "원문 주소"]].concat(lastResult.list.map((r) => [r.d.date, r.d.dept, r.d.title, r.hits, ARTICLE + r.d.id]));
+    const tsv = rows.map((r) => r.join("\t")).join("\n");
+    navigator.clipboard.writeText(tsv).then(() => toast(`${fmt(lastResult.list.length)}건을 복사했습니다. 엑셀에 붙여넣으면 됩니다.`), () => toast("이 화면에서는 복사가 막혀 있습니다."));
+  });
+
+  // ---- 입력 연결 ----
+  let timer = 0;
+  $("form").addEventListener("submit", (e) => { e.preventDefault(); clearTimeout(timer); monthOnly = null; run(); });
+  $("q").addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(() => { monthOnly = null; run(); }, 250); });
+  for (const id of ["from", "to", "dept", "scope", "sort"]) $(id).addEventListener("change", () => { if (id === "from" || id === "to") monthOnly = null; run(); });
+  const exBox = document.querySelector(".examples");
+  for (const ex of EXAMPLES) {
+    const b = el("button", "ex", ex); b.type = "button";
+    b.addEventListener("click", () => { $("q").value = ex; monthOnly = null; run(); $("q").focus(); });
+    exBox.appendChild(b);
+  }
+  let lastW = 0;
+  new ResizeObserver(() => { const w = $("hist").clientWidth; if (w !== lastW) { lastW = w; renderHist(); } }).observe($("hist"));
+
+  // ---- 데이터 불러오기 ----
+  async function load() {
+    // docs.b64.txt = gzip 으로 압축한 JSON 을 base64 로 적은 것 (약 4MB)
+    const res = await fetch("docs.b64.txt");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const b64 = (await res.text()).trim();
+    const bin = atob(b64);
+    const buf = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    const text = await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+    const data = JSON.parse(text);
+    docs = data.docs.map(([id, date, dept, title, body]) => ({ id, date, month: date.slice(0, 7), dept, title, body, lt: title.toLowerCase(), lb: body.toLowerCase() }));
+    months = [...new Set(docs.map((d) => d.month))].sort();
+    $("total").textContent = fmt(docs.length);
+    for (const id of ["from", "to"]) {
+      const sel = $(id);
+      sel.appendChild(new Option(id === "from" ? "처음부터" : "끝까지", ""));
+      for (const m of months) sel.appendChild(new Option(monthLabel(m), m));
+    }
+    const deptCount = new Map();
+    for (const d of docs) deptCount.set(d.dept, (deptCount.get(d.dept) || 0) + 1);
+    $("dept").options[0].textContent = `전체 부서 (${deptCount.size})`;
+    for (const [name, n] of [...deptCount].sort((a, b) => b[1] - a[1])) $("dept").appendChild(new Option(`${name || "부서 미상"} (${n})`, name));
+    const saved = store.get("moisdb.q");
+    $("q").value = saved != null ? saved : "지방정부";
+    run();
+  }
+  load().catch((e) => {
+    $("count").textContent = "";
+    $("count-sub").textContent = "";
+    $("results").replaceChildren(el("p", "empty", `보도자료 데이터를 불러오지 못했습니다 (${e.message}). 페이지를 새로 고쳐 보세요.`));
+  });
+})();
+</script>

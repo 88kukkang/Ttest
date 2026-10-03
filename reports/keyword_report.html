@@ -83,6 +83,7 @@ section { display: grid; gap: 16px; min-width: 0; }
 .chart .grid { stroke: var(--line); stroke-width: 1; }
 .chart .base { stroke: var(--axis); stroke-width: 1; }
 .hit { fill: transparent; cursor: default; }
+.mark { pointer-events: none; }
 .hit:hover + .mark, .hit:focus + .mark { opacity: 0.75; }
 
 .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: var(--step--1); color: var(--ink-2); }
