@@ -1,0 +1,554 @@
+<title>행안부 키워드 관계도</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@800&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<style>
+/* 레이아웃: 보도자료 서식 한 장. 보기 전환·조건 → 관계도 판 → 묶음 범례 → 고른 단어·연결의 상세 → 표 */
+:root {
+  --bg: #eef0f2; --paper: #ffffff; --ink: #15181c; --ink-2: #4a515a; --muted: #7b828b;
+  --line: #e1e4e8; --axis: #c5cad0; --accent: #2a78d6; --accent-soft: #e8f1fc; --band: #e9f3fe;
+  --edge: #9aa3ad; --other: #a3a9b0; --center: #15181c;
+  --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #4a3aa7;
+  --bar: #2a78d6;
+  --tip-bg: #15181c; --tip-ink: #ffffff;
+  --font-display: "Nanum Myeongjo", "Noto Serif KR", "Batang", serif;
+  --font-body: "Noto Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --step--1: 0.8125rem; --step-0: 0.9375rem; --step-1: 1.0625rem; --step-2: 1.375rem; --step-3: clamp(1.7rem, 4vw, 2.3rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1013; --paper: #171a1e; --ink: #f1f3f5; --ink-2: #b9bfc7; --muted: #8b929b;
+    --line: #2a2f35; --axis: #3b4149; --accent: #6da7ec; --accent-soft: #1a2738; --band: #1a2738;
+    --edge: #59616b; --other: #6b727b; --center: #f1f3f5;
+    --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #9085e9;
+    --bar: #3987e5; --tip-bg: #f1f3f5; --tip-ink: #15181c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1013; --paper: #171a1e; --ink: #f1f3f5; --ink-2: #b9bfc7; --muted: #8b929b;
+  --line: #2a2f35; --axis: #3b4149; --accent: #6da7ec; --accent-soft: #1a2738; --band: #1a2738;
+  --edge: #59616b; --other: #6b727b; --center: #f1f3f5;
+  --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #9085e9;
+  --bar: #3987e5; --tip-bg: #f1f3f5; --tip-ink: #15181c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: var(--step-0); line-height: 1.65; padding-inline: 16px; padding-block: 24px 48px; }
+.sheet { max-width: 1040px; margin: 0 auto; background: var(--paper); border: 1px solid var(--line); padding: clamp(18px, 4vw, 44px); display: grid; gap: 22px; }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: var(--step-3); line-height: 1.2; margin: 0; text-wrap: balance; }
+h2, h3 { margin: 0; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+.head { display: grid; gap: 10px; }
+.stamp { width: fit-content; border: 2px solid var(--ink); padding: 1px 10px; font-family: var(--font-display); font-weight: 800; letter-spacing: 0.3em; font-size: var(--step-0); }
+.scope { color: var(--ink-2); font-size: var(--step--1); max-width: 72ch; }
+
+.modes { display: inline-flex; border: 2px solid var(--ink); width: fit-content; }
+.modes button { font: inherit; font-weight: 700; font-size: var(--step--1); padding: 6px 14px; border: 0; background: var(--paper); color: var(--ink); cursor: pointer; }
+.modes button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.centerbox { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.centerbox input { font: inherit; padding: 6px 10px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); min-width: 0; width: 14em; }
+.btn { font: inherit; font-weight: 700; padding: 6px 14px; border: 2px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; }
+.btn-ghost { font: inherit; cursor: pointer; padding: 5px 12px; border: 1px solid var(--axis); background: var(--paper); color: var(--ink-2); font-size: var(--step--1); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--ink); }
+.ex { font: inherit; font-size: var(--step--1); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; background: var(--paper); color: var(--ink-2); cursor: pointer; }
+.ex:hover { border-color: var(--accent); color: var(--ink); }
+.filters { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding-block: 12px; }
+.field { display: grid; gap: 2px; font-size: var(--step--1); color: var(--muted); min-width: 0; }
+.field select { font: inherit; font-size: var(--step--1); color: var(--ink); background: var(--paper); border: 1px solid var(--axis); padding: 5px 8px; max-width: 100%; }
+.field.dept select { max-width: 14em; }
+.check { display: inline-flex; gap: 6px; align-items: center; font-size: var(--step--1); color: var(--ink-2); }
+.note { font-size: var(--step--1); color: var(--muted); }
+.note.warn { color: var(--ink-2); background: var(--accent-soft); padding: 6px 10px; }
+
+.panel { border: 1px solid var(--line); border-top: 3px solid var(--ink); min-width: 0; }
+.panel-band { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; background: var(--band); padding: 10px 16px; }
+.panel-band h2 { font-size: var(--step-1); font-weight: 700; }
+.panel-band .meta { font-size: var(--step--1); color: var(--ink-2); }
+.stage { position: relative; min-width: 0; }
+.stage svg { display: block; width: 100%; touch-action: none; }
+.link { stroke: var(--edge); fill: none; }
+.link-hit { stroke: transparent; stroke-width: 12; fill: none; cursor: pointer; }
+.node circle { stroke: var(--paper); stroke-width: 2; cursor: pointer; }
+.node text { fill: var(--ink); font-family: var(--font-body); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+.dim { opacity: 0.12; }
+.hl { stroke: var(--ink) !important; }
+.sel circle { stroke: var(--ink); stroke-width: 3; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 16px; border-top: 1px solid var(--line); font-size: var(--step--1); color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+
+.detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; align-items: start; }
+@media (max-width: 720px) { .detail { grid-template-columns: 1fr; } }
+.sel-head { display: grid; gap: 4px; }
+.sel-head .label { font-size: var(--step--1); color: var(--muted); }
+.sel-head strong { font-family: var(--font-display); font-size: var(--step-2); }
+.sel-head .figs { font-size: var(--step--1); color: var(--ink-2); }
+.bars { display: grid; gap: 5px; margin-top: 8px; }
+.bar-row { display: grid; grid-template-columns: minmax(5em, 9em) 1fr 3em; gap: 8px; align-items: center; font-size: var(--step--1); }
+.bar-row button { all: unset; cursor: pointer; color: var(--ink-2); overflow-wrap: anywhere; }
+.bar-row button:hover, .bar-row button:focus-visible { color: var(--accent); text-decoration: underline; }
+.bar-track { height: 10px; min-width: 0; }
+.bar-fill { height: 100%; background: var(--bar); border-radius: 0 4px 4px 0; }
+.bar-row .v { text-align: right; font-variant-numeric: tabular-nums; }
+.docs { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.docs li { padding: 8px 0; border-bottom: 1px solid var(--line); display: grid; gap: 2px; min-width: 0; }
+.docs .d-meta { font-size: var(--step--1); color: var(--muted); }
+.docs a { color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+.docs a:hover { color: var(--accent); text-decoration: underline; }
+.docs-title { font-size: var(--step--1); color: var(--muted); margin-bottom: 4px; }
+
+details { font-size: var(--step--1); }
+summary { cursor: pointer; color: var(--accent); width: fit-content; }
+details[open] summary { margin-bottom: 8px; }
+.table-wrap { overflow-x: auto; max-height: 26rem; overflow-y: auto; }
+table.data { width: 100%; border-collapse: collapse; }
+table.data th, table.data td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+table.data th:nth-child(-n+2), table.data td:nth-child(-n+2) { text-align: left; }
+table.data thead th { color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--axis); position: sticky; top: 0; background: var(--paper); }
+table.data td { font-variant-numeric: tabular-nums; }
+.foot { font-size: var(--step--1); color: var(--muted); display: grid; gap: 4px; }
+#tip { position: fixed; z-index: 10; pointer-events: none; background: var(--tip-bg); color: var(--tip-ink); padding: 7px 10px; border-radius: 6px; font-size: 12px; line-height: 1.5; box-shadow: 0 4px 16px rgba(0,0,0,0.18); max-width: 260px; }
+#tip .t { opacity: 0.75; }
+#tip b { font-variant-numeric: tabular-nums; }
+</style>
+
+<main class="sheet">
+  <header class="head">
+    <span class="stamp">관계도</span>
+    <h1>행안부 키워드 관계도</h1>
+    <p class="scope">행정안전부 보도자료 1,786건(2025. 6. 4. ~ 2026. 10. 2.)에서 같은 보도자료에 함께 자주 나온 단어끼리 선으로 이었습니다. 선이 굵을수록 함께 나오는 정도가 강하고, 같은 색은 서로 촘촘히 엮인 단어 묶음입니다. 원 크기는 그 단어가 나온 보도자료 수입니다.</p>
+  </header>
+
+  <div class="modes" role="group" aria-label="보기 방식">
+    <button type="button" id="mode-net" aria-pressed="true">전체 관계망</button>
+    <button type="button" id="mode-ego" aria-pressed="false">중심어 연관어</button>
+  </div>
+  <form class="centerbox" id="centerbox" hidden>
+    <label for="center" class="note">중심어</label>
+    <input id="center" type="text" autocomplete="off" value="인공지능" list="terms-list">
+    <datalist id="terms-list"></datalist>
+    <button class="btn" type="submit">보기</button>
+    <span class="note">예시</span>
+  </form>
+
+  <div class="filters">
+    <label class="field" for="from">시작<select id="from"></select></label>
+    <label class="field" for="to">끝<select id="to"></select></label>
+    <label class="field dept" for="dept">부서<select id="dept"><option value="">전체 부서</option></select></label>
+    <label class="field" for="n">단어 수<select id="n"><option value="30">30</option><option value="50" selected>50</option><option value="80">80</option></select></label>
+    <label class="field" for="k">단어마다 잇는 선<select id="k"><option value="2">2개</option><option value="3" selected>3개</option><option value="5">5개</option></select></label>
+    <label class="check" for="common"><input type="checkbox" id="common" checked>보도자료 절반 이상에 나오는 말(정부·국민·지원 등) 빼기</label>
+  </div>
+  <p class="note warn" id="msg" hidden></p>
+
+  <section class="panel" aria-labelledby="g-title">
+    <div class="panel-band">
+      <div><h2 id="g-title">전체 관계망</h2><span class="meta num" id="meta">불러오는 중…</span></div>
+      <button class="btn-ghost" id="reset" type="button">처음 배치로</button>
+    </div>
+    <div class="stage" id="stage"></div>
+    <div class="legend" id="legend"></div>
+  </section>
+  <p class="note">끌어서 단어를 옮기고, 휠·두 손가락으로 확대할 수 있습니다. 단어나 선을 누르면 아래에 함께 나온 보도자료가 나옵니다.</p>
+
+  <section class="detail" aria-live="polite">
+    <div class="sel-head">
+      <span class="label" id="sel-label">고른 단어</span>
+      <strong id="sel-name">—</strong>
+      <span class="figs num" id="sel-figs"></span>
+      <div id="sel-actions"></div>
+      <div class="bars" id="sel-bars"></div>
+    </div>
+    <div>
+      <p class="docs-title" id="docs-title"></p>
+      <ul class="docs" id="sel-docs"></ul>
+    </div>
+  </section>
+
+  <details><summary>표로 보기 (그린 연결 전체)</summary><div class="table-wrap" id="table"></div></details>
+
+  <footer class="foot">
+    <p>연결 강도는 코사인 계수(함께 나온 보도자료 수 ÷ √(두 단어 각각의 보도자료 수의 곱))입니다. 각 단어에서 가장 강한 연결 몇 개만 남겨(3건 이상 함께 나온 경우) 뼈대만 보이게 했습니다. 묶음은 연결을 기준으로 모듈성을 높이는 방식(루뱅 알고리즘의 1단계)으로 나눴습니다.</p>
+    <p>중심어 연관어는 중심어가 나온 보도자료에 유독 많이 함께 나온 말을 ‘함께 나온 수 × log(1 + 향상도)’ 순으로 골랐습니다. 데이터와 코드: <a href="https://github.com/88kukkang/Ttest/tree/claude/moi-press-release-database-ncgqwa">github.com/88kukkang/Ttest</a></p>
+  </footer>
+</main>
+<div id="tip" hidden></div>
+
+<script>
+(() => {
+  const ARTICLE = "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=";
+  const EXAMPLES = ["인공지능", "지방정부", "재난", "소비쿠폰", "국가정보자원관리원", "산불", "주민자치", "통합특별시"];
+  const COMMON_SHARE = 0.5;
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => n.toLocaleString("ko-KR");
+  const monthLabel = (m) => { const [y, mo] = m.split("-"); return `${y}년 ${+mo}월`; };
+  const dateLabel = (d) => { const [y, m, dd] = d.split("-"); return `${y}. ${+m}. ${+dd}.`; };
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+  let D = null, months = [], mode = "net", sel = [], graph = null, selected = null, zoom = null, svgSel = null, fitTransform = null;
+
+  const tip = $("tip");
+  function showTip(title, value, x, y) {
+    tip.replaceChildren(el("div", "t", title), el("b", null, value));
+    tip.hidden = false;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let left = x + 14, top = y - h - 12;
+    if (left + w > innerWidth - 8) left = x - w - 14;
+    if (top < 8) top = y + 18;
+    tip.style.left = Math.max(8, left) + "px"; tip.style.top = top + "px";
+  }
+  const hideTip = () => (tip.hidden = true);
+  function message(text) { const m = $("msg"); m.textContent = text || ""; m.hidden = !text; }
+
+  // ---- 조건에 맞는 보도자료와 단어별 문서 빈도 ----
+  function selection() {
+    const from = $("from").value, to = $("to").value, dept = $("dept").value;
+    sel = D.docs.filter((d) => (!from || d.month >= from) && (!to || d.month <= to) && (dept === "" || d.dept === +dept));
+    const df = new Uint32Array(D.terms.length);
+    for (const d of sel) for (const t of d.terms) df[t]++;
+    return df;
+  }
+  const isCommon = (t, df) => $("common").checked && df[t] / Math.max(1, sel.length) >= COMMON_SHARE;
+
+  // 단어 묶음 사이 동시 출현 수
+  function coMatrix(nodeTerms) {
+    const n = nodeTerms.length, pos = new Int32Array(D.terms.length).fill(-1);
+    nodeTerms.forEach((t, i) => (pos[t] = i));
+    const co = new Uint32Array(n * n);
+    const present = [];
+    for (const d of sel) {
+      present.length = 0;
+      for (const t of d.terms) if (pos[t] >= 0) present.push(pos[t]);
+      for (let a = 0; a < present.length; a++) for (let b = a + 1; b < present.length; b++) {
+        const i = present[a], j = present[b];
+        co[i * n + j]++; co[j * n + i]++;
+      }
+    }
+    return co;
+  }
+  // 단어마다 코사인 계수가 큰 이웃 k개 (3건 이상 함께 나온 경우만)
+  function knnEdges(nodes, co, df, k, skip = () => false) {
+    const n = nodes.length, edges = new Map();
+    for (let i = 0; i < n; i++) {
+      if (skip(i)) continue;
+      const cand = [];
+      for (let j = 0; j < n; j++) {
+        if (i === j || skip(j)) continue;
+        const c = co[i * n + j];
+        if (c < 3) continue;
+        cand.push({ j, c, w: c / Math.sqrt(df[nodes[i].t] * df[nodes[j].t]) });
+      }
+      cand.sort((a, b) => b.w - a.w);
+      for (const e of cand.slice(0, k)) {
+        const key = i < e.j ? `${i}-${e.j}` : `${e.j}-${i}`;
+        if (!edges.has(key)) edges.set(key, { source: Math.min(i, e.j), target: Math.max(i, e.j), co: e.c, w: e.w });
+      }
+    }
+    return [...edges.values()];
+  }
+
+  // ---- 루뱅 1단계(국소 이동)로 묶음 나누기 ----
+  function communities(n, edges, skip = () => false) {
+    const adj = Array.from({ length: n }, () => []);
+    let m2 = 0;
+    for (const e of edges) { adj[e.source].push([e.target, e.w]); adj[e.target].push([e.source, e.w]); m2 += 2 * e.w; }
+    const k = adj.map((a) => a.reduce((s, x) => s + x[1], 0));
+    const comm = Array.from({ length: n }, (_, i) => i), tot = k.slice();
+    if (m2 === 0) return comm;
+    for (let pass = 0; pass < 20; pass++) {
+      let moved = false;
+      for (let i = 0; i < n; i++) {
+        if (skip(i) || !adj[i].length) continue;
+        const ci = comm[i];
+        tot[ci] -= k[i];
+        const links = new Map();
+        for (const [j, w] of adj[i]) if (!skip(j)) links.set(comm[j], (links.get(comm[j]) || 0) + w);
+        let best = ci, bestGain = (links.get(ci) || 0) - (tot[ci] * k[i]) / m2;
+        for (const [c, w] of links) {
+          const gain = w - (tot[c] * k[i]) / m2;
+          if (gain > bestGain + 1e-12 || (Math.abs(gain - bestGain) <= 1e-12 && c < best)) { best = c; bestGain = gain; }
+        }
+        comm[i] = best; tot[best] += k[i];
+        if (best !== ci) moved = true;
+      }
+      if (!moved) break;
+    }
+    return comm;
+  }
+
+  // ---- 그래프 만들기 ----
+  function buildNet(df) {
+    const N = +$("n").value;
+    const cand = [];
+    for (let t = 0; t < df.length; t++) if (df[t] >= 3 && !isCommon(t, df)) cand.push(t);
+    cand.sort((a, b) => df[b] - df[a] || a - b);
+    const nodes = cand.slice(0, N).map((t) => ({ t, term: D.terms[t], df: df[t] }));
+    const co = coMatrix(nodes.map((x) => x.t));
+    const links = knnEdges(nodes, co, df, +$("k").value);
+    return { nodes, links, co, center: -1 };
+  }
+  function findTerm(q) {
+    q = q.trim();
+    if (!q) return { t: -1 };
+    const exact = D.termIndex.get(q);
+    if (exact != null) return { t: exact };
+    let best = -1;
+    for (let t = 0; t < D.terms.length; t++) if (D.terms[t].includes(q) && (best < 0 || D.totalDf[t] > D.totalDf[best])) best = t;
+    return { t: best, approx: best >= 0 };
+  }
+  function buildEgo(df) {
+    const q = $("center").value;
+    const { t: c, approx } = findTerm(q);
+    if (c < 0) { message(`‘${q.trim()}’이(가) 들어간 단어를 찾지 못했습니다. 다른 말로 해 보세요.`); return null; }
+    if (approx) message(`‘${q.trim()}’ 단어가 따로 없어 가장 많이 나온 ‘${D.terms[c]}’로 보여줍니다.`);
+    const withC = sel.filter((d) => d.termSet.has(c)), nc = withC.length;
+    if (nc < 3) { message(`고른 범위에서 ‘${D.terms[c]}’이(가) 나온 보도자료가 ${nc}건뿐이라 연관어를 고를 수 없습니다. 기간이나 부서를 넓혀 보세요.`); return null; }
+    const dfc = new Uint32Array(D.terms.length);
+    for (const d of withC) for (const t of d.terms) dfc[t]++;
+    const N = Math.max(10, Math.round(+$("n").value * 0.6)), n = sel.length;
+    const cand = [];
+    for (let t = 0; t < df.length; t++) {
+      if (t === c || dfc[t] < 3 || isCommon(t, df)) continue;
+      if (D.terms[c].includes(D.terms[t])) continue;  // 중심어의 조각(인공지능 → 인공, 지능)은 연관어가 아니다
+      const lift = (dfc[t] / nc) / (df[t] / n);
+      if (lift <= 1) continue;
+      cand.push({ t, co: dfc[t], lift, score: dfc[t] * Math.log1p(lift) });
+    }
+    cand.sort((a, b) => b.score - a.score || a.t - b.t);
+    const rel = cand.slice(0, N);
+    const nodes = [{ t: c, term: D.terms[c], df: df[c], center: true }, ...rel.map((r) => ({ t: r.t, term: D.terms[r.t], df: df[r.t], co: r.co, lift: r.lift }))];
+    const co = coMatrix(nodes.map((x) => x.t));
+    const maxScore = rel.length ? rel[0].score : 1;
+    const spokes = rel.map((r, i) => ({ source: 0, target: i + 1, co: r.co, w: r.co / Math.sqrt(df[c] * df[r.t]), spoke: true, s: r.score / maxScore }));
+    const among = knnEdges(nodes, co, df, Math.min(2, +$("k").value), (i) => i === 0);
+    return { nodes, links: [...spokes, ...among], co, center: 0, nc };
+  }
+
+  // ---- 그리기 ----
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  function render() {
+    hideTip();
+    message("");
+    const df = selection();
+    graph = mode === "net" ? buildNet(df) : buildEgo(df);
+    const stage = $("stage");
+    if (!graph || !graph.nodes.length) { stage.replaceChildren(); $("legend").replaceChildren(); $("table").replaceChildren(); $("meta").textContent = `보도자료 ${fmt(sel.length)}건`; return; }
+    const { nodes, links } = graph;
+    // 묶음 (중심어 보기에서는 중심어를 빼고 나눔)
+    const skip = (i) => i === graph.center;
+    const comm = communities(nodes.length, links.filter((l) => !l.spoke), skip);
+    const groups = new Map();
+    nodes.forEach((nd, i) => { if (skip(i)) return; const g = comm[i]; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(i); });
+    const ranked = [...groups.values()].filter((g) => g.length >= 2).sort((a, b) => b.reduce((s, i) => s + nodes[i].df, 0) - a.reduce((s, i) => s + nodes[i].df, 0));
+    nodes.forEach((nd) => (nd.group = -1));
+    ranked.slice(0, 6).forEach((g, gi) => g.forEach((i) => (nodes[i].group = gi)));
+    const color = (nd) => (nd.center ? "var(--center)" : nd.group >= 0 ? `var(--c${nd.group + 1})` : "var(--other)");
+
+    const W = Math.max(300, stage.clientWidth), H = Math.round(Math.max(420, Math.min(700, W * 0.68)));
+    const maxDf = d3.max(nodes, (d) => d.df), minDf = d3.min(nodes, (d) => d.df);
+    const rScale = d3.scaleSqrt().domain([minDf, maxDf]).range([5, mode === "ego" ? 18 : 20]);
+    const fScale = d3.scaleSqrt().domain([minDf, maxDf]).range([11, 16]);
+    nodes.forEach((d) => { d.r = d.center ? 24 : rScale(d.df); d.fs = d.center ? 18 : fScale(d.df); });
+    const sim = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).distance((l) => (l.spoke ? 70 + 150 * (1 - l.s) : 40 + 110 * (1 - Math.min(1, l.w * 2)))).strength((l) => (l.spoke ? 0.25 : 0.15 + 0.6 * Math.min(1, l.w * 2))))
+      .force("charge", d3.forceManyBody().strength(mode === "ego" ? -260 : -200))
+      .force("collide", d3.forceCollide((d) => d.r + d.fs * d.term.length * 0.32 + 4).iterations(2))
+      .force("x", d3.forceX(W / 2).strength(0.04)).force("y", d3.forceY(H / 2).strength(0.06))
+      .stop();
+    if (graph.center >= 0) { nodes[0].fx = W / 2; nodes[0].fy = H / 2; }
+    for (let i = 0; i < 400; i++) sim.tick();
+
+    const svg = d3.create("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("height", H).attr("role", "img").attr("aria-label", mode === "net" ? "키워드 관계망" : `${nodes[0].term} 연관어 관계도`);
+    const g = svg.append("g");
+    const wMax = d3.max(links, (l) => l.w) || 1;
+    const lw = (l) => (l.spoke ? 1 + 4 * l.s : 1 + 4 * (l.w / wMax));
+    const lo = (l) => (l.spoke ? 0.35 + 0.5 * l.s : 0.3 + 0.55 * (l.w / wMax));
+    const linkG = g.append("g");
+    const linkSel = linkG.selectAll("line.link").data(links).join("line").attr("class", "link").attr("stroke-width", lw).attr("stroke-opacity", lo).attr("stroke-linecap", "round");
+    const hitSel = linkG.selectAll("line.link-hit").data(links).join("line").attr("class", "link-hit");
+    const nodeSel = g.append("g").selectAll("g.node").data(nodes).join("g").attr("class", "node").attr("tabindex", 0).attr("role", "button").attr("aria-label", (d) => `${d.term}, 보도자료 ${d.df}건`);
+    nodeSel.append("circle").attr("r", (d) => d.r).style("fill", color);
+    nodeSel.append("text").text((d) => d.term).attr("font-size", (d) => d.fs).attr("font-weight", (d) => (d.center || d.r > 12 ? 700 : 500))
+      .attr("x", (d) => (d.center ? 0 : d.r + 4)).attr("y", (d) => (d.center ? d.r + d.fs + 2 : 0)).attr("dy", (d) => (d.center ? 0 : "0.35em")).attr("text-anchor", (d) => (d.center ? "middle" : "start"));
+
+    function place() {
+      linkSel.attr("x1", (l) => l.source.x).attr("y1", (l) => l.source.y).attr("x2", (l) => l.target.x).attr("y2", (l) => l.target.y);
+      hitSel.attr("x1", (l) => l.source.x).attr("y1", (l) => l.source.y).attr("x2", (l) => l.target.x).attr("y2", (l) => l.target.y);
+      nodeSel.attr("transform", (d) => `translate(${d.x},${d.y})`);
+    }
+    place();
+
+    // 이웃 강조
+    const nb = new Map(nodes.map((d) => [d, new Set([d])]));
+    for (const l of links) { nb.get(l.source).add(l.target); nb.get(l.target).add(l.source); }
+    function focus(d) {
+      if (!d) { nodeSel.classed("dim", false); linkSel.classed("dim", false).classed("hl", false); return; }
+      const s = nb.get(d);
+      nodeSel.classed("dim", (x) => !s.has(x));
+      linkSel.classed("dim", (l) => l.source !== d && l.target !== d).classed("hl", (l) => l.source === d || l.target === d);
+    }
+    nodeSel.on("pointerenter", (e, d) => { focus(d); showTip(d.term, `보도자료 ${fmt(d.df)}건 · 연결 ${nb.get(d).size - 1}개`, e.clientX, e.clientY); })
+      .on("pointermove", (e, d) => showTip(d.term, `보도자료 ${fmt(d.df)}건 · 연결 ${nb.get(d).size - 1}개`, e.clientX, e.clientY))
+      .on("pointerleave", () => { focus(null); hideTip(); })
+      .on("click", (e, d) => { if (!e.defaultPrevented) selectNode(d); })
+      .on("keydown", (e, d) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectNode(d); } })
+      .on("focus", (e, d) => { focus(d); const r = e.currentTarget.getBoundingClientRect(); showTip(d.term, `보도자료 ${fmt(d.df)}건`, r.left + r.width / 2, r.top); })
+      .on("blur", () => { focus(null); hideTip(); });
+    hitSel.on("pointermove", (e, l) => showTip(`${l.source.term} + ${l.target.term}`, `함께 나온 보도자료 ${fmt(l.co)}건`, e.clientX, e.clientY))
+      .on("pointerenter", (e, l) => linkSel.filter((x) => x === l).classed("hl", true))
+      .on("pointerleave", (e, l) => { linkSel.filter((x) => x === l).classed("hl", false); hideTip(); })
+      .on("click", (e, l) => selectEdge(l));
+
+    // 끌기
+    nodeSel.call(d3.drag()
+      .on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.15).restart(); d.fx = d.x; d.fy = d.y; hideTip(); })
+      .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); if (!d.center) { d.fx = null; d.fy = null; } }));
+    sim.on("tick", place);
+
+    // 확대/이동, 처음엔 전체가 보이게 맞춤
+    zoom = d3.zoom().scaleExtent([0.4, 4]).on("zoom", (e) => g.attr("transform", e.transform));
+    svg.call(zoom).on("dblclick.zoom", null);
+    const xs = nodes.map((d) => d.x), ys = nodes.map((d) => d.y);
+    const pad = 30, extra = 90;
+    const x0 = d3.min(xs) - pad, x1 = d3.max(xs) + pad + extra, y0 = d3.min(ys) - pad, y1 = d3.max(ys) + pad;
+    const k = Math.min(1.4, W / (x1 - x0), H / (y1 - y0));
+    fitTransform = d3.zoomIdentity.translate(W / 2 - (k * (x0 + x1)) / 2, H / 2 - (k * (y0 + y1)) / 2).scale(k);
+    svg.call(zoom.transform, fitTransform);
+    svgSel = svg;
+    stage.replaceChildren(svg.node());
+
+    // 범례·메타·표
+    const lg = $("legend");
+    lg.replaceChildren();
+    if (graph.center >= 0) { const s = el("span"); const sw = el("span", "sw"); sw.style.background = "var(--center)"; s.append(sw, `중심어 ${nodes[0].term}`); lg.appendChild(s); }
+    ranked.slice(0, 6).forEach((grp, gi) => {
+      const words = grp.slice().sort((a, b) => nodes[b].df - nodes[a].df).slice(0, 4).map((i) => nodes[i].term);
+      const s = el("span"); const sw = el("span", "sw"); sw.style.background = `var(--c${gi + 1})`;
+      s.append(sw, `묶음 ${gi + 1} · ${words.join(" · ")}`); lg.appendChild(s);
+    });
+    if (nodes.some((d) => d.group < 0 && !d.center)) { const s = el("span"); const sw = el("span", "sw"); sw.style.background = "var(--other)"; s.append(sw, "어느 묶음에도 속하지 않음"); lg.appendChild(s); }
+    $("g-title").textContent = mode === "net" ? "전체 관계망" : `‘${nodes[0].term}’ 연관어`;
+    const range = [$("from").value ? monthLabel($("from").value) : "처음", $("to").value ? monthLabel($("to").value) : "끝"].join(" ~ ");
+    $("meta").textContent = `보도자료 ${fmt(sel.length)}건${graph.nc ? ` 중 중심어 포함 ${fmt(graph.nc)}건` : ""} · 단어 ${nodes.length}개 · 연결 ${links.length}개 · ${range}${$("dept").value !== "" ? " · " + D.depts[+$("dept").value] : ""}`;
+    const t = el("table", "data");
+    const hr = t.createTHead().insertRow();
+    for (const h of ["단어 A", "단어 B", "함께 나온 보도자료", "연결 강도(코사인)"]) hr.appendChild(el("th", null, h));
+    const tb = t.createTBody();
+    links.slice().sort((a, b) => b.co - a.co).forEach((l) => { const tr = tb.insertRow(); [l.source.term, l.target.term, fmt(l.co), l.w.toFixed(3)].forEach((v) => (tr.insertCell().textContent = v)); });
+    $("table").replaceChildren(t);
+
+    // 처음 고른 상태: 중심어 또는 가장 큰 단어
+    const keep = selected && selected.type === "node" && nodes.find((d) => d.term === selected.term);
+    selectNode(keep || (graph.center >= 0 ? nodes[0] : nodes.reduce((a, b) => (b.df > a.df ? b : a))));
+  }
+
+  // ---- 상세 패널 ----
+  function docList(filterFn, title) {
+    const list = sel.filter(filterFn);
+    $("docs-title").textContent = `${title} (${fmt(list.length)}건 중 최근 ${Math.min(6, list.length)}건)`;
+    const ul = $("sel-docs"); ul.replaceChildren();
+    for (const d of list.slice(0, 6)) {
+      const li = el("li");
+      li.appendChild(el("span", "d-meta num", `${dateLabel(d.date)} · ${D.depts[d.dept] || "부서 미상"}`));
+      const a = el("a", null, d.title); a.href = ARTICLE + d.id; a.target = "_blank"; a.rel = "noopener";
+      li.appendChild(a); ul.appendChild(li);
+    }
+  }
+  function markSelected(pred) { if (svgSel) svgSel.selectAll("g.node").classed("sel", pred); }
+  function selectNode(d) {
+    selected = { type: "node", term: d.term };
+    markSelected((x) => x === d);
+    $("sel-label").textContent = d.center ? "중심어" : "고른 단어";
+    $("sel-name").textContent = d.term;
+    $("sel-figs").textContent = `고른 범위 보도자료 ${fmt(sel.length)}건 중 ${fmt(d.df)}건`;
+    const act = $("sel-actions"); act.replaceChildren();
+    if (!d.center) {
+      const b = el("button", "btn-ghost", "이 단어를 중심으로 보기"); b.type = "button";
+      b.addEventListener("click", () => { $("center").value = d.term; setMode("ego"); });
+      act.appendChild(b);
+    }
+    // 함께 많이 나온 말 (그린 단어 안에서)
+    const i = graph.nodes.indexOf(d), n = graph.nodes.length;
+    const rows = graph.nodes.map((x, j) => ({ x, c: j === i ? 0 : graph.co[i * n + j] })).filter((r) => r.c > 0).sort((a, b) => b.c - a.c).slice(0, 8);
+    const bars = $("sel-bars"); bars.replaceChildren();
+    if (rows.length) bars.appendChild(el("span", "note", "그린 단어 가운데 함께 많이 나온 말"));
+    const max = rows.length ? rows[0].c : 1;
+    for (const r of rows) {
+      const row = el("div", "bar-row");
+      const nameBtn = el("button", null, r.x.term); nameBtn.type = "button";
+      nameBtn.addEventListener("click", () => selectNode(r.x));
+      const track = el("div", "bar-track"), fill = el("div", "bar-fill"); fill.style.width = (r.c / max) * 100 + "%"; track.appendChild(fill);
+      row.append(nameBtn, track, el("span", "v", fmt(r.c)));
+      bars.appendChild(row);
+    }
+    docList((doc) => doc.termSet.has(d.t), `‘${d.term}’이(가) 나온 보도자료`);
+  }
+  function selectEdge(l) {
+    selected = { type: "edge" };
+    markSelected((x) => x === l.source || x === l.target);
+    $("sel-label").textContent = "고른 연결";
+    $("sel-name").textContent = `${l.source.term} + ${l.target.term}`;
+    $("sel-figs").textContent = `함께 나온 보도자료 ${fmt(l.co)}건 · 연결 강도 ${l.w.toFixed(3)}`;
+    $("sel-actions").replaceChildren(); $("sel-bars").replaceChildren();
+    docList((doc) => doc.termSet.has(l.source.t) && doc.termSet.has(l.target.t), `두 단어가 함께 나온 보도자료`);
+  }
+
+  // ---- 입력 연결 ----
+  function setMode(m) {
+    mode = m;
+    $("mode-net").setAttribute("aria-pressed", String(m === "net"));
+    $("mode-ego").setAttribute("aria-pressed", String(m === "ego"));
+    $("centerbox").hidden = m !== "ego";
+    selected = null;
+    render();
+  }
+  $("mode-net").addEventListener("click", () => setMode("net"));
+  $("mode-ego").addEventListener("click", () => setMode("ego"));
+  $("centerbox").addEventListener("submit", (e) => { e.preventDefault(); selected = null; render(); });
+  for (const ex of EXAMPLES) {
+    const b = el("button", "ex", ex); b.type = "button";
+    b.addEventListener("click", () => { $("center").value = ex; selected = null; render(); });
+    $("centerbox").appendChild(b);
+  }
+  for (const id of ["from", "to", "dept", "n", "k", "common"]) $(id).addEventListener("change", render);
+  $("reset").addEventListener("click", () => { if (svgSel && fitTransform) svgSel.transition().duration(300).call(zoom.transform, fitTransform); });
+  let lastW = 0, rt = 0;
+  new ResizeObserver(() => { const w = $("stage").clientWidth; if (!D || Math.abs(w - lastW) < 16) return; lastW = w; clearTimeout(rt); rt = setTimeout(render, 250); }).observe($("stage"));
+
+  // ---- 데이터 ----
+  async function load() {
+    if (!window.d3) throw new Error("그래프 라이브러리(d3)를 불러오지 못했습니다");
+    const res = await fetch("cloud.b64.txt");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const bin = atob((await res.text()).trim());
+    const buf = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    const raw = JSON.parse(await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"))).text());
+    D = { terms: raw.terms, depts: raw.depts, docs: raw.docs.map(([id, date, dept, title, terms]) => ({ id, date, month: date.slice(0, 7), dept, title, terms, termSet: new Set(terms) })) };
+    D.termIndex = new Map(D.terms.map((t, i) => [t, i]));
+    D.totalDf = new Uint32Array(D.terms.length);
+    for (const d of D.docs) for (const t of d.terms) D.totalDf[t]++;
+    months = [...new Set(D.docs.map((d) => d.month))].sort();
+    for (const id of ["from", "to"]) {
+      const s = $(id);
+      s.appendChild(new Option(id === "from" ? "처음부터" : "끝까지", ""));
+      for (const m of months) s.appendChild(new Option(monthLabel(m), m));
+    }
+    const cnt = new Map();
+    for (const d of D.docs) cnt.set(d.dept, (cnt.get(d.dept) || 0) + 1);
+    $("dept").options[0].textContent = `전체 부서 (${cnt.size})`;
+    for (const [i, n] of [...cnt].sort((a, b) => b[1] - a[1])) $("dept").appendChild(new Option(`${D.depts[i] || "부서 미상"} (${n})`, String(i)));
+    const dl = $("terms-list");
+    [...D.totalDf.keys()].sort((a, b) => D.totalDf[b] - D.totalDf[a]).slice(0, 1500).forEach((t) => dl.appendChild(new Option(D.terms[t])));
+    if (window.innerWidth < 520) $("n").value = "30";
+    lastW = $("stage").clientWidth;
+    render();
+  }
+  load().catch((e) => { $("meta").textContent = `불러오지 못했습니다 (${e.message}). 페이지를 새로 고쳐 보세요.`; });
+})();
+</script>

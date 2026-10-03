@@ -98,6 +98,19 @@ tests/                    합성 HTML·HWPX·PDF 로 전 과정을 오프라인 
 - `dataset/attachments.csv` — 첨부 목록과 처리 상태
 - 원본 HTML·첨부까지 포함한 전체 `data/` 는 실행 페이지의 Artifacts(`moisdb-data-full`, 30일 보관)
 
+## 웹 페이지 (`web/`)
+
+수집한 DB 로 만든 정적 페이지. 데이터 파일은 `python ci/build_web_data.py` 로 `web/` 에 만든다(저장소에는 올리지 않음).
+
+| 파일 | 내용 | 데이터 |
+|---|---|---|
+| `web/search.html` | 보도자료 제목·본문 검색 (AND·"구절"·-제외, 기간·부서, 월별 분포, 결과 복사) | `docs.b64.txt` |
+| `web/cloud.html` | 키워드 클라우드 (단어 수 50/100/200, 많이 나온 말·두드러진 말, 단어별 추이) | `cloud.b64.txt` |
+| `web/network.html` | 키워드 관계도 (전체 관계망·중심어 연관어, 묶음 색, 연결별 보도자료) | `cloud.b64.txt` |
+| `reports/keyword_report.html` | 첫 키워드 분석 보고서 (월별 특징어, 표기 변화, 주제 흐름) | 페이지 안에 포함 |
+
+로컬에서 볼 때는 `cd web && python -m http.server` 후 브라우저로 연다(파일을 직접 열면 데이터 파일을 못 읽는다).
+
 ## 주의
 
 - 사이트 구조는 2026-10-02 실제 페이지로 확인했다([DESIGN.md §7](docs/DESIGN.md#7-실제-사이트-확인-결과-2026-10-02-github-actions-정찰)). 개편되면 `recon` 부터 다시.
