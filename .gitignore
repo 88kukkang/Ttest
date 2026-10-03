@@ -6,5 +6,5 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 
-# 검색 페이지 데이터 (ci/build_search_data.py 로 생성)
-web/docs.b64.txt
+# 검색 페이지 데이터 (ci/build_web_data.py 로 생성)
+web/*.b64.txt

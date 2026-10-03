@@ -1,0 +1,411 @@
+<title>행안부 키워드 클라우드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@800&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.3/src/wordcloud2.js"></script>
+<style>
+/* 레이아웃: 보도자료 서식 한 장. 조건 줄 → 클라우드 판(빅카인즈식 머리띠) → 고른 단어의 상세 → 표 */
+:root {
+  --bg: #eef0f2; --paper: #ffffff; --ink: #15181c; --ink-2: #4a515a; --muted: #7b828b;
+  --line: #e1e4e8; --axis: #c5cad0; --accent: #2a78d6; --accent-soft: #e8f1fc; --band: #e9f3fe;
+  --bar: #2a78d6; --bar-dim: #b7d3f6;
+  /* 단어 색 8개: 글자로 읽히도록 바탕 대비를 맞춘 값 */
+  --w1: #2a78d6; --w2: #d4561f; --w3: #128a60; --w4: #a86f00; --w5: #c4457a; --w6: #008300; --w7: #4a3aa7; --w8: #d03b3b;
+  /* 한 색 모드: 파랑 농도 3단계 */
+  --q1: #104281; --q2: #1c5cab; --q3: #3f86dd;
+  --tip-bg: #15181c; --tip-ink: #ffffff;
+  --font-display: "Nanum Myeongjo", "Noto Serif KR", "Batang", serif;
+  --font-body: "Noto Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --step--1: 0.8125rem; --step-0: 0.9375rem; --step-1: 1.0625rem; --step-2: 1.375rem; --step-3: clamp(1.7rem, 4vw, 2.3rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1013; --paper: #171a1e; --ink: #f1f3f5; --ink-2: #b9bfc7; --muted: #8b929b;
+    --line: #2a2f35; --axis: #3b4149; --accent: #6da7ec; --accent-soft: #1a2738; --band: #1a2738;
+    --bar: #3987e5; --bar-dim: #1f3a5c;
+    --w1: #5598e7; --w2: #e2703f; --w3: #2bb383; --w4: #d69a1c; --w5: #e06b97; --w6: #3fae3f; --w7: #9085e9; --w8: #e66767;
+    --q1: #b7d3f6; --q2: #6da7ec; --q3: #3987e5;
+    --tip-bg: #f1f3f5; --tip-ink: #15181c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1013; --paper: #171a1e; --ink: #f1f3f5; --ink-2: #b9bfc7; --muted: #8b929b;
+  --line: #2a2f35; --axis: #3b4149; --accent: #6da7ec; --accent-soft: #1a2738; --band: #1a2738;
+  --bar: #3987e5; --bar-dim: #1f3a5c;
+  --w1: #5598e7; --w2: #e2703f; --w3: #2bb383; --w4: #d69a1c; --w5: #e06b97; --w6: #3fae3f; --w7: #9085e9; --w8: #e66767;
+  --q1: #b7d3f6; --q2: #6da7ec; --q3: #3987e5;
+  --tip-bg: #f1f3f5; --tip-ink: #15181c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: var(--step-0); line-height: 1.65; padding-inline: 16px; padding-block: 24px 48px; }
+.sheet { max-width: 1000px; margin: 0 auto; background: var(--paper); border: 1px solid var(--line); padding: clamp(18px, 4vw, 44px); display: grid; gap: 24px; }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: var(--step-3); line-height: 1.2; margin: 0; text-wrap: balance; }
+h2, h3 { margin: 0; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+.head { display: grid; gap: 10px; }
+.stamp { width: fit-content; border: 2px solid var(--ink); padding: 1px 10px; font-family: var(--font-display); font-weight: 800; letter-spacing: 0.3em; font-size: var(--step-0); }
+.scope { color: var(--ink-2); font-size: var(--step--1); max-width: 70ch; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding-block: 12px; }
+.field { display: grid; gap: 2px; font-size: var(--step--1); color: var(--muted); min-width: 0; }
+.field select { font: inherit; font-size: var(--step--1); color: var(--ink); background: var(--paper); border: 1px solid var(--axis); padding: 5px 8px; max-width: 100%; }
+.field.dept select { max-width: 15em; }
+.note { font-size: var(--step--1); color: var(--muted); }
+
+/* 클라우드 판: 위쪽 머리띠 + 오른쪽 위 단어 수 */
+.panel { border: 1px solid var(--line); border-top: 3px solid var(--ink); }
+.panel-band { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; background: var(--band); padding: 10px 16px; }
+.panel-band h2 { font-size: var(--step-1); font-weight: 700; }
+.panel-band .meta { font-size: var(--step--1); color: var(--ink-2); }
+.panel-tools { display: flex; gap: 8px; align-items: center; }
+.panel-tools select { font: inherit; font-size: var(--step-0); padding: 4px 8px; border: 1px solid var(--axis); background: var(--paper); color: var(--ink); }
+.btn-ghost { font: inherit; cursor: pointer; padding: 5px 12px; border: 1px solid var(--axis); background: var(--paper); color: var(--ink-2); font-size: var(--step--1); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--ink); }
+.stage { position: relative; padding: 12px; min-width: 0; }
+.stage canvas { display: block; width: 100%; cursor: pointer; }
+.drawing { position: absolute; top: 14px; left: 16px; font-size: var(--step--1); color: var(--muted); }
+
+.detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; align-items: start; }
+@media (max-width: 720px) { .detail { grid-template-columns: 1fr; } }
+.word-head { display: grid; gap: 4px; }
+.word-head .label { font-size: var(--step--1); color: var(--muted); }
+.word-head strong { font-family: var(--font-display); font-size: var(--step-2); }
+.word-head .figs { font-size: var(--step--1); color: var(--ink-2); }
+.chart { position: relative; width: 100%; min-width: 0; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart text { fill: var(--muted); font-family: var(--font-body); font-size: 11px; }
+.chart .val { fill: var(--ink); font-weight: 700; font-size: 12px; }
+.chart .base { stroke: var(--axis); stroke-width: 1; }
+.hit { fill: transparent; }
+.mark { pointer-events: none; }
+.hit:hover + .mark { opacity: 0.75; }
+.docs { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+.docs li { padding: 8px 0; border-bottom: 1px solid var(--line); display: grid; gap: 2px; min-width: 0; }
+.docs .d-meta { font-size: var(--step--1); color: var(--muted); }
+.docs a { color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+.docs a:hover { color: var(--accent); text-decoration: underline; }
+.docs-title { font-size: var(--step--1); color: var(--muted); margin-bottom: 4px; }
+
+details { font-size: var(--step--1); }
+summary { cursor: pointer; color: var(--accent); width: fit-content; }
+details[open] summary { margin-bottom: 8px; }
+.table-wrap { overflow-x: auto; max-height: 28rem; overflow-y: auto; }
+table.data { width: 100%; border-collapse: collapse; }
+table.data th, table.data td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+table.data th:nth-child(2), table.data td:nth-child(2) { text-align: left; }
+table.data thead th { color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--axis); position: sticky; top: 0; background: var(--paper); }
+table.data td { font-variant-numeric: tabular-nums; }
+.foot { font-size: var(--step--1); color: var(--muted); display: grid; gap: 4px; }
+
+#tip { position: fixed; z-index: 10; pointer-events: none; background: var(--tip-bg); color: var(--tip-ink); padding: 7px 10px; border-radius: 6px; font-size: 12px; line-height: 1.5; box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
+#tip .t { opacity: 0.75; }
+#tip b { font-variant-numeric: tabular-nums; }
+#toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--tip-bg); color: var(--tip-ink); padding: 8px 14px; border-radius: 6px; font-size: var(--step--1); z-index: 11; max-width: calc(100% - 32px); }
+</style>
+
+<main class="sheet">
+  <header class="head">
+    <span class="stamp">키워드</span>
+    <h1>행안부 키워드 클라우드</h1>
+    <p class="scope">이재명 정부 출범(2025. 6. 4.)부터 2026. 10. 2.까지 행정안전부 보도자료 1,786건에서 뽑은 명사로 그린 클라우드입니다. 글자가 클수록 그 단어가 나온 보도자료가 많습니다. 단어를 누르면 언제, 어떤 보도자료에 나왔는지 보여줍니다.</p>
+  </header>
+
+  <div class="filters">
+    <label class="field" for="from">시작<select id="from"></select></label>
+    <label class="field" for="to">끝<select id="to"></select></label>
+    <label class="field dept" for="dept">부서<select id="dept"><option value="">전체 부서</option></select></label>
+    <label class="field" for="basis">기준<select id="basis"><option value="df">많이 나온 말</option><option value="z">이 범위에서 두드러진 말</option></select></label>
+    <label class="field" for="palette">색<select id="palette"><option value="multi">여러 색</option><option value="mono">한 색 (클수록 진하게)</option></select></label>
+  </div>
+  <p class="note" id="basis-note" hidden></p>
+
+  <section class="panel" aria-labelledby="cloud-title">
+    <div class="panel-band">
+      <div><h2 id="cloud-title">키워드 클라우드</h2><span class="meta num" id="meta">불러오는 중…</span></div>
+      <div class="panel-tools">
+        <label for="topn" hidden>단어 수</label>
+        <select id="topn" aria-label="단어 수"><option value="50">50</option><option value="100" selected>100</option><option value="200">200</option></select>
+        <button class="btn-ghost" id="copy" type="button">이미지 복사</button>
+      </div>
+    </div>
+    <div class="stage" id="stage">
+      <span class="drawing" id="drawing" hidden>그리는 중…</span>
+      <canvas id="cloud" role="img" aria-label="키워드 클라우드"></canvas>
+    </div>
+  </section>
+
+  <section class="detail" aria-live="polite">
+    <div class="word-head">
+      <span class="label">고른 단어</span>
+      <strong id="w-term">—</strong>
+      <span class="figs num" id="w-figs"></span>
+      <div class="chart" id="w-chart"></div>
+      <span class="note">월별로 이 단어가 나온 보도자료 수 (부서 조건 반영, 고른 기간은 진하게)</span>
+    </div>
+    <div>
+      <p class="docs-title" id="docs-title">이 단어가 나온 최근 보도자료</p>
+      <ul class="docs" id="w-docs"></ul>
+    </div>
+  </section>
+
+  <details><summary>표로 보기 (클라우드에 그린 단어 전체)</summary><div class="table-wrap" id="table"></div></details>
+
+  <footer class="foot">
+    <p>단어는 형태소 분석기 Kiwi로 뽑은 명사와 띄어 쓰지 않은 복합명사입니다. ‘추진’·‘개최’처럼 거의 모든 보도자료에 나오는 행정 용어와 기관명은 뺐습니다. 색은 단어를 구분하기 위한 것이고 따로 뜻은 없습니다.</p>
+    <p>‘두드러진 말’은 고른 범위를 나머지 보도자료와 견준 로그오즈비(z값)로 크기를 정합니다. 데이터와 코드: <a href="https://github.com/88kukkang/Ttest/tree/claude/moi-press-release-database-ncgqwa">github.com/88kukkang/Ttest</a></p>
+  </footer>
+</main>
+<div id="tip" hidden></div>
+<div id="toast" hidden></div>
+
+<script>
+(() => {
+  const ARTICLE = "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=";
+  const $ = (id) => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+  const fmt = (n) => n.toLocaleString("ko-KR");
+  const pct = (x) => (x * 100).toFixed(x < 0.1 ? 1 : 0) + "%";
+  const monthLabel = (m) => { const [y, mo] = m.split("-"); return `${y}년 ${+mo}월`; };
+  const dateLabel = (d) => { const [y, m, dd] = d.split("-"); return `${y}. ${+m}. ${+dd}.`; };
+  const tickLabel = (m, first) => { const [y, mo] = m.split("-"); return first || mo === "01" ? `${y.slice(2)}.${+mo}` : `${+mo}`; };
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const svgEl = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+  function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => (t.hidden = true), 2600); }
+
+  let D = null, months = [], totalDf = null, words = [], selDocs = [], picked = null, drawSeq = 0;
+
+  // ---- 툴팁 ----
+  const tip = $("tip");
+  function showTip(title, value, x, y) {
+    tip.replaceChildren(el("div", "t", title), el("b", null, value));
+    tip.hidden = false;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let left = x + 14, top = y - h - 12;
+    if (left + w > innerWidth - 8) left = x - w - 14;
+    if (top < 8) top = y + 18;
+    tip.style.left = Math.max(8, left) + "px"; tip.style.top = top + "px";
+  }
+  const hideTip = () => (tip.hidden = true);
+
+  // ---- 조건에 맞는 보도자료와 단어 점수 ----
+  function compute() {
+    const from = $("from").value, to = $("to").value, dept = $("dept").value;
+    selDocs = D.docs.filter((d) => (!from || d.month >= from) && (!to || d.month <= to) && (dept === "" || d.dept === +dept));
+    const df = new Uint32Array(D.terms.length);
+    for (const d of selDocs) for (const t of d.terms) df[t]++;
+    const filtered = selDocs.length !== D.docs.length;
+    let basis = $("basis").value;
+    const note = $("basis-note");
+    note.hidden = true;
+    if (basis === "z" && !filtered) {
+      basis = "df";
+      note.textContent = "‘두드러진 말’은 기간이나 부서를 골라야 비교할 대상이 생깁니다. 지금은 많이 나온 말로 그렸습니다.";
+      note.hidden = false;
+    }
+    const n = Math.max(1, selDocs.length);
+    let scored = [];
+    if (basis === "df") {
+      for (let i = 0; i < df.length; i++) if (df[i] > 0) scored.push({ i, df: df[i], score: df[i] });
+    } else {
+      // 정보적 사전분포 로그오즈비 (보고서와 같은 식)
+      let nT = 0, nR = 0, pooledTotal = 0;
+      for (let i = 0; i < df.length; i++) { nT += df[i]; nR += totalDf[i] - df[i]; pooledTotal += totalDf[i]; }
+      const prior = 500;
+      for (let i = 0; i < df.length; i++) {
+        if (df[i] < 3) continue;
+        const a = (prior * totalDf[i]) / pooledTotal, yT = df[i], yR = totalDf[i] - df[i];
+        const delta = Math.log((yT + a) / (nT + prior - yT - a)) - Math.log((yR + a) / (nR + prior - yR - a));
+        const z = delta / Math.sqrt(1 / (yT + a) + 1 / (yR + a));
+        if (z > 0) scored.push({ i, df: df[i], score: z });
+      }
+    }
+    scored.sort((a, b) => b.score - a.score || b.df - a.df);
+    words = scored.slice(0, +$("topn").value).map((w) => ({ ...w, term: D.terms[w.i], share: w.df / n }));
+    const parts = [`보도자료 ${fmt(selDocs.length)}건`, `단어 ${fmt(words.length)}개`];
+    if (from || to) parts.push(`${from ? monthLabel(from) : "처음"} ~ ${to ? monthLabel(to) : "끝"}`);
+    if (dept !== "") parts.push(D.depts[+dept] || "부서 미상");
+    $("meta").textContent = parts.join(" · ");
+    renderTable(basis);
+    return basis;
+  }
+
+  // ---- 클라우드 그리기 ----
+  function hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function draw() {
+    const canvas = $("cloud");
+    if (!window.WordCloud || !WordCloud.isSupported) { $("drawing").hidden = false; $("drawing").textContent = "이 브라우저에서는 클라우드를 그릴 수 없습니다. 아래 ‘표로 보기’를 이용하세요."; return; }
+    const cssW = Math.max(280, $("stage").clientWidth - 24);
+    const cssH = Math.round(Math.max(320, Math.min(620, cssW * 0.62)));
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+    canvas.style.height = cssH + "px";
+    const many = words.length > 120;
+    const maxPx = Math.max(30, Math.min(80, cssW * (many ? 0.07 : 0.085)));
+    const minPx = many ? 10 : 12;
+    const vals = words.map((w) => w.score);
+    const hi = Math.max(...vals), lo = Math.min(...vals);
+    const size = (v) => minPx + (maxPx - minPx) * Math.sqrt(hi === lo ? 1 : (v - lo) / (hi - lo));
+    const multi = $("palette").value === "multi";
+    const wc = [1, 2, 3, 4, 5, 6, 7, 8].map((k) => css(`--w${k}`));
+    const qc = [css("--q1"), css("--q2"), css("--q3")];
+    const colorOf = new Map(words.map((w, r) => [w.term, multi ? wc[hash(w.term) % 8] : qc[r < words.length * 0.1 ? 0 : r < words.length * 0.4 ? 1 : 2]]));
+    const byTerm = new Map(words.map((w) => [w.term, w]));
+    const seq = ++drawSeq;
+    $("drawing").hidden = false; $("drawing").textContent = "그리는 중…";
+    canvas.addEventListener("wordcloudstop", () => { if (seq === drawSeq) $("drawing").hidden = true; }, { once: true });
+    WordCloud(canvas, {
+      list: words.map((w) => [w.term, size(w.score)]),
+      weightFactor: (s) => s * dpr,
+      fontFamily: '"Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
+      fontWeight: (word, weight) => (weight >= maxPx * 0.45 ? "700" : "500"),
+      color: (word) => colorOf.get(word),
+      backgroundColor: "rgba(0,0,0,0)",
+      gridSize: Math.round((many ? 7 : 9) * dpr),  // 낱말 사이 간격: 좁으면 이웃 단어가 붙어 복합어처럼 읽힌다
+      rotateRatio: 0,
+      shape: "circle",
+      ellipticity: Math.min(1, cssH / cssW + 0.05),
+      shuffle: false,
+      shrinkToFit: true,
+      drawOutOfBound: false,
+      hover: (item, dim, evt) => {
+        canvas.style.cursor = item ? "pointer" : "default";
+        if (!item) return hideTip();
+        const w = byTerm.get(item[0]);
+        showTip(w.term, `${fmt(w.df)}건 (${pct(w.share)})`, evt.clientX, evt.clientY);
+      },
+      click: (item) => { if (item) pick(item[0]); },
+    });
+  }
+  $("cloud").addEventListener("mouseleave", hideTip);
+
+  // ---- 고른 단어 상세 ----
+  function pick(term) {
+    picked = term;
+    const ti = D.terms.indexOf(term);
+    const dept = $("dept").value, from = $("from").value, to = $("to").value;
+    const pool = D.docs.filter((d) => (dept === "" || d.dept === +dept) && d.termSet.has(ti));
+    const inSel = pool.filter((d) => (!from || d.month >= from) && (!to || d.month <= to));
+    $("w-term").textContent = term;
+    $("w-figs").textContent = `고른 범위 보도자료 ${fmt(selDocs.length)}건 중 ${fmt(inSel.length)}건 (${pct(inSel.length / Math.max(1, selDocs.length))})`;
+    // 월별 막대
+    const box = $("w-chart");
+    const counts = months.map((m) => pool.filter((d) => d.month === m).length);
+    const W = Math.max(240, box.clientWidth), H = 110, mm = { l: 0, r: 0, t: 16, b: 18 };
+    const ih = H - mm.t - mm.b, band = W / months.length, bw = Math.min(24, band * 0.66);
+    const max = Math.max(1, ...counts), maxI = counts.indexOf(max);
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": `${term} 월별 보도자료 수` });
+    svgEl("line", { x1: 0, x2: W, y1: mm.t + ih, y2: mm.t + ih, class: "base" }, svg);
+    months.forEach((m, i) => {
+      const cx = band * i + band / 2, h = (counts[i] / max) * ih, y = mm.t + ih - h;
+      const on = (!from || m >= from) && (!to || m <= to);
+      const hit = svgEl("rect", { x: band * i, y: 0, width: band, height: mm.t + ih, class: "hit", tabindex: 0, "aria-label": `${monthLabel(m)} ${counts[i]}건` }, svg);
+      if (h > 0) { const r = Math.min(4, bw / 2, h); svgEl("path", { class: "mark", d: `M${cx - bw / 2},${y + h}V${y + r}Q${cx - bw / 2},${y} ${cx - bw / 2 + r},${y}H${cx + bw / 2 - r}Q${cx + bw / 2},${y} ${cx + bw / 2},${y + r}V${y + h}Z`, style: `fill:var(${on ? "--bar" : "--bar-dim"})` }, svg); }
+      else svgEl("g", { class: "mark" }, svg);
+      const show = (x, yy) => showTip(`${term} · ${monthLabel(m)}${m === "2026-10" ? " (이틀치)" : ""}`, `${counts[i]}건`, x, yy);
+      hit.addEventListener("pointermove", (e) => show(e.clientX, e.clientY));
+      hit.addEventListener("pointerleave", hideTip);
+      hit.addEventListener("focus", () => { const r = hit.getBoundingClientRect(); show(r.left + r.width / 2, r.top + 10); });
+      hit.addEventListener("blur", hideTip);
+    });
+    const tl = svgEl("text", { x: 0, y: H - 4 }, svg); tl.textContent = tickLabel(months[0], true);
+    const tr = svgEl("text", { x: W, y: H - 4, "text-anchor": "end" }, svg); tr.textContent = tickLabel(months[months.length - 1], true);
+    if (max > 0) { const t = svgEl("text", { x: band * maxI + band / 2, y: mm.t + ih - ih - 4, "text-anchor": "middle", class: "val num" }, svg); t.textContent = max; }
+    box.replaceChildren(svg);
+    // 최근 보도자료
+    $("docs-title").textContent = `이 단어가 나온 고른 범위의 최근 보도자료 (${fmt(inSel.length)}건 중 ${Math.min(6, inSel.length)}건)`;
+    const list = $("w-docs");
+    list.replaceChildren();
+    for (const d of inSel.slice(0, 6)) {
+      const li = el("li");
+      li.appendChild(el("span", "d-meta num", `${dateLabel(d.date)} · ${D.depts[d.dept] || "부서 미상"}`));
+      const a = el("a", null, d.title); a.href = ARTICLE + d.id; a.target = "_blank"; a.rel = "noopener";
+      li.appendChild(a);
+      list.appendChild(li);
+    }
+  }
+
+  // ---- 표 ----
+  function renderTable(basis) {
+    const t = el("table", "data");
+    const hr = t.createTHead().insertRow();
+    for (const h of ["순위", "단어", "보도자료 수", "비율", ...(basis === "z" ? ["z값"] : [])]) hr.appendChild(el("th", null, h));
+    const tb = t.createTBody();
+    words.forEach((w, r) => {
+      const tr = tb.insertRow();
+      [String(r + 1), w.term, fmt(w.df), pct(w.share), ...(basis === "z" ? [w.score.toFixed(1)] : [])].forEach((v) => (tr.insertCell().textContent = v));
+    });
+    $("table").replaceChildren(t);
+  }
+
+  // ---- 이미지 복사 (다운로드는 이 화면에서 막혀 있어 클립보드로) ----
+  $("copy").addEventListener("click", () => {
+    const src = $("cloud");
+    const out = document.createElement("canvas");
+    out.width = src.width; out.height = src.height;
+    const ctx = out.getContext("2d");
+    ctx.fillStyle = css("--paper"); ctx.fillRect(0, 0, out.width, out.height);
+    ctx.drawImage(src, 0, 0);
+    try {
+      const blob = new Promise((res) => out.toBlob(res, "image/png"));
+      navigator.clipboard.write([new ClipboardItem({ "image/png": blob })])
+        .then(() => toast("클라우드 이미지를 복사했습니다. 문서나 메신저에 붙여넣으면 됩니다."))
+        .catch(() => toast("이 화면에서는 이미지 복사가 막혀 있습니다. 화면 캡처를 이용해 주세요."));
+    } catch { toast("이 화면에서는 이미지 복사가 막혀 있습니다. 화면 캡처를 이용해 주세요."); }
+  });
+
+  // ---- 다시 그리기 ----
+  function refresh() {
+    hideTip();
+    compute();
+    draw();
+    const keep = picked && words.some((w) => w.term === picked) ? picked : words[0] && words[0].term;
+    if (keep) pick(keep);
+  }
+  for (const id of ["from", "to", "dept", "basis", "topn"]) $(id).addEventListener("change", refresh);
+  $("palette").addEventListener("change", () => { hideTip(); draw(); });
+  let lastW = 0, rt = 0;
+  new ResizeObserver(() => {
+    const w = $("stage").clientWidth;
+    if (!D || Math.abs(w - lastW) < 8) return;
+    lastW = w; clearTimeout(rt);
+    rt = setTimeout(() => { draw(); if (picked) pick(picked); }, 200);
+  }).observe($("stage"));
+  const redrawTheme = () => { if (D) { draw(); if (picked) pick(picked); } };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", redrawTheme);
+  new MutationObserver(redrawTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  // ---- 데이터 불러오기 ----
+  async function load() {
+    const res = await fetch("cloud.b64.txt");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const bin = atob((await res.text()).trim());
+    const buf = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    const raw = JSON.parse(await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"))).text());
+    D = {
+      terms: raw.terms, depts: raw.depts,
+      docs: raw.docs.map(([id, date, dept, title, terms]) => ({ id, date, month: date.slice(0, 7), dept, title, terms, termSet: new Set(terms) })),
+    };
+    totalDf = new Uint32Array(D.terms.length);
+    for (const d of D.docs) for (const t of d.terms) totalDf[t]++;
+    months = [...new Set(D.docs.map((d) => d.month))].sort();
+    for (const id of ["from", "to"]) {
+      const sel = $(id);
+      sel.appendChild(new Option(id === "from" ? "처음부터" : "끝까지", ""));
+      for (const m of months) sel.appendChild(new Option(monthLabel(m), m));
+    }
+    const cnt = new Map();
+    for (const d of D.docs) cnt.set(d.dept, (cnt.get(d.dept) || 0) + 1);
+    $("dept").options[0].textContent = `전체 부서 (${cnt.size})`;
+    for (const [i, n] of [...cnt].sort((a, b) => b[1] - a[1])) $("dept").appendChild(new Option(`${D.depts[i] || "부서 미상"} (${n})`, String(i)));
+    try { await document.fonts.load('700 40px "Noto Sans KR"'); await document.fonts.load('500 16px "Noto Sans KR"'); } catch {}
+    lastW = $("stage").clientWidth;
+    refresh();
+  }
+  load().catch((e) => { $("meta").textContent = `데이터를 불러오지 못했습니다 (${e.message}). 페이지를 새로 고쳐 보세요.`; });
+})();
+</script>
