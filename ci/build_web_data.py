@@ -25,7 +25,7 @@ ORDER = "ORDER BY r.published_date DESC, cast(r.source_id AS integer) DESC"
 
 def write(name: str, payload: dict) -> None:
     raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-    packed = base64.b64encode(gzip.compress(raw, compresslevel=9))
+    packed = base64.b64encode(gzip.compress(raw, compresslevel=9, mtime=0))
     (out_dir / name).write_bytes(packed)
     print(f"{out_dir / name} ({len(packed) / 1e6:.1f} MB)")
 
@@ -42,10 +42,10 @@ rows = conn.execute(
 ).fetchall()
 sets = [set(r[4].split()) for r in rows]
 df = Counter(t for s in sets for t in s)
-terms = [t for t, n in df.most_common() if n >= 2]
+terms = [t for t, n in sorted(df.items(), key=lambda x: (-x[1], x[0])) if n >= 2]  # 동률은 가나다순 (실행마다 같은 결과)
 term_idx = {t: i for i, t in enumerate(terms)}
 dept_n = Counter(r[2] for r in rows)
-depts = [d for d, _ in dept_n.most_common()]
+depts = [d for d, _ in sorted(dept_n.items(), key=lambda x: (-x[1], x[0]))]
 dept_idx = {d: i for i, d in enumerate(depts)}
 docs = [[r[0], r[1], dept_idx[r[2]], r[3], sorted(term_idx[t] for t in s if t in term_idx)] for r, s in zip(rows, sets)]
 write("cloud.b64.txt", {"v": 1, "built": date.today().isoformat(), "terms": terms, "depts": depts, "docs": docs})
