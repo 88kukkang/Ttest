@@ -72,3 +72,16 @@ def test_clean_text_drops_contact_table_but_keeps_appendix():
         "5개 기관 민원해결 우수사례 발표 요약",
         "- 반복·특이민원에 대해 충분한 면담과 현장 확인을 통해 민원 발생 원인을 파악",
     ]
+
+
+def test_compose_uses_attachment_when_body_is_summary_pointing_to_it():
+    # 실제 누리집 본문 형태: 두세 문장 요약 + '자세한 내용은 첨부를 참고' + 담당자
+    body = "\n".join([
+        "행정안전부(장관 윤호중)는 9월 11일(목)부터 9월 12일(금)까지 전북특별자치도 군산새만금컨벤션센터에서 "
+        "'제42회 지역정보화 우수사례 발표대회'를 개최한다고 밝혔다.",
+        "자세한 내용은 첨부를 참고하시기 바랍니다.",
+        "* 담당자 : 지역디지털협력과 박찬수(044-205-2763)",
+    ])
+    att = "□ 행정안전부(장관 윤호중)는 9월 11일(목)부터 … ‘제42회 지역정보화 우수사례 발표대회’를 개최한다고 밝혔다."
+    assert compose_text(body, [att]) == (att, "attachments")
+    assert "담당자" not in clean_text(body)

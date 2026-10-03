@@ -29,10 +29,10 @@ BOILERPLATE_LINE_RES = [
         r"^보\s*도\s*자\s*료$",
         r"^보\s*도\s*시\s*점",
         r"^배\s*포(\s*일\s*시|\s*시\s*점)?\s*[:：]?",
-        r"^\(?\s*(온라인|지면|방송)",
+        r"^\(?\s*(온\s*라\s*인|지\s*면|방\s*송)",
         r"즉시\s*보도",
         r"^\d{4}\.\s*\d{1,2}\.\s*\d{1,2}\.?\s*\(.\)\s*(\d{1,2}:\d{2})?\s*$",  # '2026. 10. 2.(금) 15:00'
-        r"^(담\s*당\s*부\s*서|책\s*임\s*자|담\s*당\s*자)",
+        r"^[*※\s]*(담\s*당\s*부\s*서|책\s*임\s*자|담\s*당\s*자)",
         r"보도자료와 관련하여 보다 자세한 내용이나 취재를 원하시면",
         r"^(과|팀|국|실|단|센터)\s*장\s*\S{2,4}\s*$",
         r"^(사무관|주무관|서기관|연구관|연구사|행정관)\s*\S{2,4}\s*$",
@@ -150,7 +150,12 @@ def release_deferred(conn: sqlite3.Connection, release_id: int, filename: str | 
 
 
 def _squash(text: str) -> str:
-    return re.sub(r"\s+", "", text)
+    """비교용: 공백·문장부호를 모두 지운다 (따옴표 ' 와 ‘ 처럼 표기만 다른 경우도 같게 본다)."""
+    return re.sub(r"[\W_]+", "", text)
+
+
+# 게시판 본문이 '요약 + 첨부 참조' 형태임을 알려 주는 문구
+SEE_ATTACHMENT_RE = re.compile(r"(자세한|상세한|세부)\s*내용은\s*(붙임|첨부)|(첨부|붙임)\s*(파일|자료)?[을를]?\s*참(고|조)")
 
 
 def compose_text(body: str, attachment_texts: list[str], mode: str = "best") -> tuple[str, str]:
@@ -159,10 +164,16 @@ def compose_text(body: str, attachment_texts: list[str], mode: str = "best") -> 
     att = "\n\n".join(t for t in attachment_texts if t.strip())
     if mode == "body" or not att:
         return body, "body"
-    if mode == "attachments" or len(_squash(body)) < 100:
+    squashed_body, squashed_att = _squash(body), _squash(att)
+    # 본문이 비었거나, '자세한 내용은 첨부 참고' 식의 요약이거나, 첨부보다 훨씬 짧으면 첨부만 쓴다
+    if (
+        mode == "attachments"
+        or len(squashed_body) < 100
+        or SEE_ATTACHMENT_RE.search(body)
+        or len(squashed_body) * 3 < len(squashed_att)
+    ):
         return att, "attachments"
     # 본문 줄 대부분이 첨부에 그대로 들어 있으면 첨부가 본문을 포함하는 것으로 본다
-    squashed_att = _squash(att)
     lines = [_squash(l) for l in body.splitlines() if len(_squash(l)) >= 15]
     covered = sum(1 for l in lines if l in squashed_att)
     if lines and covered / len(lines) >= 0.5:
