@@ -5,7 +5,7 @@
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.3/src/wordcloud2.js"></script>
 <style>
-/* 레이아웃: 보도자료 서식을 닮은 한 장. 머리 → 탭 줄(고정) → 탭마다 한 화면. 탭: AI 질문 · 검색 · 키워드 클라우드 · 관계도 · 분석 보고서 */
+/* 레이아웃: 보도자료 서식을 닮은 한 장. 머리 → 탭 줄(고정) → 탭마다 한 화면. 탭: AI 질문 · AI 규칙 · 검색 · 키워드 클라우드 · 관계도 · 분석 보고서 */
 :root {
   --bg: #eef0f2; --paper: #ffffff; --ink: #15181c; --ink-2: #4a515a; --muted: #7b828b;
   --line: #e1e4e8; --axis: #c5cad0; --accent: #2a78d6; --accent-soft: #e8f1fc; --band: #e9f3fe;
@@ -60,6 +60,9 @@ p { margin: 0; }
 a { color: var(--accent); text-underline-offset: 2px; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 button { font: inherit; }
+/* 보도자료 제목: 버튼이지만 링크처럼 보인다 (누르면 읽기 창) */
+.doclink, .textbtn { all: unset; cursor: pointer; color: var(--accent); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
+.doclink:focus-visible, .textbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .num { font-variant-numeric: tabular-nums; }
 .head { display: grid; gap: 10px; }
 .stamp { width: fit-content; border: 2px solid var(--ink); padding: 1px 12px; font-family: var(--font-display); font-weight: 800; letter-spacing: 0.3em; font-size: var(--step-0); }
@@ -142,6 +145,31 @@ table.data td { font-variant-numeric: tabular-nums; }
 .ai-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
 .ai-off { display: grid; gap: 6px; padding: 14px 16px; background: var(--accent-soft); font-size: var(--step--1); color: var(--ink-2); }
 
+/* AI 규칙 */
+.ai-rules-note { font-size: var(--step--1); color: var(--ink-2); }
+.ru-status { font-size: var(--step--1); color: var(--ink-2); background: var(--accent-soft); padding: 6px 10px; }
+.ru-bar { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--ink); padding-bottom: 10px; min-height: 2.6em; }
+.ru-form { display: grid; gap: 12px; padding: 16px; border: 2px solid var(--ink); background: var(--bg); min-width: 0; }
+.ru-kind { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.ru-kind .note { margin-left: 2px; }
+.ru-field { display: grid; gap: 4px; font-size: var(--step--1); color: var(--ink-2); font-weight: 500; min-width: 0; }
+.ru-field .note { font-weight: 400; }
+.ru-field input, .ru-field textarea { font: inherit; font-size: var(--step-0); font-weight: 400; color: var(--ink); background: var(--paper); border: 1px solid var(--axis); border-radius: 0; padding: 8px 10px; width: 100%; }
+.ru-field textarea { resize: vertical; line-height: 1.6; min-height: 7.5em; }
+.ru-field input::placeholder, .ru-field textarea::placeholder { color: var(--muted); }
+.ru-form-actions { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.ru-list { display: grid; }
+.ru-card { display: grid; gap: 8px; padding-block: 16px; border-bottom: 1px solid var(--line); min-width: 0; }
+.ru-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.ru-head h4 { font-size: var(--step-1); font-weight: 700; flex: 1; min-width: 8em; overflow-wrap: anywhere; }
+.ru-card.off .ru-head h4, .ru-card.off .ru-body { color: var(--muted); }
+.ru-body { white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink-2); max-width: 72ch; }
+.ru-ex { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: var(--step--1); color: var(--ink-2); overflow-wrap: anywhere; }
+.ru-foot { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; justify-content: space-between; }
+.ru-foot .acts { display: flex; gap: 6px; }
+.ru-log { list-style: none; margin: 8px 0 0; padding: 0; display: grid; }
+.ru-log li { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+
 /* 검색 */
 .summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; }
 .summary strong { font-size: var(--step-2); font-family: var(--font-display); }
@@ -153,8 +181,8 @@ table.data td { font-variant-numeric: tabular-nums; }
 .item-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: var(--step--1); color: var(--muted); }
 .item-meta .count { color: var(--ink-2); font-weight: 500; }
 .item h4 { font-size: var(--step-1); font-weight: 700; line-height: 1.45; text-wrap: pretty; }
-.item h4 a { color: var(--ink); text-decoration: none; }
-.item h4 a:hover { color: var(--accent); text-decoration: underline; }
+.item h4 .doclink { color: var(--ink); text-decoration: none; }
+.item h4 .doclink:hover { color: var(--accent); text-decoration: underline; }
 .snips { display: grid; gap: 4px; font-size: var(--step--1); color: var(--ink-2); min-width: 0; }
 .snips p { overflow-wrap: anywhere; }
 .item-actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -200,8 +228,8 @@ table.data td { font-variant-numeric: tabular-nums; }
 .docs { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
 .docs li { padding: 8px 0; border-bottom: 1px solid var(--line); display: grid; gap: 2px; min-width: 0; }
 .docs .d-meta { font-size: var(--step--1); color: var(--muted); }
-.docs a { color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
-.docs a:hover { color: var(--accent); text-decoration: underline; }
+.docs .doclink { color: var(--ink); text-decoration: none; }
+.docs .doclink:hover { color: var(--accent); text-decoration: underline; }
 .docs-title { font-size: var(--step--1); color: var(--muted); margin-bottom: 4px; }
 .bars { display: grid; gap: 6px; }
 .bar-row { display: grid; grid-template-columns: minmax(5em, 10em) 1fr 3.2em; gap: 10px; align-items: center; font-size: var(--step--1); }
@@ -266,6 +294,7 @@ dialog#reader::backdrop { background: rgba(0, 0, 0, 0.45); }
 
   <nav class="tabs" role="tablist" aria-label="기능">
     <button role="tab" id="tab-ai" aria-controls="panel-ai" aria-selected="true">AI에게 묻기</button>
+    <button role="tab" id="tab-rules" aria-controls="panel-rules" aria-selected="false">AI 규칙</button>
     <button role="tab" id="tab-search" aria-controls="panel-search" aria-selected="false">검색</button>
     <button role="tab" id="tab-cloud" aria-controls="panel-cloud" aria-selected="false">키워드 클라우드</button>
     <button role="tab" id="tab-network" aria-controls="panel-network" aria-selected="false">관계도</button>
@@ -288,7 +317,37 @@ dialog#reader::backdrop { background: rgba(0, 0, 0, 0.45); }
         <button class="btn-ghost" type="button" id="ai-new" hidden>새 대화</button>
       </span>
     </div>
+    <p class="ai-rules-note" id="ai-rules-note" hidden></p>
     <div class="ai-log" id="ai-log" aria-live="polite"></div>
+  </section>
+
+  <!-- ===== AI 규칙 ===== -->
+  <section class="panel-tab" id="panel-rules" role="tabpanel" aria-labelledby="tab-rules" hidden>
+    <p class="prose">여기 적은 기준은 ‘AI에게 묻기’가 답할 때마다 함께 전달됩니다. 저장하면 다음 질문부터 바로 반영되고, 이 페이지를 쓰는 모두에게 똑같이 적용됩니다.</p>
+    <p class="ru-status" id="ru-status" hidden></p>
+    <div class="ru-bar">
+      <span class="note num" id="ru-budget"></span>
+      <button class="btn" type="button" id="ru-add" hidden>규칙 추가</button>
+    </div>
+    <form class="ru-form" id="ru-form" hidden>
+      <h3 id="ru-form-title">새 규칙</h3>
+      <div class="ru-kind" role="radiogroup" aria-label="종류">
+        <label class="check"><input type="radio" name="ru-kind" value="term" checked>용어 기준 <span class="note">이 말이 나오면 무엇을 넣고 뺄지</span></label>
+        <label class="check"><input type="radio" name="ru-kind" value="style">답변 방식 <span class="note">답을 어떻게 쓸지</span></label>
+      </div>
+      <label class="ru-field" for="ru-title">이름<input id="ru-title" maxlength="40" autocomplete="off" placeholder="예: 업무보고" required></label>
+      <label class="ru-field" for="ru-body">내용<textarea id="ru-body" rows="5" maxlength="1000" required placeholder="포함: 대통령에게 한 업무보고 자체&#10;제외: 업무보고 후속조치, 산하기관 업무보고&#10;이유: ‘업무보고’가 들어간 보도자료 대부분은 대통령 업무보고와 무관함"></textarea></label>
+      <label class="ru-field" for="ru-example">예시 질문 <span class="note">(선택) 규칙이 잘 지켜지는지 시험할 때 씁니다</span><input id="ru-example" maxlength="200" autocomplete="off" placeholder="예: 대통령 업무보고 관련 보도자료 알려줘"></label>
+      <p class="note warn" id="ru-form-msg" hidden></p>
+      <div class="ru-form-actions">
+        <button class="btn" type="submit" id="ru-save">저장</button>
+        <button class="btn-ghost" type="button" id="ru-cancel">취소</button>
+        <span class="note num" id="ru-count"></span>
+      </div>
+    </form>
+    <div class="ru-list" id="ru-list"><p class="empty">불러오는 중…</p></div>
+    <details id="ru-log-box"><summary>변경 기록</summary><ul class="ru-log" id="ru-log"></ul></details>
+    <p class="caption">규칙은 짧고 분명할수록 잘 지켜집니다. ‘포함’과 ‘제외’를 나눠 적고 이유를 한 줄 덧붙이면 좋습니다. 꼭 지켜야 하는 기준이면 예시 질문을 넣고 ‘이 질문으로 시험’으로 확인해 보세요. 켜 둔 규칙만 AI에 전달되고, 전체 분량이 넘치면 뒤쪽 규칙부터 빠집니다.</p>
   </section>
 
   <!-- ===== 검색 ===== -->
@@ -502,12 +561,15 @@ function table(headers, rows, cls = "data") {
   for (const r of rows) { const tr = tb.insertRow(); for (const c of r) tr.insertCell().textContent = c; }
   return t;
 }
-/** 보도자료 제목 링크: 누르면 페이지 안 읽기 창으로 본문, Ctrl/⌘/가운데 클릭은 행안부 원문 */
+/** 보도자료 제목: 누르면 페이지 안 읽기 창으로 본문만 연다. 행안부 누리집 원문은 읽기 창 안의 버튼으로만 간다. */
 function articleLink(d, terms = [], content = null) {
-  const a = el("a"); a.href = ARTICLE + d.id; a.target = "_blank"; a.rel = "noopener";
-  a.appendChild(content || document.createTextNode(d.title));
-  a.addEventListener("click", (e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; e.preventDefault(); Reader.open(d.id, terms); });
-  return a;
+  return docButton(d.id, content || document.createTextNode(d.title), terms);
+}
+function docButton(id, content, terms = []) {
+  const b = el("button", "doclink"); b.type = "button";
+  b.appendChild(typeof content === "string" ? document.createTextNode(content) : content);
+  b.addEventListener("click", () => Reader.open(id, terms));
+  return b;
 }
 const Reader = (() => {
   const dlg = $("reader");
@@ -516,12 +578,17 @@ const Reader = (() => {
   async function open(id, terms = []) {
     await docsReady;
     const d = DOC_BY_ID.get(String(id));
-    if (!d) { window.open(ARTICLE + id, "_blank", "noopener"); return; }
-    $("reader-meta").textContent = `${dateLabel(d.date)} · ${d.dept || "부서 미상"} · 본문 ${fmt(d.body.length)}자`;
-    $("reader-title").textContent = d.title;
-    $("reader-orig").href = ARTICLE + d.id;
+    $("reader-orig").href = ARTICLE + id;
     const body = $("reader-body");
-    body.replaceChildren(terms.length ? highlighted(d.body, d.lb, terms) : document.createTextNode(d.body));
+    if (d) {
+      $("reader-meta").textContent = `${dateLabel(d.date)} · ${d.dept || "부서 미상"} · 본문 ${fmt(d.body.length)}자`;
+      $("reader-title").textContent = d.title;
+      body.replaceChildren(terms.length ? highlighted(d.body, d.lb, terms) : document.createTextNode(d.body));
+    } else {
+      $("reader-meta").textContent = `글 번호 ${id}`;
+      $("reader-title").textContent = "이 페이지 데이터에 없는 보도자료입니다";
+      body.replaceChildren(document.createTextNode("아직 수집되지 않았거나 번호가 잘못됐을 수 있습니다. 위의 ‘행안부 누리집 원문 열기’로 확인해 주세요."));
+    }
     hideTip();
     if (typeof dlg.showModal === "function") { if (!dlg.open) dlg.showModal(); } else dlg.setAttribute("open", "");
     body.scrollTop = 0;
@@ -530,18 +597,6 @@ const Reader = (() => {
   }
   return { open };
 })();
-/** 본문 안 행안부 원문 링크(nttId=…)를 읽기 창으로 연다 (AI 답변용) */
-function routeArticleClicks(container, termsFn = () => []) {
-  container.addEventListener("click", (e) => {
-    const a = e.target.closest && e.target.closest("a[href]");
-    if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
-    const m = a.href.match(/[?&]nttId=(\d+)/);
-    if (!m || !a.href.startsWith("https://www.mois.go.kr/")) return;
-    e.preventDefault();
-    Reader.open(m[1], termsFn());
-  });
-}
-
 // ---- 툴팁: 값이 굵게, 이름은 보조 ----
 const tip = $("tip");
 function fillTip(title, rows) {
@@ -730,7 +785,7 @@ const AI = (() => {
 - 이어서 근거 보도자료를 날짜순 목록으로: "- 2025. 7. 10. [보도자료 제목](url) — 한 줄 요지". url은 도구가 준 그대로 쓴다.
 - 숫자·금액·날짜·대상은 본문에 적힌 그대로 옮긴다. 추측하지 않는다.
 - 찾지 못했으면 찾지 못했다고 말하고, 어떤 말로 찾아봤는지 적는다.
-- 마크다운은 목록, 굵게(**), 링크만 쓴다. 표와 제목(#)은 쓰지 않는다.`;
+- 마크다운은 목록, 굵게(**), 링크만 쓴다. 표와 제목(#)은 쓰지 않는다.${Rules.promptBlock()}`;
 
   const ERR = {
     not_granted: ["이 페이지가 Claude를 쓰도록 허용되지 않았습니다. 페이지의 권한 메뉴에서 허용한 뒤 새로 고쳐 주세요.", true],
@@ -762,7 +817,12 @@ const AI = (() => {
     let last = 0, m;
     while ((m = re.exec(s))) {
       if (m.index > last) parent.appendChild(document.createTextNode(s.slice(last, m.index)));
-      if (m[1]) { const a = el("a", null, m[1]); a.href = m[2]; a.target = "_blank"; a.rel = "noopener"; parent.appendChild(a); }
+      if (m[1]) {
+        // 행안부 보도자료 링크는 읽기 창으로만 연다 (누리집으로 바로 넘어가지 않게)
+        const id = m[2].startsWith("https://www.mois.go.kr/") && (m[2].match(/[?&]nttId=(\d+)/) || [])[1];
+        if (id) parent.appendChild(docButton(id, m[1]));
+        else { const a = el("a", null, m[1]); a.href = m[2]; a.target = "_blank"; a.rel = "noopener"; parent.appendChild(a); }
+      }
       else parent.appendChild(el("strong", null, m[3]));
       last = re.lastIndex;
     }
@@ -912,7 +972,6 @@ const AI = (() => {
     body.appendChild(el("p", "thinking", "생각하는 중…"));
     aEl.append(steps, body);
     log.append(qEl, aEl);
-    routeArticleClicks(body);
     qEl.scrollIntoView({ block: "nearest" });
     const step = (text) => { steps.querySelectorAll("li").forEach((li) => li.classList.add("done")); steps.appendChild(el("li", null, text)); };
     const readMap = new Map();
@@ -991,7 +1050,292 @@ const AI = (() => {
         return s;
       });
   }
-  return { init, show() {}, resize() {} };
+  return { init, ask, show() {}, resize() {} };
+})();
+// =====================================================================
+// AI 규칙: 이 페이지를 쓰는 사람들이 함께 고치는 규칙 (db 능력).
+// 켜 둔 규칙은 'AI에게 묻기' 지시문 끝에 [팀 규칙]으로 붙는다.
+//   rules/{id}     {kind: term|style, title, body, example, enabled, order, createdBy, createdAt, updatedBy, updatedAt}
+//   rules_log/{id} {ruleId, action, title, before, after, by, at}   ← 되돌리기용 변경 기록
+// =====================================================================
+const Rules = (() => {
+  const BUDGET = 4000; // AI에 전달하는 규칙 전체 글자 수 한도 (질문마다 함께 보내므로 사용량에 들어감)
+  const KIND = { term: "용어 기준", style: "답변 방식" };
+  const ACTION = { create: "추가", update: "수정", delete: "삭제", on: "켬", off: "끔", restore: "되돌림" };
+  const CLAUDE_ID = "claude"; // Claude가 대신 적은 항목(예시 규칙)
+  let db = null, user = null, myId = null;
+  let writable = null; // true/false = 플랫폼이 알려준 값, null = 알려주지 않음 → 써 보고 판단
+  let rules = [], log = [], loaded = false, editing = null, deleteArm = null, renderSeq = 0;
+
+  const str = (v, max) => String(v == null ? "" : v).slice(0, max);
+  const normalize = (id, d) => ({
+    id, kind: d.kind === "style" ? "style" : "term", title: str(d.title, 40), body: str(d.body, 1000), example: str(d.example, 200),
+    enabled: d.enabled !== false, order: Number(d.order) || 0,
+    createdBy: d.createdBy || null, createdAt: str(d.createdAt, 40), updatedBy: d.updatedBy || null, updatedAt: str(d.updatedAt, 40),
+  });
+  const bodyOf = (r) => { const { id, ...rest } = r; return rest; };
+  const when = (iso) => {
+    const d = new Date(iso);
+    if (!iso || isNaN(d)) return "";
+    return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}. ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  };
+  const oneLine = (s) => String(s || "").replace(/\s*\n\s*/g, " / ").trim();
+  const lineOf = (r) => `- [${r.kind === "style" ? "답변" : "용어"}] ${oneLine(r.title)}: ${oneLine(r.body)}`;
+  const sorted = () => [...rules].sort((a, b) => (a.kind === b.kind ? 0 : a.kind === "term" ? -1 : 1) || a.order - b.order || (a.id < b.id ? -1 : 1));
+
+  /** 켜진 규칙을 순서대로 담다가 한도를 넘으면 그 뒤는 모두 뺀다 */
+  function plan() {
+    const sent = new Set();
+    let used = 0, full = false;
+    for (const r of sorted()) {
+      if (!r.enabled || full) continue;
+      const n = lineOf(r).length + 1;
+      if (used + n > BUDGET) { full = true; continue; }
+      used += n; sent.add(r.id);
+    }
+    return { sent, used };
+  }
+  function promptBlock() {
+    const { sent } = plan();
+    const lines = sorted().filter((r) => sent.has(r.id)).map(lineOf);
+    if (!lines.length) return "";
+    return `
+
+[팀 규칙]
+이 페이지를 함께 쓰는 사람들이 정한 기준이다. 검색 범위, 포함·제외, 답변 방식에 반드시 반영하라. 용어 기준이 있는 말이 질문에 나오면 그 기준대로 보도자료를 고르고, 기준 때문에 뺀 보도자료가 있으면 답 끝에 "규칙에 따라 뺀 자료:" 뒤에 제목과 날짜를 짧게 적어라. 질문이 규칙과 다르게 분명히 요구하면 질문을 따르고 그렇게 했다고 한 줄 밝혀라.
+${lines.join("\n")}`;
+  }
+
+  // ---- 화면 ----
+  function setStatus(text) { const s = $("ru-status"); s.textContent = text; s.hidden = !text; }
+  const canTry = () => !!db && writable !== false;
+  function applyWritable() {
+    $("ru-add").hidden = !canTry() || !$("ru-form").hidden;
+    if (!db) return;
+    if (writable === false) { closeForm(); setStatus("보기만 할 수 있습니다. 규칙을 고치려면 페이지 소유자에게 편집 권한을 요청하세요."); }
+    else if (writable === true) setStatus("편집할 수 있습니다. 바꾼 내용은 이 페이지를 쓰는 모두에게 바로 반영됩니다.");
+  }
+  /** 쓰기 실패 → 안내 문구. 권한 거절이면 이번 방문 동안 읽기 전용으로 바꾼다 */
+  function refused(e) {
+    const code = e && e.code;
+    if (code === "invalid_argument") { writable = false; applyWritable(); render(); return "편집 권한이 없어 저장하지 못했습니다."; }
+    if (code === "quota_exceeded") return "저장 공간이 가득 찼습니다. 쓰지 않는 규칙을 지운 뒤 다시 해 보세요.";
+    if (code === "resource_exhausted") return "요청이 너무 잦습니다. 잠시 뒤 다시 해 보세요.";
+    if (code === "revoked") return "이 페이지 접근 권한이 바뀌었습니다. 새로 고쳐 주세요.";
+    return "저장하지 못했습니다. 잠시 뒤 다시 해 보세요.";
+  }
+  function formMsg(text) { const m = $("ru-form-msg"); m.textContent = text; m.hidden = !text; }
+  function count() { $("ru-count").textContent = `내용 ${fmt($("ru-body").value.length)} / 1,000자`; }
+
+  async function render() {
+    const seq = ++renderSeq;
+    const list = sorted();
+    const { sent, used } = plan();
+    $("ru-budget").textContent = db ? `켜진 규칙 ${fmt(rules.filter((r) => r.enabled).length)}개 · AI에 전달되는 분량 ${fmt(used)} / ${fmt(BUDGET)}자` : "";
+    const note = $("ai-rules-note");
+    if (sent.size) {
+      const b = el("button", "textbtn", "규칙 보기"); b.type = "button";
+      b.addEventListener("click", () => Tabs.show("rules"));
+      note.replaceChildren(document.createTextNode(`팀 규칙 ${sent.size}개를 함께 전달합니다. `), b);
+      note.hidden = false;
+    } else note.hidden = true;
+    if (!loaded) return;
+
+    const ids = [...new Set([...list.flatMap((r) => [r.updatedBy, r.createdBy]), ...log.map((l) => l.by)])].filter((x) => x && x !== CLAUDE_ID);
+    const names = user && ids.length ? await user.profiles(ids).catch(() => ({})) : {};
+    if (seq !== renderSeq) return;
+    const who = (id) => (id === CLAUDE_ID ? "Claude" : (names[id] && names[id].name) || (id && id === myId ? "나" : "누군가"));
+
+    const box = $("ru-list");
+    if (!list.length) box.replaceChildren(el("p", "empty", canTry() ? "아직 규칙이 없습니다. ‘규칙 추가’로 첫 규칙을 적어 보세요." : "아직 규칙이 없습니다."));
+    else box.replaceChildren(...list.map((r) => card(r, sent.has(r.id), who)));
+
+    const ul = $("ru-log");
+    if (!log.length) ul.replaceChildren(el("li", null, "아직 기록이 없습니다."));
+    else ul.replaceChildren(...log.map((l) => logItem(l, who)));
+  }
+
+  function card(r, isSent, who) {
+    const art = el("article", "ru-card" + (r.enabled ? "" : " off"));
+    const head = el("div", "ru-head");
+    head.append(el("span", "chip", KIND[r.kind]), el("h4", null, r.title));
+    const tg = el("label", "check ru-toggle");
+    const cb = el("input"); cb.type = "checkbox"; cb.checked = r.enabled; cb.disabled = !canTry();
+    cb.addEventListener("change", () => toggle(r, cb));
+    tg.append(cb, document.createTextNode("AI에 적용"));
+    head.appendChild(tg);
+    art.append(head, el("p", "ru-body", r.body));
+    if (r.enabled && !isSent) art.appendChild(el("p", "note warn", "전체 분량을 넘어 지금은 AI에 전달되지 않습니다. 다른 규칙을 줄이거나 꺼 주세요."));
+    if (r.example) {
+      const ex = el("div", "ru-ex");
+      const t = el("button", "btn-ghost", "이 질문으로 시험"); t.type = "button";
+      t.addEventListener("click", () => { Tabs.show("ai"); AI.ask(r.example); });
+      ex.append(el("span", null, `예시 질문: ${r.example}`), t);
+      art.appendChild(ex);
+    }
+    const foot = el("div", "ru-foot");
+    foot.appendChild(el("span", "note num", [when(r.updatedAt), `${who(r.updatedBy)} ${r.createdAt === r.updatedAt ? "작성" : "수정"}`].filter(Boolean).join(" · ")));
+    if (canTry()) {
+      const acts = el("div", "acts");
+      const ed = el("button", "btn-ghost", "고치기"); ed.type = "button";
+      ed.addEventListener("click", () => openForm(r));
+      const del = el("button", "btn-ghost", "삭제"); del.type = "button";
+      del.addEventListener("click", () => remove(r, del));
+      acts.append(ed, del);
+      foot.appendChild(acts);
+    }
+    art.appendChild(foot);
+    return art;
+  }
+  function logItem(l, who) {
+    const li = el("li");
+    li.appendChild(el("span", "num", `${when(l.at)} · ${who(l.by)} · ‘${l.title}’ ${ACTION[l.action] || "변경"}`));
+    if (l.before && canTry()) {
+      const b = el("button", "btn-ghost", "이 변경 전으로 되돌리기"); b.type = "button";
+      b.addEventListener("click", () => restore(l, b));
+      li.appendChild(b);
+    }
+    return li;
+  }
+
+  // ---- 쓰기 (문서마다 한 번에 하나씩) ----
+  async function addLog(ruleId, action, title, before, after) {
+    try { await db.collection("rules_log").add({ ruleId, action, title, before, after, by: myId, at: new Date().toISOString() }); }
+    catch { /* 기록 실패는 규칙 저장을 막지 않는다 */ }
+  }
+  function openForm(r = null) {
+    editing = r ? { id: r.id, base: r.updatedAt, confirmed: false } : null;
+    $("ru-form-title").textContent = r ? `‘${r.title}’ 고치기` : "새 규칙";
+    for (const radio of document.querySelectorAll("input[name=ru-kind]")) radio.checked = radio.value === (r ? r.kind : "term");
+    $("ru-title").value = r ? r.title : "";
+    $("ru-body").value = r ? r.body : "";
+    $("ru-example").value = r ? r.example : "";
+    formMsg("");
+    count();
+    $("ru-form").hidden = false;
+    $("ru-add").hidden = true;
+    $("ru-form").scrollIntoView({ block: "nearest" });
+    $("ru-title").focus();
+  }
+  function closeForm() {
+    $("ru-form").hidden = true;
+    editing = null;
+    $("ru-add").hidden = !canTry();
+  }
+  async function save(e) {
+    e.preventDefault();
+    const kind = (document.querySelector("input[name=ru-kind]:checked") || {}).value === "style" ? "style" : "term";
+    const title = $("ru-title").value.trim(), body = $("ru-body").value.trim(), example = $("ru-example").value.trim();
+    if (!title || !body) { formMsg("이름과 내용을 적어 주세요."); return; }
+    const btn = $("ru-save");
+    btn.disabled = true;
+    const now = new Date().toISOString();
+    try {
+      if (editing) {
+        const ref = db.doc("rules/" + editing.id);
+        const cur = await ref.get();
+        const prev = cur.exists ? normalize(cur.id, cur.data()) : null;
+        if (!editing.confirmed && (!prev || prev.updatedAt !== editing.base)) {
+          editing.confirmed = true;
+          formMsg(prev ? "편집하는 동안 다른 사람이 이 규칙을 고쳤습니다. 아래 목록에서 새 내용을 확인하세요. ‘저장’을 한 번 더 누르면 지금 쓴 내용으로 덮어씁니다."
+            : "편집하는 동안 이 규칙이 지워졌습니다. ‘저장’을 한 번 더 누르면 다시 만듭니다.");
+          return;
+        }
+        const next = { kind, title, body, example, enabled: prev ? prev.enabled : true, order: prev ? prev.order : Date.now(),
+          createdBy: prev ? prev.createdBy : myId, createdAt: prev ? prev.createdAt : now, updatedBy: myId, updatedAt: now };
+        await ref.set(next);
+        await addLog(editing.id, prev ? "update" : "create", title, prev && bodyOf(prev), next);
+      } else {
+        const ref = db.collection("rules").doc();
+        const next = { kind, title, body, example, enabled: true, order: Date.now(), createdBy: myId, createdAt: now, updatedBy: myId, updatedAt: now };
+        await ref.set(next);
+        await addLog(ref.id, "create", title, null, next);
+      }
+      closeForm();
+      toast("저장했습니다. 다음 질문부터 반영됩니다.");
+    } catch (err) {
+      formMsg(refused(err));
+    } finally {
+      btn.disabled = false;
+    }
+  }
+  async function toggle(r, cb) {
+    cb.disabled = true;
+    const now = new Date().toISOString();
+    try {
+      await db.doc("rules/" + r.id).update({ enabled: cb.checked, updatedBy: myId, updatedAt: now });
+      await addLog(r.id, cb.checked ? "on" : "off", r.title, bodyOf(r), { ...bodyOf(r), enabled: cb.checked, updatedBy: myId, updatedAt: now });
+    } catch (err) {
+      cb.checked = !cb.checked;
+      toast(refused(err));
+    } finally {
+      cb.disabled = !canTry();
+    }
+  }
+  async function remove(r, btn) {
+    if (deleteArm !== r.id) {
+      deleteArm = r.id;
+      btn.textContent = "한 번 더 누르면 삭제";
+      setTimeout(() => { if (deleteArm === r.id) { deleteArm = null; btn.textContent = "삭제"; } }, 4000);
+      return;
+    }
+    deleteArm = null;
+    btn.disabled = true;
+    try {
+      await db.doc("rules/" + r.id).delete();
+      await addLog(r.id, "delete", r.title, bodyOf(r), null);
+      toast(`‘${r.title}’ 규칙을 지웠습니다. 변경 기록에서 되돌릴 수 있습니다.`);
+    } catch (err) {
+      btn.disabled = false;
+      toast(refused(err));
+    }
+  }
+  async function restore(l, btn) {
+    btn.disabled = true;
+    try {
+      const ref = db.doc("rules/" + l.ruleId);
+      const cur = await ref.get();
+      const prev = cur.exists ? bodyOf(normalize(cur.id, cur.data())) : null;
+      const next = { ...bodyOf(normalize(l.ruleId, l.before)), updatedBy: myId, updatedAt: new Date().toISOString() };
+      await ref.set(next);
+      await addLog(l.ruleId, "restore", next.title, prev, next);
+      toast(`‘${next.title}’ 규칙을 그 변경 전 상태로 되돌렸습니다.`);
+    } catch (err) {
+      btn.disabled = false;
+      toast(refused(err));
+    }
+  }
+
+  async function init() {
+    $("ru-add").addEventListener("click", () => openForm());
+    $("ru-cancel").addEventListener("click", closeForm);
+    $("ru-form").addEventListener("submit", save);
+    $("ru-body").addEventListener("input", count);
+    const use = (n) => (window.claude && typeof window.claude.use === "function" ? window.claude.use(n) : Promise.resolve(null)).catch(() => null);
+    [db, user] = await Promise.all([use("db"), use("user")]);
+    if (!db) {
+      $("ru-list").replaceChildren(el("p", "empty", "claude.ai에 로그인한 상태로 이 페이지를 열면 팀 규칙을 보고 고칠 수 있습니다."));
+      return;
+    }
+    if (user) { myId = await user.id(); writable = await user.can("data.write"); }
+    applyWritable();
+    const failed = (e) => {
+      setStatus(e && e.code === "revoked" ? "이 페이지 접근 권한이 바뀌었습니다. 새로 고쳐 주세요." : "규칙을 불러오지 못했습니다. 새로 고쳐 주세요.");
+    };
+    db.collection("rules").onSnapshot((snap) => {
+      rules = snap.docs.filter((d) => d.exists).map((d) => normalize(d.id, d.data()));
+      loaded = true;
+      render();
+    }, failed);
+    db.collection("rules_log").orderBy("at", "desc").limit(40).onSnapshot((snap) => {
+      log = snap.docs.filter((d) => d.exists).map((d) => {
+        const x = d.data();
+        return { ruleId: str(x.ruleId, 200), action: str(x.action, 20), title: str(x.title, 40), before: x.before && typeof x.before === "object" ? x.before : null, by: x.by || null, at: str(x.at, 40) };
+      }).filter((l) => l.ruleId);
+      render();
+    }, () => {});
+  }
+  return { init, promptBlock, show() {}, resize() {} };
 })();
 
 // =====================================================================
@@ -1111,8 +1455,7 @@ const S = (() => {
       if (open && !full.childNodes.length) full.appendChild(terms.length ? highlighted(d.body, d.lb, terms) : document.createTextNode(d.body));
       full.hidden = !open; btn.textContent = open ? "본문 접기" : "본문 펼치기"; btn.setAttribute("aria-expanded", String(open));
     });
-    const orig = el("a", "btn-ghost", "행안부 원문 ↗"); orig.href = ARTICLE + d.id; orig.target = "_blank"; orig.rel = "noopener";
-    actions.append(btn, orig);
+    actions.append(btn);
     art.append(actions, full);
     return art;
   }
@@ -1716,8 +2059,8 @@ const R = (() => {
 // 탭과 시작
 // =====================================================================
 const Tabs = (() => {
-  const NAMES = ["ai", "search", "cloud", "network", "report"];
-  const MODS = { ai: AI, search: S, cloud: C, network: N, report: R };
+  const NAMES = ["ai", "rules", "search", "cloud", "network", "report"];
+  const MODS = { ai: AI, rules: Rules, search: S, cloud: C, network: N, report: R };
   let current = null;
   function show(name, focusTab = false) {
     if (!NAMES.includes(name)) name = "ai";
@@ -1758,7 +2101,7 @@ const Tabs = (() => {
   return { init, show };
 })();
 
-AI.init(); S.init(); C.init(); N.init(); R.init();
+AI.init(); Rules.init(); S.init(); C.init(); N.init(); R.init();
 Tabs.init();
 })();
 </script>

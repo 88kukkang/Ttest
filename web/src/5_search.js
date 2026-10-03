@@ -116,8 +116,7 @@ const S = (() => {
       if (open && !full.childNodes.length) full.appendChild(terms.length ? highlighted(d.body, d.lb, terms) : document.createTextNode(d.body));
       full.hidden = !open; btn.textContent = open ? "본문 접기" : "본문 펼치기"; btn.setAttribute("aria-expanded", String(open));
     });
-    const orig = el("a", "btn-ghost", "행안부 원문 ↗"); orig.href = ARTICLE + d.id; orig.target = "_blank"; orig.rel = "noopener";
-    actions.append(btn, orig);
+    actions.append(btn);
     art.append(actions, full);
     return art;
   }

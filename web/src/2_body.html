@@ -7,6 +7,7 @@
 
   <nav class="tabs" role="tablist" aria-label="기능">
     <button role="tab" id="tab-ai" aria-controls="panel-ai" aria-selected="true">AI에게 묻기</button>
+    <button role="tab" id="tab-rules" aria-controls="panel-rules" aria-selected="false">AI 규칙</button>
     <button role="tab" id="tab-search" aria-controls="panel-search" aria-selected="false">검색</button>
     <button role="tab" id="tab-cloud" aria-controls="panel-cloud" aria-selected="false">키워드 클라우드</button>
     <button role="tab" id="tab-network" aria-controls="panel-network" aria-selected="false">관계도</button>
@@ -29,7 +30,37 @@
         <button class="btn-ghost" type="button" id="ai-new" hidden>새 대화</button>
       </span>
     </div>
+    <p class="ai-rules-note" id="ai-rules-note" hidden></p>
     <div class="ai-log" id="ai-log" aria-live="polite"></div>
+  </section>
+
+  <!-- ===== AI 규칙 ===== -->
+  <section class="panel-tab" id="panel-rules" role="tabpanel" aria-labelledby="tab-rules" hidden>
+    <p class="prose">여기 적은 기준은 ‘AI에게 묻기’가 답할 때마다 함께 전달됩니다. 저장하면 다음 질문부터 바로 반영되고, 이 페이지를 쓰는 모두에게 똑같이 적용됩니다.</p>
+    <p class="ru-status" id="ru-status" hidden></p>
+    <div class="ru-bar">
+      <span class="note num" id="ru-budget"></span>
+      <button class="btn" type="button" id="ru-add" hidden>규칙 추가</button>
+    </div>
+    <form class="ru-form" id="ru-form" hidden>
+      <h3 id="ru-form-title">새 규칙</h3>
+      <div class="ru-kind" role="radiogroup" aria-label="종류">
+        <label class="check"><input type="radio" name="ru-kind" value="term" checked>용어 기준 <span class="note">이 말이 나오면 무엇을 넣고 뺄지</span></label>
+        <label class="check"><input type="radio" name="ru-kind" value="style">답변 방식 <span class="note">답을 어떻게 쓸지</span></label>
+      </div>
+      <label class="ru-field" for="ru-title">이름<input id="ru-title" maxlength="40" autocomplete="off" placeholder="예: 업무보고" required></label>
+      <label class="ru-field" for="ru-body">내용<textarea id="ru-body" rows="5" maxlength="1000" required placeholder="포함: 대통령에게 한 업무보고 자체&#10;제외: 업무보고 후속조치, 산하기관 업무보고&#10;이유: ‘업무보고’가 들어간 보도자료 대부분은 대통령 업무보고와 무관함"></textarea></label>
+      <label class="ru-field" for="ru-example">예시 질문 <span class="note">(선택) 규칙이 잘 지켜지는지 시험할 때 씁니다</span><input id="ru-example" maxlength="200" autocomplete="off" placeholder="예: 대통령 업무보고 관련 보도자료 알려줘"></label>
+      <p class="note warn" id="ru-form-msg" hidden></p>
+      <div class="ru-form-actions">
+        <button class="btn" type="submit" id="ru-save">저장</button>
+        <button class="btn-ghost" type="button" id="ru-cancel">취소</button>
+        <span class="note num" id="ru-count"></span>
+      </div>
+    </form>
+    <div class="ru-list" id="ru-list"><p class="empty">불러오는 중…</p></div>
+    <details id="ru-log-box"><summary>변경 기록</summary><ul class="ru-log" id="ru-log"></ul></details>
+    <p class="caption">규칙은 짧고 분명할수록 잘 지켜집니다. ‘포함’과 ‘제외’를 나눠 적고 이유를 한 줄 덧붙이면 좋습니다. 꼭 지켜야 하는 기준이면 예시 질문을 넣고 ‘이 질문으로 시험’으로 확인해 보세요. 켜 둔 규칙만 AI에 전달되고, 전체 분량이 넘치면 뒤쪽 규칙부터 빠집니다.</p>
   </section>
 
   <!-- ===== 검색 ===== -->

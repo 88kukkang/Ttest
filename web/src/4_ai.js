@@ -28,7 +28,7 @@ const AI = (() => {
 - 이어서 근거 보도자료를 날짜순 목록으로: "- 2025. 7. 10. [보도자료 제목](url) — 한 줄 요지". url은 도구가 준 그대로 쓴다.
 - 숫자·금액·날짜·대상은 본문에 적힌 그대로 옮긴다. 추측하지 않는다.
 - 찾지 못했으면 찾지 못했다고 말하고, 어떤 말로 찾아봤는지 적는다.
-- 마크다운은 목록, 굵게(**), 링크만 쓴다. 표와 제목(#)은 쓰지 않는다.`;
+- 마크다운은 목록, 굵게(**), 링크만 쓴다. 표와 제목(#)은 쓰지 않는다.${Rules.promptBlock()}`;
 
   const ERR = {
     not_granted: ["이 페이지가 Claude를 쓰도록 허용되지 않았습니다. 페이지의 권한 메뉴에서 허용한 뒤 새로 고쳐 주세요.", true],
@@ -60,7 +60,12 @@ const AI = (() => {
     let last = 0, m;
     while ((m = re.exec(s))) {
       if (m.index > last) parent.appendChild(document.createTextNode(s.slice(last, m.index)));
-      if (m[1]) { const a = el("a", null, m[1]); a.href = m[2]; a.target = "_blank"; a.rel = "noopener"; parent.appendChild(a); }
+      if (m[1]) {
+        // 행안부 보도자료 링크는 읽기 창으로만 연다 (누리집으로 바로 넘어가지 않게)
+        const id = m[2].startsWith("https://www.mois.go.kr/") && (m[2].match(/[?&]nttId=(\d+)/) || [])[1];
+        if (id) parent.appendChild(docButton(id, m[1]));
+        else { const a = el("a", null, m[1]); a.href = m[2]; a.target = "_blank"; a.rel = "noopener"; parent.appendChild(a); }
+      }
       else parent.appendChild(el("strong", null, m[3]));
       last = re.lastIndex;
     }
@@ -210,7 +215,6 @@ const AI = (() => {
     body.appendChild(el("p", "thinking", "생각하는 중…"));
     aEl.append(steps, body);
     log.append(qEl, aEl);
-    routeArticleClicks(body);
     qEl.scrollIntoView({ block: "nearest" });
     const step = (text) => { steps.querySelectorAll("li").forEach((li) => li.classList.add("done")); steps.appendChild(el("li", null, text)); };
     const readMap = new Map();
@@ -289,5 +293,5 @@ const AI = (() => {
         return s;
       });
   }
-  return { init, show() {}, resize() {} };
+  return { init, ask, show() {}, resize() {} };
 })();

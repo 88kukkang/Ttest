@@ -27,12 +27,15 @@ function table(headers, rows, cls = "data") {
   for (const r of rows) { const tr = tb.insertRow(); for (const c of r) tr.insertCell().textContent = c; }
   return t;
 }
-/** 보도자료 제목 링크: 누르면 페이지 안 읽기 창으로 본문, Ctrl/⌘/가운데 클릭은 행안부 원문 */
+/** 보도자료 제목: 누르면 페이지 안 읽기 창으로 본문만 연다. 행안부 누리집 원문은 읽기 창 안의 버튼으로만 간다. */
 function articleLink(d, terms = [], content = null) {
-  const a = el("a"); a.href = ARTICLE + d.id; a.target = "_blank"; a.rel = "noopener";
-  a.appendChild(content || document.createTextNode(d.title));
-  a.addEventListener("click", (e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return; e.preventDefault(); Reader.open(d.id, terms); });
-  return a;
+  return docButton(d.id, content || document.createTextNode(d.title), terms);
+}
+function docButton(id, content, terms = []) {
+  const b = el("button", "doclink"); b.type = "button";
+  b.appendChild(typeof content === "string" ? document.createTextNode(content) : content);
+  b.addEventListener("click", () => Reader.open(id, terms));
+  return b;
 }
 const Reader = (() => {
   const dlg = $("reader");
@@ -41,12 +44,17 @@ const Reader = (() => {
   async function open(id, terms = []) {
     await docsReady;
     const d = DOC_BY_ID.get(String(id));
-    if (!d) { window.open(ARTICLE + id, "_blank", "noopener"); return; }
-    $("reader-meta").textContent = `${dateLabel(d.date)} · ${d.dept || "부서 미상"} · 본문 ${fmt(d.body.length)}자`;
-    $("reader-title").textContent = d.title;
-    $("reader-orig").href = ARTICLE + d.id;
+    $("reader-orig").href = ARTICLE + id;
     const body = $("reader-body");
-    body.replaceChildren(terms.length ? highlighted(d.body, d.lb, terms) : document.createTextNode(d.body));
+    if (d) {
+      $("reader-meta").textContent = `${dateLabel(d.date)} · ${d.dept || "부서 미상"} · 본문 ${fmt(d.body.length)}자`;
+      $("reader-title").textContent = d.title;
+      body.replaceChildren(terms.length ? highlighted(d.body, d.lb, terms) : document.createTextNode(d.body));
+    } else {
+      $("reader-meta").textContent = `글 번호 ${id}`;
+      $("reader-title").textContent = "이 페이지 데이터에 없는 보도자료입니다";
+      body.replaceChildren(document.createTextNode("아직 수집되지 않았거나 번호가 잘못됐을 수 있습니다. 위의 ‘행안부 누리집 원문 열기’로 확인해 주세요."));
+    }
     hideTip();
     if (typeof dlg.showModal === "function") { if (!dlg.open) dlg.showModal(); } else dlg.setAttribute("open", "");
     body.scrollTop = 0;
@@ -55,18 +63,6 @@ const Reader = (() => {
   }
   return { open };
 })();
-/** 본문 안 행안부 원문 링크(nttId=…)를 읽기 창으로 연다 (AI 답변용) */
-function routeArticleClicks(container, termsFn = () => []) {
-  container.addEventListener("click", (e) => {
-    const a = e.target.closest && e.target.closest("a[href]");
-    if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
-    const m = a.href.match(/[?&]nttId=(\d+)/);
-    if (!m || !a.href.startsWith("https://www.mois.go.kr/")) return;
-    e.preventDefault();
-    Reader.open(m[1], termsFn());
-  });
-}
-
 // ---- 툴팁: 값이 굵게, 이름은 보조 ----
 const tip = $("tip");
 function fillTip(title, rows) {

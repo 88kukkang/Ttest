@@ -124,8 +124,8 @@ const R = (() => {
 // 탭과 시작
 // =====================================================================
 const Tabs = (() => {
-  const NAMES = ["ai", "search", "cloud", "network", "report"];
-  const MODS = { ai: AI, search: S, cloud: C, network: N, report: R };
+  const NAMES = ["ai", "rules", "search", "cloud", "network", "report"];
+  const MODS = { ai: AI, rules: Rules, search: S, cloud: C, network: N, report: R };
   let current = null;
   function show(name, focusTab = false) {
     if (!NAMES.includes(name)) name = "ai";
@@ -166,6 +166,6 @@ const Tabs = (() => {
   return { init, show };
 })();
 
-AI.init(); S.init(); C.init(); N.init(); R.init();
+AI.init(); Rules.init(); S.init(); C.init(); N.init(); R.init();
 Tabs.init();
 })();

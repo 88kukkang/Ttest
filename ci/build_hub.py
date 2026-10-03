@@ -9,7 +9,7 @@ from pathlib import Path
 
 SRC = Path("web/src")
 report = Path("reports/report_data.json").read_text(encoding="utf-8").strip()
-scripts = ["3_core.js", "4_ai.js", "5_search.js", "6_cloud.js", "7_network.js", "8_report_tabs.js"]
+scripts = ["3_core.js", "4_ai.js", "4b_rules.js", "5_search.js", "6_cloud.js", "7_network.js", "8_report_tabs.js"]
 html = (
     (SRC / "1_head.html").read_text(encoding="utf-8")
     + (SRC / "2_body.html").read_text(encoding="utf-8")
