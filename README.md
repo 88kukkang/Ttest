@@ -104,12 +104,14 @@ tests/                    합성 HTML·HWPX·PDF 로 전 과정을 오프라인 
 
 | 파일 | 내용 | 데이터 |
 |---|---|---|
+| `web/index.html` | **한 페이지 통합본**: AI에게 묻기(Claude가 페이지 안 검색 도구로 보도자료를 찾아 읽고 답함) · 검색 · 클라우드 · 관계도 · 보고서 탭 | `docs.b64.txt`, `cloud.b64.txt` |
 | `web/search.html` | 보도자료 제목·본문 검색 (AND·"구절"·-제외, 기간·부서, 월별 분포, 결과 복사) | `docs.b64.txt` |
 | `web/cloud.html` | 키워드 클라우드 (단어 수 50/100/200, 많이 나온 말·두드러진 말, 단어별 추이) | `cloud.b64.txt` |
 | `web/network.html` | 키워드 관계도 (전체 관계망·중심어 연관어, 묶음 색, 연결별 보도자료) | `cloud.b64.txt` |
 | `reports/keyword_report.html` | 첫 키워드 분석 보고서 (월별 특징어, 표기 변화, 주제 흐름) | 페이지 안에 포함 |
 
 로컬에서 볼 때는 `cd web && python -m http.server` 후 브라우저로 연다(파일을 직접 열면 데이터 파일을 못 읽는다).
+‘AI에게 묻기’는 claude.ai 아티팩트로 열었을 때만 동작한다(보는 사람의 Claude 계정으로 실행).
 
 ## 주의
 

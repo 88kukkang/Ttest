@@ -1,0 +1,1703 @@
+<title>행안부 보도자료 DB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.3/src/wordcloud2.js"></script>
+<style>
+/* 레이아웃: 보도자료 서식을 닮은 한 장. 머리 → 탭 줄(고정) → 탭마다 한 화면. 탭: AI 질문 · 검색 · 키워드 클라우드 · 관계도 · 분석 보고서 */
+:root {
+  --bg: #eef0f2; --paper: #ffffff; --ink: #15181c; --ink-2: #4a515a; --muted: #7b828b;
+  --line: #e1e4e8; --axis: #c5cad0; --accent: #2a78d6; --accent-soft: #e8f1fc; --band: #e9f3fe;
+  --mark-bg: #ffe28a; --mark-ink: #15181c;
+  --bar: #2a78d6; --bar-dim: #b7d3f6; --bar-partial: #9ec5f4;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  --w1: #2a78d6; --w2: #d4561f; --w3: #128a60; --w4: #a86f00; --w5: #c4457a; --w6: #008300; --w7: #4a3aa7; --w8: #d03b3b;
+  --q1: #104281; --q2: #1c5cab; --q3: #3f86dd;
+  --edge: #9aa3ad; --other: #a3a9b0; --center: #15181c;
+  --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c6: #4a3aa7;
+  --tip-bg: #15181c; --tip-ink: #ffffff;
+  --font-display: "Nanum Myeongjo", "Noto Serif KR", "Batang", serif;
+  --font-body: "Noto Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --step--1: 0.8125rem; --step-0: 0.9375rem; --step-1: 1.0625rem; --step-2: 1.375rem; --step-3: clamp(1.7rem, 4vw, 2.3rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1013; --paper: #171a1e; --ink: #f1f3f5; --ink-2: #b9bfc7; --muted: #8b929b;
+    --line: #2a2f35; --axis: #3b4149; --accent: #6da7ec; --accent-soft: #1a2738; --band: #1a2738;
+    --mark-bg: #6b5410; --mark-ink: #fff4cf;
+    --bar: #3987e5; --bar-dim: #1f3a5c; --bar-partial: #1c5cab;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    --w1: #5598e7; --w2: #e2703f; --w3: #2bb383; --w4: #d69a1c; --w5: #e06b97; --w6: #3fae3f; --w7: #9085e9; --w8: #e66767;
+    --q1: #b7d3f6; --q2: #6da7ec; --q3: #3987e5;
+    --edge: #59616b; --other: #6b727b; --center: #f1f3f5;
+    --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #9085e9;
+    --tip-bg: #f1f3f5; --tip-ink: #15181c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1013; --paper: #171a1e; --ink: #f1f3f5; --ink-2: #b9bfc7; --muted: #8b929b;
+  --line: #2a2f35; --axis: #3b4149; --accent: #6da7ec; --accent-soft: #1a2738; --band: #1a2738;
+  --mark-bg: #6b5410; --mark-ink: #fff4cf;
+  --bar: #3987e5; --bar-dim: #1f3a5c; --bar-partial: #1c5cab;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+  --w1: #5598e7; --w2: #e2703f; --w3: #2bb383; --w4: #d69a1c; --w5: #e06b97; --w6: #3fae3f; --w7: #9085e9; --w8: #e66767;
+  --q1: #b7d3f6; --q2: #6da7ec; --q3: #3987e5;
+  --edge: #59616b; --other: #6b727b; --center: #f1f3f5;
+  --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #9085e9;
+  --tip-bg: #f1f3f5; --tip-ink: #15181c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: var(--step-0); line-height: 1.65; padding-inline: 16px; padding-block: 24px 48px; }
+.sheet { max-width: 1040px; margin: 0 auto; background: var(--paper); border: 1px solid var(--line); padding: clamp(18px, 4vw, 44px); display: grid; gap: 22px; }
+h1, .h2 { font-family: var(--font-display); font-weight: 800; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h1 { font-size: var(--step-3); line-height: 1.2; }
+.h2 { font-size: var(--step-2); line-height: 1.3; }
+h2, h3, h4 { margin: 0; }
+h3 { font-size: var(--step-1); font-weight: 700; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button { font: inherit; }
+.num { font-variant-numeric: tabular-nums; }
+.head { display: grid; gap: 10px; }
+.stamp { width: fit-content; border: 2px solid var(--ink); padding: 1px 12px; font-family: var(--font-display); font-weight: 800; letter-spacing: 0.3em; font-size: var(--step-0); }
+.scope { color: var(--ink-2); font-size: var(--step--1); max-width: 74ch; }
+.prose { max-width: 66ch; color: var(--ink-2); }
+.note { font-size: var(--step--1); color: var(--muted); }
+.note.warn { color: var(--ink-2); background: var(--accent-soft); padding: 6px 10px; }
+.caption { font-size: var(--step--1); color: var(--muted); max-width: 72ch; }
+
+/* 탭 줄: 화면 위에 붙는다 */
+.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; gap: 0; overflow-x: auto; background: var(--paper); border-bottom: 2px solid var(--ink); margin-inline: calc(-1 * clamp(18px, 4vw, 44px)); padding-inline: clamp(18px, 4vw, 44px); scrollbar-width: none; }
+.tabs button { flex: none; border: 0; background: transparent; color: var(--ink-2); padding: 10px 14px 9px; font-weight: 500; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; }
+.tabs button[aria-selected="true"] { color: var(--ink); font-weight: 700; border-bottom-color: var(--accent); }
+.tabs button:hover { color: var(--ink); }
+.panel-tab { display: grid; gap: 20px; min-width: 0; }
+
+/* 공용 컨트롤 */
+.filters { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding-block: 12px; }
+.field { display: grid; gap: 2px; font-size: var(--step--1); color: var(--muted); min-width: 0; }
+.field select { font: inherit; font-size: var(--step--1); color: var(--ink); background: var(--paper); border: 1px solid var(--axis); padding: 5px 8px; max-width: 100%; }
+.field.dept select { max-width: 14em; }
+.check { display: inline-flex; gap: 6px; align-items: center; font-size: var(--step--1); color: var(--ink-2); }
+.btn { font-weight: 700; padding: 8px 16px; border: 2px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn-ghost { cursor: pointer; padding: 5px 12px; border: 1px solid var(--axis); background: var(--paper); color: var(--ink-2); font-size: var(--step--1); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--ink); }
+.btn-ghost:disabled { opacity: 0.5; cursor: default; }
+.chips-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: var(--step--1); color: var(--muted); }
+.ex { font-size: var(--step--1); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; background: var(--paper); color: var(--ink-2); cursor: pointer; text-align: left; }
+.ex:hover { border-color: var(--accent); color: var(--ink); }
+.qrow { display: flex; gap: 8px; }
+.qrow input, .qrow textarea { flex: 1; min-width: 0; font: inherit; font-size: var(--step-1); padding: 10px 14px; border: 2px solid var(--ink); border-radius: 0; background: var(--paper); color: var(--ink); }
+.qrow textarea { resize: vertical; min-height: 3.2em; line-height: 1.5; }
+.qrow input::placeholder, .qrow textarea::placeholder { color: var(--muted); }
+.help { font-size: var(--step--1); color: var(--muted); }
+.help code { font-family: inherit; background: var(--accent-soft); color: var(--ink); padding: 0 4px; }
+mark { background: var(--mark-bg); color: var(--mark-ink); padding: 0 1px; }
+details { font-size: var(--step--1); }
+summary { cursor: pointer; color: var(--accent); width: fit-content; }
+details[open] summary { margin-bottom: 8px; }
+.table-wrap { overflow-x: auto; }
+.table-wrap.tall { max-height: 26rem; overflow-y: auto; }
+table.data { width: 100%; border-collapse: collapse; font-size: var(--step--1); }
+table.data th, table.data td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+table.data th:first-child, table.data td:first-child { text-align: left; }
+table.data.left2 th:nth-child(2), table.data.left2 td:nth-child(2) { text-align: left; }
+table.data thead th { color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--axis); position: sticky; top: 0; background: var(--paper); }
+table.data td { font-variant-numeric: tabular-nums; }
+
+/* 차트 공용 */
+.chart { position: relative; width: 100%; min-width: 0; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart text { fill: var(--muted); font-family: var(--font-body); font-size: 11px; }
+.chart .val { fill: var(--ink); font-weight: 700; font-size: 12px; }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .base { stroke: var(--axis); stroke-width: 1; }
+.hit { fill: transparent; }
+.hit.click { cursor: pointer; }
+.mark { pointer-events: none; }
+.hit:hover + .mark, .hit:focus + .mark { opacity: 0.75; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: var(--step--1); color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.key { width: 18px; height: 0; border-top: 2px solid; border-radius: 2px; display: inline-block; }
+.sw { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+
+/* AI 질문 */
+.ai-log { display: grid; gap: 18px; }
+.ai-q { justify-self: end; max-width: 85%; background: var(--accent-soft); padding: 8px 14px; border-radius: 12px 12px 2px 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ai-a { display: grid; gap: 10px; border-left: 3px solid var(--ink); padding-left: 14px; min-width: 0; }
+.ai-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: var(--step--1); color: var(--muted); }
+.ai-steps li::before { content: "○ "; }
+.ai-steps li.done::before { content: "● "; color: var(--accent); }
+.ai-body { display: grid; gap: 8px; min-width: 0; overflow-wrap: anywhere; }
+.ai-body ul, .ai-body ol { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
+.ai-body h4 { font-size: var(--step-0); font-weight: 700; margin-top: 4px; }
+.ai-body .thinking { color: var(--muted); }
+.ai-refs { font-size: var(--step--1); color: var(--ink-2); display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 8px; }
+.ai-refs ul { margin: 0; padding-left: 1.1em; display: grid; gap: 2px; }
+.ai-err { font-size: var(--step--1); color: var(--ink-2); background: var(--accent-soft); padding: 6px 10px; }
+.ai-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.ai-off { display: grid; gap: 6px; padding: 14px 16px; background: var(--accent-soft); font-size: var(--step--1); color: var(--ink-2); }
+
+/* 검색 */
+.summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; }
+.summary strong { font-size: var(--step-2); font-family: var(--font-display); }
+.summary .sub { color: var(--muted); font-size: var(--step--1); }
+.active-month { display: inline-flex; gap: 6px; align-items: center; font-size: var(--step--1); background: var(--accent-soft); padding: 2px 4px 2px 10px; }
+.active-month button { border: 0; background: transparent; color: var(--ink-2); padding: 0 6px; cursor: pointer; }
+.results { display: grid; border-top: 2px solid var(--ink); }
+.item { display: grid; gap: 6px; padding-block: 16px; border-bottom: 1px solid var(--line); min-width: 0; }
+.item-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: var(--step--1); color: var(--muted); }
+.item-meta .count { color: var(--ink-2); font-weight: 500; }
+.item h4 { font-size: var(--step-1); font-weight: 700; line-height: 1.45; text-wrap: pretty; }
+.item h4 a { color: var(--ink); text-decoration: none; }
+.item h4 a:hover { color: var(--accent); text-decoration: underline; }
+.snips { display: grid; gap: 4px; font-size: var(--step--1); color: var(--ink-2); min-width: 0; }
+.snips p { overflow-wrap: anywhere; }
+.item-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.full { white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--step--1); color: var(--ink-2); background: var(--bg); padding: 14px 16px; max-height: 32rem; overflow-y: auto; border-left: 3px solid var(--axis); }
+.more-row { display: flex; justify-content: center; padding-top: 16px; }
+.empty { padding-block: 24px; color: var(--ink-2); }
+
+/* 클라우드·관계도 판 */
+.board { border: 1px solid var(--line); border-top: 3px solid var(--ink); min-width: 0; }
+.board-band { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; background: var(--band); padding: 10px 16px; }
+.board-band h3 { font-size: var(--step-1); }
+.board-band .meta { font-size: var(--step--1); color: var(--ink-2); }
+.board-tools { display: flex; gap: 8px; align-items: center; }
+.board-tools select { font: inherit; padding: 4px 8px; border: 1px solid var(--axis); background: var(--paper); color: var(--ink); }
+.stage { position: relative; min-width: 0; }
+.cloud-stage { padding: 12px; }
+.cloud-stage canvas { display: block; width: 100%; cursor: pointer; }
+.drawing { position: absolute; top: 14px; left: 16px; font-size: var(--step--1); color: var(--muted); }
+.net-stage svg { display: block; width: 100%; touch-action: none; }
+.board .legend { padding: 10px 16px; border-top: 1px solid var(--line); }
+.link { stroke: var(--edge); fill: none; }
+.link-hit { stroke: transparent; stroke-width: 12; fill: none; cursor: pointer; }
+.node circle { stroke: var(--paper); stroke-width: 2; cursor: pointer; }
+.node text { fill: var(--ink); font-family: var(--font-body); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+.dim { opacity: 0.12; }
+.hl { stroke: var(--ink) !important; }
+.sel circle { stroke: var(--ink); stroke-width: 3; }
+.modes { display: inline-flex; border: 2px solid var(--ink); width: fit-content; }
+.modes button { font-weight: 700; font-size: var(--step--1); padding: 6px 14px; border: 0; background: var(--paper); color: var(--ink); cursor: pointer; }
+.modes button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.centerbox { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.centerbox input { font: inherit; padding: 6px 10px; border: 2px solid var(--ink); background: var(--paper); color: var(--ink); min-width: 0; width: 14em; }
+.centerbox .btn { padding: 6px 14px; }
+
+/* 고른 단어 상세 (클라우드·관계도 공용) */
+.detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 24px; align-items: start; }
+@media (max-width: 720px) { .detail { grid-template-columns: 1fr; } }
+.sel-head { display: grid; gap: 4px; }
+.sel-head .label { font-size: var(--step--1); color: var(--muted); }
+.sel-head strong { font-family: var(--font-display); font-size: var(--step-2); }
+.sel-head .figs { font-size: var(--step--1); color: var(--ink-2); }
+.sel-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.docs { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.docs li { padding: 8px 0; border-bottom: 1px solid var(--line); display: grid; gap: 2px; min-width: 0; }
+.docs .d-meta { font-size: var(--step--1); color: var(--muted); }
+.docs a { color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+.docs a:hover { color: var(--accent); text-decoration: underline; }
+.docs-title { font-size: var(--step--1); color: var(--muted); margin-bottom: 4px; }
+.bars { display: grid; gap: 6px; }
+.bar-row { display: grid; grid-template-columns: minmax(5em, 10em) 1fr 3.2em; gap: 10px; align-items: center; font-size: var(--step--1); }
+.bar-row .name { color: var(--ink-2); overflow-wrap: anywhere; }
+.bar-row button.name { all: unset; cursor: pointer; color: var(--ink-2); overflow-wrap: anywhere; }
+.bar-row button.name:hover, .bar-row button.name:focus-visible { color: var(--accent); text-decoration: underline; }
+.bar-track { height: 12px; min-width: 0; }
+.bar-fill { height: 100%; background: var(--bar); border-radius: 0 4px 4px 0; }
+.bar-row .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 500; }
+
+/* 보고서 */
+.rep { display: grid; gap: 40px; }
+.rep section { display: grid; gap: 14px; min-width: 0; }
+.section-head { display: grid; gap: 6px; border-top: 2px solid var(--ink); padding-top: 14px; }
+.kicker { font-size: var(--step--1); color: var(--muted); letter-spacing: 0.04em; }
+.points { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; max-width: 70ch; }
+.points li { display: grid; grid-template-columns: 1.4em 1fr; gap: 4px; }
+.points li::before { content: "□"; color: var(--ink); }
+.points li.sub::before { content: "○"; }
+.points li.sub { padding-left: 1.4em; color: var(--ink-2); }
+.ledger { display: grid; border-top: 1px solid var(--line); }
+.ledger-row { display: grid; grid-template-columns: 7.5em 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.ledger-month b { display: block; }
+.ledger-month span { font-size: var(--step--1); color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.chip { font-size: var(--step--1); padding: 2px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-2); background: var(--paper); }
+.chip.first { border-color: var(--accent); color: var(--ink); font-weight: 700; background: var(--accent-soft); }
+.multiples { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 20px; }
+@media (max-width: 760px) { .multiples { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .multiples { grid-template-columns: 1fr; } }
+.mini { display: grid; gap: 4px; min-width: 0; }
+.mini-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.mini-head h4 { font-size: var(--step-0); }
+.mini-head span { font-size: var(--step--1); color: var(--muted); white-space: nowrap; }
+.mini-peak { font-size: var(--step--1); color: var(--ink-2); }
+.two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+@media (max-width: 720px) { .two-col { grid-template-columns: 1fr; } }
+
+.foot { font-size: var(--step--1); color: var(--muted); display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 14px; }
+#tip { position: fixed; z-index: 20; pointer-events: none; background: var(--tip-bg); color: var(--tip-ink); padding: 7px 10px; border-radius: 6px; font-size: 12px; line-height: 1.5; box-shadow: 0 4px 16px rgba(0,0,0,0.18); max-width: 260px; }
+#tip .t { opacity: 0.75; }
+#tip b { font-variant-numeric: tabular-nums; }
+#tip .t-row { display: flex; align-items: center; gap: 6px; }
+#toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--tip-bg); color: var(--tip-ink); padding: 8px 14px; border-radius: 6px; font-size: var(--step--1); z-index: 21; max-width: calc(100% - 32px); }
+@media (prefers-reduced-motion: no-preference) { .bar-fill { transition: width 0.4s ease; } }
+</style>
+<main class="sheet">
+  <header class="head">
+    <span class="stamp">보도자료</span>
+    <h1>행안부 보도자료 DB</h1>
+    <p class="scope">이재명 정부 출범(2025. 6. 4.)부터 2026. 10. 2.까지 행정안전부 누리집에 올라온 보도자료 <span class="num js-total">1,786</span>건을 첨부 원문까지 모았습니다. 묻고, 찾고, 키워드로 훑어볼 수 있습니다.</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="기능">
+    <button role="tab" id="tab-ai" aria-controls="panel-ai" aria-selected="true">AI에게 묻기</button>
+    <button role="tab" id="tab-search" aria-controls="panel-search" aria-selected="false">검색</button>
+    <button role="tab" id="tab-cloud" aria-controls="panel-cloud" aria-selected="false">키워드 클라우드</button>
+    <button role="tab" id="tab-network" aria-controls="panel-network" aria-selected="false">관계도</button>
+    <button role="tab" id="tab-report" aria-controls="panel-report" aria-selected="false">분석 보고서</button>
+  </nav>
+
+  <!-- ===== AI에게 묻기 ===== -->
+  <section class="panel-tab" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai">
+    <p class="prose">보도자료에 관해 평소 말로 물어보세요. Claude가 보도자료를 직접 검색하고 본문을 읽은 뒤, 근거 보도자료 링크를 달아 답합니다. 한 질문에 30초~1분 반쯤 걸립니다.</p>
+    <div class="ai-off" id="ai-off" hidden></div>
+    <form class="qrow" id="ai-form">
+      <textarea id="ai-q" rows="2" placeholder="예: 인구감소지역에 별도 혜택을 주는 것과 관련된 보도자료는?" aria-label="질문"></textarea>
+      <button class="btn" type="submit" id="ai-send">묻기</button>
+    </form>
+    <div class="chips-row" id="ai-examples"><span>예시</span></div>
+    <div class="ai-bar">
+      <span class="note">Claude 사용량은 각자 계정에서 빠집니다. 처음 물을 때 허용 여부를 묻는 창이 뜹니다.</span>
+      <span>
+        <button class="btn-ghost" type="button" id="ai-stop" hidden>멈추기</button>
+        <button class="btn-ghost" type="button" id="ai-new" hidden>새 대화</button>
+      </span>
+    </div>
+    <div class="ai-log" id="ai-log" aria-live="polite"></div>
+  </section>
+
+  <!-- ===== 검색 ===== -->
+  <section class="panel-tab" id="panel-search" role="tabpanel" aria-labelledby="tab-search" hidden>
+    <form class="qrow" id="s-form" role="search">
+      <input id="s-q" type="search" autocomplete="off" placeholder="검색어 (예: 지방정부, 소비쿠폰, “국가정보자원관리원 화재”)" aria-label="검색어">
+      <button class="btn" type="submit">검색</button>
+    </form>
+    <p class="help">띄어 쓴 단어는 모두 들어간 글만 찾습니다. <code>"큰따옴표"</code>는 구절 그대로, <code>-단어</code>는 그 단어가 든 글을 뺍니다.</p>
+    <div class="chips-row" id="s-examples"><span>예시</span></div>
+    <div class="filters">
+      <label class="field" for="s-from">시작<select id="s-from"></select></label>
+      <label class="field" for="s-to">끝<select id="s-to"></select></label>
+      <label class="field dept" for="s-dept">부서<select id="s-dept"><option value="">전체 부서</option></select></label>
+      <label class="field" for="s-scope">검색 범위<select id="s-scope"><option value="all">제목 + 본문</option><option value="title">제목만</option></select></label>
+      <label class="field" for="s-sort">정렬<select id="s-sort"><option value="date">최신순</option><option value="score">많이 나온 순</option></select></label>
+    </div>
+    <div class="summary" aria-live="polite">
+      <div><strong class="num" id="s-count">…</strong> <span class="sub" id="s-count-sub">보도자료를 불러오는 중입니다 (약 4MB).</span></div>
+      <button class="btn-ghost" id="s-copy" type="button" disabled>결과 목록 복사</button>
+    </div>
+    <div>
+      <span class="note" id="s-hist-label">월별 건수 · 막대를 누르면 그 달만 봅니다</span>
+      <div class="chart" id="s-hist"></div>
+    </div>
+    <div class="results" id="s-results"><p class="empty">불러오는 중…</p></div>
+  </section>
+
+  <!-- ===== 키워드 클라우드 ===== -->
+  <section class="panel-tab" id="panel-cloud" role="tabpanel" aria-labelledby="tab-cloud" hidden>
+    <p class="prose">글자가 클수록 그 단어가 나온 보도자료가 많습니다. 단어를 누르면 언제, 어떤 보도자료에 나왔는지 보여줍니다.</p>
+    <div class="filters">
+      <label class="field" for="c-from">시작<select id="c-from"></select></label>
+      <label class="field" for="c-to">끝<select id="c-to"></select></label>
+      <label class="field dept" for="c-dept">부서<select id="c-dept"><option value="">전체 부서</option></select></label>
+      <label class="field" for="c-basis">기준<select id="c-basis"><option value="df">많이 나온 말</option><option value="z">이 범위에서 두드러진 말</option></select></label>
+      <label class="field" for="c-palette">색<select id="c-palette"><option value="multi">여러 색</option><option value="mono">한 색 (클수록 진하게)</option></select></label>
+    </div>
+    <p class="note warn" id="c-note" hidden></p>
+    <div class="board">
+      <div class="board-band">
+        <div><h3>키워드 클라우드</h3><span class="meta num" id="c-meta">불러오는 중…</span></div>
+        <div class="board-tools">
+          <select id="c-topn" aria-label="단어 수"><option value="50">50</option><option value="100" selected>100</option><option value="200">200</option></select>
+          <button class="btn-ghost" id="c-copy" type="button">이미지 복사</button>
+        </div>
+      </div>
+      <div class="stage cloud-stage" id="c-stage">
+        <span class="drawing" id="c-drawing" hidden>그리는 중…</span>
+        <canvas id="c-canvas" role="img" aria-label="키워드 클라우드"></canvas>
+      </div>
+    </div>
+    <div class="detail" aria-live="polite">
+      <div class="sel-head">
+        <span class="label">고른 단어</span>
+        <strong id="c-term">—</strong>
+        <span class="figs num" id="c-figs"></span>
+        <div class="sel-actions" id="c-actions"></div>
+        <div class="chart" id="c-chart"></div>
+        <span class="note">월별로 이 단어가 나온 보도자료 수 (부서 조건 반영, 고른 기간은 진하게)</span>
+      </div>
+      <div><p class="docs-title" id="c-docs-title"></p><ul class="docs" id="c-docs"></ul></div>
+    </div>
+    <details><summary>표로 보기 (클라우드에 그린 단어 전체)</summary><div class="table-wrap tall" id="c-table"></div></details>
+    <p class="caption">색은 단어를 구분하기 위한 것이고 따로 뜻은 없습니다. ‘두드러진 말’은 고른 범위를 나머지 보도자료와 견준 로그오즈비(z값)로 크기를 정합니다.</p>
+  </section>
+
+  <!-- ===== 관계도 ===== -->
+  <section class="panel-tab" id="panel-network" role="tabpanel" aria-labelledby="tab-network" hidden>
+    <p class="prose">같은 보도자료에 함께 자주 나온 단어끼리 이었습니다. 선이 굵을수록 함께 나오는 정도가 강하고, 같은 색은 서로 촘촘히 엮인 단어 묶음입니다. 원 크기는 그 단어가 나온 보도자료 수입니다.</p>
+    <div class="modes" role="group" aria-label="보기 방식">
+      <button type="button" id="n-mode-net" aria-pressed="true">전체 관계망</button>
+      <button type="button" id="n-mode-ego" aria-pressed="false">중심어 연관어</button>
+    </div>
+    <form class="centerbox" id="n-centerbox" hidden>
+      <label for="n-center" class="note">중심어</label>
+      <input id="n-center" type="text" autocomplete="off" value="인공지능" list="n-terms">
+      <datalist id="n-terms"></datalist>
+      <button class="btn" type="submit">보기</button>
+      <span class="note">예시</span>
+    </form>
+    <div class="filters">
+      <label class="field" for="n-from">시작<select id="n-from"></select></label>
+      <label class="field" for="n-to">끝<select id="n-to"></select></label>
+      <label class="field dept" for="n-dept">부서<select id="n-dept"><option value="">전체 부서</option></select></label>
+      <label class="field" for="n-n">단어 수<select id="n-n"><option value="30">30</option><option value="50" selected>50</option><option value="80">80</option></select></label>
+      <label class="field" for="n-k">단어마다 잇는 선<select id="n-k"><option value="2">2개</option><option value="3" selected>3개</option><option value="5">5개</option></select></label>
+      <label class="check" for="n-common"><input type="checkbox" id="n-common" checked>보도자료 절반 이상에 나오는 말(정부·국민·지원 등) 빼기</label>
+    </div>
+    <p class="note warn" id="n-msg" hidden></p>
+    <div class="board">
+      <div class="board-band">
+        <div><h3 id="n-title">전체 관계망</h3><span class="meta num" id="n-meta">불러오는 중…</span></div>
+        <button class="btn-ghost" id="n-reset" type="button">처음 배치로</button>
+      </div>
+      <div class="stage net-stage" id="n-stage"></div>
+      <div class="legend" id="n-legend"></div>
+    </div>
+    <p class="note">끌어서 단어를 옮기고, 휠·두 손가락으로 확대할 수 있습니다. 단어나 선을 누르면 아래에 함께 나온 보도자료가 나옵니다.</p>
+    <div class="detail" aria-live="polite">
+      <div class="sel-head">
+        <span class="label" id="n-sel-label">고른 단어</span>
+        <strong id="n-sel-name">—</strong>
+        <span class="figs num" id="n-sel-figs"></span>
+        <div class="sel-actions" id="n-sel-actions"></div>
+        <div class="bars" id="n-sel-bars"></div>
+      </div>
+      <div><p class="docs-title" id="n-docs-title"></p><ul class="docs" id="n-docs"></ul></div>
+    </div>
+    <details><summary>표로 보기 (그린 연결 전체)</summary><div class="table-wrap tall" id="n-table"></div></details>
+    <p class="caption">연결 강도는 코사인 계수(함께 나온 보도자료 수 ÷ √두 단어 보도자료 수의 곱)이고, 단어마다 가장 강한 연결 몇 개만 남겼습니다(3건 이상 함께 나온 경우). 묶음은 루뱅 알고리즘 1단계로 나눴습니다. 중심어 연관어는 ‘함께 나온 수 × log(1 + 향상도)’ 순입니다.</p>
+  </section>
+
+  <!-- ===== 분석 보고서 ===== -->
+  <section class="panel-tab rep" id="panel-report" role="tabpanel" aria-labelledby="tab-report" hidden>
+    <ul class="points">
+      <li><span>출범 뒤 16개월 동안 행정안전부는 보도자료를 <b>1,786건</b> 냈다. 2025년 6월~2026년 9월 기준 한 달 평균 <b>약 111건</b>, 가장 많은 달은 2025년 9월(143건)이다.</span></li>
+      <li><span>표기가 바뀌었다. ‘지방정부’가 나온 보도자료 비율이 2025년 9월 <b>1%</b>에서 10월 15%, 12월 <b>51%</b>로 뛰었고, 같은 기간 ‘지자체’·‘지방자치단체’는 줄었다.</span></li>
+      <li><span>달마다 두드러진 이슈가 뚜렷하다.</span></li>
+      <li class="sub"><span>2025년 7월 민생회복 소비쿠폰, 8월 호우·긴급재난문자, 10월 국가정보자원관리원 화재 뒤 시스템 복구</span></li>
+      <li class="sub"><span>2026년 1월 한파, 3월 BTS 광화문 공연 안전관리, 4월 고유가 피해지원금, 5월 지방선거, 6월 이후 전남광주통합특별시</span></li>
+      <li><span>인공지능·AI는 특정 달에 몰리지 않고 내내 나온다. 전체 보도자료의 <b>22%</b>(400건)에 등장한다.</span></li>
+    </ul>
+    <section>
+      <div class="section-head"><span class="kicker">월별 보도자료 수</span><p class="h2">한 달에 100건 안팎</p></div>
+      <div class="chart" id="r-volume"></div>
+      <p class="caption">2026년 10월은 1~2일 이틀치(11건)라 옅게 표시했다. 2025년 6월은 4일부터 센 값이다.</p>
+      <details><summary>표로 보기</summary><div class="table-wrap" id="r-volume-table"></div></details>
+    </section>
+    <section>
+      <div class="section-head"><span class="kicker">달마다 두드러진 키워드</span><p class="h2">그 달에 유독 많이 나온 말</p></div>
+      <p class="prose">각 달의 보도자료를 나머지 기간 전체와 견줘, 그 달에 치우쳐 나온 단어를 6개씩 골랐다(로그오즈비, 3건 이상). 맨 앞이 가장 두드러진 말이다. 실장·직무대행 같은 인명이 끼는 달도 있다.</p>
+      <div class="ledger" id="r-ledger"></div>
+    </section>
+    <section>
+      <div class="section-head"><span class="kicker">표기 변화</span><p class="h2">‘지자체’에서 ‘지방정부’로</p></div>
+      <div class="legend" id="r-shift-legend"></div>
+      <div class="chart" id="r-shift"></div>
+      <p class="caption">그 달 보도자료 가운데 해당 표기가 한 번이라도 나온 비율. 이틀치뿐인 2026년 10월은 뺐다.</p>
+      <details><summary>표로 보기</summary><div class="table-wrap" id="r-shift-table"></div></details>
+    </section>
+    <section>
+      <div class="section-head"><span class="kicker">주제별 흐름</span><p class="h2">주요 이슈가 언제 몰렸나</p></div>
+      <p class="prose">주제어가 나온 보도자료의 월별 비율. 막대 높이는 주제마다 따로 맞췄으니 주제끼리는 최고치 숫자로 비교하면 된다. 오른쪽 위 숫자는 기간 전체에서 그 주제가 나온 보도자료 수다.</p>
+      <div class="multiples" id="r-topics"></div>
+    </section>
+    <section>
+      <div class="section-head"><span class="kicker">초기와 최근 비교</span><p class="h2">늘어난 말, 줄어든 말</p></div>
+      <p class="prose">출범 초기(2025년 6~12월, <span class="num" id="r-n-early">745</span>건)와 최근(2026년 4월~10월 2일, <span class="num" id="r-n-recent">738</span>건)을 견줬다. 두 기간의 보도자료 수가 비슷해 건수를 그대로 비교해도 된다.</p>
+      <div class="two-col">
+        <div class="table-wrap"><h3>최근에 늘어난 말</h3><div id="r-rising"></div></div>
+        <div class="table-wrap"><h3>초기에 많았던 말</h3><div id="r-falling"></div></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-head"><span class="kicker">기간 전체</span><p class="h2">가장 많이 쓴 말, 가장 많이 낸 부서</p></div>
+      <div class="two-col">
+        <div><h3>상위 키워드 30</h3><div class="bars" id="r-terms"></div></div>
+        <div><h3>보도자료를 많이 낸 부서 15</h3><div class="bars" id="r-depts"></div></div>
+      </div>
+    </section>
+  </section>
+
+  <footer class="foot">
+    <p>수집: 행정안전부 누리집 보도자료 게시판(등록일 기준). 본문은 첨부 원문(HWPX·HWP·PDF)에서 뽑아 보도시점·연락처 줄을 지운 텍스트. 단어는 형태소 분석기 Kiwi로 뽑은 명사이며 ‘추진’·‘개최’ 같은 행정 용어와 기관명은 뺐습니다.</p>
+    <p>데이터와 코드: <a href="https://github.com/88kukkang/Ttest/tree/claude/moi-press-release-database-ncgqwa">github.com/88kukkang/Ttest</a></p>
+  </footer>
+</main>
+<div id="tip" hidden></div>
+<div id="toast" hidden></div>
+<script type="application/json" id="report-data">{"n_docs": 1786, "first": "2025-06-04", "last": "2026-10-02", "n_depts": 188, "attachments": {"hwp": 84, "hwpx": 1705, "pdf": 105}, "early_n": 745, "recent_n": 738, "monthly_counts": [{"m": "2025-06", "n": 63}, {"m": "2025-07", "n": 119}, {"m": "2025-08", "n": 93}, {"m": "2025-09", "n": 143}, {"m": "2025-10", "n": 103}, {"m": "2025-11", "n": 95}, {"m": "2025-12", "n": 129}, {"m": "2026-01", "n": 83}, {"m": "2026-02", "n": 95}, {"m": "2026-03", "n": 125}, {"m": "2026-04", "n": 114}, {"m": "2026-05", "n": 106}, {"m": "2026-06", "n": 137}, {"m": "2026-07", "n": 130}, {"m": "2026-08", "n": 115}, {"m": "2026-09", "n": 125}, {"m": "2026-10", "n": 11}], "distinctive": {"2025-06": [{"t": "직무대행", "df": 11, "z": 7.19}, {"t": "디지털정부혁신", "df": 7, "z": 6.11}, {"t": "디지털정부혁신실장", "df": 7, "z": 6.03}, {"t": "이용석", "df": 7, "z": 6.03}, {"t": "대행", "df": 12, "z": 5.96}, {"t": "정체전선", "df": 4, "z": 4.8}, {"t": "재발", "df": 9, "z": 4.62}, {"t": "영국", "df": 5, "z": 4.46}, {"t": "초점", "df": 5, "z": 4.37}, {"t": "지방자치단체", "df": 16, "z": 4.36}], "2025-07": [{"t": "소비쿠폰", "df": 26, "z": 9.32}, {"t": "민생회복", "df": 26, "z": 9.15}, {"t": "지자체", "df": 42, "z": 6.55}, {"t": "피해지역", "df": 18, "z": 6.13}, {"t": "물놀이", "df": 13, "z": 6.02}, {"t": "폭염", "df": 24, "z": 5.75}, {"t": "지역사랑상품권", "df": 18, "z": 5.72}, {"t": "지방자치단체", "df": 29, "z": 5.56}, {"t": "뱅크", "df": 11, "z": 5.53}, {"t": "직무대행", "df": 11, "z": 5.3}], "2025-08": [{"t": "긴급재난문자", "df": 10, "z": 5.59}, {"t": "지자체", "df": 34, "z": 5.34}, {"t": "위험기상", "df": 7, "z": 5.04}, {"t": "외출", "df": 12, "z": 4.95}, {"t": "마을방송", "df": 9, "z": 4.51}, {"t": "펜션", "df": 5, "z": 4.46}, {"t": "민방위", "df": 10, "z": 4.38}, {"t": "접근금지", "df": 5, "z": 4.24}, {"t": "호우", "df": 25, "z": 4.21}, {"t": "상공", "df": 4, "z": 4.15}], "2025-09": [{"t": "추석", "df": 26, "z": 7.82}, {"t": "통계청", "df": 14, "z": 6.61}, {"t": "지방자치단체", "df": 36, "z": 5.89}, {"t": "기재부", "df": 10, "z": 5.44}, {"t": "디지털예산회계시스템", "df": 8, "z": 5.17}, {"t": "등록시스템", "df": 8, "z": 5.17}, {"t": "환경부", "df": 21, "z": 5.12}, {"t": "모바일메시지시스템", "df": 8, "z": 5.11}, {"t": "국회답변", "df": 8, "z": 5.11}, {"t": "노인맞춤", "df": 8, "z": 5.11}], "2025-10": [{"t": "국가정보자원관리원", "df": 32, "z": 8.2}, {"t": "하모니", "df": 17, "z": 7.1}, {"t": "하모니시스템", "df": 16, "z": 6.93}, {"t": "하도급지킴이", "df": 16, "z": 6.93}, {"t": "Census", "df": 16, "z": 6.93}, {"t": "통합재난문자시스템", "df": 16, "z": 6.93}, {"t": "농림어업", "df": 16, "z": 6.9}, {"t": "수발", "df": 16, "z": 6.9}, {"t": "수발신", "df": 16, "z": 6.9}, {"t": "GPKI", "df": 16, "z": 6.9}], "2025-11": [{"t": "이관", "df": 16, "z": 6.01}, {"t": "기자단", "df": 11, "z": 5.95}, {"t": "희귀", "df": 10, "z": 5.67}, {"t": "정보공개시스템", "df": 10, "z": 5.64}, {"t": "휴먼", "df": 10, "z": 5.64}, {"t": "계측", "df": 10, "z": 5.63}, {"t": "RPA", "df": 10, "z": 5.51}, {"t": "국가통계포털", "df": 10, "z": 5.49}, {"t": "화학물질안전원", "df": 10, "z": 5.49}, {"t": "개인정보보호위원회", "df": 13, "z": 5.41}], "2025-12": [{"t": "시상식", "df": 14, "z": 5.26}, {"t": "연말연시", "df": 10, "z": 5.2}, {"t": "제설", "df": 11, "z": 4.93}, {"t": "수상", "df": 21, "z": 4.83}, {"t": "겨울", "df": 10, "z": 4.72}, {"t": "서울특별시", "df": 17, "z": 4.31}, {"t": "대전환", "df": 9, "z": 4.22}, {"t": "서구", "df": 13, "z": 4.18}, {"t": "추위", "df": 6, "z": 4.18}, {"t": "국민주권정부", "df": 12, "z": 4.16}], "2026-01": [{"t": "한파", "df": 12, "z": 6.49}, {"t": "한파쉼터", "df": 8, "z": 6.02}, {"t": "업무보고", "df": 6, "z": 5.39}, {"t": "겨울철", "df": 9, "z": 4.82}, {"t": "노숙인", "df": 6, "z": 4.73}, {"t": "역점", "df": 5, "z": 4.71}, {"t": "대설", "df": 8, "z": 4.62}, {"t": "제설", "df": 7, "z": 4.56}, {"t": "병권", "df": 6, "z": 4.54}, {"t": "오병권", "df": 6, "z": 4.45}], "2026-02": [{"t": "연휴", "df": 17, "z": 7.43}, {"t": "명절", "df": 15, "z": 6.12}, {"t": "일제", "df": 10, "z": 5.01}, {"t": "진화", "df": 11, "z": 4.68}, {"t": "입산", "df": 5, "z": 4.67}, {"t": "산림청", "df": 14, "z": 4.5}, {"t": "ASF", "df": 4, "z": 4.48}, {"t": "실화", "df": 4, "z": 4.48}, {"t": "불씨", "df": 5, "z": 4.45}, {"t": "지역번호", "df": 4, "z": 4.43}], "2026-03": [{"t": "공장", "df": 14, "z": 6.11}, {"t": "대덕구", "df": 11, "z": 5.58}, {"t": "봄철", "df": 11, "z": 5.25}, {"t": "방침", "df": 31, "z": 4.78}, {"t": "BTS", "df": 6, "z": 4.66}, {"t": "방탄소년단", "df": 5, "z": 4.31}, {"t": "거대", "df": 5, "z": 4.25}, {"t": "컴백", "df": 6, "z": 4.16}, {"t": "대전광역시", "df": 9, "z": 4.15}, {"t": "반입", "df": 5, "z": 4.14}], "2026-04": [{"t": "유가", "df": 23, "z": 8.75}, {"t": "피해지원금", "df": 18, "z": 7.84}, {"t": "중동", "df": 14, "z": 6.87}, {"t": "중동전쟁", "df": 10, "z": 6.31}, {"t": "전쟁", "df": 14, "z": 6.01}, {"t": "취소", "df": 9, "z": 4.7}, {"t": "지원금", "df": 18, "z": 4.61}, {"t": "이병철", "df": 5, "z": 4.43}, {"t": "컨설팅", "df": 16, "z": 4.41}, {"t": "자문단", "df": 7, "z": 4.35}], "2026-05": [{"t": "피해지원금", "df": 17, "z": 8.21}, {"t": "유가", "df": 17, "z": 7.36}, {"t": "선불", "df": 16, "z": 7.18}, {"t": "이용통계", "df": 10, "z": 6.72}, {"t": "지방선거", "df": 10, "z": 6.0}, {"t": "신청자", "df": 13, "z": 5.9}, {"t": "지원금", "df": 19, "z": 5.88}, {"t": "지급대상자", "df": 11, "z": 5.77}, {"t": "누계", "df": 7, "z": 5.65}, {"t": "선거", "df": 12, "z": 5.6}], "2026-06": [{"t": "프랑스", "df": 8, "z": 5.01}, {"t": "여름철", "df": 18, "z": 4.31}, {"t": "간담회", "df": 18, "z": 4.27}, {"t": "특별법", "df": 12, "z": 4.05}, {"t": "출범", "df": 22, "z": 3.93}, {"t": "전남광주통합특별시", "df": 10, "z": 3.92}, {"t": "태양광", "df": 8, "z": 3.83}, {"t": "지부", "df": 4, "z": 3.72}, {"t": "독서", "df": 4, "z": 3.72}, {"t": "경험", "df": 31, "z": 3.69}], "2026-07": [{"t": "예찰", "df": 17, "z": 5.53}, {"t": "무더위쉼터", "df": 13, "z": 5.49}, {"t": "지하차도", "df": 14, "z": 5.4}, {"t": "주민대피지원단", "df": 9, "z": 5.39}, {"t": "행동", "df": 33, "z": 5.34}, {"t": "여름", "df": 18, "z": 5.25}, {"t": "요령", "df": 34, "z": 5.25}, {"t": "특보", "df": 18, "z": 5.07}, {"t": "기상정보", "df": 11, "z": 5.06}, {"t": "지방정부", "df": 70, "z": 4.99}], "2026-08": [{"t": "전남광주", "df": 13, "z": 6.34}, {"t": "거제", "df": 12, "z": 5.83}, {"t": "장기화", "df": 10, "z": 5.15}, {"t": "거제시", "df": 7, "z": 4.85}, {"t": "중대", "df": 16, "z": 4.52}, {"t": "냉방", "df": 10, "z": 4.44}, {"t": "수사관", "df": 6, "z": 4.3}, {"t": "일상", "df": 41, "z": 4.28}, {"t": "폭염", "df": 22, "z": 4.18}, {"t": "피해조사", "df": 6, "z": 4.18}], "2026-09": [{"t": "추석", "df": 21, "z": 6.6}, {"t": "명절", "df": 20, "z": 6.08}, {"t": "인공지능정부실장", "df": 13, "z": 5.96}, {"t": "황규철", "df": 13, "z": 5.8}, {"t": "진명기", "df": 10, "z": 5.06}, {"t": "벡스코", "df": 7, "z": 4.83}, {"t": "한가위", "df": 6, "z": 4.51}, {"t": "MOU", "df": 11, "z": 4.34}, {"t": "박람회", "df": 12, "z": 4.33}, {"t": "자치혁신실장", "df": 10, "z": 4.3}], "2026-10": [{"t": "전남광주", "df": 3, "z": 4.0}, {"t": "시청", "df": 3, "z": 3.7}, {"t": "사후", "df": 3, "z": 3.07}, {"t": "위원장", "df": 4, "z": 3.05}, {"t": "마무리", "df": 4, "z": 2.9}, {"t": "대체", "df": 4, "z": 2.9}, {"t": "운행", "df": 3, "z": 2.83}, {"t": "검토", "df": 6, "z": 2.74}, {"t": "구체화", "df": 3, "z": 2.7}, {"t": "거리", "df": 3, "z": 2.7}]}, "term_shift": {"지방정부": [{"m": "2025-06", "k": 1, "n": 63, "s": 0.0159}, {"m": "2025-07", "k": 3, "n": 119, "s": 0.0252}, {"m": "2025-08", "k": 1, "n": 93, "s": 0.0108}, {"m": "2025-09", "k": 2, "n": 143, "s": 0.014}, {"m": "2025-10", "k": 15, "n": 103, "s": 0.1456}, {"m": "2025-11", "k": 36, "n": 95, "s": 0.3789}, {"m": "2025-12", "k": 66, "n": 129, "s": 0.5116}, {"m": "2026-01", "k": 36, "n": 83, "s": 0.4337}, {"m": "2026-02", "k": 47, "n": 95, "s": 0.4947}, {"m": "2026-03", "k": 65, "n": 125, "s": 0.52}, {"m": "2026-04", "k": 57, "n": 114, "s": 0.5}, {"m": "2026-05", "k": 46, "n": 106, "s": 0.434}, {"m": "2026-06", "k": 56, "n": 137, "s": 0.4088}, {"m": "2026-07", "k": 70, "n": 130, "s": 0.5385}, {"m": "2026-08", "k": 63, "n": 115, "s": 0.5478}, {"m": "2026-09", "k": 64, "n": 125, "s": 0.512}, {"m": "2026-10", "k": 4, "n": 11, "s": 0.3636}], "지방자치단체": [{"m": "2025-06", "k": 16, "n": 63, "s": 0.254}, {"m": "2025-07", "k": 29, "n": 119, "s": 0.2437}, {"m": "2025-08", "k": 17, "n": 93, "s": 0.1828}, {"m": "2025-09", "k": 36, "n": 143, "s": 0.2517}, {"m": "2025-10", "k": 22, "n": 103, "s": 0.2136}, {"m": "2025-11", "k": 2, "n": 95, "s": 0.0211}, {"m": "2025-12", "k": 10, "n": 129, "s": 0.0775}, {"m": "2026-01", "k": 1, "n": 83, "s": 0.012}, {"m": "2026-02", "k": 3, "n": 95, "s": 0.0316}, {"m": "2026-03", "k": 6, "n": 125, "s": 0.048}, {"m": "2026-04", "k": 3, "n": 114, "s": 0.0263}, {"m": "2026-05", "k": 4, "n": 106, "s": 0.0377}, {"m": "2026-06", "k": 10, "n": 137, "s": 0.073}, {"m": "2026-07", "k": 4, "n": 130, "s": 0.0308}, {"m": "2026-08", "k": 6, "n": 115, "s": 0.0522}, {"m": "2026-09", "k": 9, "n": 125, "s": 0.072}, {"m": "2026-10", "k": 1, "n": 11, "s": 0.0909}], "지자체": [{"m": "2025-06", "k": 13, "n": 63, "s": 0.2063}, {"m": "2025-07", "k": 42, "n": 119, "s": 0.3529}, {"m": "2025-08", "k": 34, "n": 93, "s": 0.3656}, {"m": "2025-09", "k": 43, "n": 143, "s": 0.3007}, {"m": "2025-10", "k": 37, "n": 103, "s": 0.3592}, {"m": "2025-11", "k": 18, "n": 95, "s": 0.1895}, {"m": "2025-12", "k": 17, "n": 129, "s": 0.1318}, {"m": "2026-01", "k": 8, "n": 83, "s": 0.0964}, {"m": "2026-02", "k": 6, "n": 95, "s": 0.0632}, {"m": "2026-03", "k": 4, "n": 125, "s": 0.032}, {"m": "2026-04", "k": 6, "n": 114, "s": 0.0526}, {"m": "2026-05", "k": 4, "n": 106, "s": 0.0377}, {"m": "2026-06", "k": 7, "n": 137, "s": 0.0511}, {"m": "2026-07", "k": 1, "n": 130, "s": 0.0077}, {"m": "2026-08", "k": 7, "n": 115, "s": 0.0609}, {"m": "2026-09", "k": 16, "n": 125, "s": 0.128}, {"m": "2026-10", "k": 2, "n": 11, "s": 0.1818}]}, "topics": [{"name": "민생회복 소비쿠폰", "terms": ["소비쿠폰"], "series": [{"m": "2025-06", "k": 3, "n": 63, "s": 0.0476}, {"m": "2025-07", "k": 26, "n": 119, "s": 0.2185}, {"m": "2025-08", "k": 7, "n": 93, "s": 0.0753}, {"m": "2025-09", "k": 17, "n": 143, "s": 0.1189}, {"m": "2025-10", "k": 1, "n": 103, "s": 0.0097}, {"m": "2025-11", "k": 2, "n": 95, "s": 0.0211}, {"m": "2025-12", "k": 4, "n": 129, "s": 0.031}, {"m": "2026-01", "k": 0, "n": 83, "s": 0.0}, {"m": "2026-02", "k": 0, "n": 95, "s": 0.0}, {"m": "2026-03", "k": 0, "n": 125, "s": 0.0}, {"m": "2026-04", "k": 3, "n": 114, "s": 0.0263}, {"m": "2026-05", "k": 1, "n": 106, "s": 0.0094}, {"m": "2026-06", "k": 1, "n": 137, "s": 0.0073}, {"m": "2026-07", "k": 0, "n": 130, "s": 0.0}, {"m": "2026-08", "k": 0, "n": 115, "s": 0.0}, {"m": "2026-09", "k": 0, "n": 125, "s": 0.0}, {"m": "2026-10", "k": 0, "n": 11, "s": 0.0}], "total": 65}, {"name": "국가정보자원관리원", "terms": ["국가정보자원관리원", "국정자원"], "series": [{"m": "2025-06", "k": 2, "n": 63, "s": 0.0317}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 1, "n": 93, "s": 0.0108}, {"m": "2025-09", "k": 16, "n": 143, "s": 0.1119}, {"m": "2025-10", "k": 32, "n": 103, "s": 0.3107}, {"m": "2025-11", "k": 13, "n": 95, "s": 0.1368}, {"m": "2025-12", "k": 2, "n": 129, "s": 0.0155}, {"m": "2026-01", "k": 0, "n": 83, "s": 0.0}, {"m": "2026-02", "k": 1, "n": 95, "s": 0.0105}, {"m": "2026-03", "k": 1, "n": 125, "s": 0.008}, {"m": "2026-04", "k": 2, "n": 114, "s": 0.0175}, {"m": "2026-05", "k": 2, "n": 106, "s": 0.0189}, {"m": "2026-06", "k": 3, "n": 137, "s": 0.0219}, {"m": "2026-07", "k": 2, "n": 130, "s": 0.0154}, {"m": "2026-08", "k": 1, "n": 115, "s": 0.0087}, {"m": "2026-09", "k": 5, "n": 125, "s": 0.04}, {"m": "2026-10", "k": 1, "n": 11, "s": 0.0909}], "total": 84}, {"name": "인공지능·AI", "terms": ["인공지능", "AI"], "series": [{"m": "2025-06", "k": 13, "n": 63, "s": 0.2063}, {"m": "2025-07", "k": 13, "n": 119, "s": 0.1092}, {"m": "2025-08", "k": 15, "n": 93, "s": 0.1613}, {"m": "2025-09", "k": 31, "n": 143, "s": 0.2168}, {"m": "2025-10", "k": 19, "n": 103, "s": 0.1845}, {"m": "2025-11", "k": 35, "n": 95, "s": 0.3684}, {"m": "2025-12", "k": 42, "n": 129, "s": 0.3256}, {"m": "2026-01", "k": 18, "n": 83, "s": 0.2169}, {"m": "2026-02", "k": 16, "n": 95, "s": 0.1684}, {"m": "2026-03", "k": 32, "n": 125, "s": 0.256}, {"m": "2026-04", "k": 22, "n": 114, "s": 0.193}, {"m": "2026-05", "k": 23, "n": 106, "s": 0.217}, {"m": "2026-06", "k": 32, "n": 137, "s": 0.2336}, {"m": "2026-07", "k": 21, "n": 130, "s": 0.1615}, {"m": "2026-08", "k": 26, "n": 115, "s": 0.2261}, {"m": "2026-09", "k": 39, "n": 125, "s": 0.312}, {"m": "2026-10", "k": 3, "n": 11, "s": 0.2727}], "total": 400}, {"name": "호우", "terms": ["호우"], "series": [{"m": "2025-06", "k": 10, "n": 63, "s": 0.1587}, {"m": "2025-07", "k": 27, "n": 119, "s": 0.2269}, {"m": "2025-08", "k": 25, "n": 93, "s": 0.2688}, {"m": "2025-09", "k": 20, "n": 143, "s": 0.1399}, {"m": "2025-10", "k": 3, "n": 103, "s": 0.0291}, {"m": "2025-11", "k": 1, "n": 95, "s": 0.0105}, {"m": "2025-12", "k": 8, "n": 129, "s": 0.062}, {"m": "2026-01", "k": 5, "n": 83, "s": 0.0602}, {"m": "2026-02", "k": 4, "n": 95, "s": 0.0421}, {"m": "2026-03", "k": 4, "n": 125, "s": 0.032}, {"m": "2026-04", "k": 8, "n": 114, "s": 0.0702}, {"m": "2026-05", "k": 12, "n": 106, "s": 0.1132}, {"m": "2026-06", "k": 14, "n": 137, "s": 0.1022}, {"m": "2026-07", "k": 28, "n": 130, "s": 0.2154}, {"m": "2026-08", "k": 24, "n": 115, "s": 0.2087}, {"m": "2026-09", "k": 15, "n": 125, "s": 0.12}, {"m": "2026-10", "k": 2, "n": 11, "s": 0.1818}], "total": 210}, {"name": "폭염", "terms": ["폭염"], "series": [{"m": "2025-06", "k": 7, "n": 63, "s": 0.1111}, {"m": "2025-07", "k": 24, "n": 119, "s": 0.2017}, {"m": "2025-08", "k": 8, "n": 93, "s": 0.086}, {"m": "2025-09", "k": 4, "n": 143, "s": 0.028}, {"m": "2025-10", "k": 1, "n": 103, "s": 0.0097}, {"m": "2025-11", "k": 0, "n": 95, "s": 0.0}, {"m": "2025-12", "k": 4, "n": 129, "s": 0.031}, {"m": "2026-01", "k": 3, "n": 83, "s": 0.0361}, {"m": "2026-02", "k": 1, "n": 95, "s": 0.0105}, {"m": "2026-03", "k": 1, "n": 125, "s": 0.008}, {"m": "2026-04", "k": 5, "n": 114, "s": 0.0439}, {"m": "2026-05", "k": 6, "n": 106, "s": 0.0566}, {"m": "2026-06", "k": 14, "n": 137, "s": 0.1022}, {"m": "2026-07", "k": 21, "n": 130, "s": 0.1615}, {"m": "2026-08", "k": 22, "n": 115, "s": 0.1913}, {"m": "2026-09", "k": 7, "n": 125, "s": 0.056}, {"m": "2026-10", "k": 0, "n": 11, "s": 0.0}], "total": 128}, {"name": "한파·대설", "terms": ["한파", "대설"], "series": [{"m": "2025-06", "k": 2, "n": 63, "s": 0.0317}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 0, "n": 93, "s": 0.0}, {"m": "2025-09", "k": 2, "n": 143, "s": 0.014}, {"m": "2025-10", "k": 2, "n": 103, "s": 0.0194}, {"m": "2025-11", "k": 5, "n": 95, "s": 0.0526}, {"m": "2025-12", "k": 16, "n": 129, "s": 0.124}, {"m": "2026-01", "k": 13, "n": 83, "s": 0.1566}, {"m": "2026-02", "k": 8, "n": 95, "s": 0.0842}, {"m": "2026-03", "k": 3, "n": 125, "s": 0.024}, {"m": "2026-04", "k": 2, "n": 114, "s": 0.0175}, {"m": "2026-05", "k": 0, "n": 106, "s": 0.0}, {"m": "2026-06", "k": 3, "n": 137, "s": 0.0219}, {"m": "2026-07", "k": 0, "n": 130, "s": 0.0}, {"m": "2026-08", "k": 1, "n": 115, "s": 0.0087}, {"m": "2026-09", "k": 1, "n": 125, "s": 0.008}, {"m": "2026-10", "k": 0, "n": 11, "s": 0.0}], "total": 58}, {"name": "산불", "terms": ["산불"], "series": [{"m": "2025-06", "k": 5, "n": 63, "s": 0.0794}, {"m": "2025-07", "k": 7, "n": 119, "s": 0.0588}, {"m": "2025-08", "k": 7, "n": 93, "s": 0.0753}, {"m": "2025-09", "k": 12, "n": 143, "s": 0.0839}, {"m": "2025-10", "k": 3, "n": 103, "s": 0.0291}, {"m": "2025-11", "k": 9, "n": 95, "s": 0.0947}, {"m": "2025-12", "k": 9, "n": 129, "s": 0.0698}, {"m": "2026-01", "k": 16, "n": 83, "s": 0.1928}, {"m": "2026-02", "k": 16, "n": 95, "s": 0.1684}, {"m": "2026-03", "k": 10, "n": 125, "s": 0.08}, {"m": "2026-04", "k": 9, "n": 114, "s": 0.0789}, {"m": "2026-05", "k": 7, "n": 106, "s": 0.066}, {"m": "2026-06", "k": 9, "n": 137, "s": 0.0657}, {"m": "2026-07", "k": 10, "n": 130, "s": 0.0769}, {"m": "2026-08", "k": 13, "n": 115, "s": 0.113}, {"m": "2026-09", "k": 13, "n": 125, "s": 0.104}, {"m": "2026-10", "k": 1, "n": 11, "s": 0.0909}], "total": 156}, {"name": "지방선거", "terms": ["지방선거"], "series": [{"m": "2025-06", "k": 0, "n": 63, "s": 0.0}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 0, "n": 93, "s": 0.0}, {"m": "2025-09", "k": 1, "n": 143, "s": 0.007}, {"m": "2025-10", "k": 1, "n": 103, "s": 0.0097}, {"m": "2025-11", "k": 0, "n": 95, "s": 0.0}, {"m": "2025-12", "k": 0, "n": 129, "s": 0.0}, {"m": "2026-01", "k": 1, "n": 83, "s": 0.012}, {"m": "2026-02", "k": 2, "n": 95, "s": 0.0211}, {"m": "2026-03", "k": 7, "n": 125, "s": 0.056}, {"m": "2026-04", "k": 3, "n": 114, "s": 0.0263}, {"m": "2026-05", "k": 10, "n": 106, "s": 0.0943}, {"m": "2026-06", "k": 3, "n": 137, "s": 0.0219}, {"m": "2026-07", "k": 0, "n": 130, "s": 0.0}, {"m": "2026-08", "k": 1, "n": 115, "s": 0.0087}, {"m": "2026-09", "k": 0, "n": 125, "s": 0.0}, {"m": "2026-10", "k": 0, "n": 11, "s": 0.0}], "total": 29}, {"name": "통합특별시", "terms": ["통합특별시", "전남광주통합특별시"], "series": [{"m": "2025-06", "k": 0, "n": 63, "s": 0.0}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 0, "n": 93, "s": 0.0}, {"m": "2025-09", "k": 0, "n": 143, "s": 0.0}, {"m": "2025-10", "k": 0, "n": 103, "s": 0.0}, {"m": "2025-11", "k": 0, "n": 95, "s": 0.0}, {"m": "2025-12", "k": 2, "n": 129, "s": 0.0155}, {"m": "2026-01", "k": 3, "n": 83, "s": 0.0361}, {"m": "2026-02", "k": 1, "n": 95, "s": 0.0105}, {"m": "2026-03", "k": 5, "n": 125, "s": 0.04}, {"m": "2026-04", "k": 0, "n": 114, "s": 0.0}, {"m": "2026-05", "k": 2, "n": 106, "s": 0.0189}, {"m": "2026-06", "k": 10, "n": 137, "s": 0.073}, {"m": "2026-07", "k": 7, "n": 130, "s": 0.0538}, {"m": "2026-08", "k": 9, "n": 115, "s": 0.0783}, {"m": "2026-09", "k": 8, "n": 125, "s": 0.064}, {"m": "2026-10", "k": 1, "n": 11, "s": 0.0909}], "total": 48}, {"name": "유가·피해지원금", "terms": ["유가", "피해지원금"], "series": [{"m": "2025-06", "k": 0, "n": 63, "s": 0.0}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 2, "n": 93, "s": 0.0215}, {"m": "2025-09", "k": 0, "n": 143, "s": 0.0}, {"m": "2025-10", "k": 0, "n": 103, "s": 0.0}, {"m": "2025-11", "k": 0, "n": 95, "s": 0.0}, {"m": "2025-12", "k": 0, "n": 129, "s": 0.0}, {"m": "2026-01", "k": 0, "n": 83, "s": 0.0}, {"m": "2026-02", "k": 0, "n": 95, "s": 0.0}, {"m": "2026-03", "k": 5, "n": 125, "s": 0.04}, {"m": "2026-04", "k": 24, "n": 114, "s": 0.2105}, {"m": "2026-05", "k": 17, "n": 106, "s": 0.1604}, {"m": "2026-06", "k": 5, "n": 137, "s": 0.0365}, {"m": "2026-07", "k": 2, "n": 130, "s": 0.0154}, {"m": "2026-08", "k": 3, "n": 115, "s": 0.0261}, {"m": "2026-09", "k": 0, "n": 125, "s": 0.0}, {"m": "2026-10", "k": 0, "n": 11, "s": 0.0}], "total": 58}, {"name": "주민자치", "terms": ["주민자치", "주민자치회"], "series": [{"m": "2025-06", "k": 0, "n": 63, "s": 0.0}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 1, "n": 93, "s": 0.0108}, {"m": "2025-09", "k": 2, "n": 143, "s": 0.014}, {"m": "2025-10", "k": 2, "n": 103, "s": 0.0194}, {"m": "2025-11", "k": 6, "n": 95, "s": 0.0632}, {"m": "2025-12", "k": 3, "n": 129, "s": 0.0233}, {"m": "2026-01", "k": 2, "n": 83, "s": 0.0241}, {"m": "2026-02", "k": 1, "n": 95, "s": 0.0105}, {"m": "2026-03", "k": 3, "n": 125, "s": 0.024}, {"m": "2026-04", "k": 0, "n": 114, "s": 0.0}, {"m": "2026-05", "k": 0, "n": 106, "s": 0.0}, {"m": "2026-06", "k": 7, "n": 137, "s": 0.0511}, {"m": "2026-07", "k": 2, "n": 130, "s": 0.0154}, {"m": "2026-08", "k": 3, "n": 115, "s": 0.0261}, {"m": "2026-09", "k": 0, "n": 125, "s": 0.0}, {"m": "2026-10", "k": 0, "n": 11, "s": 0.0}], "total": 32}, {"name": "중대범죄수사청", "terms": ["중대범죄수사청", "중수청"], "series": [{"m": "2025-06", "k": 0, "n": 63, "s": 0.0}, {"m": "2025-07", "k": 0, "n": 119, "s": 0.0}, {"m": "2025-08", "k": 0, "n": 93, "s": 0.0}, {"m": "2025-09", "k": 2, "n": 143, "s": 0.014}, {"m": "2025-10", "k": 1, "n": 103, "s": 0.0097}, {"m": "2025-11", "k": 1, "n": 95, "s": 0.0105}, {"m": "2025-12", "k": 1, "n": 129, "s": 0.0078}, {"m": "2026-01", "k": 1, "n": 83, "s": 0.012}, {"m": "2026-02", "k": 1, "n": 95, "s": 0.0105}, {"m": "2026-03", "k": 2, "n": 125, "s": 0.016}, {"m": "2026-04", "k": 1, "n": 114, "s": 0.0088}, {"m": "2026-05", "k": 0, "n": 106, "s": 0.0}, {"m": "2026-06", "k": 4, "n": 137, "s": 0.0292}, {"m": "2026-07", "k": 1, "n": 130, "s": 0.0077}, {"m": "2026-08", "k": 7, "n": 115, "s": 0.0609}, {"m": "2026-09", "k": 4, "n": 125, "s": 0.032}, {"m": "2026-10", "k": 1, "n": 11, "s": 0.0909}], "total": 27}], "top": [{"term": "정부", "df": 1106, "df_ratio": 0.6193, "tf": 4790}, {"term": "국민", "df": 1104, "df_ratio": 0.6181, "tf": 5862}, {"term": "기관", "df": 1046, "df_ratio": 0.5857, "tf": 5294}, {"term": "지원", "df": 1031, "df_ratio": 0.5773, "tf": 10062}, {"term": "지역", "df": 1011, "df_ratio": 0.5661, "tf": 6591}, {"term": "안전", "df": 997, "df_ratio": 0.5582, "tf": 7488}, {"term": "운영", "df": 991, "df_ratio": 0.5549, "tf": 3750}, {"term": "관리", "df": 989, "df_ratio": 0.5538, "tf": 14624}, {"term": "현장", "df": 964, "df_ratio": 0.5398, "tf": 2961}, {"term": "체계", "df": 760, "df_ratio": 0.4255, "tf": 2420}, {"term": "대응", "df": 745, "df_ratio": 0.4171, "tf": 2629}, {"term": "재난", "df": 738, "df_ratio": 0.4132, "tf": 5119}, {"term": "발생", "df": 705, "df_ratio": 0.3947, "tf": 2043}, {"term": "참여", "df": 689, "df_ratio": 0.3858, "tf": 2272}, {"term": "지방", "df": 673, "df_ratio": 0.3768, "tf": 4082}, {"term": "정책", "df": 672, "df_ratio": 0.3763, "tf": 2715}, {"term": "행정", "df": 663, "df_ratio": 0.3712, "tf": 4365}, {"term": "주민", "df": 648, "df_ratio": 0.3628, "tf": 3561}, {"term": "점검", "df": 632, "df_ratio": 0.3539, "tf": 2689}, {"term": "지방정부", "df": 632, "df_ratio": 0.3539, "tf": 2183}, {"term": "협력", "df": 619, "df_ratio": 0.3466, "tf": 1963}, {"term": "시설", "df": 618, "df_ratio": 0.346, "tf": 2605}, {"term": "확대", "df": 603, "df_ratio": 0.3376, "tf": 2057}, {"term": "정보", "df": 601, "df_ratio": 0.3365, "tf": 18917}, {"term": "전국", "df": 567, "df_ratio": 0.3175, "tf": 1570}, {"term": "사회", "df": 566, "df_ratio": 0.3169, "tf": 3638}, {"term": "피해", "df": 558, "df_ratio": 0.3124, "tf": 2772}, {"term": "기반", "df": 556, "df_ratio": 0.3113, "tf": 2461}, {"term": "개선", "df": 550, "df_ratio": 0.308, "tf": 1835}, {"term": "서비스", "df": 537, "df_ratio": 0.3007, "tf": 6786}], "rising": [{"term": "지방정부", "z": 12.01, "df": 360, "ref_df": 124}, {"term": "방침", "z": 7.5, "df": 128, "ref_df": 39}, {"term": "출범", "z": 6.02, "df": 81, "ref_df": 24}, {"term": "본격", "z": 5.99, "df": 130, "ref_df": 62}, {"term": "실질", "z": 5.98, "df": 141, "ref_df": 71}, {"term": "체감", "z": 5.57, "df": 141, "ref_df": 77}, {"term": "핵심", "z": 5.11, "df": 139, "ref_df": 82}, {"term": "발굴", "z": 4.96, "df": 158, "ref_df": 101}, {"term": "경험", "z": 4.88, "df": 127, "ref_df": 75}, {"term": "지원금", "z": 4.77, "df": 68, "ref_df": 28}, {"term": "유가", "z": 4.76, "df": 50, "ref_df": 2}, {"term": "일상", "z": 4.75, "df": 152, "ref_df": 99}, {"term": "현장", "z": 4.72, "df": 422, "ref_df": 362}, {"term": "부담", "z": 4.71, "df": 102, "ref_df": 56}, {"term": "밀착", "z": 4.63, "df": 53, "ref_df": 18}], "falling": [{"term": "지자체", "z": 8.18, "df": 204, "ref_df": 43}, {"term": "지방자치단체", "z": 5.84, "df": 132, "ref_df": 37}, {"term": "소비쿠폰", "z": 4.95, "df": 60, "ref_df": 5}, {"term": "민생회복", "z": 4.68, "df": 58, "ref_df": 9}, {"term": "국가정보자원관리원", "z": 4.53, "df": 66, "ref_df": 15}, {"term": "자치단체", "z": 4.32, "df": 47, "ref_df": 6}, {"term": "배출", "z": 4.27, "df": 46, "ref_df": 6}, {"term": "관세청", "z": 4.24, "df": 44, "ref_df": 4}, {"term": "목록", "z": 4.2, "df": 55, "ref_df": 12}, {"term": "빅데이터", "z": 4.16, "df": 49, "ref_df": 9}, {"term": "이벤트", "z": 4.08, "df": 46, "ref_df": 8}, {"term": "환경부", "z": 4.07, "df": 66, "ref_df": 19}, {"term": "자치", "z": 3.94, "df": 174, "ref_df": 86}, {"term": "메인", "z": 3.94, "df": 39, "ref_df": 5}, {"term": "GIS", "z": 3.89, "df": 37, "ref_df": 3}], "departments": [{"d": "자연재난대응과", "n": 89}, {"d": "기후재난관리과", "n": 75}, {"d": "재정정책과", "n": 74}, {"d": "디지털정부기획과", "n": 53}, {"d": "자치행정과", "n": 50}, {"d": "재난관리정책과", "n": 40}, {"d": "균형발전진흥과", "n": 40}, {"d": "국토산업재난대응과", "n": 35}, {"d": "예방안전제도과", "n": 34}, {"d": "안전개선과", "n": 34}, {"d": "혁신기획과", "n": 32}, {"d": "재난안전점검과", "n": 30}, {"d": "복구지원과", "n": 29}, {"d": "환경산림재난대응과", "n": 25}, {"d": "재난안전산업과", "n": 24}]}</script>
+<script>
+(() => {
+"use strict";
+// =====================================================================
+// 공용 도구
+// =====================================================================
+const ARTICLE = "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=";
+const PARTIAL = "2026-10";
+const NS = "http://www.w3.org/2000/svg";
+const $ = (id) => document.getElementById(id);
+const fmt = (n) => Number(n).toLocaleString("ko-KR");
+const pct = (x) => (x * 100).toFixed(x > 0 && x < 0.1 ? 1 : 0) + "%";
+const monthLabel = (m) => { const [y, mo] = m.split("-"); return `${y}년 ${+mo}월`; };
+const dateLabel = (d) => { const [y, m, dd] = d.split("-"); return `${y}. ${+m}. ${+dd}.`; };
+const tickLabel = (m, first) => { const [y, mo] = m.split("-"); return first || mo === "01" ? `${y.slice(2)}.${+mo}` : `${+mo}`; };
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function svgEl(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function svgText(parent, x, y, str, attrs = {}) { const t = svgEl("text", { x, y, ...attrs }, parent); t.textContent = str; return t; }
+function colPath(x, y, w, h, r) { if (h <= 0) return ""; r = Math.min(r, w / 2, h); return `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`; }
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => (t.hidden = true), 2600); }
+function table(headers, rows, cls = "data") {
+  const t = el("table", cls);
+  const hr = t.createTHead().insertRow();
+  for (const x of headers) hr.appendChild(el("th", null, x));
+  const tb = t.createTBody();
+  for (const r of rows) { const tr = tb.insertRow(); for (const c of r) tr.insertCell().textContent = c; }
+  return t;
+}
+function articleLink(d) { const a = el("a", null, d.title); a.href = ARTICLE + d.id; a.target = "_blank"; a.rel = "noopener"; return a; }
+
+// ---- 툴팁: 값이 굵게, 이름은 보조 ----
+const tip = $("tip");
+function fillTip(title, rows) {
+  tip.replaceChildren(el("div", "t", title));
+  for (const r of rows) {
+    const row = el("div", "t-row");
+    if (r.color) { const k = el("span", "key"); k.style.borderTopColor = r.color; row.appendChild(k); }
+    row.appendChild(el("b", null, r.value));
+    if (r.label) row.appendChild(el("span", null, r.label));
+    tip.appendChild(row);
+  }
+  tip.hidden = false;
+}
+function placeTip(x, y) {
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  let left = x + 14, top = y - h - 12;
+  if (left + w > innerWidth - 8) left = x - w - 14;
+  if (top < 8) top = y + 18;
+  tip.style.left = Math.max(8, left) + "px"; tip.style.top = top + "px";
+}
+function showTip(title, value, x, y) { fillTip(title, [{ value }]); placeTip(x, y); }
+const hideTip = () => (tip.hidden = true);
+function bindHover(node, content) {
+  node.addEventListener("pointermove", (e) => { content(); placeTip(e.clientX, e.clientY); });
+  node.addEventListener("pointerleave", hideTip);
+  node.addEventListener("focus", () => { const b = node.getBoundingClientRect(); content(); placeTip(b.left + b.width / 2, b.top); });
+  node.addEventListener("blur", hideTip);
+}
+
+// ---- 월 선택 상자 채우기 ----
+function fillMonthSelects(fromId, toId, months) {
+  for (const id of [fromId, toId]) {
+    const s = $(id);
+    s.replaceChildren(new Option(id === fromId ? "처음부터" : "끝까지", ""));
+    for (const m of months) s.appendChild(new Option(monthLabel(m), m));
+  }
+}
+
+// =====================================================================
+// 데이터: 페이지와 함께 올린 base64(gzip(JSON)) 파일
+// =====================================================================
+async function fetchB64Json(name) {
+  const res = await fetch(name);
+  if (!res.ok) throw new Error(`${name}: HTTP ${res.status}`);
+  const bin = atob((await res.text()).trim());
+  const buf = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  return JSON.parse(await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"))).text());
+}
+let DOCS = [], DOC_BY_ID = new Map(), MONTHS = [], DEPT_COUNTS = [];
+const docsReady = fetchB64Json("docs.b64.txt").then((raw) => {
+  DOCS = raw.docs.map(([id, date, dept, title, body]) => ({ id, date, month: date.slice(0, 7), dept, title, body, lt: title.toLowerCase(), lb: body.toLowerCase() }));
+  DOC_BY_ID = new Map(DOCS.map((d) => [d.id, d]));
+  MONTHS = [...new Set(DOCS.map((d) => d.month))].sort();
+  const cnt = new Map();
+  for (const d of DOCS) cnt.set(d.dept, (cnt.get(d.dept) || 0) + 1);
+  DEPT_COUNTS = [...cnt].sort((a, b) => b[1] - a[1]);
+  document.querySelectorAll(".js-total").forEach((n) => (n.textContent = fmt(DOCS.length)));
+});
+let cloudPromise = null, CLOUD = null;
+function cloudReady() {
+  return (cloudPromise ||= fetchB64Json("cloud.b64.txt").then((raw) => {
+    const docs = raw.docs.map(([id, date, dept, title, terms]) => ({ id, date, month: date.slice(0, 7), dept, title, terms, termSet: new Set(terms) }));
+    const totalDf = new Uint32Array(raw.terms.length);
+    for (const d of docs) for (const t of d.terms) totalDf[t]++;
+    const months = [...new Set(docs.map((d) => d.month))].sort();
+    const cnt = new Map();
+    for (const d of docs) cnt.set(d.dept, (cnt.get(d.dept) || 0) + 1);
+    CLOUD = { terms: raw.terms, depts: raw.depts, docs, totalDf, months, termIndex: new Map(raw.terms.map((t, i) => [t, i])), deptCounts: [...cnt].sort((a, b) => b[1] - a[1]) };
+    return CLOUD;
+  }));
+}
+
+// =====================================================================
+// 검색 엔진 (검색 탭과 AI 도구가 함께 씀)
+// =====================================================================
+function countOcc(s, t) { let n = 0, i = s.indexOf(t); while (i !== -1) { n++; i = s.indexOf(t, i + t.length); } return n; }
+function parseQuery(q) {
+  q = q.replace(/[“”]/g, '"');
+  const terms = [], excludes = [];
+  const re = /(-?)"([^"]+)"|(-?)(\S+)/g;
+  let m;
+  while ((m = re.exec(q))) {
+    const neg = m[1] || m[3];
+    const t = (m[2] != null ? m[2] : m[4] || "").toLowerCase().trim();
+    if (!t || t === "-") continue;
+    (neg ? excludes : terms).push(t);
+  }
+  return { terms, excludes };
+}
+/** all: 모두 포함, any: 하나 이상 포함, none: 제외. 점수 = 본문 등장 수 + 제목 등장 수 × 5 */
+function findDocs({ all = [], any = [], none = [], from = "", to = "", dept = "", deptLike = "", scope = "all" }) {
+  const out = [];
+  for (const d of DOCS) {
+    if (from && d.month < from) continue;
+    if (to && d.month > to) continue;
+    if (dept && d.dept !== dept) continue;
+    if (deptLike && !d.dept.includes(deptLike)) continue;
+    let ok = true, score = 0, hits = 0;
+    for (const t of all) {
+      const a = countOcc(d.lt, t), b = scope === "title" ? 0 : countOcc(d.lb, t);
+      if (!a && !b) { ok = false; break; }
+      score += b + a * 5; hits += a + b;
+    }
+    if (!ok) continue;
+    if (any.length) {
+      let anyHit = false;
+      for (const t of any) {
+        const a = countOcc(d.lt, t), b = scope === "title" ? 0 : countOcc(d.lb, t);
+        if (a || b) { anyHit = true; score += b + a * 5; hits += a + b; }
+      }
+      if (!anyHit) continue;
+    }
+    if (none.length) {
+      const hay = scope === "title" ? d.lt : d.lt + "\n" + d.lb;
+      if (none.some((t) => hay.includes(t))) continue;
+    }
+    out.push({ d, score, hits });
+  }
+  return out;
+}
+function matchRanges(lower, terms) {
+  const rs = [];
+  for (const t of terms) { if (!t) continue; let i = lower.indexOf(t); while (i !== -1) { rs.push([i, i + t.length]); i = lower.indexOf(t, i + t.length); } }
+  rs.sort((a, b) => a[0] - b[0]);
+  const out = [];
+  for (const r of rs) { const last = out[out.length - 1]; if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]); else out.push(r.slice()); }
+  return out;
+}
+function highlighted(text, lower, terms, start = 0, end = text.length) {
+  const frag = document.createDocumentFragment();
+  let pos = start;
+  for (const [a, b] of matchRanges(lower.slice(start, end), terms)) {
+    const s = a + start, e = b + start;
+    if (s > pos) frag.appendChild(document.createTextNode(text.slice(pos, s)));
+    frag.appendChild(el("mark", null, text.slice(s, e)));
+    pos = e;
+  }
+  if (pos < end) frag.appendChild(document.createTextNode(text.slice(pos, end)));
+  return frag;
+}
+function snippetWindows(d, terms, max = 3, pad = 48) {
+  const wins = [];
+  for (const [a, b] of matchRanges(d.lb, terms)) {
+    const s = Math.max(0, a - pad), e = Math.min(d.body.length, b + pad);
+    const last = wins[wins.length - 1];
+    if (last && s <= last[1]) last[1] = Math.max(last[1], e); else wins.push([s, e]);
+    if (wins.length > max) break;
+  }
+  return wins.slice(0, max);
+}
+function plainSnippet(d, terms, pad = 90) {
+  const [w] = snippetWindows(d, terms, 1, pad);
+  const [s, e] = w || [0, Math.min(d.body.length, pad * 2)];
+  return (s > 0 ? "…" : "") + d.body.slice(s, e).replace(/\s+/g, " ") + (e < d.body.length ? "…" : "");
+}
+
+// =====================================================================
+// AI에게 묻기: sample 능력 + 페이지 안 검색 도구
+// =====================================================================
+const AI = (() => {
+  const EXAMPLES = [
+    "인구감소지역에 별도 혜택을 주는 것과 관련된 보도자료는?",
+    "국가정보자원관리원 화재 이후 행안부가 내놓은 대책을 시간순으로 정리해줘",
+    "고유가 피해지원금은 누가, 언제까지 받을 수 있어?",
+    "‘지방정부’라는 표현은 언제부터 쓰기 시작했어?",
+    "주민자치와 관련해 바뀐 제도가 있어?",
+  ];
+  const RULES = `너는 행정안전부 보도자료 데이터베이스를 검색해 질문에 답하는 도우미다.
+
+[데이터]
+행정안전부 누리집 보도자료 게시판에 2025-06-04 ~ 2026-10-02에 등록된 보도자료 1,786건. 본문은 첨부 원문(HWPX·PDF)에서 뽑은 텍스트다. 이 기간 밖의 일, 다른 부처 자료, 인터넷 정보는 이 데이터에 없다.
+
+[도구]
+- search_releases: 단어 일치 검색. all(모두 포함), any(하나 이상 포함), none(제외), from/to(YYYY-MM), dept(부서명 일부), sort(relevance|date), limit(최대 20). 한국어는 같은 뜻도 표현이 여러 가지라서, 핵심어는 all에 두고 비슷한 말은 any로 넓게 묶어라. 예) "인구감소지역 혜택" → all ["인구감소지역"], any ["특례","우대","감면","지원","가점","인센티브","혜택"]. 결과가 너무 많으면 all을 늘려 좁히고, 0건이면 말을 바꿔 다시 찾아라.
+- read_release: id로 본문을 읽는다. 답의 근거는 반드시 실제로 읽은 본문에서 가져와라.
+- count_by_month: 조건에 맞는 보도자료 수를 월별로 센다. '언제부터', '얼마나 자주', '추이' 질문에 쓴다.
+
+[일하는 방식]
+도구를 부를 수 있는 라운드는 몇 번뿐이다. 한 라운드에 여러 도구를 한꺼번에 불러라(검색 2~3개를 동시에, 그다음 유력한 본문 3~5개를 동시에). 도구를 쓰는 동안에는 설명을 쓰지 말고, 마지막에 답만 써라.
+
+[답변 형식]
+- 한국어. 먼저 질문에 대한 답을 2~4문장으로.
+- 이어서 근거 보도자료를 날짜순 목록으로: "- 2025. 7. 10. [보도자료 제목](url) — 한 줄 요지". url은 도구가 준 그대로 쓴다.
+- 숫자·금액·날짜·대상은 본문에 적힌 그대로 옮긴다. 추측하지 않는다.
+- 찾지 못했으면 찾지 못했다고 말하고, 어떤 말로 찾아봤는지 적는다.
+- 마크다운은 목록, 굵게(**), 링크만 쓴다. 표와 제목(#)은 쓰지 않는다.`;
+
+  const ERR = {
+    not_granted: ["이 페이지가 Claude를 쓰도록 허용되지 않았습니다. 페이지의 권한 메뉴에서 허용한 뒤 새로 고쳐 주세요.", true],
+    sampling_disabled: ["이 계정이나 조직에서는 페이지에서 Claude를 쓸 수 없습니다. 검색 탭을 이용해 주세요.", true],
+    not_declared: ["지금 화면에서는 이 기능을 쓸 수 없습니다.", true],
+    capability_disabled: ["지금 화면에서는 이 기능을 쓸 수 없습니다.", true],
+    capability_removed: ["지금 쓰는 Claude 앱에서는 이 기능을 쓸 수 없습니다. 앱이나 브라우저를 최신으로 바꿔 주세요.", true],
+    rate_limited: ["요청이 많거나 사용량 한도에 닿았습니다. 잠시 뒤 다시 물어보세요.", false],
+    session_expired: ["claude.ai에 다시 로그인한 뒤 물어보세요.", false],
+    refused: ["Claude가 이 질문에는 답하지 않았습니다. 질문을 바꿔 보세요.", false],
+    empty_completion: ["답이 비어 있습니다. 질문을 조금 더 구체적으로 바꿔 보세요.", false],
+    prompt_too_large: ["대화가 길어졌습니다. ‘새 대화’를 누르고 다시 물어보세요.", false],
+    invalid_json: ["검색 계획을 읽지 못했습니다. 다시 물어보세요.", false],
+  };
+  let samplePromise = null, toolsOK = false, turns = [], ctl = null, busy = false, disabled = false;
+
+  function offMessage(text) {
+    const box = $("ai-off");
+    box.replaceChildren(el("b", null, "AI 질문을 쓸 수 없습니다"), el("span", null, text));
+    box.hidden = false;
+    disabled = true;
+    $("ai-send").disabled = true;
+    $("ai-q").disabled = true;
+  }
+
+  // ---- 안전한 마크다운(목록·굵게·링크만) → DOM ----
+  function inline(parent, s) {
+    const re = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|\*\*([^*]+)\*\*/g;
+    let last = 0, m;
+    while ((m = re.exec(s))) {
+      if (m.index > last) parent.appendChild(document.createTextNode(s.slice(last, m.index)));
+      if (m[1]) { const a = el("a", null, m[1]); a.href = m[2]; a.target = "_blank"; a.rel = "noopener"; parent.appendChild(a); }
+      else parent.appendChild(el("strong", null, m[3]));
+      last = re.lastIndex;
+    }
+    if (last < s.length) parent.appendChild(document.createTextNode(s.slice(last)));
+  }
+  function renderMd(box, text) {
+    const frag = document.createDocumentFragment();
+    let list = null, type = null, para = [];
+    const flush = () => { if (para.length) { const p = el("p"); inline(p, para.join(" ")); frag.appendChild(p); para = []; } };
+    for (const raw of text.replace(/\r/g, "").split("\n")) {
+      const line = raw.trimEnd();
+      let m;
+      if (!line.trim()) { flush(); list = null; type = null; continue; }
+      if ((m = line.match(/^\s*#{1,6}\s+(.*)$/))) { flush(); list = null; type = null; const h = el("h4"); inline(h, m[1]); frag.appendChild(h); continue; }
+      if ((m = line.match(/^\s*[-*•]\s+(.*)$/))) { flush(); if (type !== "ul") { list = el("ul"); type = "ul"; frag.appendChild(list); } const li = el("li"); inline(li, m[1]); list.appendChild(li); continue; }
+      if ((m = line.match(/^\s*(\d+)[.)]\s+(.*)$/))) { flush(); if (type !== "ol") { list = el("ol"); type = "ol"; frag.appendChild(list); } const li = el("li"); inline(li, m[2]); list.appendChild(li); continue; }
+      list = null; type = null; para.push(line.trim());
+    }
+    flush();
+    box.replaceChildren(frag);
+  }
+
+  // ---- 도구 ----
+  const strArr = (v) => (Array.isArray(v) ? v : v == null ? [] : [v]).map((x) => String(x).toLowerCase().trim()).filter(Boolean).slice(0, 12);
+  const ym = (v) => (typeof v === "string" && /^\d{4}-\d{2}$/.test(v.trim()) ? v.trim() : "");
+  const int = (v, dflt) => { const n = Math.floor(Number(v)); return Number.isFinite(n) ? n : dflt; };
+  function describe(input) {
+    const parts = [];
+    const all = strArr(input.all), any = strArr(input.any), none = strArr(input.none);
+    if (all.length) parts.push(all.join(" + "));
+    if (any.length) parts.push(`(${any.join(" | ")})`);
+    if (none.length) parts.push(none.map((t) => "-" + t).join(" "));
+    if (ym(input.from) || ym(input.to)) parts.push(`${ym(input.from) || "처음"}~${ym(input.to) || "끝"}`);
+    if (input.dept) parts.push(String(input.dept));
+    return parts.join(" ");
+  }
+  function criteria(input) {
+    const all = strArr(input.all), any = strArr(input.any), none = strArr(input.none);
+    if (!all.length && !any.length) throw new Error("all 이나 any 에 검색어를 하나 이상 넣으세요.");
+    return { all, any, none, from: ym(input.from), to: ym(input.to), deptLike: input.dept ? String(input.dept).trim() : "" };
+  }
+  const ARGS = {
+    all: { type: "array", items: { type: "string" }, description: "모두 들어가야 하는 말" },
+    any: { type: "array", items: { type: "string" }, description: "하나 이상 들어가야 하는 말(비슷한 말 묶음)" },
+    none: { type: "array", items: { type: "string" }, description: "들어가면 안 되는 말" },
+    from: { type: "string", description: "시작 월 YYYY-MM" },
+    to: { type: "string", description: "끝 월 YYYY-MM" },
+    dept: { type: "string", description: "담당 부서 이름 일부 (예: 재난, 지방재정)" },
+  };
+  function makeTools(step, readMap) {
+    return [
+      {
+        name: "search_releases",
+        description: "행안부 보도자료를 단어 일치로 찾아 목록을 돌려준다. total=조건에 맞는 전체 건수, results=[{id, date, dept, title, hits(검색어 등장 횟수), snippet}]. 본문 내용은 read_release로 읽는다.",
+        inputSchema: { type: "object", properties: { ...ARGS, sort: { type: "string", enum: ["relevance", "date"], description: "relevance(기본): 검색어가 많이 나온 순, date: 최신순" }, limit: { type: "integer", minimum: 1, maximum: 20, description: "돌려받을 건수 (기본 10)" } } },
+        execute(input) {
+          const c = criteria(input);
+          const res = findDocs(c);
+          if (input.sort === "date") res.sort((a, b) => (a.d.date < b.d.date ? 1 : -1));
+          else res.sort((a, b) => b.score - a.score || (a.d.date < b.d.date ? 1 : -1));
+          const limit = Math.min(20, Math.max(1, int(input.limit, 10)));
+          step(`검색 ${describe(input)} → ${fmt(res.length)}건`);
+          const terms = [...c.all, ...c.any];
+          return { total: res.length, results: res.slice(0, limit).map((r) => ({ id: r.d.id, date: r.d.date, dept: r.d.dept, title: r.d.title, hits: r.hits, snippet: plainSnippet(r.d, terms) })) };
+        },
+      },
+      {
+        name: "read_release",
+        description: "보도자료 하나의 본문을 읽는다. 긴 글은 앞에서부터 max_chars(기본 5000, 최대 8000)자만 온다. 더 읽으려면 offset을 늘린다. url은 답에 링크로 쓴다.",
+        inputSchema: { type: "object", properties: { id: { type: "string", description: "search_releases가 준 id" }, offset: { type: "integer", minimum: 0 }, max_chars: { type: "integer", minimum: 500, maximum: 8000 } }, required: ["id"] },
+        execute(input) {
+          const d = DOC_BY_ID.get(String(input.id).trim());
+          if (!d) throw new Error(`id ${input.id} 인 보도자료가 없습니다.`);
+          const off = Math.min(d.body.length, Math.max(0, int(input.offset, 0)));
+          const n = Math.min(8000, Math.max(500, int(input.max_chars, 5000)));
+          if (!readMap.has(d.id)) step(`읽음: ${dateLabel(d.date)} ${d.title}`);
+          readMap.set(d.id, d);
+          return { id: d.id, date: d.date, dept: d.dept, title: d.title, url: ARTICLE + d.id, offset: off, total_chars: d.body.length, text: d.body.slice(off, off + n) };
+        },
+      },
+      {
+        name: "count_by_month",
+        description: "조건에 맞는 보도자료 수를 월별로 센다. by_month={YYYY-MM: 건수}, month_totals={YYYY-MM: 그 달 전체 보도자료 수}.",
+        inputSchema: { type: "object", properties: ARGS },
+        execute(input) {
+          const res = findDocs(criteria(input));
+          const by = {}, totals = {};
+          for (const m of MONTHS) { by[m] = 0; totals[m] = 0; }
+          for (const d of DOCS) totals[d.month]++;
+          for (const r of res) by[r.d.month]++;
+          step(`월별 집계 ${describe(input)} → ${fmt(res.length)}건`);
+          return { total: res.length, by_month: by, month_totals: totals, note: `${PARTIAL}은 1~2일 이틀치` };
+        },
+      },
+    ];
+  }
+
+  // ---- 도구를 못 쓰는 화면: 검색 계획 → 페이지가 검색 → 자료를 붙여 한 번에 묻기 ----
+  async function withoutTools(sample, q, history, signal, step, readMap, onText) {
+    step("검색어 정하는 중");
+    const plan = await sample.json(
+      `행정안전부 보도자료(2025-06~2026-10)를 단어 일치로 검색해 다음 질문에 답하려 한다. 검색 계획을 JSON 하나로만 답하라.
+형식: {"searches":[{"all":["핵심어"],"any":["비슷한 말", "..."]}]} (최대 3개, 비슷한 말은 any에 넓게)
+질문: ${q}`,
+      { modelTier: "quick", signal },
+    );
+    const merged = new Map();
+    for (const s of (plan && Array.isArray(plan.searches) ? plan.searches : []).slice(0, 3)) {
+      let c;
+      try { c = criteria(s || {}); } catch { continue; }
+      const res = findDocs(c);
+      step(`검색 ${describe(s)} → ${fmt(res.length)}건`);
+      for (const r of res) { const prev = merged.get(r.d.id); if (!prev || prev.score < r.score) merged.set(r.d.id, { ...r, terms: [...c.all, ...c.any] }); }
+    }
+    const top = [...merged.values()].sort((a, b) => b.score - a.score).slice(0, 8);
+    if (!top.length) return "관련 보도자료를 찾지 못했습니다. 질문에 들어간 말을 바꿔서 다시 물어보세요.";
+    const material = top.map((r) => {
+      readMap.set(r.d.id, r.d);
+      const wins = snippetWindows(r.d, r.terms, 3, 300).map(([s, e]) => r.d.body.slice(s, e).replace(/\s+/g, " ")).join(" … ");
+      return `### ${dateLabel(r.d.date)} ${r.d.title}\nurl: ${ARTICLE + r.d.id}\n부서: ${r.d.dept}\n${r.d.body.slice(0, 600).replace(/\s+/g, " ")}\n…\n${wins}`;
+    }).join("\n\n");
+    step(`관련 보도자료 ${top.length}건으로 답하는 중`);
+    const turnsNoTools = [{ role: "user", content: RULES.replace(/\[도구\][\s\S]*?\[답변 형식\]/, "[답변 형식]") }, ...history.slice(0, -1),
+      { role: "user", content: `질문: ${q}\n\n아래는 검색으로 찾은 보도자료 발췌다. 이 자료만 근거로 답하라.\n\n${material}` }];
+    const { text } = await sample(turnsNoTools, { signal, onText, cache: false });
+    return text;
+  }
+
+  // ---- 묻기 ----
+  function trimmedHistory() {
+    const keep = turns.slice(-7);
+    while (keep.length && keep[0].role !== "user") keep.shift();
+    return keep;
+  }
+  async function ask(q) {
+    q = q.trim();
+    if (!q || busy || disabled) return;
+    const sample = await samplePromise;
+    if (!sample) return;
+    busy = true;
+    $("ai-send").disabled = true; $("ai-stop").hidden = false; $("ai-new").hidden = false;
+    const log = $("ai-log");
+    const qEl = el("div", "ai-q", q);
+    const aEl = el("div", "ai-a");
+    const steps = el("ul", "ai-steps");
+    const body = el("div", "ai-body");
+    body.appendChild(el("p", "thinking", "생각하는 중…"));
+    aEl.append(steps, body);
+    log.append(qEl, aEl);
+    qEl.scrollIntoView({ block: "nearest" });
+    const step = (text) => { steps.querySelectorAll("li").forEach((li) => li.classList.add("done")); steps.appendChild(el("li", null, text)); };
+    const readMap = new Map();
+    let raf = 0, latest = "";
+    const onText = ({ text }) => { latest = text; cancelAnimationFrame(raf); raf = requestAnimationFrame(() => renderMd(body, latest)); };
+    turns.push({ role: "user", content: q });
+    const history = trimmedHistory();
+    ctl = new AbortController();
+    try {
+      await docsReady;
+      let text, truncated = false;
+      if (toolsOK) {
+        try {
+          const r = await sample([{ role: "user", content: RULES }, ...history], { signal: ctl.signal, tools: makeTools(step, readMap), onText });
+          text = r.text; truncated = r.truncated;
+        } catch (e) {
+          if (e && e.code === "tools_unavailable") { toolsOK = false; text = await withoutTools(sample, q, history, ctl.signal, step, readMap, onText); }
+          else throw e;
+        }
+      } else {
+        text = await withoutTools(sample, q, history, ctl.signal, step, readMap, onText);
+      }
+      cancelAnimationFrame(raf);
+      renderMd(body, text);
+      steps.querySelectorAll("li").forEach((li) => li.classList.add("done"));
+      if (truncated) body.appendChild(el("p", "ai-err", "답이 길어 중간에 끊겼습니다. 범위를 좁혀 다시 물어보세요."));
+      turns.push({ role: "assistant", content: text });
+      if (readMap.size) {
+        const refs = el("div", "ai-refs");
+        refs.appendChild(el("span", null, `Claude가 읽은 보도자료 ${readMap.size}건`));
+        const ul = el("ul");
+        for (const d of [...readMap.values()].sort((a, b) => (a.date < b.date ? -1 : 1))) {
+          const li = el("li");
+          li.append(`${dateLabel(d.date)} `, articleLink(d));
+          ul.appendChild(li);
+        }
+        refs.appendChild(ul);
+        aEl.appendChild(refs);
+      }
+    } catch (e) {
+      cancelAnimationFrame(raf);
+      turns.pop();
+      const code = (e && e.code) || "upstream_error";
+      if (e && e.text) renderMd(body, e.text); else body.replaceChildren();
+      if (code === "cancelled") body.appendChild(el("p", "note", "멈췄습니다."));
+      else {
+        const [msg, permanent] = ERR[code] || ["연결이 끊겼습니다. 다시 물어보세요.", false];
+        body.appendChild(el("p", "ai-err", msg));
+        if (permanent) offMessage(msg);
+      }
+    } finally {
+      busy = false;
+      ctl = null;
+      $("ai-stop").hidden = true;
+      if (!disabled) $("ai-send").disabled = false;
+    }
+  }
+
+  function init() {
+    const exBox = $("ai-examples");
+    for (const ex of EXAMPLES) {
+      const b = el("button", "ex", ex); b.type = "button";
+      b.addEventListener("click", () => { if (!busy) ask(ex); });
+      exBox.appendChild(b);
+    }
+    $("ai-form").addEventListener("submit", (e) => { e.preventDefault(); const q = $("ai-q").value; if (q.trim() && !busy) { $("ai-q").value = ""; ask(q); } });
+    $("ai-q").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); $("ai-form").requestSubmit(); } });
+    $("ai-stop").addEventListener("click", () => ctl && ctl.abort());
+    $("ai-new").addEventListener("click", () => { if (busy && ctl) ctl.abort(); turns = []; $("ai-log").replaceChildren(); $("ai-new").hidden = true; $("ai-q").focus(); });
+    samplePromise = (window.claude && typeof window.claude.use === "function" ? window.claude.use("sample") : Promise.resolve(null))
+      .catch(() => null)
+      .then(async (s) => {
+        if (!s) { offMessage("claude.ai에 로그인한 상태에서 이 페이지를 열어야 쓸 수 있습니다. 검색·키워드 클라우드·관계도는 그대로 쓸 수 있습니다."); return null; }
+        const lim = await s.limits().catch(() => null);
+        toolsOK = !!(lim && lim.tools);
+        return s;
+      });
+  }
+  return { init, show() {}, resize() {} };
+})();
+
+// =====================================================================
+// 검색 탭
+// =====================================================================
+const S = (() => {
+  const PAGE = 30;
+  const EXAMPLES = ["지방정부", "소비쿠폰", "\"국가정보자원관리원 화재\"", "인공지능", "통합특별시", "고유가 피해지원금", "산불 -훈련"];
+  let ready = false, shown = PAGE, last = null, monthOnly = null, timer = 0;
+
+  function run() {
+    if (!ready) return;
+    const q = $("s-q").value;
+    store.set("moisdb.q", q);
+    const { terms, excludes } = parseQuery(q);
+    const scope = $("s-scope").value;
+    const base = findDocs({ all: terms, none: excludes, dept: $("s-dept").value, scope });
+    const byMonth = new Map(MONTHS.map((m) => [m, 0]));
+    for (const r of base) byMonth.set(r.d.month, byMonth.get(r.d.month) + 1);
+    const from = $("s-from").value, to = $("s-to").value;
+    const inRange = (m) => (monthOnly ? m === monthOnly : (!from || m >= from) && (!to || m <= to));
+    const list = base.filter((r) => inRange(r.d.month));
+    if ($("s-sort").value === "score" && terms.length) list.sort((a, b) => b.score - a.score || (a.d.date < b.d.date ? 1 : -1));
+    last = { list, terms, q: q.trim(), byMonth, inRange };
+    shown = PAGE;
+    summary(); hist(); renderList();
+  }
+  function summary() {
+    const { list, q } = last;
+    $("s-count").textContent = fmt(list.length) + "건";
+    const parts = [q ? `‘${q}’ 검색 결과` : "전체 보도자료"];
+    if ($("s-dept").value) parts.push($("s-dept").value);
+    if (monthOnly) parts.push(monthLabel(monthOnly) + "만");
+    $("s-count-sub").textContent = parts.join(" · ") + ` (전체 ${fmt(DOCS.length)}건 중)`;
+    $("s-copy").disabled = !list.length;
+    const label = $("s-hist-label");
+    label.replaceChildren(document.createTextNode("월별 건수 · 막대를 누르면 그 달만 봅니다"));
+    if (monthOnly) {
+      const chip = el("span", "active-month", `${monthLabel(monthOnly)}만 보는 중`);
+      const x = el("button", null, "해제"); x.type = "button"; x.addEventListener("click", () => { monthOnly = null; run(); });
+      chip.appendChild(x); label.append(" ", chip);
+    }
+  }
+  function hist() {
+    const box = $("s-hist");
+    if (!last || box.clientWidth === 0) return;
+    const { byMonth, inRange } = last;
+    const W = Math.max(280, box.clientWidth), H = 120, m = { l: 30, r: 6, t: 18, b: 22 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b, n = MONTHS.length;
+    const vals = MONTHS.map((mm) => byMonth.get(mm) || 0);
+    const raw = Math.max(1, ...vals);
+    let tick = raw <= 5 ? 1 : raw <= 20 ? 5 : raw <= 50 ? 10 : raw <= 100 ? 25 : 50;
+    while (Math.ceil(raw / tick) > 3) tick *= 2;
+    const yMax = Math.ceil(raw / tick) * tick;
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": "검색 결과 월별 건수" });
+    for (let v = 0; v <= yMax; v += tick) {
+      const y = m.t + ih - (v / yMax) * ih;
+      svgEl("line", { x1: m.l, x2: W - m.r, y1: y, y2: y, class: v === 0 ? "base" : "grid" }, svg);
+      svgText(svg, m.l - 6, y + 4, String(v), { "text-anchor": "end", class: "num" });
+    }
+    const band = iw / n, bw = Math.min(24, band * 0.62), step = band < 30 ? 2 : 1, maxI = vals.indexOf(Math.max(...vals));
+    const totals = new Map(MONTHS.map((mm) => [mm, 0]));
+    for (const d of DOCS) totals.set(d.month, totals.get(d.month) + 1);
+    MONTHS.forEach((mm, i) => {
+      const cx = m.l + band * i + band / 2, h = (vals[i] / yMax) * ih, y = m.t + ih - h;
+      const hit = svgEl("rect", { x: m.l + band * i, y: 0, width: band, height: m.t + ih, class: "hit click", tabindex: 0, role: "button", "aria-label": `${monthLabel(mm)} ${vals[i]}건, 이 달만 보기` }, svg);
+      svgEl("path", { d: colPath(cx - bw / 2, y, bw, h, 4), class: "mark", style: `fill:var(${inRange(mm) ? "--bar" : "--bar-dim"})` }, svg);
+      bindHover(hit, () => fillTip(monthLabel(mm) + (mm === PARTIAL ? " (이틀치)" : ""), [{ value: `${fmt(vals[i])}건`, label: `/ 그 달 ${fmt(totals.get(mm))}건` }]));
+      const pick = () => { monthOnly = monthOnly === mm ? null : mm; hideTip(); run(); };
+      hit.addEventListener("click", pick);
+      hit.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
+      if (i % step === 0) svgText(svg, cx, H - 6, tickLabel(mm, i === 0), { "text-anchor": "middle" });
+      if (i === maxI && vals[i] > 0) svgText(svg, cx, y - 5, String(vals[i]), { "text-anchor": "middle", class: "val num" });
+    });
+    box.replaceChildren(svg);
+  }
+  function renderList() {
+    const box = $("s-results");
+    box.replaceChildren();
+    const { list, terms } = last;
+    if (!list.length) { box.appendChild(el("p", "empty", "찾는 글이 없습니다. 검색어를 줄이거나 기간·부서 조건을 넓혀 보세요. 문장으로 묻고 싶다면 ‘AI에게 묻기’ 탭을 써 보세요.")); return; }
+    for (const r of list.slice(0, shown)) box.appendChild(item(r, terms));
+    if (list.length > shown) {
+      const row = el("div", "more-row");
+      const more = el("button", "btn-ghost", `더 보기 (${fmt(Math.min(PAGE, list.length - shown))}건 더 · 남은 ${fmt(list.length - shown)}건)`);
+      more.type = "button";
+      more.addEventListener("click", () => { shown += PAGE; renderList(); });
+      row.appendChild(more); box.appendChild(row);
+    }
+  }
+  function item(r, terms) {
+    const { d } = r;
+    const art = el("article", "item");
+    const meta = el("div", "item-meta");
+    meta.append(el("span", "num", dateLabel(d.date)), el("span", null, d.dept || "부서 미상"));
+    if (terms.length) meta.appendChild(el("span", "count num", `검색어 ${fmt(r.hits)}회`));
+    const h = el("h4");
+    const a = el("a"); a.href = ARTICLE + d.id; a.target = "_blank"; a.rel = "noopener";
+    a.appendChild(terms.length ? highlighted(d.title, d.lt, terms) : document.createTextNode(d.title));
+    h.appendChild(a);
+    art.append(meta, h);
+    const sn = el("div", "snips");
+    if (terms.length) {
+      const flat = d.body.replace(/\n/g, " "), flatLower = d.lb.replace(/\n/g, " ");
+      for (const [s, e] of snippetWindows(d, terms)) {
+        const p = el("p");
+        if (s > 0) p.appendChild(document.createTextNode("… "));
+        p.appendChild(highlighted(flat, flatLower, terms, s, e));
+        if (e < d.body.length) p.appendChild(document.createTextNode(" …"));
+        sn.appendChild(p);
+      }
+    } else sn.appendChild(el("p", null, d.body.slice(0, 140).replace(/\n/g, " ") + (d.body.length > 140 ? " …" : "")));
+    if (sn.childNodes.length) art.appendChild(sn);
+    const actions = el("div", "item-actions");
+    const btn = el("button", "btn-ghost", "본문 펼치기"); btn.type = "button"; btn.setAttribute("aria-expanded", "false");
+    const full = el("div", "full"); full.hidden = true;
+    btn.addEventListener("click", () => {
+      const open = full.hidden;
+      if (open && !full.childNodes.length) full.appendChild(terms.length ? highlighted(d.body, d.lb, terms) : document.createTextNode(d.body));
+      full.hidden = !open; btn.textContent = open ? "본문 접기" : "본문 펼치기"; btn.setAttribute("aria-expanded", String(open));
+    });
+    actions.appendChild(btn);
+    art.append(actions, full);
+    return art;
+  }
+  function init() {
+    const exBox = $("s-examples");
+    for (const ex of EXAMPLES) {
+      const b = el("button", "ex", ex); b.type = "button";
+      b.addEventListener("click", () => { $("s-q").value = ex; monthOnly = null; run(); });
+      exBox.appendChild(b);
+    }
+    $("s-form").addEventListener("submit", (e) => { e.preventDefault(); clearTimeout(timer); monthOnly = null; run(); });
+    $("s-q").addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(() => { monthOnly = null; run(); }, 250); });
+    for (const id of ["s-from", "s-to", "s-dept", "s-scope", "s-sort"]) $(id).addEventListener("change", () => { if (id === "s-from" || id === "s-to") monthOnly = null; run(); });
+    $("s-copy").addEventListener("click", () => {
+      const rows = [["등록일", "부서", "제목", "검색어 횟수", "원문 주소"]].concat(last.list.map((r) => [r.d.date, r.d.dept, r.d.title, r.hits, ARTICLE + r.d.id]));
+      navigator.clipboard.writeText(rows.map((r) => r.join("\t")).join("\n"))
+        .then(() => toast(`${fmt(last.list.length)}건을 복사했습니다. 엑셀에 붙여넣으면 됩니다.`), () => toast("이 화면에서는 복사가 막혀 있습니다."));
+    });
+    docsReady.then(() => {
+      fillMonthSelects("s-from", "s-to", MONTHS);
+      $("s-dept").options[0].textContent = `전체 부서 (${DEPT_COUNTS.length})`;
+      for (const [name, n] of DEPT_COUNTS) $("s-dept").appendChild(new Option(`${name || "부서 미상"} (${n})`, name));
+      const saved = store.get("moisdb.q");
+      if (!$("s-q").value) $("s-q").value = saved != null ? saved : "지방정부";
+      ready = true;
+      run();
+    }).catch((e) => { $("s-count").textContent = ""; $("s-count-sub").textContent = ""; $("s-results").replaceChildren(el("p", "empty", `보도자료 데이터를 불러오지 못했습니다 (${e.message}). 페이지를 새로 고쳐 보세요.`)); });
+  }
+  /** 다른 탭에서 '이 단어로 검색' */
+  function query(q) { $("s-q").value = q; monthOnly = null; ["s-from", "s-to", "s-dept"].forEach((id) => ($(id).value = "")); run(); }
+  return { init, show() { hist(); }, resize() { hist(); }, query };
+})();
+
+// =====================================================================
+// 키워드 클라우드 탭
+// =====================================================================
+function wordDetail(prefix, D, term, sel, opts) {
+  // 클라우드·관계도 공용: 월별 막대 + 최근 보도자료
+  const { dept, from, to } = opts;
+  const ti = D.termIndex.get(term);
+  const pool = D.docs.filter((d) => (dept === "" || d.dept === +dept) && d.termSet.has(ti));
+  const inSel = pool.filter((d) => (!from || d.month >= from) && (!to || d.month <= to));
+  const box = $(prefix + "-chart");
+  if (box) {
+    const counts = D.months.map((m) => pool.filter((d) => d.month === m).length);
+    const W = Math.max(240, box.clientWidth), H = 110, mt = 16, mb = 18, ih = H - mt - mb;
+    const band = W / D.months.length, bw = Math.min(24, band * 0.66);
+    const max = Math.max(1, ...counts), maxI = counts.indexOf(max);
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": `${term} 월별 보도자료 수` });
+    svgEl("line", { x1: 0, x2: W, y1: mt + ih, y2: mt + ih, class: "base" }, svg);
+    D.months.forEach((m, i) => {
+      const cx = band * i + band / 2, h = (counts[i] / max) * ih, y = mt + ih - h;
+      const on = (!from || m >= from) && (!to || m <= to);
+      const hit = svgEl("rect", { x: band * i, y: 0, width: band, height: mt + ih, class: "hit", tabindex: 0, "aria-label": `${monthLabel(m)} ${counts[i]}건` }, svg);
+      svgEl("path", { class: "mark", d: colPath(cx - bw / 2, y, bw, h, 4), style: `fill:var(${on ? "--bar" : "--bar-dim"})` }, svg);
+      bindHover(hit, () => fillTip(`${term} · ${monthLabel(m)}${m === PARTIAL ? " (이틀치)" : ""}`, [{ value: `${counts[i]}건` }]));
+    });
+    svgText(svg, 0, H - 4, tickLabel(D.months[0], true));
+    svgText(svg, W, H - 4, tickLabel(D.months[D.months.length - 1], true), { "text-anchor": "end" });
+    svgText(svg, band * maxI + band / 2, mt - 4, String(max), { "text-anchor": "middle", class: "val num" });
+    box.replaceChildren(svg);
+  }
+  $(prefix + "-docs-title").textContent = `‘${term}’이(가) 나온 고른 범위의 보도자료 (${fmt(inSel.length)}건 중 최근 ${Math.min(6, inSel.length)}건)`;
+  const ul = $(prefix + "-docs"); ul.replaceChildren();
+  for (const d of inSel.slice(0, 6)) {
+    const li = el("li");
+    li.append(el("span", "d-meta num", `${dateLabel(d.date)} · ${D.depts[d.dept] || "부서 미상"}`), articleLink(d));
+    ul.appendChild(li);
+  }
+  return inSel.length;
+}
+function fillCloudFilters(prefix, D) {
+  fillMonthSelects(prefix + "-from", prefix + "-to", D.months);
+  const dsel = $(prefix + "-dept");
+  dsel.options[0].textContent = `전체 부서 (${D.deptCounts.length})`;
+  for (const [i, n] of D.deptCounts) dsel.appendChild(new Option(`${D.depts[i] || "부서 미상"} (${n})`, String(i)));
+}
+
+const C = (() => {
+  let D = null, words = [], sel = [], picked = null, drawSeq = 0, started = false, dirty = true;
+  function compute() {
+    const from = $("c-from").value, to = $("c-to").value, dept = $("c-dept").value;
+    sel = D.docs.filter((d) => (!from || d.month >= from) && (!to || d.month <= to) && (dept === "" || d.dept === +dept));
+    const df = new Uint32Array(D.terms.length);
+    for (const d of sel) for (const t of d.terms) df[t]++;
+    const filtered = sel.length !== D.docs.length;
+    let basis = $("c-basis").value;
+    const note = $("c-note"); note.hidden = true;
+    if (basis === "z" && !filtered) { basis = "df"; note.textContent = "‘두드러진 말’은 기간이나 부서를 골라야 비교할 대상이 생깁니다. 지금은 많이 나온 말로 그렸습니다."; note.hidden = false; }
+    const n = Math.max(1, sel.length), scored = [];
+    if (basis === "df") { for (let i = 0; i < df.length; i++) if (df[i] > 0) scored.push({ i, df: df[i], score: df[i] }); }
+    else {
+      let nT = 0, nR = 0, pooled = 0;
+      for (let i = 0; i < df.length; i++) { nT += df[i]; nR += D.totalDf[i] - df[i]; pooled += D.totalDf[i]; }
+      const prior = 500;
+      for (let i = 0; i < df.length; i++) {
+        if (df[i] < 3) continue;
+        const a = (prior * D.totalDf[i]) / pooled, yT = df[i], yR = D.totalDf[i] - df[i];
+        const z = (Math.log((yT + a) / (nT + prior - yT - a)) - Math.log((yR + a) / (nR + prior - yR - a))) / Math.sqrt(1 / (yT + a) + 1 / (yR + a));
+        if (z > 0) scored.push({ i, df: df[i], score: z });
+      }
+    }
+    scored.sort((a, b) => b.score - a.score || b.df - a.df);
+    words = scored.slice(0, +$("c-topn").value).map((w) => ({ ...w, term: D.terms[w.i], share: w.df / n }));
+    const parts = [`보도자료 ${fmt(sel.length)}건`, `단어 ${fmt(words.length)}개`];
+    if (from || to) parts.push(`${from ? monthLabel(from) : "처음"} ~ ${to ? monthLabel(to) : "끝"}`);
+    if (dept !== "") parts.push(D.depts[+dept] || "부서 미상");
+    $("c-meta").textContent = parts.join(" · ");
+    const t = table(["순위", "단어", "보도자료 수", "비율", ...(basis === "z" ? ["z값"] : [])],
+      words.map((w, r) => [String(r + 1), w.term, fmt(w.df), pct(w.share), ...(basis === "z" ? [w.score.toFixed(1)] : [])]), "data left2");
+    $("c-table").replaceChildren(t);
+  }
+  function hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function draw() {
+    const canvas = $("c-canvas");
+    if (!window.WordCloud || !WordCloud.isSupported) { $("c-drawing").hidden = false; $("c-drawing").textContent = "이 브라우저에서는 클라우드를 그릴 수 없습니다. 아래 ‘표로 보기’를 이용하세요."; return; }
+    const cssW = Math.max(280, $("c-stage").clientWidth - 24);
+    const cssH = Math.round(Math.max(320, Math.min(620, cssW * 0.62)));
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr); canvas.style.height = cssH + "px";
+    const many = words.length > 120;
+    const maxPx = Math.max(30, Math.min(80, cssW * (many ? 0.07 : 0.085))), minPx = many ? 10 : 12;
+    const vals = words.map((w) => w.score), hi = Math.max(...vals), lo = Math.min(...vals);
+    const size = (v) => minPx + (maxPx - minPx) * Math.sqrt(hi === lo ? 1 : (v - lo) / (hi - lo));
+    const multi = $("c-palette").value === "multi";
+    const wc = [1, 2, 3, 4, 5, 6, 7, 8].map((k) => css(`--w${k}`)), qc = [css("--q1"), css("--q2"), css("--q3")];
+    const colorOf = new Map(words.map((w, r) => [w.term, multi ? wc[hash(w.term) % 8] : qc[r < words.length * 0.1 ? 0 : r < words.length * 0.4 ? 1 : 2]]));
+    const byTerm = new Map(words.map((w) => [w.term, w]));
+    const seq = ++drawSeq;
+    $("c-drawing").hidden = false; $("c-drawing").textContent = "그리는 중…";
+    canvas.addEventListener("wordcloudstop", () => { if (seq === drawSeq) $("c-drawing").hidden = true; }, { once: true });
+    WordCloud(canvas, {
+      list: words.map((w) => [w.term, size(w.score)]),
+      weightFactor: (s) => s * dpr,
+      fontFamily: '"Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
+      fontWeight: (word, weight) => (weight >= maxPx * 0.45 ? "700" : "500"),
+      color: (word) => colorOf.get(word),
+      backgroundColor: "rgba(0,0,0,0)",
+      gridSize: Math.round((many ? 7 : 9) * dpr), // 낱말 사이 간격: 좁으면 이웃 단어가 붙어 복합어처럼 읽힌다
+      rotateRatio: 0, shape: "circle", ellipticity: Math.min(1, cssH / cssW + 0.05),
+      shuffle: false, shrinkToFit: true, drawOutOfBound: false,
+      hover: (item, dim, evt) => {
+        canvas.style.cursor = item ? "pointer" : "default";
+        if (!item) return hideTip();
+        const w = byTerm.get(item[0]);
+        showTip(w.term, `${fmt(w.df)}건 (${pct(w.share)})`, evt.clientX, evt.clientY);
+      },
+      click: (item) => { if (item) pick(item[0]); },
+    });
+    dirty = false;
+  }
+  function pick(term) {
+    picked = term;
+    const opts = { dept: $("c-dept").value, from: $("c-from").value, to: $("c-to").value };
+    $("c-term").textContent = term;
+    const n = wordDetail("c", D, term, sel, opts);
+    $("c-figs").textContent = `고른 범위 보도자료 ${fmt(sel.length)}건 중 ${fmt(n)}건 (${pct(n / Math.max(1, sel.length))})`;
+    const act = $("c-actions"); act.replaceChildren();
+    const b1 = el("button", "btn-ghost", "이 단어로 검색"); b1.type = "button"; b1.addEventListener("click", () => { S.query(term); Tabs.show("search"); });
+    const b2 = el("button", "btn-ghost", "관계도에서 보기"); b2.type = "button"; b2.addEventListener("click", () => { N.center(term); Tabs.show("network"); });
+    act.append(b1, b2);
+  }
+  function refresh() {
+    hideTip(); compute(); draw();
+    const keep = picked && words.some((w) => w.term === picked) ? picked : words[0] && words[0].term;
+    if (keep) pick(keep);
+  }
+  async function start() {
+    started = true;
+    $("c-meta").textContent = "불러오는 중…";
+    try { D = await cloudReady(); } catch (e) { $("c-meta").textContent = `불러오지 못했습니다 (${e.message}).`; return; }
+    fillCloudFilters("c", D);
+    try { await document.fonts.load('700 40px "Noto Sans KR"'); await document.fonts.load('500 16px "Noto Sans KR"'); } catch {}
+    for (const id of ["c-from", "c-to", "c-dept", "c-basis", "c-topn"]) $(id).addEventListener("change", refresh);
+    $("c-palette").addEventListener("change", () => { hideTip(); draw(); });
+    $("c-canvas").addEventListener("mouseleave", hideTip);
+    $("c-copy").addEventListener("click", () => {
+      const src = $("c-canvas"), out = document.createElement("canvas");
+      out.width = src.width; out.height = src.height;
+      const ctx = out.getContext("2d"); ctx.fillStyle = css("--paper"); ctx.fillRect(0, 0, out.width, out.height); ctx.drawImage(src, 0, 0);
+      try {
+        navigator.clipboard.write([new ClipboardItem({ "image/png": new Promise((res) => out.toBlob(res, "image/png")) })])
+          .then(() => toast("클라우드 이미지를 복사했습니다. 문서나 메신저에 붙여넣으면 됩니다."), () => toast("이 화면에서는 이미지 복사가 막혀 있습니다. 화면 캡처를 이용해 주세요."));
+      } catch { toast("이 화면에서는 이미지 복사가 막혀 있습니다. 화면 캡처를 이용해 주세요."); }
+    });
+    refresh();
+  }
+  return {
+    init() {},
+    show() { if (!started) start(); else if (dirty) { draw(); if (picked) pick(picked); } },
+    resize() { if (D) { draw(); if (picked) pick(picked); } },
+    themeChanged() { dirty = true; },
+  };
+})();
+
+// =====================================================================
+// 관계도 탭
+// =====================================================================
+const N = (() => {
+  const EXAMPLES = ["인공지능", "지방정부", "재난", "소비쿠폰", "국가정보자원관리원", "산불", "주민자치", "통합특별시"];
+  const COMMON_SHARE = 0.5;
+  let D = null, mode = "net", sel = [], graph = null, selected = null, zoom = null, svgSel = null, fitT = null, started = false, needsRender = false;
+
+  function message(t) { const m = $("n-msg"); m.textContent = t || ""; m.hidden = !t; }
+  function selection() {
+    const from = $("n-from").value, to = $("n-to").value, dept = $("n-dept").value;
+    sel = D.docs.filter((d) => (!from || d.month >= from) && (!to || d.month <= to) && (dept === "" || d.dept === +dept));
+    const df = new Uint32Array(D.terms.length);
+    for (const d of sel) for (const t of d.terms) df[t]++;
+    return df;
+  }
+  const isCommon = (t, df) => $("n-common").checked && df[t] / Math.max(1, sel.length) >= COMMON_SHARE;
+  function coMatrix(nodeTerms) {
+    const n = nodeTerms.length, pos = new Int32Array(D.terms.length).fill(-1);
+    nodeTerms.forEach((t, i) => (pos[t] = i));
+    const co = new Uint32Array(n * n), present = [];
+    for (const d of sel) {
+      present.length = 0;
+      for (const t of d.terms) if (pos[t] >= 0) present.push(pos[t]);
+      for (let a = 0; a < present.length; a++) for (let b = a + 1; b < present.length; b++) { const i = present[a], j = present[b]; co[i * n + j]++; co[j * n + i]++; }
+    }
+    return co;
+  }
+  function knnEdges(nodes, co, df, k, skip = () => false) {
+    const n = nodes.length, edges = new Map();
+    for (let i = 0; i < n; i++) {
+      if (skip(i)) continue;
+      const cand = [];
+      for (let j = 0; j < n; j++) {
+        if (i === j || skip(j)) continue;
+        const c = co[i * n + j];
+        if (c >= 3) cand.push({ j, c, w: c / Math.sqrt(df[nodes[i].t] * df[nodes[j].t]) });
+      }
+      cand.sort((a, b) => b.w - a.w);
+      for (const e of cand.slice(0, k)) {
+        const key = i < e.j ? `${i}-${e.j}` : `${e.j}-${i}`;
+        if (!edges.has(key)) edges.set(key, { source: Math.min(i, e.j), target: Math.max(i, e.j), co: e.c, w: e.w });
+      }
+    }
+    return [...edges.values()];
+  }
+  // 루뱅 1단계(국소 이동)
+  function communities(n, edges, skip) {
+    const adj = Array.from({ length: n }, () => []);
+    let m2 = 0;
+    for (const e of edges) { adj[e.source].push([e.target, e.w]); adj[e.target].push([e.source, e.w]); m2 += 2 * e.w; }
+    const k = adj.map((a) => a.reduce((s, x) => s + x[1], 0));
+    const comm = Array.from({ length: n }, (_, i) => i), tot = k.slice();
+    if (!m2) return comm;
+    for (let pass = 0; pass < 20; pass++) {
+      let moved = false;
+      for (let i = 0; i < n; i++) {
+        if (skip(i) || !adj[i].length) continue;
+        const ci = comm[i];
+        tot[ci] -= k[i];
+        const links = new Map();
+        for (const [j, w] of adj[i]) if (!skip(j)) links.set(comm[j], (links.get(comm[j]) || 0) + w);
+        let best = ci, bestGain = (links.get(ci) || 0) - (tot[ci] * k[i]) / m2;
+        for (const [c, w] of links) { const g = w - (tot[c] * k[i]) / m2; if (g > bestGain + 1e-12 || (Math.abs(g - bestGain) <= 1e-12 && c < best)) { best = c; bestGain = g; } }
+        comm[i] = best; tot[best] += k[i];
+        if (best !== ci) moved = true;
+      }
+      if (!moved) break;
+    }
+    return comm;
+  }
+  function buildNet(df) {
+    const cand = [];
+    for (let t = 0; t < df.length; t++) if (df[t] >= 3 && !isCommon(t, df)) cand.push(t);
+    cand.sort((a, b) => df[b] - df[a] || a - b);
+    const nodes = cand.slice(0, +$("n-n").value).map((t) => ({ t, term: D.terms[t], df: df[t] }));
+    const co = coMatrix(nodes.map((x) => x.t));
+    return { nodes, links: knnEdges(nodes, co, df, +$("n-k").value), co, center: -1 };
+  }
+  function findTerm(q) {
+    q = q.trim();
+    if (!q) return { t: -1 };
+    const exact = D.termIndex.get(q);
+    if (exact != null) return { t: exact };
+    let best = -1;
+    for (let t = 0; t < D.terms.length; t++) if (D.terms[t].includes(q) && (best < 0 || D.totalDf[t] > D.totalDf[best])) best = t;
+    return { t: best, approx: best >= 0 };
+  }
+  function buildEgo(df) {
+    const q = $("n-center").value;
+    const { t: c, approx } = findTerm(q);
+    if (c < 0) { message(`‘${q.trim()}’이(가) 들어간 단어를 찾지 못했습니다. 다른 말로 해 보세요.`); return null; }
+    if (approx) message(`‘${q.trim()}’ 단어가 따로 없어 가장 많이 나온 ‘${D.terms[c]}’로 보여줍니다.`);
+    const withC = sel.filter((d) => d.termSet.has(c)), nc = withC.length;
+    if (nc < 3) { message(`고른 범위에서 ‘${D.terms[c]}’이(가) 나온 보도자료가 ${nc}건뿐이라 연관어를 고를 수 없습니다. 기간이나 부서를 넓혀 보세요.`); return null; }
+    const dfc = new Uint32Array(D.terms.length);
+    for (const d of withC) for (const t of d.terms) dfc[t]++;
+    const N = Math.max(10, Math.round(+$("n-n").value * 0.6)), n = sel.length, cand = [];
+    for (let t = 0; t < df.length; t++) {
+      if (t === c || dfc[t] < 3 || isCommon(t, df)) continue;
+      if (D.terms[c].includes(D.terms[t])) continue; // 중심어의 조각(인공지능 → 인공, 지능)은 연관어가 아니다
+      const lift = (dfc[t] / nc) / (df[t] / n);
+      if (lift <= 1) continue;
+      cand.push({ t, co: dfc[t], score: dfc[t] * Math.log1p(lift) });
+    }
+    cand.sort((a, b) => b.score - a.score || a.t - b.t);
+    const rel = cand.slice(0, N);
+    const nodes = [{ t: c, term: D.terms[c], df: df[c], center: true }, ...rel.map((r) => ({ t: r.t, term: D.terms[r.t], df: df[r.t] }))];
+    const co = coMatrix(nodes.map((x) => x.t));
+    const maxScore = rel.length ? rel[0].score : 1;
+    const spokes = rel.map((r, i) => ({ source: 0, target: i + 1, co: r.co, w: r.co / Math.sqrt(df[c] * df[r.t]), spoke: true, s: r.score / maxScore }));
+    const among = knnEdges(nodes, co, df, Math.min(2, +$("n-k").value), (i) => i === 0);
+    return { nodes, links: [...spokes, ...among], co, center: 0, nc };
+  }
+  function render() {
+    if (!D) return;
+    hideTip(); message("");
+    const df = selection();
+    graph = mode === "net" ? buildNet(df) : buildEgo(df);
+    const stage = $("n-stage");
+    if (!graph || !graph.nodes.length) { stage.replaceChildren(); $("n-legend").replaceChildren(); $("n-table").replaceChildren(); $("n-meta").textContent = `보도자료 ${fmt(sel.length)}건`; return; }
+    const { nodes, links } = graph;
+    const skip = (i) => i === graph.center;
+    const comm = communities(nodes.length, links.filter((l) => !l.spoke), skip);
+    const groups = new Map();
+    nodes.forEach((nd, i) => { if (skip(i)) return; if (!groups.has(comm[i])) groups.set(comm[i], []); groups.get(comm[i]).push(i); });
+    const ranked = [...groups.values()].filter((g) => g.length >= 2).sort((a, b) => b.reduce((s, i) => s + nodes[i].df, 0) - a.reduce((s, i) => s + nodes[i].df, 0));
+    nodes.forEach((nd) => (nd.group = -1));
+    ranked.slice(0, 6).forEach((g, gi) => g.forEach((i) => (nodes[i].group = gi)));
+    const color = (nd) => (nd.center ? "var(--center)" : nd.group >= 0 ? `var(--c${nd.group + 1})` : "var(--other)");
+
+    const W = Math.max(300, stage.clientWidth), H = Math.round(Math.max(420, Math.min(700, W * 0.68)));
+    const maxDf = d3.max(nodes, (d) => d.df), minDf = d3.min(nodes, (d) => d.df);
+    const rScale = d3.scaleSqrt().domain([minDf, maxDf]).range([5, mode === "ego" ? 18 : 20]);
+    const fScale = d3.scaleSqrt().domain([minDf, maxDf]).range([11, 16]);
+    nodes.forEach((d) => { d.r = d.center ? 24 : rScale(d.df); d.fs = d.center ? 18 : fScale(d.df); });
+    const sim = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).distance((l) => (l.spoke ? 70 + 150 * (1 - l.s) : 40 + 110 * (1 - Math.min(1, l.w * 2)))).strength((l) => (l.spoke ? 0.25 : 0.15 + 0.6 * Math.min(1, l.w * 2))))
+      .force("charge", d3.forceManyBody().strength(mode === "ego" ? -260 : -200))
+      .force("collide", d3.forceCollide((d) => d.r + d.fs * d.term.length * 0.32 + 4).iterations(2))
+      .force("x", d3.forceX(W / 2).strength(0.04)).force("y", d3.forceY(H / 2).strength(0.06))
+      .stop();
+    if (graph.center >= 0) { nodes[0].fx = W / 2; nodes[0].fy = H / 2; }
+    for (let i = 0; i < 400; i++) sim.tick();
+
+    const svg = d3.create("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("height", H).attr("role", "img").attr("aria-label", mode === "net" ? "키워드 관계망" : `${nodes[0].term} 연관어 관계도`);
+    const g = svg.append("g");
+    const wMax = d3.max(links, (l) => l.w) || 1;
+    const linkG = g.append("g");
+    const linkSel = linkG.selectAll("line.link").data(links).join("line").attr("class", "link")
+      .attr("stroke-width", (l) => (l.spoke ? 1 + 4 * l.s : 1 + 4 * (l.w / wMax)))
+      .attr("stroke-opacity", (l) => (l.spoke ? 0.35 + 0.5 * l.s : 0.3 + 0.55 * (l.w / wMax))).attr("stroke-linecap", "round");
+    const hitSel = linkG.selectAll("line.link-hit").data(links).join("line").attr("class", "link-hit");
+    const nodeSel = g.append("g").selectAll("g.node").data(nodes).join("g").attr("class", "node").attr("tabindex", 0).attr("role", "button").attr("aria-label", (d) => `${d.term}, 보도자료 ${d.df}건`);
+    nodeSel.append("circle").attr("r", (d) => d.r).style("fill", color);
+    nodeSel.append("text").text((d) => d.term).attr("font-size", (d) => d.fs).attr("font-weight", (d) => (d.center || d.r > 12 ? 700 : 500))
+      .attr("x", (d) => (d.center ? 0 : d.r + 4)).attr("y", (d) => (d.center ? d.r + d.fs + 2 : 0)).attr("dy", (d) => (d.center ? 0 : "0.35em")).attr("text-anchor", (d) => (d.center ? "middle" : "start"));
+    const place = () => {
+      for (const s of [linkSel, hitSel]) s.attr("x1", (l) => l.source.x).attr("y1", (l) => l.source.y).attr("x2", (l) => l.target.x).attr("y2", (l) => l.target.y);
+      nodeSel.attr("transform", (d) => `translate(${d.x},${d.y})`);
+    };
+    place();
+    const nb = new Map(nodes.map((d) => [d, new Set([d])]));
+    for (const l of links) { nb.get(l.source).add(l.target); nb.get(l.target).add(l.source); }
+    const focus = (d) => {
+      if (!d) { nodeSel.classed("dim", false); linkSel.classed("dim", false).classed("hl", false); return; }
+      const s = nb.get(d);
+      nodeSel.classed("dim", (x) => !s.has(x));
+      linkSel.classed("dim", (l) => l.source !== d && l.target !== d).classed("hl", (l) => l.source === d || l.target === d);
+    };
+    const nodeTip = (e, d) => showTip(d.term, `보도자료 ${fmt(d.df)}건 · 연결 ${nb.get(d).size - 1}개`, e.clientX, e.clientY);
+    nodeSel.on("pointerenter", (e, d) => { focus(d); nodeTip(e, d); }).on("pointermove", nodeTip)
+      .on("pointerleave", () => { focus(null); hideTip(); })
+      .on("click", (e, d) => { if (!e.defaultPrevented) selectNode(d); })
+      .on("keydown", (e, d) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectNode(d); } })
+      .on("focus", (e, d) => { focus(d); const r = e.currentTarget.getBoundingClientRect(); showTip(d.term, `보도자료 ${fmt(d.df)}건`, r.left + r.width / 2, r.top); })
+      .on("blur", () => { focus(null); hideTip(); });
+    hitSel.on("pointermove", (e, l) => showTip(`${l.source.term} + ${l.target.term}`, `함께 나온 보도자료 ${fmt(l.co)}건`, e.clientX, e.clientY))
+      .on("pointerenter", (e, l) => linkSel.filter((x) => x === l).classed("hl", true))
+      .on("pointerleave", (e, l) => { linkSel.filter((x) => x === l).classed("hl", false); hideTip(); })
+      .on("click", (e, l) => selectEdge(l));
+    nodeSel.call(d3.drag()
+      .on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.15).restart(); d.fx = d.x; d.fy = d.y; hideTip(); })
+      .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); if (!d.center) { d.fx = null; d.fy = null; } }));
+    sim.on("tick", place);
+    zoom = d3.zoom().scaleExtent([0.4, 4]).on("zoom", (e) => g.attr("transform", e.transform));
+    svg.call(zoom).on("dblclick.zoom", null);
+    const xs = nodes.map((d) => d.x), ys = nodes.map((d) => d.y);
+    const x0 = d3.min(xs) - 30, x1 = d3.max(xs) + 120, y0 = d3.min(ys) - 30, y1 = d3.max(ys) + 30;
+    const k = Math.min(1.4, W / (x1 - x0), H / (y1 - y0));
+    fitT = d3.zoomIdentity.translate(W / 2 - (k * (x0 + x1)) / 2, H / 2 - (k * (y0 + y1)) / 2).scale(k);
+    svg.call(zoom.transform, fitT);
+    svgSel = svg;
+    stage.replaceChildren(svg.node());
+
+    const lg = $("n-legend"); lg.replaceChildren();
+    const legendItem = (bg, text) => { const s = el("span"); const sw = el("span", "sw"); sw.style.background = bg; s.append(sw, text); lg.appendChild(s); };
+    if (graph.center >= 0) legendItem("var(--center)", `중심어 ${nodes[0].term}`);
+    ranked.slice(0, 6).forEach((grp, gi) => legendItem(`var(--c${gi + 1})`, `묶음 ${gi + 1} · ${grp.slice().sort((a, b) => nodes[b].df - nodes[a].df).slice(0, 4).map((i) => nodes[i].term).join(" · ")}`));
+    if (nodes.some((d) => d.group < 0 && !d.center)) legendItem("var(--other)", "어느 묶음에도 속하지 않음");
+    $("n-title").textContent = mode === "net" ? "전체 관계망" : `‘${nodes[0].term}’ 연관어`;
+    const range = [$("n-from").value ? monthLabel($("n-from").value) : "처음", $("n-to").value ? monthLabel($("n-to").value) : "끝"].join(" ~ ");
+    $("n-meta").textContent = `보도자료 ${fmt(sel.length)}건${graph.nc ? ` 중 중심어 포함 ${fmt(graph.nc)}건` : ""} · 단어 ${nodes.length}개 · 연결 ${links.length}개 · ${range}${$("n-dept").value !== "" ? " · " + D.depts[+$("n-dept").value] : ""}`;
+    $("n-table").replaceChildren(table(["단어 A", "단어 B", "함께 나온 보도자료", "연결 강도(코사인)"],
+      links.slice().sort((a, b) => b.co - a.co).map((l) => [l.source.term, l.target.term, fmt(l.co), l.w.toFixed(3)]), "data left2"));
+    const keep = selected && selected.type === "node" && nodes.find((d) => d.term === selected.term);
+    selectNode(keep || (graph.center >= 0 ? nodes[0] : nodes.reduce((a, b) => (b.df > a.df ? b : a))));
+  }
+  function docList(filterFn, title) {
+    const list = sel.filter(filterFn);
+    $("n-docs-title").textContent = `${title} (${fmt(list.length)}건 중 최근 ${Math.min(6, list.length)}건)`;
+    const ul = $("n-docs"); ul.replaceChildren();
+    for (const d of list.slice(0, 6)) { const li = el("li"); li.append(el("span", "d-meta num", `${dateLabel(d.date)} · ${D.depts[d.dept] || "부서 미상"}`), articleLink(d)); ul.appendChild(li); }
+  }
+  function selectNode(d) {
+    selected = { type: "node", term: d.term };
+    if (svgSel) svgSel.selectAll("g.node").classed("sel", (x) => x === d);
+    $("n-sel-label").textContent = d.center ? "중심어" : "고른 단어";
+    $("n-sel-name").textContent = d.term;
+    $("n-sel-figs").textContent = `고른 범위 보도자료 ${fmt(sel.length)}건 중 ${fmt(d.df)}건`;
+    const act = $("n-sel-actions"); act.replaceChildren();
+    if (!d.center) { const b = el("button", "btn-ghost", "이 단어를 중심으로 보기"); b.type = "button"; b.addEventListener("click", () => center(d.term)); act.appendChild(b); }
+    const s = el("button", "btn-ghost", "이 단어로 검색"); s.type = "button"; s.addEventListener("click", () => { S.query(d.term); Tabs.show("search"); }); act.appendChild(s);
+    const i = graph.nodes.indexOf(d), n = graph.nodes.length;
+    const rows = graph.nodes.map((x, j) => ({ x, c: j === i ? 0 : graph.co[i * n + j] })).filter((r) => r.c > 0).sort((a, b) => b.c - a.c).slice(0, 8);
+    const bars = $("n-sel-bars"); bars.replaceChildren();
+    if (rows.length) bars.appendChild(el("span", "note", "그린 단어 가운데 함께 많이 나온 말"));
+    const max = rows.length ? rows[0].c : 1;
+    for (const r of rows) {
+      const row = el("div", "bar-row");
+      const nameBtn = el("button", "name", r.x.term); nameBtn.type = "button"; nameBtn.addEventListener("click", () => selectNode(r.x));
+      const track = el("div", "bar-track"), fill = el("div", "bar-fill"); fill.style.width = (r.c / max) * 100 + "%"; track.appendChild(fill);
+      row.append(nameBtn, track, el("span", "v", fmt(r.c)));
+      bars.appendChild(row);
+    }
+    docList((doc) => doc.termSet.has(d.t), `‘${d.term}’이(가) 나온 보도자료`);
+  }
+  function selectEdge(l) {
+    selected = { type: "edge" };
+    if (svgSel) svgSel.selectAll("g.node").classed("sel", (x) => x === l.source || x === l.target);
+    $("n-sel-label").textContent = "고른 연결";
+    $("n-sel-name").textContent = `${l.source.term} + ${l.target.term}`;
+    $("n-sel-figs").textContent = `함께 나온 보도자료 ${fmt(l.co)}건 · 연결 강도 ${l.w.toFixed(3)}`;
+    $("n-sel-actions").replaceChildren(); $("n-sel-bars").replaceChildren();
+    docList((doc) => doc.termSet.has(l.source.t) && doc.termSet.has(l.target.t), "두 단어가 함께 나온 보도자료");
+  }
+  function setMode(m) { setModeUi(m); render(); }
+  function setModeUi(m) {
+    mode = m;
+    $("n-mode-net").setAttribute("aria-pressed", String(m === "net"));
+    $("n-mode-ego").setAttribute("aria-pressed", String(m === "ego"));
+    $("n-centerbox").hidden = m !== "ego";
+    selected = null;
+  }
+  /** 다른 탭에서 '관계도에서 보기': 탭이 보일 때 그린다 (숨은 채로 그리면 크기를 못 잰다) */
+  function center(term) {
+    $("n-center").value = term;
+    setModeUi("ego");
+    if (D && !$("panel-network").hidden) render(); else needsRender = true;
+  }
+  async function start() {
+    started = true;
+    if (!window.d3) { $("n-meta").textContent = "그래프 라이브러리(d3)를 불러오지 못했습니다. 페이지를 새로 고쳐 보세요."; return; }
+    try { D = await cloudReady(); } catch (e) { $("n-meta").textContent = `불러오지 못했습니다 (${e.message}).`; return; }
+    fillCloudFilters("n", D);
+    const dl = $("n-terms");
+    [...D.totalDf.keys()].sort((a, b) => D.totalDf[b] - D.totalDf[a]).slice(0, 1500).forEach((t) => dl.appendChild(new Option(D.terms[t])));
+    if (window.innerWidth < 520) $("n-n").value = "30";
+    needsRender = false;
+    render();
+  }
+  function init() {
+    $("n-mode-net").addEventListener("click", () => setMode("net"));
+    $("n-mode-ego").addEventListener("click", () => setMode("ego"));
+    $("n-centerbox").addEventListener("submit", (e) => { e.preventDefault(); selected = null; render(); });
+    for (const ex of EXAMPLES) { const b = el("button", "ex", ex); b.type = "button"; b.addEventListener("click", () => { $("n-center").value = ex; selected = null; render(); }); $("n-centerbox").appendChild(b); }
+    for (const id of ["n-from", "n-to", "n-dept", "n-n", "n-k", "n-common"]) $(id).addEventListener("change", render);
+    $("n-reset").addEventListener("click", () => { if (svgSel && fitT) svgSel.transition().duration(300).call(zoom.transform, fitT); });
+  }
+  return { init, show() { if (!started) start(); else if (needsRender) { needsRender = false; render(); } }, resize() { render(); }, center };
+})();
+
+// =====================================================================
+// 분석 보고서 탭 (2026-10-03 기준 고정 분석, 페이지 안 JSON)
+// =====================================================================
+const R = (() => {
+  const RD = JSON.parse($("report-data").textContent);
+  const SHIFT = [{ k: "지방정부", v: "--s1" }, { k: "지자체", v: "--s2" }, { k: "지방자치단체", v: "--s3" }];
+  const shiftData = SHIFT.map((s) => ({ ...s, pts: RD.term_shift[s.k].filter((p) => p.m !== PARTIAL) }));
+  let built = false;
+  function volume() {
+    const box = $("r-volume");
+    const W = Math.max(280, box.clientWidth), H = 220, m = { l: 34, r: 8, t: 22, b: 26 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b, data = RD.monthly_counts, n = data.length;
+    const yMax = Math.ceil(Math.max(...data.map((d) => d.n)) / 50) * 50;
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": "월별 보도자료 수" });
+    for (let v = 0; v <= yMax; v += 50) {
+      const y = m.t + ih - (v / yMax) * ih;
+      svgEl("line", { x1: m.l, x2: W - m.r, y1: y, y2: y, class: v === 0 ? "base" : "grid" }, svg);
+      svgText(svg, m.l - 6, y + 4, String(v), { "text-anchor": "end", class: "num" });
+    }
+    const band = iw / n, bw = Math.min(24, band * 0.62), step = band < 30 ? 2 : 1;
+    const maxI = data.reduce((a, d, i) => (d.n > data[a].n ? i : a), 0);
+    data.forEach((d, i) => {
+      const cx = m.l + band * i + band / 2, hh = (d.n / yMax) * ih, y = m.t + ih - hh, partial = d.m === PARTIAL;
+      const hit = svgEl("rect", { x: m.l + band * i, y: m.t, width: band, height: ih, class: "hit", tabindex: 0, "aria-label": `${monthLabel(d.m)} ${d.n}건` }, svg);
+      svgEl("path", { d: colPath(cx - bw / 2, y, bw, hh, 4), class: "mark", style: `fill:var(${partial ? "--bar-partial" : "--bar"})` }, svg);
+      bindHover(hit, () => fillTip(monthLabel(d.m) + (partial ? " (이틀치)" : ""), [{ value: fmt(d.n) + "건" }]));
+      if (i % step === 0) svgText(svg, cx, H - 8, tickLabel(d.m, i === 0), { "text-anchor": "middle" });
+      if (i === maxI) svgText(svg, cx, y - 6, String(d.n), { "text-anchor": "middle", class: "val num" });
+    });
+    box.replaceChildren(svg);
+  }
+  function shift() {
+    const box = $("r-shift");
+    const W = Math.max(280, box.clientWidth), H = 260, m = { l: 38, r: 76, t: 14, b: 26 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const months = shiftData[0].pts.map((p) => p.m), n = months.length, yMax = 0.6;
+    const X = (i) => m.l + (i / (n - 1)) * iw, Y = (s) => m.t + ih - (s / yMax) * ih;
+    const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": "지방정부·지자체·지방자치단체 표기 비율" });
+    for (let v = 0; v <= yMax + 1e-9; v += 0.2) {
+      svgEl("line", { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v), class: v === 0 ? "base" : "grid" }, svg);
+      svgText(svg, m.l - 6, Y(v) + 4, Math.round(v * 100) + "%", { "text-anchor": "end", class: "num" });
+    }
+    const step = iw / (n - 1) < 32 ? 2 : 1;
+    months.forEach((mm, i) => { if (i % step === 0) svgText(svg, X(i), H - 8, tickLabel(mm, i === 0), { "text-anchor": "middle" }); });
+    const cross = svgEl("line", { y1: m.t, y2: m.t + ih, class: "base", visibility: "hidden" }, svg);
+    for (const s of shiftData) svgEl("polyline", { points: s.pts.map((p, i) => `${X(i)},${Y(p.s)}`).join(" "), fill: "none", "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round", style: `stroke:var(${s.v})` }, svg);
+    for (const s of shiftData) svgEl("circle", { cx: X(n - 1), cy: Y(s.pts[n - 1].s), r: 4, "stroke-width": 2, style: `fill:var(${s.v});stroke:var(--paper)` }, svg);
+    svgText(svg, X(n - 1) + 9, Y(shiftData[0].pts[n - 1].s) + 4, `${shiftData[0].k} ${pct(shiftData[0].pts[n - 1].s)}`, { class: "val" });
+    const dots = shiftData.map((s) => svgEl("circle", { r: 4, "stroke-width": 2, visibility: "hidden", style: `fill:var(${s.v});stroke:var(--paper)` }, svg));
+    const overlay = svgEl("rect", { x: m.l - 6, y: m.t, width: iw + 12, height: ih, class: "hit", tabindex: 0, "aria-label": "월을 고르려면 좌우 화살표" }, svg);
+    let idx = n - 1;
+    const showAt = (i, cx, cy) => {
+      idx = Math.max(0, Math.min(n - 1, i));
+      cross.setAttribute("x1", X(idx)); cross.setAttribute("x2", X(idx)); cross.setAttribute("visibility", "visible");
+      shiftData.forEach((s, j) => { dots[j].setAttribute("cx", X(idx)); dots[j].setAttribute("cy", Y(s.pts[idx].s)); dots[j].setAttribute("visibility", "visible"); });
+      fillTip(`${monthLabel(months[idx])} · 보도자료 ${shiftData[0].pts[idx].n}건`, shiftData.map((s) => ({ color: `var(${s.v})`, value: pct(s.pts[idx].s), label: `${s.k} (${s.pts[idx].k}건)` })));
+      placeTip(cx, cy);
+    };
+    const hide = () => { cross.setAttribute("visibility", "hidden"); dots.forEach((d) => d.setAttribute("visibility", "hidden")); hideTip(); };
+    overlay.addEventListener("pointermove", (e) => { const r = svg.getBoundingClientRect(); const px = ((e.clientX - r.left) / r.width) * W; showAt(Math.round(((px - m.l) / iw) * (n - 1)), e.clientX, e.clientY); });
+    overlay.addEventListener("pointerleave", hide);
+    overlay.addEventListener("blur", hide);
+    const keyShow = () => { const r = svg.getBoundingClientRect(); showAt(idx, r.left + (X(idx) / W) * r.width, r.top + 20); };
+    overlay.addEventListener("focus", keyShow);
+    overlay.addEventListener("keydown", (e) => { if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); idx += e.key === "ArrowLeft" ? -1 : 1; idx = Math.max(0, Math.min(n - 1, idx)); keyShow(); } });
+    box.replaceChildren(svg);
+  }
+  function topics() {
+    const wrap = $("r-topics"); wrap.replaceChildren();
+    for (const t of RD.topics) {
+      const pts = t.series.filter((p) => p.m !== PARTIAL), n = pts.length;
+      const card = el("div", "mini"), head = el("div", "mini-head"), chart = el("div", "chart");
+      head.append(el("h4", null, t.name), el("span", "num", `${fmt(t.total)}건`));
+      const peakI = pts.reduce((a, p, i) => (p.s > pts[a].s ? i : a), 0), peak = pts[peakI];
+      card.append(head, chart, el("p", "mini-peak num", `최고 ${monthLabel(peak.m)} · ${pct(peak.s)} (${peak.k}건)`));
+      wrap.appendChild(card);
+      const W = Math.max(160, chart.clientWidth), H = 76, mt = 6, mb = 18, ih = H - mt - mb, band = W / n, bw = Math.min(24, band * 0.68), max = peak.s || 1;
+      const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, height: H, role: "img", "aria-label": `${t.name} 월별 언급 비율` });
+      svgEl("line", { x1: 0, x2: W, y1: mt + ih, y2: mt + ih, class: "base" }, svg);
+      pts.forEach((p, i) => {
+        const cx = band * i + band / 2, hh = (p.s / max) * ih, y = mt + ih - hh;
+        const hit = svgEl("rect", { x: band * i, y: 0, width: band, height: H - mb, class: "hit", tabindex: 0, "aria-label": `${monthLabel(p.m)} ${p.k}건, ${pct(p.s)}` }, svg);
+        svgEl("path", { d: colPath(cx - bw / 2, y, bw, hh, 4), class: "mark", style: "fill:var(--bar)" }, svg);
+        bindHover(hit, () => fillTip(`${t.name} · ${monthLabel(p.m)}`, [{ value: pct(p.s), label: `${p.k}건 / ${p.n}건` }]));
+      });
+      svgText(svg, 0, H - 4, tickLabel(pts[0].m, true));
+      svgText(svg, W, H - 4, tickLabel(pts[n - 1].m, true), { "text-anchor": "end" });
+      chart.appendChild(svg);
+    }
+  }
+  function barList(id, rows) {
+    const box = $(id); box.replaceChildren();
+    const max = Math.max(...rows.map((r) => r.v));
+    for (const r of rows) {
+      const row = el("div", "bar-row"), track = el("div", "bar-track"), fill = el("div", "bar-fill");
+      fill.style.width = (r.v / max) * 100 + "%"; track.appendChild(fill);
+      row.append(el("span", "name", r.k), track, el("span", "v", fmt(r.v)));
+      box.appendChild(row);
+    }
+  }
+  function build() {
+    built = true;
+    $("r-volume-table").appendChild(table(["월", "보도자료"], RD.monthly_counts.map((d) => [monthLabel(d.m) + (d.m === PARTIAL ? " (이틀치)" : ""), fmt(d.n)])));
+    for (const { m, n } of RD.monthly_counts) {
+      const row = el("div", "ledger-row"), left = el("div", "ledger-month"), chips = el("div", "chips");
+      left.append(el("b", null, monthLabel(m)), el("span", "num", `${fmt(n)}건${m === PARTIAL ? " · 이틀치" : ""}`));
+      (RD.distinctive[m] || []).slice(0, 6).forEach((t, i) => { const c = el("span", "chip" + (i === 0 ? " first" : ""), t.t); c.title = `${t.df}건에 등장`; chips.appendChild(c); });
+      row.append(left, chips); $("r-ledger").appendChild(row);
+    }
+    for (const s of SHIFT) { const item = el("span"), k = el("span", "key"); k.style.borderTopColor = `var(${s.v})`; item.append(k, document.createTextNode(s.k)); $("r-shift-legend").appendChild(item); }
+    $("r-shift-table").appendChild(table(["월", ...SHIFT.map((s) => s.k)], shiftData[0].pts.map((p, i) => [monthLabel(p.m), ...shiftData.map((s) => `${pct(s.pts[i].s)} (${s.pts[i].k}건)`)])));
+    $("r-n-early").textContent = fmt(RD.early_n); $("r-n-recent").textContent = fmt(RD.recent_n);
+    $("r-rising").appendChild(table(["단어", "초기", "최근"], RD.rising.slice(0, 12).map((r) => [r.term, fmt(r.ref_df), fmt(r.df)])));
+    $("r-falling").appendChild(table(["단어", "초기", "최근"], RD.falling.slice(0, 12).map((r) => [r.term, fmt(r.df), fmt(r.ref_df)])));
+    barList("r-terms", RD.top.map((r) => ({ k: r.term, v: r.df })));
+    barList("r-depts", RD.departments.map((r) => ({ k: r.d, v: r.n })));
+  }
+  function draw() { volume(); shift(); topics(); }
+  return { init() {}, show() { if (!built) build(); draw(); }, resize() { if (built) draw(); } };
+})();
+
+// =====================================================================
+// 탭과 시작
+// =====================================================================
+const Tabs = (() => {
+  const NAMES = ["ai", "search", "cloud", "network", "report"];
+  const MODS = { ai: AI, search: S, cloud: C, network: N, report: R };
+  let current = null;
+  function show(name, focusTab = false) {
+    if (!NAMES.includes(name)) name = "ai";
+    current = name;
+    hideTip();
+    for (const n of NAMES) {
+      const on = n === name;
+      $("tab-" + n).setAttribute("aria-selected", String(on));
+      $("tab-" + n).tabIndex = on ? 0 : -1;
+      $("panel-" + n).hidden = !on;
+    }
+    if (focusTab) $("tab-" + name).focus();
+    store.set("moisdb.tab", name);
+    try { if (location.hash !== "#" + name) history.replaceState(null, "", "#" + name); } catch {}
+    MODS[name].show();
+  }
+  function init() {
+    for (const n of NAMES) $("tab-" + n).addEventListener("click", () => show(n));
+    document.querySelector(".tabs").addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      e.preventDefault();
+      const i = NAMES.indexOf(current) + (e.key === "ArrowRight" ? 1 : -1);
+      show(NAMES[(i + NAMES.length) % NAMES.length], true);
+    });
+    const fromHash = location.hash.replace("#", "");
+    show(NAMES.includes(fromHash) ? fromHash : store.get("moisdb.tab") || "ai");
+    let lastW = document.querySelector(".sheet").clientWidth, raf = 0;
+    new ResizeObserver(() => {
+      const w = document.querySelector(".sheet").clientWidth;
+      if (Math.abs(w - lastW) < 12) return;
+      lastW = w; cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => { hideTip(); MODS[current].resize(); });
+    }).observe(document.querySelector(".sheet"));
+    const themeChanged = () => { C.themeChanged(); if (current === "cloud") C.show(); };
+    matchMedia("(prefers-color-scheme: dark)").addEventListener("change", themeChanged);
+    new MutationObserver(themeChanged).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  }
+  return { init, show };
+})();
+
+AI.init(); S.init(); C.init(); N.init(); R.init();
+Tabs.init();
+})();
+</script>
