@@ -25,7 +25,7 @@ const AI = (() => {
 
 [답변 형식]
 - 한국어. 먼저 질문에 대한 답을 2~4문장으로.
-- 이어서 근거 보도자료를 날짜순 목록으로: "- 2025. 7. 10. [보도자료 제목](url) — 한 줄 요지". url은 도구가 준 그대로 쓴다.
+- 이어서 근거 보도자료를 날짜순 목록으로: "- 2025. 7. 10. [보도자료 제목](id:129005) — 한 줄 요지". 괄호 안에는 도구가 준 id를 "id:숫자"로 쓴다(인터넷 주소는 쓰지 않는다). 이 링크를 누르면 페이지 안에서 본문이 열린다.
 - 숫자·금액·날짜·대상은 본문에 적힌 그대로 옮긴다. 추측하지 않는다.
 - 찾지 못했으면 찾지 못했다고 말하고, 어떤 말로 찾아봤는지 적는다.
 - 마크다운은 목록, 굵게(**), 링크만 쓴다. 표와 제목(#)은 쓰지 않는다.${Rules.promptBlock()}`;
@@ -55,18 +55,25 @@ const AI = (() => {
   }
 
   // ---- 안전한 마크다운(목록·굵게·링크만) → DOM ----
+  /** 링크 대상에서 보도자료 번호를 꺼낸다: id:129005, #129005, 행안부 주소(nttId=…), 모델이 지어낸 "search id:129005" 같은 꼴까지 */
+  function docIdOf(target) {
+    const t = target.trim();
+    if (/^https?:\/\//.test(t)) return t.startsWith("https://www.mois.go.kr/") ? (t.match(/[?&]nttId=(\d+)/) || [])[1] || null : null;
+    const m = t.match(/^(?:[a-z ]*id\s*[:=]?\s*|#)?(\d{4,9})$/i);
+    return m ? m[1] : null;
+  }
   function inline(parent, s) {
-    const re = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|\*\*([^*]+)\*\*/g;
+    const re = /\[([^\]]+)\]\(([^)\n]{1,300})\)|\*\*([^*]+)\*\*/g;
     let last = 0, m;
     while ((m = re.exec(s))) {
       if (m.index > last) parent.appendChild(document.createTextNode(s.slice(last, m.index)));
       if (m[1]) {
-        // 행안부 보도자료 링크는 읽기 창으로만 연다 (누리집으로 바로 넘어가지 않게)
-        const id = m[2].startsWith("https://www.mois.go.kr/") && (m[2].match(/[?&]nttId=(\d+)/) || [])[1];
+        // 보도자료 링크는 읽기 창으로만 연다 (누리집으로 바로 넘어가지 않게)
+        const id = docIdOf(m[2]);
         if (id) parent.appendChild(docButton(id, m[1]));
-        else { const a = el("a", null, m[1]); a.href = m[2]; a.target = "_blank"; a.rel = "noopener"; parent.appendChild(a); }
-      }
-      else parent.appendChild(el("strong", null, m[3]));
+        else if (/^https?:\/\/\S+$/.test(m[2].trim())) { const a = el("a", null, m[1]); a.href = m[2].trim(); a.target = "_blank"; a.rel = "noopener"; parent.appendChild(a); }
+        else parent.appendChild(document.createTextNode(m[1]));
+      } else parent.appendChild(el("strong", null, m[3]));
       last = re.lastIndex;
     }
     if (last < s.length) parent.appendChild(document.createTextNode(s.slice(last)));
@@ -134,7 +141,7 @@ const AI = (() => {
       },
       {
         name: "read_release",
-        description: "보도자료 하나의 본문을 읽는다. 긴 글은 앞에서부터 max_chars(기본 5000, 최대 8000)자만 온다. 더 읽으려면 offset을 늘린다. url은 답에 링크로 쓴다.",
+        description: "보도자료 하나의 본문을 읽는다. 긴 글은 앞에서부터 max_chars(기본 5000, 최대 8000)자만 온다. 더 읽으려면 offset을 늘린다.",
         inputSchema: { type: "object", properties: { id: { type: "string", description: "search_releases가 준 id" }, offset: { type: "integer", minimum: 0 }, max_chars: { type: "integer", minimum: 500, maximum: 8000 } }, required: ["id"] },
         execute(input) {
           const d = DOC_BY_ID.get(String(input.id).trim());
@@ -143,7 +150,7 @@ const AI = (() => {
           const n = Math.min(8000, Math.max(500, int(input.max_chars, 5000)));
           if (!readMap.has(d.id)) step(`읽음: ${dateLabel(d.date)} ${d.title}`);
           readMap.set(d.id, d);
-          return { id: d.id, date: d.date, dept: d.dept, title: d.title, url: ARTICLE + d.id, offset: off, total_chars: d.body.length, text: d.body.slice(off, off + n) };
+          return { id: d.id, date: d.date, dept: d.dept, title: d.title, offset: off, total_chars: d.body.length, text: d.body.slice(off, off + n) };
         },
       },
       {
@@ -185,7 +192,7 @@ const AI = (() => {
     const material = top.map((r) => {
       readMap.set(r.d.id, r.d);
       const wins = snippetWindows(r.d, r.terms, 3, 300).map(([s, e]) => r.d.body.slice(s, e).replace(/\s+/g, " ")).join(" … ");
-      return `### ${dateLabel(r.d.date)} ${r.d.title}\nurl: ${ARTICLE + r.d.id}\n부서: ${r.d.dept}\n${r.d.body.slice(0, 600).replace(/\s+/g, " ")}\n…\n${wins}`;
+      return `### ${dateLabel(r.d.date)} ${r.d.title}\nid: ${r.d.id}\n부서: ${r.d.dept}\n${r.d.body.slice(0, 600).replace(/\s+/g, " ")}\n…\n${wins}`;
     }).join("\n\n");
     step(`관련 보도자료 ${top.length}건으로 답하는 중`);
     const turnsNoTools = [{ role: "user", content: rules().replace(/\[도구\][\s\S]*?\[답변 형식\]/, "[답변 형식]") }, ...history.slice(0, -1),
