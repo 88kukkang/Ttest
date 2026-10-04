@@ -1,0 +1,885 @@
+<title>NBA 시즌 레이스</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: 한 열 대시보드. 머리말 → 컨트롤 한 줄 → 팀 선택(컨퍼런스 순위순) → 차트 → 성적표 */
+:root {
+  --bg: #eceef2;
+  --surface: #fcfcfb;
+  --surface-2: #f2f3f6;
+  --ink: #10141d;
+  --ink-2: #4a5160;
+  --muted: #6f7480;
+  --grid: #e5e6e9;
+  --axis: #c3c6cc;
+  --hair: rgba(16, 20, 29, 0.10);
+  --accent: #1b3a8c;
+  --on-accent: #ffffff;
+  --field: rgba(96, 102, 116, 0.20);
+  --zone-1: rgba(27, 58, 140, 0.055);
+  --zone-2: rgba(27, 58, 140, 0.025);
+  --up: #006300;
+  --down: #b42828;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --s5: #e87ba4; --s6: #008300; --s7: #4a3aa7; --s8: #e34948;
+  --font-display: "Barlow Condensed", "IBM Plex Sans KR", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans KR", system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --radius: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1115; --surface: #181a1f; --surface-2: #20232a;
+    --ink: #f3f4f6; --ink-2: #b9bec8; --muted: #8d929c;
+    --grid: #262930; --axis: #3b3f48; --hair: rgba(255, 255, 255, 0.10);
+    --accent: #9db4ff; --on-accent: #0f1115;
+    --field: rgba(170, 176, 190, 0.17);
+    --zone-1: rgba(157, 180, 255, 0.075); --zone-2: rgba(157, 180, 255, 0.035);
+    --up: #2fbf4a; --down: #f07070;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1115; --surface: #181a1f; --surface-2: #20232a;
+  --ink: #f3f4f6; --ink-2: #b9bec8; --muted: #8d929c;
+  --grid: #262930; --axis: #3b3f48; --hair: rgba(255, 255, 255, 0.10);
+  --accent: #9db4ff; --on-accent: #0f1115;
+  --field: rgba(170, 176, 190, 0.17);
+  --zone-1: rgba(157, 180, 255, 0.075); --zone-2: rgba(157, 180, 255, 0.035);
+  --up: #2fbf4a; --down: #f07070;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.55 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-inline: 16px;
+  padding-block: 28px 48px;
+  display: grid;
+  gap: 18px;
+}
+h1, h2 { text-wrap: balance; margin: 0; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* 머리말 */
+.masthead { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 32px; }
+.masthead-text { min-width: 0; max-width: 640px; display: grid; gap: 6px; }
+.eyebrow { font: 600 13px/1 var(--font-display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+h1 { font-size: clamp(28px, 4vw, 40px); line-height: 1.1; letter-spacing: -0.02em; font-weight: 700; }
+h1 .latin { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.01em; }
+.lede { margin: 0; color: var(--ink-2); max-width: 62ch; }
+.facts { display: flex; gap: 22px; flex-wrap: wrap; }
+.fact { display: grid; gap: 2px; }
+.fact b { font: 600 24px/1 var(--font-display); letter-spacing: 0.01em; }
+.fact span { font-size: 12px; color: var(--muted); }
+
+/* 컨트롤 */
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end; }
+.ctl { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 6px; }
+.ctl legend, .ctl-label { padding: 0; font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; }
+.seg { display: inline-flex; background: var(--surface-2); border: 1px solid var(--hair); border-radius: 9px; padding: 3px; gap: 2px; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label { padding: 6px 12px; border-radius: 6px; font-size: 14px; font-weight: 500; color: var(--ink-2); cursor: pointer; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+.seg label:hover { color: var(--ink); }
+.seg input:checked + label { background: var(--accent); color: var(--on-accent); }
+.seg input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px; }
+.toggles { display: flex; gap: 8px; flex-wrap: wrap; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 8px; border: 1px solid var(--hair); border-radius: 9px; background: var(--surface-2); cursor: pointer; font-size: 14px; color: var(--ink-2); }
+.toggle input { appearance: none; width: 30px; height: 18px; border-radius: 9px; background: var(--axis); position: relative; margin: 0; cursor: pointer; transition: background 0.15s; flex: none; }
+.toggle input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--surface); transition: transform 0.15s; }
+.toggle input:checked { background: var(--accent); }
+.toggle input:checked::after { transform: translateX(12px); }
+.toggle:has(input:checked) { color: var(--ink); }
+.toggle input:disabled { opacity: 0.4; }
+
+/* 카드 */
+.card { background: var(--surface); border: 1px solid var(--hair); border-radius: var(--radius); padding: 18px 20px; min-width: 0; }
+.card-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: start; gap: 10px 24px; margin-bottom: 12px; }
+.card-head > div { min-width: 0; }
+h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+.sub { margin: 2px 0 0; color: var(--ink-2); font-size: 13.5px; }
+
+/* 팀 선택 */
+.rack { display: grid; gap: 12px; }
+.rack-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; }
+.rack-title { display: flex; align-items: baseline; gap: 10px; }
+.count { font: 600 15px/1 var(--font-display); color: var(--muted); letter-spacing: 0.04em; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.preset { border: 1px solid var(--hair); background: transparent; border-radius: 999px; padding: 4px 12px; font-size: 13px; color: var(--ink-2); cursor: pointer; }
+.preset:hover { background: var(--surface-2); color: var(--ink); }
+.conf-row { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: start; }
+.conf-label { font-size: 13px; font-weight: 700; color: var(--ink-2); padding-top: 9px; }
+.chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 6px; }
+.chip { display: grid; grid-template-columns: 10px auto 1fr; align-items: center; gap: 7px; padding: 6px 9px; border: 1px solid var(--hair); border-radius: 8px; background: transparent; cursor: pointer; text-align: left; color: var(--muted); transition: background 0.12s, border-color 0.12s, color 0.12s; }
+.chip:hover:not(:disabled) { background: var(--surface-2); color: var(--ink); }
+.chip:disabled { opacity: 0.45; cursor: not-allowed; }
+.chip .dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--axis); }
+.chip .abbr { font: 600 16px/1 var(--font-display); letter-spacing: 0.03em; white-space: nowrap; }
+.chip .rec { font: 500 13px/1 var(--font-display); letter-spacing: 0.02em; justify-self: end; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { color: var(--ink); background: var(--surface-2); border-color: var(--ink-2); }
+.chip[aria-pressed="true"] .dot { border: 0; background: var(--c); }
+.chip[aria-pressed="true"] .rec { color: var(--ink-2); }
+
+/* 차트 */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.key { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.key b { font: 600 15px/1 var(--font-display); letter-spacing: 0.03em; color: var(--ink); }
+.key svg { flex: none; }
+.legend .sep { width: 1px; height: 16px; background: var(--hair); }
+#chart { width: 100%; min-height: 360px; }
+.multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 14px; }
+.panel { border: 1px solid var(--hair); border-radius: 10px; padding: 12px 12px 4px; min-width: 0; }
+.panel-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.panel-head .key b { font-size: 18px; }
+.panel-head .name { font-size: 13px; color: var(--ink-2); }
+.panel-head .rec { margin-left: auto; font: 600 16px/1 var(--font-display); letter-spacing: 0.02em; }
+.panel .plot { width: 100%; height: 230px; }
+.empty { display: grid; place-items: center; min-height: 300px; color: var(--muted); text-align: center; padding: 24px; }
+
+/* 표 */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 9px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+th { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; }
+th:first-child, td:first-child { text-align: left; padding-left: 0; }
+tbody tr:last-child td { border-bottom: 0; }
+td .team { display: inline-flex; align-items: center; gap: 8px; }
+td .team b { font: 600 17px/1 var(--font-display); letter-spacing: 0.03em; }
+td .team span { color: var(--ink-2); font-size: 13px; }
+.num { font-family: var(--font-display); font-size: 17px; font-weight: 600; letter-spacing: 0.02em; }
+.delta-up { color: var(--up); }
+.delta-down { color: var(--down); }
+.delta-flat { color: var(--muted); }
+td.barcode { text-align: left; }
+details { margin-top: 4px; }
+summary { cursor: pointer; color: var(--ink-2); font-size: 14px; font-weight: 500; padding-block: 4px; }
+summary:hover { color: var(--ink); }
+#gametable { margin-top: 10px; font-size: 13px; }
+#gametable td, #gametable th { padding: 5px 10px; }
+
+.notes { color: var(--muted); font-size: 12.5px; display: grid; gap: 4px; max-width: 90ch; }
+.notes p { margin: 0; }
+
+@media (max-width: 640px) {
+  .page { padding-block: 20px 36px; gap: 14px; }
+  .card { padding: 14px; }
+  .conf-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .conf-label { padding-top: 0; }
+  .chips { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+  .fact b { font-size: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<!--BODY-->
+<main class="page">
+  <header class="masthead">
+    <div class="masthead-text">
+      <span class="eyebrow" id="eyebrow">NBA Regular Season</span>
+      <h1><span class="latin">NBA</span> 시즌 레이스</h1>
+      <p class="lede">경기가 하나씩 쌓일 때마다 팀의 승률과 순위가 어떻게 움직였는지 보여줍니다. 팀을 골라 한 차트에 겹치거나 팀별로 나눠 보고, 지난 시즌 같은 시점과 비교해 보세요.</p>
+    </div>
+    <div class="facts" id="facts"></div>
+  </header>
+
+  <div class="controls">
+    <fieldset class="ctl">
+      <legend>지표</legend>
+      <div class="seg">
+        <input type="radio" name="metric" id="metric-pct" value="pct" checked><label for="metric-pct">승률</label>
+        <input type="radio" name="metric" id="metric-rank" value="rank"><label for="metric-rank">순위</label>
+      </div>
+    </fieldset>
+    <fieldset class="ctl" id="calc-ctl">
+      <legend>승률 계산</legend>
+      <div class="seg">
+        <input type="radio" name="calc" id="calc-cum" value="cum" checked><label for="calc-cum">시즌 누적</label>
+        <input type="radio" name="calc" id="calc-l10" value="l10"><label for="calc-l10">최근 10경기</label>
+      </div>
+    </fieldset>
+    <fieldset class="ctl" id="rankby-ctl" hidden>
+      <legend>순위 기준</legend>
+      <div class="seg">
+        <input type="radio" name="rankby" id="rankby-conf" value="conf" checked><label for="rankby-conf">컨퍼런스</label>
+        <input type="radio" name="rankby" id="rankby-league" value="league"><label for="rankby-league">리그 전체</label>
+      </div>
+    </fieldset>
+    <fieldset class="ctl">
+      <legend>보기</legend>
+      <div class="seg">
+        <input type="radio" name="view" id="view-overlay" value="overlay" checked><label for="view-overlay">겹쳐 보기</label>
+        <input type="radio" name="view" id="view-split" value="split"><label for="view-split">팀별로 나눠 보기</label>
+      </div>
+    </fieldset>
+    <div class="ctl">
+      <span class="ctl-label">표시</span>
+      <div class="toggles">
+        <label class="toggle"><input type="checkbox" id="opt-compare" checked><span id="compare-label">지난 시즌과 비교</span></label>
+        <label class="toggle"><input type="checkbox" id="opt-field" checked><span>나머지 팀 흐리게</span></label>
+      </div>
+    </div>
+  </div>
+
+  <section class="card rack" aria-labelledby="rack-title">
+    <div class="rack-head">
+      <div class="rack-title"><h2 id="rack-title">팀 선택</h2><span class="count" id="pick-count"></span></div>
+      <div class="presets" id="presets"></div>
+    </div>
+    <div class="conf-row"><span class="conf-label">동부</span><div class="chips" id="chips-E"></div></div>
+    <div class="conf-row"><span class="conf-label">서부</span><div class="chips" id="chips-W"></div></div>
+  </section>
+
+  <section class="card" aria-labelledby="chart-title">
+    <div class="card-head">
+      <div>
+        <h2 id="chart-title"></h2>
+        <p class="sub" id="chart-sub"></p>
+      </div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div id="chart"></div>
+    <div class="multiples" id="multiples" hidden></div>
+    <div class="empty" id="empty" hidden>위에서 팀을 하나 이상 고르면 그래프가 그려집니다.</div>
+  </section>
+
+  <section class="card" aria-labelledby="ledger-title">
+    <div class="card-head">
+      <div>
+        <h2 id="ledger-title">시즌 성적표</h2>
+        <p class="sub" id="ledger-sub"></p>
+      </div>
+    </div>
+    <div class="table-wrap"><table id="ledger"></table></div>
+    <details id="game-details">
+      <summary>그래프 값을 경기별 표로 보기</summary>
+      <div class="table-wrap"><table id="gametable"></table></div>
+    </details>
+  </section>
+
+  <footer class="notes" id="notes"></footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-basic-dist-min@3.1.0/plotly-basic.min.js"></script>
+<script>
+const DATA = /*__NBA_DATA__*/null;
+
+(function () {
+  "use strict";
+  const MAX_TEAMS = 8;
+  const L10 = 10;
+  const SEASON_GAMES = 82;
+  const STORE_KEY = "nba-season-race:v1";
+  const cur = DATA.seasons[DATA.current];
+  const prev = DATA.previous ? DATA.seasons[DATA.previous] : null;
+  const TEAMS = DATA.teams;
+  const CONF_KO = { E: "동부", W: "서부" };
+
+  // ---------- 데이터 가공 ----------
+  function derive(rows) {
+    const out = { date: [], opp: [], home: [], pts: [], oppPts: [], win: [], W: [], L: [], pct: [], l10: [], l10w: [], l10n: [], crank: [], lrank: [] };
+    let W = 0, L = 0;
+    rows.forEach((r, i) => {
+      const [date, opp, home, pts, oppPts, crank, lrank] = r;
+      const win = pts > oppPts;
+      win ? W++ : L++;
+      out.date.push(date); out.opp.push(opp); out.home.push(!!home);
+      out.pts.push(pts); out.oppPts.push(oppPts); out.win.push(win);
+      out.W.push(W); out.L.push(L); out.pct.push(W / (W + L));
+      out.crank.push(crank); out.lrank.push(lrank);
+      const start = Math.max(0, i - L10 + 1);
+      let w10 = 0;
+      for (let j = start; j <= i; j++) if (rows[j][3] > rows[j][4]) w10++;
+      const n10 = i - start + 1;
+      out.l10w.push(w10); out.l10n.push(n10); out.l10.push(w10 / n10);
+    });
+    out.n = rows.length;
+    return out;
+  }
+  function deriveSeason(season) {
+    const res = {};
+    for (const t in season.teams) res[t] = derive(season.teams[t]);
+    return res;
+  }
+  const CUR = deriveSeason(cur);
+  const PREV = prev ? deriveSeason(prev) : null;
+  const last = (s) => s.n - 1;
+
+  // ---------- 서식 ----------
+  const fmtPct = (x) => (x >= 1 ? "1.000" : "." + String(Math.round(x * 1000)).padStart(3, "0"));
+  const fmtDate = (iso) => { const [, m, d] = iso.split("-"); return `${+m}/${+d}`; };
+  const fmtLongDate = (iso) => iso.replace(/-/g, ".");
+  const rec = (s, i) => `${s.W[i]}-${s.L[i]}`;
+  const seasonShort = (label) => label.slice(2); // "2025-26" -> "25-26"
+
+  // ---------- 상태 ----------
+  const finalCur = (t) => CUR[t].pct[last(CUR[t])];
+  const confOrder = (conf) => Object.keys(TEAMS).filter((t) => TEAMS[t].conf === conf && CUR[t])
+    .sort((a, b) => CUR[a].crank[last(CUR[a])] - CUR[b].crank[last(CUR[b])]);
+  const winDelta = (t) => (PREV && PREV[t] ? CUR[t].W[last(CUR[t])] - PREV[t].W[last(PREV[t])] : 0);
+
+  const state = {
+    metric: "pct", calc: "cum", rankBy: "conf", view: "overlay",
+    compare: !!prev, field: true,
+    slots: new Map(), // 팀 -> 색 슬롯(0-7). 다른 팀을 빼도 남은 팀 색은 바뀌지 않는다.
+  };
+  function defaultTeams() {
+    return [...confOrder("W").slice(0, 2), ...confOrder("E").slice(0, 2)];
+  }
+  function setTeams(list) {
+    state.slots = new Map();
+    list.slice(0, MAX_TEAMS).forEach((t, i) => state.slots.set(t, i));
+  }
+  function addTeam(t) {
+    if (state.slots.has(t) || state.slots.size >= MAX_TEAMS) return;
+    const used = new Set(state.slots.values());
+    let slot = 0;
+    while (used.has(slot)) slot++;
+    state.slots.set(t, slot);
+  }
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return false;
+      const s = JSON.parse(raw);
+      for (const k of ["metric", "calc", "rankBy", "view"]) if (typeof s[k] === "string") state[k] = s[k];
+      if (typeof s.compare === "boolean") state.compare = s.compare && !!prev;
+      if (typeof s.field === "boolean") state.field = s.field;
+      if (Array.isArray(s.slots)) {
+        state.slots = new Map(s.slots.filter(([t, i]) => CUR[t] && i >= 0 && i < MAX_TEAMS));
+      }
+      return true;
+    } catch (e) { return false; }
+  }
+  function saveState() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ ...state, slots: [...state.slots] }));
+    } catch (e) { /* 저장 불가 환경은 무시 */ }
+  }
+
+  // ---------- 테마 ----------
+  let theme = {};
+  function readTheme() {
+    const cs = getComputedStyle(document.documentElement);
+    const v = (n) => cs.getPropertyValue(n).trim();
+    theme = {
+      surface: v("--surface"), ink: v("--ink"), ink2: v("--ink-2"), muted: v("--muted"),
+      grid: v("--grid"), axis: v("--axis"), hair: v("--hair"), field: v("--field"),
+      zone1: v("--zone-1"), zone2: v("--zone-2"),
+      series: [1, 2, 3, 4, 5, 6, 7, 8].map((i) => v("--s" + i)),
+      body: v("--font-body"), display: v("--font-display"),
+    };
+  }
+  const colorOf = (t) => theme.series[state.slots.get(t)];
+
+  // ---------- 지표 ----------
+  function metricInfo() {
+    if (state.metric === "rank") {
+      const conf = state.rankBy === "conf";
+      return {
+        key: conf ? "crank" : "lrank",
+        title: conf ? "컨퍼런스 순위" : "리그 전체 순위",
+        sub: conf
+          ? "각 경기를 마친 날 기준 컨퍼런스 순위. 1–6위는 플레이오프 직행, 7–10위는 플레이인 구간입니다."
+          : "각 경기를 마친 날 기준 30개 팀 전체 순위.",
+        isRank: true, max: conf ? 15 : 30,
+        fmt: (v) => `${v}위`,
+      };
+    }
+    const l10 = state.calc === "l10";
+    return {
+      key: l10 ? "l10" : "pct",
+      title: l10 ? "최근 10경기 승률" : "시즌 누적 승률",
+      sub: l10
+        ? "해당 경기까지 최근 10경기의 승률. 10경기를 치르기 전에는 치른 경기 전부로 계산합니다."
+        : "개막부터 해당 경기까지의 승률. 가로선은 5할(.500)입니다.",
+      isRank: false, fmt: fmtPct,
+    };
+  }
+  function hoverLines(t, s, seasonLabel, m) {
+    return s.date.map((_, i) => {
+      let head;
+      if (m.key === "l10") head = `<b>${fmtPct(s.l10[i])}</b>  최근 ${s.l10n[i]}경기 ${s.l10w[i]}-${s.l10n[i] - s.l10w[i]}`;
+      else if (m.isRank) head = `<b>${s[m.key][i]}위</b>  ${rec(s, i)}`;
+      else head = `<b>${fmtPct(s.pct[i])}</b>  ${rec(s, i)}`;
+      const game = `${fmtDate(s.date[i])} ${s.home[i] ? "vs" : "@"} ${s.opp[i]} ${s.win[i] ? "승" : "패"} ${s.pts[i]}-${s.oppPts[i]}`;
+      return `${t} ${seasonShort(seasonLabel)}   ${head}   <span style="color:${theme.muted}">${game}</span>`;
+    });
+  }
+  const xs = (s) => s.date.map((_, i) => i + 1);
+
+  // ---------- Plotly 레이아웃 ----------
+  function baseLayout(m, opts) {
+    const small = !!opts.small;
+    const layout = {
+      paper_bgcolor: theme.surface, plot_bgcolor: theme.surface,
+      font: { family: theme.body, color: theme.muted, size: small ? 11 : 12 },
+      margin: { l: small ? 38 : 50, r: opts.right || (small ? 10 : 16), t: small ? 6 : 10, b: small ? 28 : 40 },
+      height: opts.height,
+      showlegend: false,
+      hovermode: "x unified",
+      hoverdistance: 40,
+      hoverlabel: { bgcolor: theme.surface, bordercolor: theme.hair, font: { family: theme.body, color: theme.ink, size: 12.5 } },
+      xaxis: {
+        range: [0, SEASON_GAMES + 1], zeroline: false, showgrid: false,
+        tickvals: small || opts.narrow ? [1, 20, 41, 60, 82] : [1, 10, 20, 30, 41, 50, 60, 70, 82],
+        ticks: "outside", ticklen: 4, tickcolor: theme.axis, showline: true, linecolor: theme.axis,
+        title: small ? undefined : { text: "경기 수", font: { size: 12, color: theme.muted }, standoff: 8 },
+        unifiedhovertitle: { text: "<b>%{x}번째 경기</b>" },
+        spikemode: "across", spikethickness: 1, spikecolor: theme.axis, spikedash: "solid", showspikes: true,
+        fixedrange: true,
+      },
+      yaxis: { zeroline: false, gridcolor: theme.grid, gridwidth: 1, fixedrange: true, ticks: "", automargin: true },
+      shapes: [], annotations: [],
+    };
+    if (m.isRank) {
+      Object.assign(layout.yaxis, {
+        range: [m.max + 0.6, 0.4],
+        tickvals: m.max === 15 ? (small ? [1, 6, 10, 15] : [1, 3, 6, 8, 10, 12, 15]) : [1, 5, 10, 15, 20, 25, 30],
+        ticktext: undefined, showgrid: true,
+      });
+      if (m.max === 15) {
+        layout.shapes.push(
+          { type: "rect", xref: "paper", yref: "y", x0: 0, x1: 1, y0: 0.5, y1: 6.5, fillcolor: theme.zone1, line: { width: 0 }, layer: "below" },
+          { type: "rect", xref: "paper", yref: "y", x0: 0, x1: 1, y0: 6.5, y1: 10.5, fillcolor: theme.zone2, line: { width: 0 }, layer: "below" },
+        );
+        if (!small) {
+          layout.annotations.push(
+            { xref: "paper", yref: "y", x: 0.005, y: 6.45, yanchor: "bottom", xanchor: "left", text: "플레이오프 직행 1–6", showarrow: false, bgcolor: theme.surface, opacity: 0.9, borderpad: 2, font: { size: 11, color: theme.muted } },
+            { xref: "paper", yref: "y", x: 0.005, y: 10.45, yanchor: "bottom", xanchor: "left", text: "플레이인 7–10", showarrow: false, bgcolor: theme.surface, opacity: 0.9, borderpad: 2, font: { size: 11, color: theme.muted } },
+          );
+        }
+      }
+    } else {
+      Object.assign(layout.yaxis, {
+        range: [-0.03, 1.03],
+        tickvals: small ? [0, 0.5, 1] : [0, 0.2, 0.4, 0.5, 0.6, 0.8, 1],
+        ticktext: (small ? [0, 0.5, 1] : [0, 0.2, 0.4, 0.5, 0.6, 0.8, 1]).map(fmtPct),
+        showgrid: true,
+      });
+      layout.shapes.push({ type: "line", xref: "paper", yref: "y", x0: 0, x1: 1, y0: 0.5, y1: 0.5, line: { color: theme.axis, width: 1.25 }, layer: "below" });
+    }
+    if (!small) {
+      layout.shapes.push({ type: "line", xref: "x", yref: "paper", x0: 41, x1: 41, y0: 0, y1: 1, line: { color: theme.grid, width: 1 }, layer: "below" });
+    }
+    return layout;
+  }
+
+  function fieldTraces(m, exclude, small) {
+    if (!state.field) return [];
+    const opacity = (m.key === "l10" ? 0.55 : 1) * (small ? 0.7 : 1);
+    return Object.keys(CUR).filter((t) => !exclude.has(t)).map((t) => ({
+      type: "scatter", mode: "lines", x: xs(CUR[t]), y: CUR[t][m.key], opacity,
+      line: { color: theme.field, width: 1 }, hoverinfo: "skip", showlegend: false,
+    }));
+  }
+  function prevTrace(t, m) {
+    const p = PREV[t];
+    return {
+      type: "scatter", mode: "lines", name: `${t} ${prev.label}`, x: xs(p), y: p[m.key],
+      line: { color: colorOf(t), width: 1.6, dash: "dot" }, opacity: 0.85, zorder: 1,
+      customdata: hoverLines(t, p, prev.label, m), hovertemplate: "%{customdata}<extra></extra>",
+    };
+  }
+  const hasPrev = (t) => state.compare && PREV && PREV[t];
+  function teamTraces(t, m, width, withPrev = true) {
+    const color = colorOf(t);
+    const s = CUR[t];
+    const traces = [{
+      type: "scatter", mode: "lines", name: `${t} ${cur.label}`, x: xs(s), y: s[m.key],
+      line: { color, width: width || 2.25 }, zorder: 2,
+      customdata: hoverLines(t, s, cur.label, m), hovertemplate: "%{customdata}<extra></extra>",
+    }, {
+      type: "scatter", mode: "markers", x: [s.n], y: [s[m.key][last(s)]],
+      marker: { color, size: 9, line: { color: theme.surface, width: 2 } }, zorder: 3,
+      hoverinfo: "skip", showlegend: false,
+    }];
+    if (withPrev && hasPrev(t)) traces.push(prevTrace(t, m));
+    return traces;
+  }
+
+  // 시즌 끝 지점 라벨: 겹치면 위아래로 밀어내고 지시선으로 잇는다.
+  function endLabels(m, layout, teams) {
+    const plotH = layout.height - layout.margin.t - layout.margin.b;
+    const [y0, y1] = layout.yaxis.range;
+    const toPx = (v) => ((v - y1) / (y0 - y1)) * plotH; // 위에서부터의 픽셀
+    const items = teams.map((t) => {
+      const s = CUR[t];
+      const v = s[m.key][last(s)];
+      return { t, v, py: toPx(v), x: s.n };
+    }).sort((a, b) => a.py - b.py);
+    const gap = 17;
+    items.forEach((it, i) => { it.ly = i ? Math.max(it.py, items[i - 1].ly + gap) : it.py; });
+    for (let i = items.length - 1; i >= 0; i--) {
+      const limit = i === items.length - 1 ? plotH : items[i + 1].ly - gap;
+      items[i].ly = Math.min(items[i].ly, limit);
+    }
+    return items.map((it) => ({
+      x: it.x, y: it.v, xref: "x", yref: "y", xanchor: "left", yanchor: "middle",
+      ax: 16, ay: it.ly - it.py, axref: "pixel", ayref: "pixel",
+      showarrow: true, arrowhead: 0, arrowwidth: 1, arrowcolor: theme.axis, standoff: 6,
+      text: `<b>${it.t}</b> ${m.fmt(it.v)}`,
+      font: { family: theme.display, size: 14, color: theme.ink },
+    }));
+  }
+
+  function finalLabel(t, m) {
+    const s = CUR[t], i = last(s);
+    if (m.key === "l10") return `최근 10경기 ${s.l10w[i]}-${s.l10n[i] - s.l10w[i]}`;
+    if (m.key === "crank") return `${CONF_KO[TEAMS[t].conf]} ${s.crank[i]}위`;
+    if (m.key === "lrank") return `리그 ${s.lrank[i]}위`;
+    return fmtPct(s.pct[i]);
+  }
+
+  const PLOT_CONFIG = { displayModeBar: false, responsive: true, scrollZoom: false, doubleClick: false };
+
+  function selectedTeams() {
+    return [...state.slots.keys()].sort((a, b) => {
+      const m = metricInfo();
+      const va = CUR[a][m.key][last(CUR[a])], vb = CUR[b][m.key][last(CUR[b])];
+      return m.isRank ? va - vb : vb - va;
+    });
+  }
+
+  function chartHeight(el) {
+    const w = el.clientWidth || 900;
+    return Math.round(Math.max(340, Math.min(560, w * 0.52)));
+  }
+
+  function renderOverlay(m, teams) {
+    const el = document.getElementById("chart");
+    const sel = new Set(teams);
+    const traces = [...fieldTraces(m, sel)];
+    // 툴팁 목록은 트레이스 순서를 따른다: 이번 시즌(현재 순위순) → 지난 시즌. 겹침 순서는 zorder로 정한다.
+    teams.forEach((t) => traces.push(...teamTraces(t, m, 2.25, false)));
+    teams.filter(hasPrev).forEach((t) => traces.push(prevTrace(t, m)));
+    const narrow = el.clientWidth < 560;
+    const layout = baseLayout(m, { height: chartHeight(el), right: narrow ? 84 : 96, narrow });
+    layout.annotations.push(...endLabels(m, layout, teams));
+    Plotly.react(el, traces, layout, PLOT_CONFIG);
+  }
+
+  function renderSplit(m, teams) {
+    const wrap = document.getElementById("multiples");
+    const existing = new Map([...wrap.children].map((c) => [c.dataset.team, c]));
+    const keep = new Set(teams);
+    existing.forEach((node, t) => { if (!keep.has(t)) { Plotly.purge(node.querySelector(".plot")); node.remove(); } });
+    teams.forEach((t) => {
+      let node = existing.get(t);
+      if (!node) {
+        node = document.createElement("article");
+        node.className = "panel";
+        node.dataset.team = t;
+        const head = document.createElement("div");
+        head.className = "panel-head";
+        const plot = document.createElement("div");
+        plot.className = "plot";
+        node.append(head, plot);
+      }
+      wrap.appendChild(node); // 정렬 순서대로 다시 붙인다
+      const s = CUR[t];
+      const head = node.querySelector(".panel-head");
+      head.replaceChildren(
+        lineKey(t, colorOf(t), false),
+        textEl("span", "name", TEAMS[t].ko),
+        textEl("span", "rec", `${rec(s, last(s))} · ${finalLabel(t, m)}`),
+      );
+      const sel = new Set([t]);
+      const traces = [...fieldTraces(m, sel, true), ...teamTraces(t, m, 2)];
+      const layout = baseLayout(m, { height: 230, small: true });
+      Plotly.react(node.querySelector(".plot"), traces, layout, PLOT_CONFIG);
+    });
+  }
+
+  // ---------- DOM 도우미 ----------
+  function textEl(tag, cls, text) {
+    const el = document.createElement(tag);
+    if (cls) el.className = cls;
+    el.textContent = text;
+    return el;
+  }
+  function svgLine(color, dashed) {
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("width", "18"); svg.setAttribute("height", "10"); svg.setAttribute("aria-hidden", "true");
+    const line = document.createElementNS(ns, "line");
+    line.setAttribute("x1", "1"); line.setAttribute("x2", "17"); line.setAttribute("y1", "5"); line.setAttribute("y2", "5");
+    line.setAttribute("stroke", color); line.setAttribute("stroke-width", dashed ? "2" : "2.5");
+    line.setAttribute("stroke-linecap", "round");
+    if (dashed) line.setAttribute("stroke-dasharray", "0.1 4");
+    svg.appendChild(line);
+    return svg;
+  }
+  function lineKey(t, color, dashed, label) {
+    const k = document.createElement("span");
+    k.className = "key";
+    k.append(svgLine(color, dashed));
+    if (t) k.append(textEl("b", "", t));
+    if (label) k.append(textEl("span", "", label));
+    return k;
+  }
+
+  function renderLegend(teams) {
+    const el = document.getElementById("legend");
+    el.replaceChildren();
+    if (!teams.length) return;
+    if (state.view === "overlay") {
+      teams.forEach((t) => el.append(lineKey(t, colorOf(t), false)));
+      const sep = document.createElement("span"); sep.className = "sep"; el.append(sep);
+    }
+    el.append(lineKey(null, theme.ink2, false, cur.label));
+    if (state.compare && prev) el.append(lineKey(null, theme.ink2, true, prev.label));
+  }
+
+  // ---------- 팀 선택 ----------
+  function renderChips() {
+    const full = state.slots.size >= MAX_TEAMS;
+    for (const conf of ["E", "W"]) {
+      const box = document.getElementById("chips-" + conf);
+      box.replaceChildren();
+      confOrder(conf).forEach((t) => {
+        const s = CUR[t];
+        const on = state.slots.has(t);
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "chip"; b.id = "chip-" + t;
+        b.setAttribute("aria-pressed", String(on));
+        b.title = `${TEAMS[t].ko} · ${CONF_KO[conf]} ${s.crank[last(s)]}위`;
+        if (on) b.style.setProperty("--c", colorOf(t));
+        if (!on && full) b.disabled = true;
+        const dot = document.createElement("span"); dot.className = "dot";
+        b.append(dot, textEl("span", "abbr", t), textEl("span", "rec", rec(s, last(s))));
+        b.addEventListener("click", () => {
+          if (state.slots.has(t)) state.slots.delete(t); else addTeam(t);
+          update();
+        });
+        box.append(b);
+      });
+    }
+    document.getElementById("pick-count").textContent = `${state.slots.size} / ${MAX_TEAMS}`;
+  }
+
+  function renderPresets() {
+    const box = document.getElementById("presets");
+    const all = Object.keys(CUR);
+    const presets = [
+      ["서부 1–4위", () => confOrder("W").slice(0, 4)],
+      ["동부 1–4위", () => confOrder("E").slice(0, 4)],
+    ];
+    if (PREV) {
+      presets.push(
+        ["작년보다 많이 오른 4팀", () => all.filter((t) => PREV[t]).sort((a, b) => winDelta(b) - winDelta(a)).slice(0, 4)],
+        ["작년보다 많이 떨어진 4팀", () => all.filter((t) => PREV[t]).sort((a, b) => winDelta(a) - winDelta(b)).slice(0, 4)],
+      );
+    }
+    presets.push(["선택 해제", () => []]);
+    box.replaceChildren(...presets.map(([label, pick]) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "preset"; b.textContent = label;
+      b.addEventListener("click", () => { setTeams(pick()); update(); });
+      return b;
+    }));
+  }
+
+  // ---------- 표 ----------
+  function barcode(s, color) {
+    const ns = "http://www.w3.org/2000/svg";
+    const step = 3.5, w = s.n * step, h = 26, mid = 13;
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("width", String(w)); svg.setAttribute("height", String(h));
+    svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", `${s.W[last(s)]}승 ${s.L[last(s)]}패 경기별 결과`);
+    s.win.forEach((win, i) => {
+      const r = document.createElementNS(ns, "rect");
+      r.setAttribute("x", String(i * step)); r.setAttribute("width", "2.5");
+      r.setAttribute("y", win ? "1" : String(mid + 1)); r.setAttribute("height", win ? String(mid - 1) : "8");
+      r.setAttribute("rx", "1");
+      r.setAttribute("fill", win ? color : theme.axis);
+      svg.appendChild(r);
+    });
+    return svg;
+  }
+
+  function renderLedger(teams) {
+    const table = document.getElementById("ledger");
+    document.getElementById("ledger-sub").textContent =
+      `선택한 팀의 ${cur.label} 최종 성적${prev ? `과 ${prev.label} 대비 변화` : ""}. 막대는 경기별 승(위)·패(아래).`;
+    const thead = document.createElement("thead");
+    const hr = document.createElement("tr");
+    const cols = ["팀", cur.label, "승률", "컨퍼런스", "리그", "마지막 10경기"];
+    if (prev) cols.push(prev.label, "승수 변화");
+    cols.push("경기별 승패");
+    cols.forEach((c) => hr.append(textEl("th", "", c)));
+    thead.append(hr);
+    const tbody = document.createElement("tbody");
+    const rows = teams.slice().sort((a, b) => finalCur(b) - finalCur(a));
+    if (!rows.length) {
+      const tr = document.createElement("tr");
+      const td = textEl("td", "", "선택한 팀이 없습니다.");
+      td.colSpan = cols.length; td.style.color = theme.muted;
+      tr.append(td); tbody.append(tr);
+    }
+    rows.forEach((t) => {
+      const s = CUR[t], i = last(s);
+      const tr = document.createElement("tr");
+      const teamCell = document.createElement("td");
+      const wrap = document.createElement("span"); wrap.className = "team";
+      wrap.append(svgLine(colorOf(t), false), textEl("b", "", t), textEl("span", "", TEAMS[t].ko));
+      teamCell.append(wrap);
+      tr.append(teamCell,
+        textEl("td", "num", rec(s, i)),
+        textEl("td", "num", fmtPct(s.pct[i])),
+        textEl("td", "", `${CONF_KO[TEAMS[t].conf]} ${s.crank[i]}위`),
+        textEl("td", "", `${s.lrank[i]}위`),
+        textEl("td", "num", `${s.l10w[i]}-${s.l10n[i] - s.l10w[i]}`));
+      if (prev) {
+        const p = PREV[t];
+        if (p) {
+          const d = winDelta(t);
+          tr.append(textEl("td", "num", rec(p, last(p))));
+          const cls = d > 0 ? "delta-up" : d < 0 ? "delta-down" : "delta-flat";
+          tr.append(textEl("td", "num " + cls, d > 0 ? `▲ ${d}승` : d < 0 ? `▼ ${-d}승` : "–"));
+        } else {
+          tr.append(textEl("td", "", "–"), textEl("td", "", "–"));
+        }
+      }
+      const bc = document.createElement("td"); bc.className = "barcode";
+      bc.append(barcode(s, colorOf(t)));
+      tr.append(bc);
+      tbody.append(tr);
+    });
+    table.replaceChildren(thead, tbody);
+  }
+
+  function renderGameTable(m, teams) {
+    const table = document.getElementById("gametable");
+    if (!document.getElementById("game-details").open) { table.replaceChildren(); return; }
+    const cols = [];
+    teams.forEach((t) => {
+      cols.push({ label: `${t} ${seasonShort(cur.label)}`, s: CUR[t] });
+      if (state.compare && PREV && PREV[t]) cols.push({ label: `${t} ${seasonShort(prev.label)}`, s: PREV[t] });
+    });
+    const thead = document.createElement("thead");
+    const hr = document.createElement("tr");
+    hr.append(textEl("th", "", "경기"));
+    cols.forEach((c) => hr.append(textEl("th", "", c.label)));
+    thead.append(hr);
+    const tbody = document.createElement("tbody");
+    const n = Math.max(0, ...cols.map((c) => c.s.n));
+    for (let i = 0; i < n; i++) {
+      const tr = document.createElement("tr");
+      tr.append(textEl("td", "", String(i + 1)));
+      cols.forEach((c) => {
+        const txt = i < c.s.n ? `${m.fmt(c.s[m.key][i])} (${rec(c.s, i)})` : "–";
+        tr.append(textEl("td", "", txt));
+      });
+      tbody.append(tr);
+    }
+    table.replaceChildren(thead, tbody);
+  }
+
+  function renderFacts() {
+    const facts = [
+      [cur.label.replace("-", "–"), "시즌"],
+      [cur.games.toLocaleString("ko-KR"), "정규시즌 경기"],
+      [`${fmtDate(cur.first)} – ${fmtDate(cur.last)}`, "개막 – 최종전"],
+    ];
+    document.getElementById("facts").replaceChildren(...facts.map(([v, l]) => {
+      const d = document.createElement("div"); d.className = "fact";
+      d.append(textEl("b", "", v), textEl("span", "", l));
+      return d;
+    }));
+    document.getElementById("eyebrow").textContent = `NBA Regular Season ${cur.label}`;
+    document.getElementById("compare-label").textContent = prev ? `${prev.label} 시즌과 비교` : "지난 시즌 데이터 없음";
+    if (!prev) { const c = document.getElementById("opt-compare"); c.checked = false; c.disabled = true; }
+  }
+
+  function renderNotes() {
+    const src = DATA.source === "bbref"
+      ? "basketball-reference.com 시즌 일정"
+      : "ESPN 경기 결과(sportsdataverse 공개 데이터셋)";
+    const lines = [
+      `데이터: ${src}. ${fmtLongDate(DATA.generated)} 생성.`,
+      "정규시즌 82경기만 포함합니다. 정규시즌 기록에 들어가지 않는 NBA컵 결승, 올스타전, 플레이인은 뺐습니다.",
+      "순위는 해당 경기를 치른 날의 모든 경기가 끝난 뒤 기준입니다. 동률은 승률 → 승패 차 → 상대 전적 → 컨퍼런스 승률 → 득실차 순으로 단순하게 가려서, 공식 시드와 다를 수 있습니다.",
+    ];
+    document.getElementById("notes").replaceChildren(...lines.map((l) => textEl("p", "", l)));
+  }
+
+  // ---------- 갱신 ----------
+  function syncControls() {
+    document.getElementById("metric-" + state.metric).checked = true;
+    document.getElementById("calc-" + state.calc).checked = true;
+    document.getElementById("rankby-" + state.rankBy).checked = true;
+    document.getElementById("view-" + state.view).checked = true;
+    document.getElementById("opt-compare").checked = state.compare;
+    document.getElementById("opt-field").checked = state.field;
+    document.getElementById("calc-ctl").hidden = state.metric !== "pct";
+    document.getElementById("rankby-ctl").hidden = state.metric !== "rank";
+  }
+
+  function update() {
+    syncControls();
+    const m = metricInfo();
+    const teams = selectedTeams();
+    document.getElementById("chart-title").textContent = m.title;
+    document.getElementById("chart-sub").textContent = m.sub;
+    renderChips();
+    renderLegend(teams);
+    const empty = teams.length === 0;
+    const chart = document.getElementById("chart");
+    const multiples = document.getElementById("multiples");
+    document.getElementById("empty").hidden = !empty;
+    chart.hidden = empty || state.view !== "overlay";
+    multiples.hidden = empty || state.view !== "split";
+    if (!empty && state.view === "overlay") renderOverlay(m, teams);
+    if (!empty && state.view === "split") renderSplit(m, teams);
+    renderLedger(teams);
+    renderGameTable(m, teams);
+    saveState();
+  }
+
+  function bind() {
+    const on = (name, key) => document.querySelectorAll(`input[name="${name}"]`).forEach((r) =>
+      r.addEventListener("change", () => { if (r.checked) { state[key] = r.value; update(); } }));
+    on("metric", "metric"); on("calc", "calc"); on("rankby", "rankBy"); on("view", "view");
+    document.getElementById("opt-compare").addEventListener("change", (e) => { state.compare = e.target.checked; update(); });
+    document.getElementById("opt-field").addEventListener("change", (e) => { state.field = e.target.checked; update(); });
+    document.getElementById("game-details").addEventListener("toggle", () => renderGameTable(metricInfo(), selectedTeams()));
+
+    const rethemed = () => { readTheme(); update(); };
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    if (mq.addEventListener) mq.addEventListener("change", rethemed);
+    new MutationObserver(rethemed).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+    let lastW = 0, timer = 0;
+    new ResizeObserver(() => {
+      const w = document.querySelector(".page").clientWidth;
+      if (Math.abs(w - lastW) < 8) return;
+      lastW = w;
+      clearTimeout(timer);
+      timer = setTimeout(update, 120);
+    }).observe(document.querySelector(".page"));
+  }
+
+  readTheme();
+  if (!loadState() || state.slots.size === 0) setTeams(defaultTeams());
+  renderFacts();
+  renderPresets();
+  renderNotes();
+  bind();
+  update();
+})();
+</script>
