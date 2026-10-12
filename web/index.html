@@ -147,6 +147,7 @@ table.data td { font-variant-numeric: tabular-nums; }
 .ai-err { font-size: var(--step--1); color: var(--ink-2); background: var(--accent-soft); padding: 6px 10px; }
 .ai-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
 .ai-off { display: grid; gap: 6px; padding: 14px 16px; background: var(--accent-soft); font-size: var(--step--1); color: var(--ink-2); }
+.ai-off .btn-ghost { justify-self: start; }
 
 /* AI 규칙 */
 .ai-rules-note { font-size: var(--step--1); color: var(--ink-2); }
@@ -849,13 +850,46 @@ ${Period.gov ? "사용자가 '이재명 정부 출범(2025. 6. 4.) 이후'만 �
   };
   let samplePromise = null, toolsOK = false, turns = [], ctl = null, busy = false, disabled = false;
 
-  function offMessage(text) {
+  /** AI를 쓸 수 없을 때: 이유와 할 일을 보여주고 입력을 잠근다. detail 은 원인을 알려줄 때 쓰는 짧은 확인용 표시 */
+  function offMessage(text, { detail = "", action = null } = {}) {
     const box = $("ai-off");
     box.replaceChildren(el("b", null, "AI 질문을 쓸 수 없습니다"), el("span", null, text));
+    if (action) { const b = el("button", "btn-ghost", action.label); b.type = "button"; b.addEventListener("click", action.run); box.appendChild(b); }
+    if (detail) box.appendChild(el("span", "note", `확인용: ${detail}`));
     box.hidden = false;
     disabled = true;
     $("ai-send").disabled = true;
     $("ai-q").disabled = true;
+    $("ai-q").placeholder = "이 화면에서는 AI 질문을 쓸 수 없습니다 (위 안내 참고). 검색 탭은 그대로 쓸 수 있습니다.";
+  }
+  const use = (name) => (window.claude && typeof window.claude.use === "function" ? window.claude.use(name).catch(() => null) : Promise.resolve(null));
+  const framed = () => { try { return window.top !== window.self; } catch { return true; } };
+  /** 권한 메뉴를 연다 (막아 둔 허용을 다시 켜는 곳). 열리지 않으면 메뉴 위치를 알려준다 */
+  async function openPermissions() {
+    const perms = await use("permissions");
+    try { await perms.manage(); toast("허용했다면 페이지를 새로 고쳐 주세요."); }
+    catch { toast("페이지 위쪽의 권한(Permissions) 메뉴에서 Claude 사용을 허용해 주세요."); }
+  }
+  /** Claude를 쓸 수 없는 까닭을 가려 안내한다 (로그인 문제로 단정하지 않는다) */
+  async function explainUnavailable() {
+    const tail = " 검색·키워드 클라우드·관계도·보고서는 그대로 쓸 수 있습니다.";
+    if (!window.claude || typeof window.claude.use !== "function") {
+      offMessage("이 페이지가 Claude 화면 밖에서 열렸습니다. claude.ai(또는 Claude 앱)에서 받은 링크를 다시 열어 주세요." + tail, { detail: "no-runtime" });
+      return;
+    }
+    if (!framed()) {
+      offMessage("페이지가 Claude 화면 밖(따로 연 창·전체 화면)으로 열려 있어 AI를 부를 수 없습니다. claude.ai나 Claude 앱 화면 안에서 링크를 열어 주세요." + tail, { detail: "top-level" });
+      return;
+    }
+    const perms = await use("permissions");
+    const st = perms ? await perms.state("sample").catch(() => "error") : "no-permissions";
+    if (st === "denied") {
+      offMessage("이 페이지가 Claude를 쓰지 못하도록 막혀 있습니다(처음 물을 때 '허용 안 함'을 눌렀거나 조직 설정). 아래 버튼이나 페이지의 권한 메뉴에서 허용한 뒤 새로 고쳐 주세요." + tail,
+        { detail: "sample=denied", action: { label: "권한 설정 열기", run: openPermissions } });
+      return;
+    }
+    offMessage("지금 화면에서는 이 페이지가 Claude를 부를 수 없습니다. claude.ai에 로그인한 상태로 웹 브라우저(크롬·엣지)에서 링크를 열어 보세요. Claude 앱에서 안 되면 앱을 최신으로 업데이트하거나 브라우저로 열면 됩니다. 회사·기관 계정이면 조직 설정으로 막혀 있을 수 있습니다." + tail,
+      { detail: `sample=${st}` });
   }
 
   // ---- 안전한 마크다운(목록·굵게·링크만) → DOM ----
@@ -1074,7 +1108,7 @@ ${Period.gov ? "사용자가 '이재명 정부 출범(2025. 6. 4.) 이후'만 �
       else {
         const [msg, permanent] = ERR[code] || ["연결이 끊겼습니다. 다시 물어보세요.", false];
         body.appendChild(el("p", "ai-err", msg));
-        if (permanent) offMessage(msg);
+        if (permanent) offMessage(msg, code === "not_granted" ? { detail: code, action: { label: "권한 설정 열기", run: openPermissions } } : { detail: code });
       }
     } finally {
       busy = false;
@@ -1095,10 +1129,9 @@ ${Period.gov ? "사용자가 '이재명 정부 출범(2025. 6. 4.) 이후'만 �
     $("ai-q").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); $("ai-form").requestSubmit(); } });
     $("ai-stop").addEventListener("click", () => ctl && ctl.abort());
     $("ai-new").addEventListener("click", () => { if (busy && ctl) ctl.abort(); turns = []; $("ai-log").replaceChildren(); $("ai-new").hidden = true; $("ai-q").focus(); });
-    samplePromise = (window.claude && typeof window.claude.use === "function" ? window.claude.use("sample") : Promise.resolve(null))
-      .catch(() => null)
+    samplePromise = use("sample")
       .then(async (s) => {
-        if (!s) { offMessage("claude.ai에 로그인한 상태에서 이 페이지를 열어야 쓸 수 있습니다. 검색·키워드 클라우드·관계도는 그대로 쓸 수 있습니다."); return null; }
+        if (!s) { await explainUnavailable(); return null; }
         const lim = await s.limits().catch(() => null);
         toolsOK = !!(lim && lim.tools);
         return s;
