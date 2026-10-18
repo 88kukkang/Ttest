@@ -12,6 +12,7 @@ import math
 import os
 import random
 import sys
+import traceback
 import tkinter as tk
 from tkinter import font as tkfont
 from tkinter import messagebox, ttk
@@ -359,6 +360,7 @@ class Dahaengi:
                                 "TkDefaultFont")
 
         self.images = self._load_images()
+        root.iconphoto(True, self.images[("idle", 1)][0])
         self.w = sprites.W * self.scale
         self.h = sprites.H * self.scale
         self.label = tk.Label(root, bg=KEY, bd=0, highlightthickness=0)
@@ -600,5 +602,24 @@ class Dahaengi:
         self.root.mainloop()
 
 
+def selftest(log_path):
+    """빌드 확인용: 창, 말풍선, 설정 창을 띄워 보고 오류가 있으면 종료 코드 1."""
+    errors = []
+    app = Dahaengi()
+    app.root.report_callback_exception = lambda *exc: errors.append("".join(traceback.format_exception(*exc)))
+    app.root.after(1500, app.bubble.dismiss)
+    app.root.after(1600, lambda: app.ring({"hour": 12, "minute": 0, "daily": True,
+                                           "message": "점심 먹을 시간이에요! 맛있게 드세요"}, preview=True))
+    app.root.after(2000, app.open_dialog)
+    app.root.after(12000, app.quit)
+    app.run()
+    with open(log_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(errors) or "ok")
+    sys.exit(1 if errors else 0)
+
+
 if __name__ == "__main__":
-    Dahaengi().run()
+    if len(sys.argv) > 2 and sys.argv[1] == "--selftest":
+        selftest(sys.argv[2])
+    else:
+        Dahaengi().run()

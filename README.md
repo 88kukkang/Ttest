@@ -4,20 +4,29 @@
 
 ![다행이 도트 스프라이트](dahaengi/preview.png)
 
-## 실행 방법 (Windows)
+## 바로 받기 (exe)
+
+👉 **[Dahaengi.exe 다운로드](https://github.com/88kukkang/Ttest/releases/latest/download/Dahaengi.exe)**
+
+받은 파일을 더블클릭하면 바로 실행돼요. 설치나 파이썬은 필요 없어요.
+처음 실행할 때 "Windows의 PC 보호" 창이 뜨면 **추가 정보 → 실행**을 눌러 주세요. (서명되지 않은 개인 제작 프로그램이라 뜨는 경고예요.)
+
+exe는 `dahaengi/` 폴더가 바뀌어 푸시될 때마다 GitHub Actions가 Windows에서 자동으로 빌드해서 [Releases](https://github.com/88kukkang/Ttest/releases)에 올려요.
+
+## 소스로 실행하기 (Windows)
 
 1. [Python 3](https://www.python.org/downloads/)을 설치해요. 설치할 때 **Add python.exe to PATH**를 체크해 주세요.
 2. `dahaengi/run.bat`을 더블클릭해요. (또는 `pythonw dahaengi\dahaengi.py`)
 
 추가 라이브러리는 필요 없어요. 파이썬 기본 tkinter만 써요.
 
-### exe 파일로 만들기
+### 내 PC에서 직접 exe 만들기
 
 `dahaengi/build_exe.bat`을 더블클릭하면 `dahaengi/dist/Dahaengi.exe`가 만들어져요. 이 파일만 있으면 파이썬이 없는 PC에서도 실행돼요.
 
 ### 윈도우 시작할 때 자동 실행
 
-`Win + R` → `shell:startup` 입력 → 열린 폴더에 `run.bat`(또는 `Dahaengi.exe`)의 바로가기를 넣어 두세요.
+`Win + R` → `shell:startup` 입력 → 열린 폴더에 `Dahaengi.exe`(또는 `run.bat`)의 바로가기를 넣어 두세요.
 
 ## 사용법
 
