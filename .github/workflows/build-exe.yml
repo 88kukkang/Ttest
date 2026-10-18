@@ -27,12 +27,14 @@ jobs:
         working-directory: dahaengi
         run: python -m PyInstaller --noconfirm --onefile --noconsole --name Dahaengi --icon icon.ico dahaengi.py
 
-      - name: Smoke test (launch exe, take screenshot)
+      - name: Smoke test (launch exe, drop pet on Notepad, take screenshot)
         working-directory: dahaengi
         shell: pwsh
         timeout-minutes: 3
         run: |
           $log = Join-Path $PWD "selftest.log"
+          Start-Process notepad
+          Start-Sleep -Seconds 2
           $p = Start-Process -FilePath "dist\Dahaengi.exe" -ArgumentList "--selftest", "`"$log`"" -PassThru
           Start-Sleep -Seconds 8
           Add-Type -AssemblyName System.Windows.Forms, System.Drawing

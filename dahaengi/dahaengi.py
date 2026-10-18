@@ -18,6 +18,7 @@ from tkinter import font as tkfont
 from tkinter import messagebox, ttk
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import desktop  # noqa: E402
 import sprites  # noqa: E402
 
 KEY = "#ff00fe"          # 투명 처리용 색
@@ -367,6 +368,8 @@ class Dahaengi:
         self.label.pack()
 
         self.area = work_area(root)
+        self.surface = None       # 서 있는 창 (None이면 작업 표시줄)
+        self.surface_rect = None
         left, _, right, _ = self.area
         self.x = random.randint(left, max(left, right - self.w))
         self.y = self.ground()
@@ -424,7 +427,28 @@ class Dahaengi:
         return images
 
     def ground(self):
+        if self.surface_rect:
+            return self.surface_rect[1] - self.h
         return self.area[3] - self.h
+
+    def foot_x(self):
+        return self.x + 22 * self.scale
+
+    def x_bounds(self):
+        left, _, right, _ = self.area
+        lo, hi = left, right - self.w
+        if self.surface_rect:  # 발이 창 윗변 위에 있는 동안만
+            l, _, r, _ = self.surface_rect
+            m = 22 * self.scale
+            lo = max(lo, l - m + 4 * self.scale)
+            hi = min(hi, r - m - 4 * self.scale)
+        return lo, hi
+
+    def fits(self, rect):
+        """창 윗변에 다행이가 올라설 공간이 있는지 (최대화/전체화면 창은 제외)."""
+        l, t, r, _ = rect
+        return (t - self.h >= self.area[1] and t < self.area[3]
+                and r - l >= 16 * self.scale)
 
     def head_x(self):
         return self.x + (24 if self.dir == 1 else 20) * self.scale
@@ -456,18 +480,22 @@ class Dahaengi:
 
     def tick(self):
         self.t += 1
-        left, _, right, _ = self.area
         st = self.state
+
+        if st in ("walk", "idle", "happy") and self.surface:
+            self.check_surface()
+            st = self.state
 
         if st == "walk":
             if self.stay.get():
                 self.set_idle()
             else:
+                lo, hi = self.x_bounds()
                 self.x += self.dir * self.speed
-                if self.x <= left:
-                    self.x, self.dir = left, 1
-                elif self.x >= right - self.w:
-                    self.x, self.dir = right - self.w, -1
+                if self.x <= lo:
+                    self.x, self.dir = lo, 1
+                elif self.x >= hi:
+                    self.x, self.dir = hi, -1
                 if random.random() < 0.004:
                     self.set_idle()
         elif st == "idle":
@@ -477,9 +505,13 @@ class Dahaengi:
                 if random.random() < 0.5:
                     self.dir = -self.dir
         elif st == "air":
+            prev_bottom = self.y + self.h
             self.vy += self.scale * 0.35
             self.y += self.vy
-            if self.y >= self.ground():
+            hit = self.find_landing(prev_bottom, self.y + self.h) if self.vy > 0 else None
+            if hit:
+                self.surface, self.surface_rect = hit
+            if hit or self.y >= self.ground():
                 self.y, self.vy = self.ground(), 0.0
                 self.set_idle(random.randint(20, 60))
         elif st == "happy":
@@ -496,6 +528,47 @@ class Dahaengi:
 
         self.render()
         self.root.after(TICK_MS, self.tick)
+
+    def fall(self, face="drag"):
+        self.surface = self.surface_rect = None
+        self.state, self.vy, self.air_face = "air", 0.0, face
+
+    def find_landing(self, y0, y1):
+        """이번 틱에 발이 지나간 [y0, y1] 사이에 있는 창 윗변 중 가장 위의 것."""
+        fx = self.foot_x()
+        m = 4 * self.scale
+        wins = desktop.list_windows()
+        best = None
+        for hwnd, r in wins:
+            l, t, rr, _ = r
+            if (y0 <= t <= y1 and l + m <= fx <= rr - m and self.fits(r)
+                    and (best is None or t < best[1][1])
+                    and desktop.visible_at(wins, hwnd, fx, t + 3)):
+                best = (hwnd, r)
+        return best
+
+    def check_surface(self):
+        """서 있는 창을 따라가고, 창이 사라지거나 가려지면 떨어진다."""
+        if self.t % 2 == 0:
+            r = desktop.window_rect(self.surface)
+            if r is None or not self.fits(r):
+                self.fall()
+                return
+            old = self.surface_rect
+            if r != old:
+                if r[2] - r[0] == old[2] - old[0]:  # 창을 옮기면 같이 이동
+                    self.x += r[0] - old[0]
+                self.surface_rect = r
+                self.y = self.ground()
+                lo, hi = self.x_bounds()
+                if hi < lo:
+                    self.fall()
+                    return
+                self.x = min(max(self.x, lo), hi)
+        if self.t % 10 == 5:
+            wins = desktop.list_windows()
+            if not desktop.visible_at(wins, self.surface, self.foot_x(), self.surface_rect[1] + 3):
+                self.fall()
 
     def celebrate(self, seconds):
         if self.state in ("drag", "air"):
@@ -522,6 +595,7 @@ class Dahaengi:
         if not self.dragging and abs(dx) + abs(dy) > 4:
             self.dragging = True
             self.state = "drag"
+            self.surface = self.surface_rect = None
         if self.dragging:
             left, top, right, _ = self.area
             self.x = min(max(sx + dx, left), right - self.w)
@@ -529,11 +603,12 @@ class Dahaengi:
 
     def on_release(self, _e):
         if self.dragging:
-            self.state, self.vy, self.air_face = "air", 0.0, "drag"
+            self.fall()
         elif self.bubble.showing:
             self.bubble.dismiss()
         elif self.state in ("walk", "idle"):
-            self.state, self.vy, self.air_face = "air", -self.scale * 2.4, "happy"
+            self.fall("happy")
+            self.vy = -self.scale * 2.4
         self.press = None
         self.dragging = False
 
@@ -603,18 +678,63 @@ class Dahaengi:
 
 
 def selftest(log_path):
-    """빌드 확인용: 창, 말풍선, 설정 창을 띄워 보고 오류가 있으면 종료 코드 1."""
-    errors = []
+    """빌드 확인용: 창, 말풍선, 설정 창을 띄우고, 열린 창이 있으면 그 위에 떨어뜨려 본다.
+    오류가 있으면 종료 코드 1."""
+    errors, notes = [], []
     app = Dahaengi()
-    app.root.report_callback_exception = lambda *exc: errors.append("".join(traceback.format_exception(*exc)))
-    app.root.after(1500, app.bubble.dismiss)
-    app.root.after(1600, lambda: app.ring({"hour": 12, "minute": 0, "daily": True,
-                                           "message": "점심 먹을 시간이에요! 맛있게 드세요"}, preview=True))
-    app.root.after(2000, app.open_dialog)
-    app.root.after(12000, app.quit)
+    root = app.root
+    root.report_callback_exception = lambda *exc: errors.append("".join(traceback.format_exception(*exc)))
+    root.after(1500, app.bubble.dismiss)
+    root.after(1600, lambda: app.ring({"hour": 12, "minute": 0, "daily": True,
+                                       "message": "점심 먹을 시간이에요! 맛있게 드세요"}, preview=True))
+    root.after(2000, app.open_dialog)
+
+    def start_window_test():
+        wins = desktop.list_windows()
+        notes.append(f"windows: {[desktop.window_class(h) for h, _ in wins]}")
+        target = next((h for h, _ in wins if desktop.window_class(h) == "Notepad"), None)
+        if target is None:
+            notes.append("window test skipped (no Notepad window)")
+            return
+        desktop.place_window(target, 300, 400, 700, 400)
+        root.after(500, lambda: drop(target))
+
+    def drop(target):
+        r = desktop.window_rect(target)
+        notes.append(f"target rect: {r}")
+        app.x = (r[0] + r[2]) // 2 - 22 * app.scale
+        app.y = 50
+        app.fall()
+        root.after(3000, lambda: check_landed(target))
+
+    def check_landed(target):
+        if app.surface != target or int(app.y) != app.surface_rect[1] - app.h:
+            errors.append(f"did not land on window: surface={app.surface} y={app.y} state={app.state}")
+            return
+        notes.append("landed on window")
+        desktop.place_window(target, 420, 520, 700, 400)
+        root.after(1000, lambda: check_follow(target))
+
+    def check_follow(target):
+        r = app.surface_rect
+        if app.surface != target or r[1] < 500 or int(app.y) != r[1] - app.h:
+            errors.append(f"did not follow window: surface={app.surface} rect={r} y={app.y}")
+            return
+        notes.append("followed moved window")
+        desktop.minimize(target)
+        root.after(2000, check_fell)
+
+    def check_fell():
+        if app.surface is not None or int(app.y) != app.area[3] - app.h:
+            errors.append(f"did not fall after minimize: surface={app.surface} y={app.y}")
+            return
+        notes.append("fell to taskbar after minimize")
+
+    root.after(2500, start_window_test)
+    root.after(12000, app.quit)
     app.run()
     with open(log_path, "w", encoding="utf-8") as f:
-        f.write("\n".join(errors) or "ok")
+        f.write("\n".join(notes + errors + ([] if errors else ["ok"])))
     sys.exit(1 if errors else 0)
 
 
