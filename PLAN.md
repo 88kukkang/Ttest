@@ -9,10 +9,8 @@
 
 1. 대한민국 지도를 **정사각형 셀(박스) 격자**로 표현한다. (도트/픽셀 지도 스타일)
 2. 마우스를 지도 위에 올리면 **커서 주변 셀들이 볼록 렌즈(fisheye)처럼 부풀어 오른다.**
-   - 단순 확대(zoom)가 아니라, 커서 가까운 셀일수록 크게 + 바깥으로 밀려나는 **비선형 왜곡**.
-   - 렌즈 가장자리 처리 방식은 두 가지를 모두 구현하고 설정 하나로 전환한다 (3절 참고):
-     - **soft (기본값)**: 효과가 반경 밖까지 살짝 퍼지며 0으로 부드럽게 사라짐 → 경계선이 안 보임
-     - **hard**: 반경 안만 왜곡, 반경 밖은 완전히 그대로 → 돋보기처럼 또렷함
+   - 단순 확대(zoom)가 아니라, 커서 가까운 셀일수록 크게 + 바깥으로 밀려나고,
+     렌즈 반경 밖의 셀은 원래 자리 그대로 있는 **비선형 왜곡**.
    - 커서를 움직이면 렌즈가 **부드럽게 따라온다** (보간/애니메이션).
    - 지도 밖으로 나가면 렌즈가 **서서히 사라지며 원래 모양으로 복귀**한다.
 3. **나중에 기능(데이터 색칠, 클릭, 툴팁 등)을 붙이기 쉬운 구조**로 만든다.
@@ -134,91 +132,41 @@ CDN 예시 (버전 고정):
 - ✅ 완료 조건: 첨부 이미지처럼 남한 + 제주도 모양의 박스 지도가 보인다.
 
 ### Phase 3 — 피시아이 수학 (`fisheye.js`)
-렌즈 함수는 **두 종류**를 만들고, 둘 다 같은 형태로 동작하게 한다:
-`apply(px, py, fx, fy, strength) → { x, y, z }`
-(px,py = 원래 점, fx,fy = 렌즈 중심, strength = 0~1 페이드 값, z = 크기 배율)
-
-```js
-export function createLens(config) {
-  return config.LENS_FALLOFF === "soft" ? createSoftLens(config) : createHardLens(config);
-}
-```
-
-#### 3-1. soft 렌즈 (기본값) — 반경 밖까지 부드럽게 퍼짐
-효과가 렌즈 중심에서 최대이고, `반경 × SOFT_SPREAD` 거리에서 **정확히 0**이 된다.
-가장자리에서 기울기도 0이라 경계선이 전혀 보이지 않는다.
-
-```js
-// R: 렌즈 반경(px). 효과가 대략 절반으로 줄어드는 지점 ≈ R
-// spread: 효과가 완전히 0이 되는 거리 = R * spread (기본 2)
-// amount: 중심 확대량. 중심 배율 = 1 + amount (기본 1.0 → 2배)
-export function createSoftLens({ LENS_RADIUS, SOFT_SPREAD, SOFT_AMOUNT }) {
-  const outer = LENS_RADIUS * SOFT_SPREAD;
-  const A = Math.min(SOFT_AMOUNT, 1.2); // ⚠️ 1.25 이상이면 셀 순서가 뒤집혀 꼬임 → 상한 고정
-
-  return function apply(px, py, fx, fy, strength = 1) {
-    const dx = px - fx, dy = py - fy;
-    const d = Math.hypot(dx, dy);
-    if (d >= outer || strength <= 0) return { x: px, y: py, z: 1 };
-
-    const t = d / outer;              // 0(중심) ~ 1(효과 끝)
-    const w = (1 - t * t) ** 2;       // 1 → 0 으로 매끄럽게 감소 (끝에서 기울기 0)
-    const s = 1 + A * strength * w;   // 이 위치의 확대 비율
-
-    return { x: fx + dx * s, y: fy + dy * s, z: s };
-  };
-}
-```
-
-- 위치: 중심에서 바깥으로 `s`배 밀려남 → 중심부는 벌어지고, 반경 바깥쪽(대략 R~2R 구간)은
-  살짝 압축되며 흡수됨. 이게 "반경 밖까지 살짝 퍼지는" 느낌을 만든다.
-- 크기: `z = s` 를 그대로 사용 → 셀 크기가 주변 간격과 자연스럽게 맞음.
-- `strength`를 A에 곱하므로 등장/퇴장 페이드가 따로 필요 없다.
-- `outer` 밖의 셀은 **계산 자체를 건너뛴다** → 지도 전체가 꿈틀거리지 않고 성능도 좋음.
-
-#### 3-2. hard 렌즈 — 반경 안만 왜곡
 d3 공식 fisheye 플러그인(“circular fisheye”, Sarkar & Brown 계열)과 같은 공식을 쓴다.
 
 ```js
 // radius: 렌즈 반경(px), distortion: 왜곡 강도(예: 3)
-export function createHardLens({ LENS_RADIUS: radius, DISTORTION: distortion, MAX_Z }) {
+export function createFisheye(radius, distortion) {
   const e  = Math.exp(distortion);
   const k0 = (e / (e - 1)) * radius;
   const k1 = distortion / radius;
 
-  return function apply(px, py, fx, fy, strength = 1) {
+  // 반환: 왜곡된 위치(x, y)와 크기 배율(z)
+  return function apply(px, py, fx, fy) {
     const dx = px - fx, dy = py - fy;
     const dd = Math.hypot(dx, dy);
-    if (dd >= radius || strength <= 0) return { x: px, y: py, z: 1 }; // 렌즈 밖: 그대로
-    const k = dd === 0
-      ? MAX_Z                                                         // 초점 정중앙
-      : (k0 * (1 - Math.exp(-dd * k1))) / dd * 0.75 + 0.25;
-    const r = { x: fx + dx * k, y: fy + dy * k, z: Math.min(k, MAX_Z) };
-    // strength 0~1 페이드: 원래 값과 선형 보간
-    return {
-      x: px + (r.x - px) * strength,
-      y: py + (r.y - py) * strength,
-      z: 1 + (r.z - 1) * strength,
-    };
+    if (dd === 0)       return { x: px, y: py, z: MAX_Z };     // 초점 정중앙
+    if (dd >= radius)   return { x: px, y: py, z: 1 };         // 렌즈 밖: 그대로
+    const k = (k0 * (1 - Math.exp(-dd * k1))) / dd * 0.75 + 0.25;
+    return { x: fx + dx * k, y: fy + dy * k, z: Math.min(k, MAX_Z) };
   };
 }
 ```
 
-- `k > 1` 이면 바깥으로 밀려나고(=부풀어 보임), 반경 경계에서는 `k → 1`이 되어 위치는 이어진다.
-  단, 경계 안쪽에 셀이 몰리고 바깥은 꿈쩍 안 해서 **원형 경계선이 눈에 보이는 편**이다.
-
-#### 3-3. 공통
-- 셀 그리기 크기 = `CELL_SIZE * CELL_FILL * z`, 중심 = `(x, y)`.
+- `k > 1` 이면 바깥으로 밀려나고(=부풀어 보임), 반경 경계에서는 `k → 1`이 되어 **렌즈 밖과 이음매 없이** 이어진다.
+- **강도(strength) 0~1 페이드:** 렌즈 등장/퇴장 시엔 결과를 원래 값과 선형 보간한다.
+  ```js
+  x' = px + (r.x - px) * strength;  y' = py + (r.y - py) * strength;
+  z' = 1  + (r.z - 1)  * strength;
+  ```
+- 셀 그리기 크기 = `CELL_SIZE * CELL_FILL * z'`, 중심 = `(x', y')`.
 - ⚠️ 주의: 위치와 크기를 각각 왜곡하므로 렌즈 중심부에서 셀끼리 살짝 겹칠 수 있다.
   겹치는 게 거슬리면 아래 "대안 B"를 쓴다.
   - **대안 B (더 정확):** 셀의 **네 꼭짓점을 각각** 왜곡해서 사각형(사다리꼴) 경로로 그린다.
     `ctx.beginPath(); moveTo(c0); lineTo(c1); lineTo(c2); lineTo(c3); closePath(); fill();`
     → 셀들이 절대 겹치지 않고 진짜 볼록렌즈처럼 휘어 보임. 연산은 4배지만 셀 수천 개면 문제없음.
   - 기본은 대안 A(중심+배율)로 만들고, `config.MODE = "center" | "corners"` 로 전환 가능하게.
-- ✅ 완료 조건: 콘솔에서 두 렌즈 모두 확인
-  - hard: `반경` 밖 = 원래 좌표, 중심 근처 = z > 1
-  - soft: `반경 × SOFT_SPREAD` 밖 = 원래 좌표, 그 안쪽은 거리가 멀어질수록 z가 1로 매끄럽게 감소
-  - 둘 다 strength = 0 이면 모든 점이 원래 좌표
+- ✅ 완료 조건: 콘솔에서 `apply`에 몇 가지 값을 넣어 반경 밖 = 원래 좌표, 중심 근처 = z > 1 확인.
 
 ### Phase 4 — 인터랙션 + 애니메이션 루프 (`interaction.js`, `main.js`)
 - **Pointer Events** 사용(마우스/터치/펜 통합): `pointermove`, `pointerleave`, `pointerdown`.
@@ -234,9 +182,7 @@ export function createHardLens({ LENS_RADIUS: radius, DISTORTION: distortion, MA
 - **최적화:** strength ≈ 0 이고 변화가 없으면 다시 그리지 않음(idle 시 CPU 0%).
 - 처음 진입 시 렌즈가 (0,0)에서 날아오지 않도록, strength가 0일 때 들어온 첫 이동은 `x = targetX`로 바로 점프.
 - **그리기 순서:** 확대된 셀이 위로 오도록 `z` 오름차순으로 정렬해서 그리거나,
-  렌즈 영향 범위 안 셀만 따로 모아 마지막에 그린다(더 빠름).
-  영향 범위 = soft면 `LENS_RADIUS × SOFT_SPREAD`, hard면 `LENS_RADIUS`.
-- **디버그 토글:** 키보드 `L` 키로 `LENS_FALLOFF`를 soft ↔ hard 전환 (비교용, 화면 구석에 현재 모드 작게 표시).
+  렌즈 반경 안 셀만 따로 모아 마지막에 그린다(더 빠름).
 - **호버 셀 하이라이트(선택):** 렌즈 중심에 가장 가까운 셀 1개를 노란색(`#e5d400`, 이미지의 노란 셀)으로 표시.
   → 나중에 툴팁/클릭 기능의 기반이 됨. 현재 호버 셀 id를 `onHover(cell)` 콜백으로 내보낸다.
 - ✅ 완료 조건: 마우스를 움직이면 볼록 렌즈가 부드럽게 따라오고, 밖으로 나가면 스르륵 복귀.
@@ -262,18 +208,9 @@ export const CONFIG = {
   CELL_FILL: 0.82,        // 셀 크기 대비 실제 사각형 비율(틈)
   CELL_RADIUS: 1.5,       // 셀 모서리 둥글기(px), 0이면 각진 사각형
   SAMPLES_PER_CELL: 3,    // 3 → 3x3 샘플링(작은 섬 보존)
-  LENS_RADIUS_CELLS: 9,   // 렌즈 반경 = 셀 크기 x 이 값 (런타임에 LENS_RADIUS(px)로 계산)
-
-  LENS_FALLOFF: "soft",   // "soft"(반경 밖까지 부드럽게 퍼짐) | "hard"(반경 안만)
-
-  // soft 전용
-  SOFT_SPREAD: 2,         // 효과가 0이 되는 거리 = 반경 x 이 값 (1.5~2.5 실험)
-  SOFT_AMOUNT: 1.0,       // 중심 배율 = 1 + 이 값. 최대 1.2 (넘으면 셀이 꼬임)
-
-  // hard 전용
+  LENS_RADIUS_CELLS: 9,   // 렌즈 반경 = 셀 크기 x 이 값
   DISTORTION: 3,          // 왜곡 강도 (2~5 사이 실험)
   MAX_Z: 3,               // 셀 최대 확대 배율 상한
-
   FOLLOW: 0.18,           // 렌즈가 커서 따라가는 속도 (0~1)
   FADE: 0.12,             // 렌즈 등장/퇴장 속도 (0~1)
   MODE: "center",         // "center" | "corners"
@@ -297,11 +234,8 @@ export const CONFIG = {
 ## 8. 테스트 체크리스트 (구현 후 직접 확인)
 
 - [ ] 남한 윤곽, 제주도, (가능하면) 울릉도가 보인다
-- [ ] soft: 원형 경계선이 보이지 않고, 반경 바로 밖 셀들이 살짝 밀려나며 자연스럽게 이어진다
-- [ ] soft: `반경 × SOFT_SPREAD` 밖 셀은 전혀 움직이지 않는다 (지도 전체가 꿈틀거리지 않음)
-- [ ] soft: SOFT_AMOUNT를 최대로 해도 셀 순서가 뒤집히거나 꼬이지 않는다
-- [ ] hard: 렌즈 반경 밖 셀은 전혀 움직이지 않는다
-- [ ] `L` 키로 soft ↔ hard 전환이 즉시 된다
+- [ ] 렌즈 반경 밖 셀은 전혀 움직이지 않는다
+- [ ] 렌즈 경계에서 셀이 "툭" 끊기지 않고 자연스럽게 이어진다
 - [ ] 커서를 빠르게 움직여도 부드럽게 따라온다(끊김 없음, 60fps)
 - [ ] 지도 밖으로 나가면 서서히 원상복구된다
 - [ ] 다시 들어올 때 렌즈가 엉뚱한 곳에서 날아오지 않는다
@@ -324,16 +258,8 @@ export const CONFIG = {
 - 지도 GeoJSON은 southkorea/southkorea-maps 의 시·도 단순화 파일을 data/ 에 저장해서 써.
   못 구하면 PLAN.md 2절의 ASCII 마스크 대체안을 써.
 - fisheye.js 는 DOM에 의존하지 않는 순수 함수로 작성해.
-  soft/hard 렌즈 둘 다 만들고 기본값은 soft.
-- 첨부 이미지는 "완성 모습의 분위기" 참고용이야. 박스 크기·간격, 배경색, 색 톤,
-  노란색 호버 셀, "서울 ●" 라벨 느낌을 참고해.
-  가운데 재생 버튼, 하단 회색 그라데이션, 진행 바는 동영상 캡처라서 생긴 거니까 무시해.
 - 마지막에 로컬에서 실행하는 방법(npx serve 등)을 알려줘.
 ```
-
-> 샘플 이미지: 이미지를 받을 수 있는 모델이면 **같이 올리는 걸 권장**.
-> 계획서만으로도 구현은 되지만, 이미지가 있으면 박스 밀도·색감·여백을 훨씬 비슷하게 맞춘다.
-> 이미지를 못 받는 모델이면 계획서만 줘도 된다 (색상값은 config에 이미 들어 있음).
 
 > 팁: 사용량을 아끼려면 한 번에 다 시키지 말고
 > "Phase 1~2만 먼저 해줘" → 확인 → "Phase 3~4 해줘" → 확인 → "Phase 5" 처럼 나눠서 요청하세요.
