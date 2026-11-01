@@ -1,4 +1,6 @@
-export const CONFIG = {
+window.KMap = window.KMap || {};
+
+KMap.CONFIG = {
   BG: "#efede9",
   CELL_SIZE: 12,          // px, 자동 계산 시 덮어씀
   ROWS_TARGET: 70,        // 지도 세로 방향 셀 개수 목표 (CELL_SIZE 자동 계산용)

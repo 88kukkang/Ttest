@@ -1,8 +1,5 @@
-import { CONFIG } from "./config.js";
-import { buildGrid } from "./grid.js";
-import { createLens, lensReach } from "./fisheye.js";
-import { draw } from "./renderer.js";
-import { createLensController } from "./interaction.js";
+(function () {
+const { CONFIG, buildGrid, createLens, lensReach, draw, createLensController } = window.KMap;
 
 const canvas = document.getElementById("map");
 const hud = document.getElementById("hud");
@@ -17,8 +14,8 @@ let apply = null, reach = 0;
 let hoverId = null;
 let dirty = true;
 
-// 나중 기능(툴팁 등)을 붙일 자리
-export let onHover = (cell) => {};
+// 나중 기능(툴팁 등)을 붙일 자리: KMap.onHover = (cell) => { ... }
+KMap.onHover = (cell) => {};
 
 function rebuildLens() {
   config.LENS_RADIUS = grid.cellSize * config.LENS_RADIUS_CELLS;
@@ -67,7 +64,7 @@ function frame() {
   const id = cell?.id ?? null;
   if (id !== hoverId) {
     hoverId = id;
-    onHover(cell);
+    KMap.onHover(cell);
     updateHud(cell);
     dirty = true;
   }
@@ -92,6 +89,7 @@ new ResizeObserver(() => {
   resizeTimer = setTimeout(() => { if (geojson) resize(); }, 150);
 }).observe(canvas);
 
-geojson = await (await fetch("data/korea-provinces.geo.json")).json();
+geojson = window.KOREA_GEOJSON;
 resize();
 requestAnimationFrame(frame);
+})();

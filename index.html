@@ -9,6 +9,13 @@
 <body>
   <canvas id="map" aria-label="대한민국 격자 지도"></canvas>
   <div id="hud" aria-live="polite"></div>
-  <script type="module" src="src/main.js"></script>
+  <!-- 순서 중요. type="module"/fetch를 안 쓰므로 index.html 더블클릭으로 바로 열림 -->
+  <script src="data/korea-provinces.js"></script>
+  <script src="src/config.js"></script>
+  <script src="src/fisheye.js"></script>
+  <script src="src/grid.js"></script>
+  <script src="src/renderer.js"></script>
+  <script src="src/interaction.js"></script>
+  <script src="src/main.js"></script>
 </body>
 </html>
