@@ -1,0 +1,33 @@
+:root {
+  --bg: #efede9;
+  --hud: #6b6a66;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  overflow: hidden;
+  font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+}
+
+#map {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  touch-action: none; /* 터치로 렌즈를 움직일 때 페이지 스크롤 방지 */
+  cursor: crosshair;
+}
+
+#hud {
+  position: fixed;
+  left: 16px;
+  bottom: 14px;
+  font-size: 12px;
+  color: var(--hud);
+  pointer-events: none;
+  user-select: none;
+  line-height: 1.6;
+}
