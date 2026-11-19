@@ -1,0 +1,438 @@
+<title>행안부가 알린 숫자</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 보도자료 세 장을 오려 붙인 숫자 판. 머리글 → 예산(백 원짜리 동전·천 칸 판) → 지원금 신청 레이스(곡선·시도별 지급 방식) → 인구감소지역의 손님(열다섯 달 막대·사람 그림) → 출처.
+   색은 design/palette.json 팔레트에서 고르고, 밝은 바탕과 어두운 바탕을 함께 둔다. */
+:root {
+  --ground: #eef1ef; --paper: #f9faf8; --ink: #1c2428; --ink-2: #46525a; --muted: #5f6a70; --rule: #c9d1cd; --grid: #dde3df;
+  --grant: #3e6f90; --prog: #d56b41; --base: #928a7f;
+  --f1: #3e6f42; --f2: #4e6aa9; --f3: #903a43; --f4: #8b4d3e;
+  --c1: #3e6f90; --c2: #689daf; --o1: #9b3737; --o2: #d56b41;
+  --p-card: #4e6aa9; --p-mob: #80a15a; --p-paper: #b87b68; --p-pre: #d56b41;
+  --res: #416e59; --vis: #d56b41; --vis-soft: #ebcfa7;
+  --display: "Do Hyeon", "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #141b1f; --paper: #1a2328; --ink: #e9edeb; --ink-2: #bcc6c9; --muted: #98a4a9; --rule: #33424a; --grid: #26333a;
+    --grant: #8eabc9; --prog: #dc8c67; --base: #b6a392;
+    --f1: #91b0a1; --f2: #8eabc9; --f3: #d6b0a7; --f4: #cd9886;
+    --c1: #8eabc9; --c2: #b5c6ce; --o1: #d6b0a7; --o2: #dc8c67;
+    --p-card: #8eabc9; --p-mob: #abc07b; --p-paper: #cd9886; --p-pre: #dc8c67;
+    --res: #91b0a1; --vis: #dc8c67; --vis-soft: #67453c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #141b1f; --paper: #1a2328; --ink: #e9edeb; --ink-2: #bcc6c9; --muted: #98a4a9; --rule: #33424a; --grid: #26333a;
+  --grant: #8eabc9; --prog: #dc8c67; --base: #b6a392;
+  --f1: #91b0a1; --f2: #8eabc9; --f3: #d6b0a7; --f4: #cd9886;
+  --c1: #8eabc9; --c2: #b5c6ce; --o1: #d6b0a7; --o2: #dc8c67;
+  --p-card: #8eabc9; --p-mob: #abc07b; --p-paper: #cd9886; --p-pre: #dc8c67;
+  --res: #91b0a1; --vis: #dc8c67; --vis-soft: #67453c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--ground); }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 16px/1.7 var(--sans); word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 56px; }
+main { max-width: 1100px; margin: 0 auto; display: grid; gap: 60px; }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--muted); }
+:focus-visible { outline: 2px solid var(--prog); outline-offset: 2px; }
+p { margin: 0; }
+h1, h2, h3 { margin: 0; font-weight: 400; text-wrap: balance; }
+h1, h2 { font-family: var(--display); letter-spacing: -0.01em; }
+.num { font-variant-numeric: tabular-nums; }
+.label { font: 500 12px/1.4 var(--mono); letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
+
+.mast { display: grid; gap: 16px; }
+.mast h1 { font-size: clamp(46px, 9vw, 100px); line-height: 1.02; }
+.mast .lede { font-size: clamp(17px, 2.2vw, 20px); color: var(--ink-2); max-width: 40em; }
+.toc { display: flex; flex-wrap: wrap; gap: 8px; }
+.toc a { text-decoration: none; border: 1px solid var(--rule); background: var(--paper); padding: 8px 14px; font-size: 15px; display: inline-flex; gap: 10px; align-items: baseline; }
+.toc a b { font: 400 20px/1 var(--display); }
+.toc a:hover { border-color: var(--ink-2); }
+
+.poster { display: grid; gap: 20px; border-top: 3px solid var(--ink); padding-top: 18px; min-width: 0; }
+.poster h2 { font-size: clamp(32px, 5.4vw, 56px); line-height: 1.1; }
+.claim { font-size: 17px; color: var(--ink-2); max-width: 44em; }
+.claim b { color: var(--ink); }
+.split { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+@media (max-width: 880px) { .split { grid-template-columns: 1fr; } }
+.card { background: var(--paper); border: 1px solid var(--rule); padding: 18px; display: grid; gap: 12px; min-width: 0; }
+.chart svg { display: block; width: 100%; height: auto; }
+.chart svg text { font-family: var(--sans); }
+.hint { font-size: 13px; color: var(--muted); }
+.src { font-size: 13px; color: var(--muted); }
+.src a { color: var(--ink-2); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--ink-2); width: fit-content; }
+.seg button { font: 500 14px var(--sans); background: var(--paper); color: var(--ink-2); border: 0; padding: 8px 14px; cursor: pointer; min-height: 38px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13.5px; color: var(--ink-2); }
+.legend span { display: inline-flex; gap: 7px; align-items: center; }
+.legend i { width: 12px; height: 12px; display: inline-block; border-radius: 2px; }
+
+/* 1. 동전 */
+.coins { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: clamp(4px, 1vw, 10px); max-width: 560px; }
+.coin { aspect-ratio: 1; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--paper), inset 0 0 0 4px rgba(255, 255, 255, 0.18); }
+.big3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 560px) { .big3 { grid-template-columns: 1fr; } }
+.big3 div { border-top: 4px solid; padding-top: 8px; display: grid; gap: 2px; }
+.big3 strong { font: 400 clamp(30px, 4.6vw, 44px)/1.05 var(--display); }
+.big3 span { font-size: 14px; color: var(--ink-2); }
+.items { display: grid; gap: 4px; }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) 5.6em; gap: 10px; align-items: center; font-size: 14px; }
+.item .bar { height: 8px; border-radius: 0 3px 3px 0; grid-column: 1 / -1; }
+.item b { font-weight: 500; }
+.item .v { text-align: right; font: 500 13.5px var(--mono); }
+.item.rest b { color: var(--muted); font-weight: 400; }
+
+/* 2. 레이스 */
+.race-key { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 720px) { .race-key { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.race-key div { border-left: 4px solid; padding: 2px 0 2px 10px; display: grid; }
+.race-key b { font-size: 14.5px; font-weight: 500; }
+.race-key span { font-size: 13px; color: var(--muted); }
+.payrow { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 10px; align-items: center; font-size: 13.5px; }
+.payrow .stack { display: flex; height: 18px; min-width: 0; }
+.payrow .stack i { display: block; height: 100%; }
+.payrow.total { font-weight: 700; }
+.pays { display: grid; gap: 5px; }
+
+/* 3. 생활인구 */
+.people { display: flex; flex-wrap: wrap; gap: 4px; align-items: flex-end; min-height: 70px; }
+.people svg { width: 26px; height: 46px; flex: none; }
+.pick { display: grid; gap: 4px; }
+.pick strong { font: 400 clamp(34px, 5vw, 52px)/1 var(--display); }
+.records { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 560px) { .records { grid-template-columns: 1fr; } }
+.records div { border-top: 1px solid var(--rule); padding-top: 8px; display: grid; gap: 2px; }
+.records strong { font: 400 34px/1 var(--display); color: var(--vis); }
+.records span { font-size: 14px; color: var(--ink-2); }
+.bar-hit { cursor: pointer; }
+.bar-hit:focus { outline: none; }
+.bar-hit:focus-visible rect.sel { stroke: var(--ink); stroke-width: 2; }
+
+.method { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 10px 20px; border-top: 3px solid var(--ink); padding-top: 18px; font-size: 14.5px; color: var(--ink-2); }
+.method dt { font: 500 12px/2 var(--mono); color: var(--muted); letter-spacing: 0.06em; }
+.method dd { margin: 0; max-width: 62em; }
+@media (max-width: 560px) { .method { grid-template-columns: 1fr; gap: 2px; } .method dd { margin-bottom: 10px; } }
+.loading { color: var(--muted); }
+</style>
+
+<main>
+  <header class="mast">
+    <h1>행안부가 알린 숫자</h1>
+    <p class="lede">보도자료는 정부가 직접 내놓는 숫자의 기록입니다. 예산이 어디로 가는지, 지원금이 얼마나 빨리 나갔는지, 인구가 줄어드는 지역에 누가 머물다 갔는지를 행안부가 발표한 숫자 그대로 그렸습니다.</p>
+    <nav class="toc" aria-label="세 장">
+      <a href="#budget"><b>84조</b>예산은 어디로</a>
+      <a href="#race"><b>열흘</b>지원금 신청 레이스</a>
+      <a href="#life"><b>5.8배</b>인구감소지역의 손님</a>
+    </nav>
+  </header>
+
+  <!-- 1. 예산 -->
+  <section class="poster" id="budget" aria-labelledby="h-budget">
+    <span class="label">예산 · 2027년 정부안</span>
+    <h2 id="h-budget">행안부 예산 100원 가운데 91원은 지방으로 간다</h2>
+    <p class="claim" id="b-claim"></p>
+    <div class="split">
+      <div class="card">
+        <span class="label">행안부 예산을 100원으로 줄이면</span>
+        <div class="coins" id="coins" role="img"></div>
+        <div class="legend" id="coin-legend"></div>
+      </div>
+      <div class="big3" id="big3" style="align-self:center"></div>
+    </div>
+    <div class="split">
+      <div class="card">
+        <span class="label">나머지 9원 · 사업비 <span id="prog-n"></span></span>
+        <div class="chart" id="fields"></div>
+        <div class="seg" id="field-seg" role="group" aria-label="분야 고르기"></div>
+        <div class="items" id="items"></div>
+        <p class="hint">보도자료가 분야마다 소개한 주요 사업입니다. 나머지는 ‘그 밖의 사업’으로 묶었습니다.</p>
+      </div>
+      <div class="card">
+        <span class="label">세 해의 본예산과 추경</span>
+        <div class="chart" id="years"></div>
+        <p class="hint" id="years-note"></p>
+      </div>
+    </div>
+    <p class="src" id="b-src"></p>
+  </section>
+
+  <!-- 2. 레이스 -->
+  <section class="poster" id="race" aria-labelledby="h-race">
+    <span class="label">지원금 · 신청 현황 보도참고자료</span>
+    <h2 id="h-race">5천만 명이 열흘 만에 신청했다</h2>
+    <p class="claim" id="r-claim"></p>
+    <div class="race-key" id="race-key"></div>
+    <div class="card">
+      <div class="seg" id="race-seg" role="group" aria-label="기간 고르기">
+        <button type="button" aria-pressed="true" data-x="14">첫 2주</button>
+        <button type="button" aria-pressed="false" data-x="70">마감까지</button>
+      </div>
+      <div class="chart" id="race-chart"><p class="loading">자료를 불러오는 중…</p></div>
+      <p class="hint">점 하나가 행안부가 발표한 신청률 하나이고(속이 빈 점은 2차), 발표가 사흘 넘게 없던 구간은 점선으로 이었습니다. 오른쪽 숫자는 그 기간 안의 마지막 발표값입니다. 신청 첫날 오전 9시를 0일로 맞췄습니다. 첫 주에는 출생연도 끝자리로 신청 요일을 나눈 요일제가 있었습니다.</p>
+    </div>
+    <div class="card">
+      <span class="label">어떻게 받았나 · 시도별 지급 방식 (신청자 수 기준)</span>
+      <div class="seg" id="pay-seg" role="group" aria-label="지원금 고르기"></div>
+      <div class="legend" id="pay-legend"></div>
+      <div class="pays" id="pays"></div>
+      <p class="hint" id="pay-note"></p>
+    </div>
+    <p class="src" id="r-src"></p>
+  </section>
+
+  <!-- 3. 생활인구 -->
+  <section class="poster" id="life" aria-labelledby="h-life">
+    <span class="label">생활인구 · 89개 인구감소지역</span>
+    <h2 id="h-life">주민 한 명이 사는 곳에 손님이 다섯 명 다녀간다</h2>
+    <p class="claim" id="l-claim"></p>
+    <div class="split">
+      <div class="card">
+        <span class="label">달마다의 생활인구 (만 명) · 막대를 누르면 그 달</span>
+        <div class="chart" id="months"></div>
+        <div class="legend"><span><i style="background:var(--res)"></i>등록인구(주민)</span><span><i style="background:var(--vis)"></i>체류인구(머물다 간 사람)</span></div>
+      </div>
+      <div class="card pick" aria-live="polite">
+        <span class="label" id="pick-when"></span>
+        <strong id="pick-x"></strong>
+        <span id="pick-txt" style="color:var(--ink-2)"></span>
+        <div class="people" id="people" aria-hidden="true"></div>
+        <span class="hint" id="pick-note"></span>
+      </div>
+    </div>
+    <div>
+      <span class="label">손님이 가장 많았던 곳 · 주민 한 명당</span>
+      <div class="records" id="records" style="margin-top:8px"></div>
+    </div>
+    <p class="src" id="l-src"></p>
+  </section>
+
+  <dl class="method">
+    <dt>자료</dt>
+    <dd>직접 만든 <a href="https://claude.ai/artifact/AZYidBSeAFxTHH5CZjY7XW" target="_blank" rel="noopener">행안부 보도자료 DB</a>의 첨부 원문입니다. 숫자는 모두 보도자료 본문과 표에 실린 값을 그대로 읽었고, 각 장 아래에 근거 보도자료를 달았습니다. 보도자료의 숫자는 행안부가 발표한 값이므로, 원 통계(예산서, 국가데이터처 생활인구 통계표)와 반올림이나 갱신 시점이 다를 수 있습니다.</dd>
+    <dt>예산</dt>
+    <dd>2025·2026년은 국회 확정 본예산, 2027년은 국회 심의 전 정부안입니다. 사업비의 분야와 주요 사업은 2027년 예산안 보도자료의 ‘예산안 주요 사업 개요’입니다. 추경은 국회에서 확정된 행안부 추가경정예산 규모입니다.</dd>
+    <dt>지원금 신청률</dt>
+    <dd>신청 현황 보도참고자료의 “○○시 기준” 신청률입니다. 고유가 피해지원금은 1차(취약계층)와 2차(국민 70%)의 대상자별 신청률을 따로 그렸고, 2차 첫날(5. 18.)은 보도자료에 2차 대상자 신청률이 없어 표의 누계에서 1차 대상자 몫을 빼 계산했습니다. 지급 방식은 마감 보도자료의 시도별 표에서 신청자 수로 나눈 비율입니다. 2026년 7월 표의 ‘구광주’·‘구전남’은 광주·전남으로 적었습니다.</dd>
+    <dt>생활인구</dt>
+    <dd>생활인구는 등록인구(주민등록·외국인등록)와 체류인구(한 달에 하루 3시간 이상 머문 사람)의 합으로, 국가데이터처의 실험적 통계입니다. 달마다의 생활인구는 분기 발표 보도자료 본문의 “○월 약 ○천○백만 명”이고, 2026년 등록인구와 배수는 보도자료 표의 값입니다. 2025년 등록인구는 보도자료의 ‘약 485만 명’으로 그렸습니다. 2025년 1분기는 DB에 해당 보도자료가 없어 비워 두었습니다.</dd>
+  </dl>
+</main>
+
+<script>
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const s = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+  const fmt = (n, d = 0) => n.toLocaleString("ko-KR", { maximumFractionDigits: d, minimumFractionDigits: d });
+  const kdate = (iso) => { const [y, m, d] = iso.split("-").map(Number); return `${y}. ${m}. ${d}.`; };
+  const won = (e) => { const jo = Math.floor(e / 1e4), ek = Math.round(e - jo * 1e4); return jo ? `${jo}조${ek ? ` ${fmt(ek)}억` : ""} 원` : `${fmt(ek)}억 원`; };
+  const jo1 = (e) => `${fmt(e / 1e4, 1)}조`;
+  const URL0 = "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=";
+  let T = {};
+  const src = (ids) => "근거 보도자료: " + ids.map((id) => T[id] ? `<a href="${URL0}${id}" target="_blank" rel="noopener">${T[id][1]}</a> (${kdate(T[id][0])})` : "").filter(Boolean).join(" · ");
+  let D;
+  const draws = [];
+  fetch("data2.json").then((r) => r.json()).then((d) => { D = d; T = d.titles; budget(); race(); life(); }).catch(() => {
+    document.querySelectorAll(".loading").forEach((e) => (e.textContent = "자료를 불러오지 못했습니다. 페이지를 새로 고쳐 보세요."));
+  });
+  const mq = matchMedia("(prefers-color-scheme: dark)");
+  const redraw = () => draws.forEach((f) => f());
+  mq.addEventListener?.("change", redraw);
+  new MutationObserver(redraw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(redraw, 150); });
+
+  /* ---------- 1. 예산 ---------- */
+  function budget() {
+    const B = D.budget, b = B["2027"];
+    const pg = (v) => (100 * v) / b.total;
+    const g = pg(b.grant), p = pg(b.prog), e = pg(b.base);
+    const b26 = B["2026"];
+    document.getElementById("b-claim").innerHTML =
+      `2027년 행안부 예산 정부안은 <b>${won(b.total)}</b>으로 올해보다 ${fmt(100 * (b.total / b26.total - 1), 1)}% 많습니다. 하지만 행안부가 직접 쓰는 돈은 많지 않습니다. <b>${won(b.grant)}(${fmt(g, 1)}%)</b>이 지방교부세로, 내국세의 정해진 몫을 지방정부에 나눠 주는 돈입니다. 행안부의 사업비는 ${won(b.prog)}, 100원으로 치면 ${fmt(p, 1)}원입니다.`;
+    // 동전 100개: 반올림해 91·8·1
+    const n = [Math.round(g), Math.round(p)]; n.push(100 - n[0] - n[1]);
+    const box = document.getElementById("coins"); box.setAttribute("aria-label", `100원 중 지방교부세 ${n[0]}원, 사업비 ${n[1]}원, 인건비·기본경비 ${n[2]}원`);
+    const kinds = [["--grant", "지방교부세"], ["--prog", "사업비"], ["--base", "인건비·기본경비"]];
+    let html = ""; kinds.forEach(([c], i) => { for (let j = 0; j < n[i]; j++) html += `<span class="coin" style="background:var(${c})"></span>`; });
+    box.innerHTML = html;
+    document.getElementById("coin-legend").innerHTML = kinds.map(([c, t], i) => `<span><i style="background:var(${c});border-radius:50%"></i>${t} ${n[i]}원</span>`).join("");
+    document.getElementById("big3").innerHTML = [[b.grant, "--grant", "지방교부세", "지방정부가 알아서 쓰는 돈"], [b.prog, "--prog", "사업비", "행안부가 사업을 정해 쓰는 돈"], [b.base, "--base", "인건비·기본경비", "행안부 공무원 월급과 운영비"]]
+      .map(([v, c, t, d]) => `<div style="border-color:var(${c})"><strong class="num">${jo1(v)}</strong><span><b>${t}</b> · ${d}</span></div>`).join("");
+    document.getElementById("prog-n").textContent = won(b.prog);
+
+    // 분야 띠
+    const F = B.fields2027, FC = ["--f1", "--f2", "--f3", "--f4"];
+    let cur = 0;
+    const seg = document.getElementById("field-seg");
+    seg.innerHTML = F.map((f, i) => `<button type="button" aria-pressed="${i === 0}" data-i="${i}">${f.name}</button>`).join("");
+    seg.querySelectorAll("button").forEach((bt) => (bt.onclick = () => { cur = +bt.dataset.i; seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === bt))); drawF(); }));
+    function drawF() {
+      const el = document.getElementById("fields"); el.innerHTML = "";
+      const W = 600, H = 74, tot = F.reduce((a, f) => a + f.v, 0);
+      const svg = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "사업비 분야별 비율" }, el);
+      let x = 0;
+      F.forEach((f, i) => {
+        const w = (f.v / tot) * W;
+        const r = s("rect", { x, y: 0, width: Math.max(w - 2, 1), height: 40, fill: css(FC[i]), opacity: i === cur ? 1 : 0.35, style: "cursor:pointer" }, svg);
+        r.addEventListener("click", () => seg.querySelectorAll("button")[i].click());
+        const t1 = s("text", { x: x + 6, y: 58, fill: css("--ink"), "font-size": 13, "font-weight": i === cur ? 700 : 400 }, svg); t1.textContent = w > 110 ? f.name : f.name.slice(0, 2);
+        const t2 = s("text", { x: x + 6, y: 72, fill: css("--muted"), "font-size": 12, "font-family": "IBM Plex Mono, monospace" }, svg); t2.textContent = jo1(f.v);
+        x += w;
+      });
+      const f = F[cur], rest = f.v - f.items.reduce((a, it) => a + it.v, 0), mx = Math.max(...f.items.map((i) => i.v), rest);
+      const rows = f.items.slice().sort((a, b2) => b2.v - a.v).concat(rest > 1 ? [{ name: "그 밖의 사업", v: rest, rest: true }] : []);
+      document.getElementById("items").innerHTML = rows.map((it) => `<div class="item${it.rest ? " rest" : ""}"><b>${it.name}</b><span class="v">${won(it.v).replace(" 원", "")}</span><span class="bar" style="width:${(it.v / mx) * 100}%;background:var(${FC[cur]});opacity:${it.rest ? 0.4 : 1}"></span></div>`).join("");
+    }
+    drawF(); draws.push(drawF);
+
+    // 세 해
+    function drawY() {
+      const el = document.getElementById("years"); el.innerHTML = "";
+      const Ys = ["2025", "2026", "2027"], sup = { "2025": B.supp.filter((x) => x.date.startsWith("2025")), "2026": B.supp.filter((x) => x.date.startsWith("2026")), "2027": [] };
+      const W = 520, H = 300, L = 44, base = 250, top = 30, max = 1000000;
+      const svg = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "2025~2027년 행안부 본예산과 추경" }, el);
+      const y = (v) => base - (v / max) * (base - top);
+      [0, 20, 40, 60, 80, 100].forEach((j) => { const v = j * 1e4; s("line", { x1: L, x2: W - 10, y1: y(v), y2: y(v), stroke: css("--grid") }, svg); const t = s("text", { x: L - 8, y: y(v) + 4, "text-anchor": "end", fill: css("--muted"), "font-size": 12, "font-family": "IBM Plex Mono, monospace" }, svg); t.textContent = j ? `${j}조` : "0"; });
+      const bw = 64, gap = (W - L - 10) / 3;
+      Ys.forEach((yr, i) => {
+        const b0 = B[yr], x = L + gap * i + (gap - bw * 1.6) / 2;
+        let acc = 0;
+        [[b0.grant, "--grant"], [b0.prog, "--prog"], [b0.base, "--base"]].forEach(([v, c]) => { s("rect", { x, y: y(acc + v), width: bw, height: y(acc) - y(acc + v), fill: css(c) }, svg); acc += v; });
+        const supT = sup[yr].reduce((a, x2) => a + x2.v, 0);
+        if (supT) {
+          s("rect", { x: x + bw + 12, y: y(supT), width: bw * 0.55, height: base - y(supT), fill: "none", stroke: css("--prog"), "stroke-width": 1.6, "stroke-dasharray": "4 3" }, svg);
+          const ts = s("text", { x: x + bw + 12 + bw * 0.275, y: y(supT) - 6, "text-anchor": "middle", fill: css("--ink-2"), "font-size": 12 }, svg); ts.textContent = `추경 ${jo1(supT)}`;
+        }
+        const tv = s("text", { x: x + bw / 2, y: y(b0.total) - 8, "text-anchor": "middle", fill: css("--ink"), "font-size": 15, "font-weight": 700 }, svg); tv.textContent = jo1(b0.total);
+        const tl = s("text", { x: x + bw / 2, y: base + 20, "text-anchor": "middle", fill: css("--ink"), "font-size": 14 }, svg); tl.textContent = yr;
+        const tl2 = s("text", { x: x + bw / 2, y: base + 38, "text-anchor": "middle", fill: css("--muted"), "font-size": 12 }, svg); tl2.textContent = b0.label.slice(5);
+      });
+    }
+    drawY(); draws.push(drawY);
+    const s25 = B.supp.filter((x) => x.date.startsWith("2025")).reduce((a, x) => a + x.v, 0);
+    document.getElementById("years-note").innerHTML = `사업비는 2025년 ${jo1(B["2025"].prog)}에서 2026년 ${jo1(B["2026"].prog)}으로 ${fmt(100 * (B["2026"].prog / B["2025"].prog - 1))}% 늘었습니다. 2025년에는 추경이 두 번(${B.supp.filter((x) => x.date.startsWith("2025")).map((x) => jo1(x.v)).join(", ")}) 있었고, 합치면 ${jo1(s25)}입니다. 2026년 추경은 ${jo1(B.supp.find((x) => x.date.startsWith("2026")).v)}입니다. 점선 막대가 추경입니다.`;
+    document.getElementById("b-src").innerHTML = src([B["2025"].ntt, B["2026"].ntt, b.ntt, ...B.supp.map((x) => x.ntt)]);
+  }
+
+  /* ---------- 2. 레이스 ---------- */
+  function race() {
+    const R = D.race, S = R.series, M = R.meta, K = ["c1", "c2", "o1", "o2"], C = { c1: "--c1", c2: "--c2", o1: "--o1", o2: "--o2" };
+    const at = (k, day) => { const a = S[k]; let best = null; a.forEach((p) => { if (p[0] <= day) best = p; }); return best; };
+    const c1 = S.c1, w1 = at("c1", 7), c1end = c1[c1.length - 1];
+    const ten = c1.find((p) => p[1] >= 90);
+    const d1 = K.map((k) => S[k][0][1]), d1min = Math.min(...d1), d1max = Math.max(...d1);
+    const wk = K.map((k) => Math.max(...S[k].filter((p) => p[0] <= 7).map((p) => p[1]))), wkmin = Math.min(...wk), wkmax = Math.max(...wk);
+    document.getElementById("r-claim").innerHTML =
+      `2025년 민생회복 소비쿠폰 1차는 전 국민 ${fmt(M.c1.target / 1e4)}만 명이 대상이었습니다. 신청 첫 주에 <b>${w1[1]}%</b>가 신청했고, <b>${fmt(ten[0], 0)}일째</b>에 ${ten[1]}%를 넘었습니다. 네 번의 지급 모두 첫날 대상자의 <b>${fmt(d1min, 1)}~${fmt(d1max, 1)}%</b>가 신청했고, 일주일 안에 <b>${fmt(wkmin, 1)}~${fmt(wkmax, 1)}%</b>에 닿았습니다. 소비쿠폰 첫 주에는 출생연도 끝자리로 신청 요일을 나눈 요일제가 있어, 평일 닷새 동안 하루 13~15%포인트씩 고르게 올랐습니다.`;
+    document.getElementById("race-key").innerHTML = K.map((k) => { const last = S[k][S[k].length - 1]; return `<div style="border-color:var(${C[k]})"><b><span style="color:var(${C[k]})">${k.endsWith("2") ? "○" : "●"}</span> ${M[k].name}</b><span>${M[k].who} ${fmt(M[k].target / 1e4)}만 명 · 마감 ${last[1]}%</span></div>`; }).join("");
+    let xmax = 14;
+    const seg = document.getElementById("race-seg");
+    seg.querySelectorAll("button").forEach((b) => (b.onclick = () => { xmax = +b.dataset.x; seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); draw(); }));
+    function draw() {
+      const el = document.getElementById("race-chart"); el.innerHTML = "";
+      const narrow = el.clientWidth < 560;
+      const W = narrow ? 420 : 900, H = narrow ? 340 : 380, L = 44, Rt = narrow ? 16 : 220, top = 18, base = H - 40;
+      const svg = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "지원금별 신청 시작 뒤 날짜에 따른 신청률" }, el);
+      const x = (d) => L + (Math.min(d, xmax) / xmax) * (W - L - Rt), y = (v) => base - (v / 100) * (base - top);
+      [0, 25, 50, 75, 100].forEach((v) => { s("line", { x1: L, x2: W - Rt, y1: y(v), y2: y(v), stroke: css("--grid") }, svg); const t = s("text", { x: L - 8, y: y(v) + 4, "text-anchor": "end", fill: css("--muted"), "font-size": 12, "font-family": "IBM Plex Mono, monospace" }, svg); t.textContent = v + "%"; });
+      const step = xmax <= 14 ? 2 : 10;
+      for (let d = 0; d <= xmax; d += step) { const t = s("text", { x: x(d), y: base + 18, "text-anchor": "middle", fill: css("--muted"), "font-size": 12, "font-family": "IBM Plex Mono, monospace" }, svg); t.textContent = d; }
+      const tl = s("text", { x: W - Rt, y: base + 34, "text-anchor": "end", fill: css("--muted"), "font-size": 12 }, svg); tl.textContent = "신청 시작 뒤 일수";
+      const ends = [];
+      K.forEach((k) => {
+        // 발표된 점만 잇는다. 보고가 사흘 넘게 비는 구간은 점선으로 그린다.
+        const pts = [[0, 0, null]].concat(S[k]).filter((p) => p[0] <= xmax + 0.01);
+        const hollow = k === "c2" || k === "o2";
+        for (let i = 1; i < pts.length; i++) {
+          const a = pts[i - 1], b = pts[i];
+          s("line", { x1: x(a[0]), y1: y(a[1]), x2: x(b[0]), y2: y(b[1]), stroke: css(C[k]), "stroke-width": 2.6, "stroke-linecap": "round", "stroke-dasharray": b[0] - a[0] > 3 ? "3 5" : "" }, svg);
+        }
+        const lp = pts[pts.length - 1]; ends.push([k, lp[1], lp[0]]);
+        pts.slice(1).forEach((p) => {
+          const c = s("circle", { cx: x(p[0]), cy: y(p[1]), r: 4.4, fill: hollow ? css("--paper") : css(C[k]), stroke: hollow ? css(C[k]) : css("--paper"), "stroke-width": hollow ? 2.2 : 1.5 }, svg);
+          const tt = s("title", {}, c); tt.textContent = `${M[k].name} · ${kdate(p[3])} ${p[4]}시 기준 ${p[1]}%${p[5] ? " (표에서 계산)" : ""}`;
+        });
+      });
+      if (!narrow) {
+        ends.sort((a, b) => b[1] - a[1]); let last = -99;
+        ends.forEach(([k, v, dd]) => { let yy = y(v); if (yy - last < 18) yy = last + 18; last = yy; const t = s("text", { x: W - Rt + 8, y: yy + 4, fill: css(C[k]), "font-size": 13, "font-weight": 700 }, svg); t.textContent = `${M[k].name} ${fmt(v, 1)}% (${fmt(dd, 0)}일)`; });
+      }
+    }
+    draw(); draws.push(draw);
+
+    // 지급 방식
+    const P = R.pay, PK = [["c1", "소비쿠폰 1차"], ["c2", "소비쿠폰 2차"], ["o", "고유가 피해지원금"]];
+    const PC = [["--p-card", "신용·체크카드"], ["--p-mob", "지역사랑상품권(모바일·카드)"], ["--p-paper", "지역사랑상품권(지류)"], ["--p-pre", "선불카드"]];
+    document.getElementById("pay-legend").innerHTML = PC.map(([c, t]) => `<span><i style="background:var(${c})"></i>${t}</span>`).join("");
+    let pk = "c1"; const ps = document.getElementById("pay-seg");
+    ps.innerHTML = PK.map(([k, t]) => `<button type="button" aria-pressed="${k === pk}" data-k="${k}">${t}</button>`).join("");
+    ps.querySelectorAll("button").forEach((b) => (b.onclick = () => { pk = b.dataset.k; ps.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); drawPay(); }));
+    function drawPay() {
+      const rows = P[pk].rows; const order = Object.keys(rows).filter((k) => k !== "계").sort((a, b) => rows[b][1] / rows[b][0] - rows[a][1] / rows[a][0]);
+      const bar = (r) => [1, 2, 3, 4].map((i, j) => `<i style="width:${(100 * r[i]) / r[0]}%;background:var(${PC[j][0]})" title="${PC[j][1]} ${fmt((100 * r[i]) / r[0], 1)}%"></i>`).join("");
+      document.getElementById("pays").innerHTML = [["계", "전국"]].concat(order.map((k) => [k, k])).map(([k, n]) => `<div class="payrow${k === "계" ? " total" : ""}" aria-label="${n}: 카드 ${fmt((100 * rows[k][1]) / rows[k][0])}%, 모바일 상품권 ${fmt((100 * rows[k][2]) / rows[k][0])}%, 지류 상품권 ${fmt((100 * rows[k][3]) / rows[k][0])}%, 선불카드 ${fmt((100 * rows[k][4]) / rows[k][0])}%"><span>${n}</span><span class="stack">${bar(rows[k])}</span></div>`).join("");
+      const sh = (k, i) => (100 * rows[k][i]) / rows[k][0];
+      const top = (i) => order.reduce((a, k) => (sh(k, i) > sh(a, i) ? k : a), order[0]);
+      const zero = order.filter((k) => sh(k, 4) < 0.1);
+      document.getElementById("pay-note").innerHTML = `전국으로는 ${fmt(sh("계", 1))}%가 신용·체크카드로 받았습니다. 지역사랑상품권(모바일·카드)은 <b>${top(2)}</b>(${fmt(sh(top(2), 2))}%), 종이 상품권은 <b>${top(3)}</b>(${fmt(sh(top(3), 3))}%), 선불카드는 <b>${top(4)}</b>(${fmt(sh(top(4), 4))}%)이 가장 많았습니다. 선불카드를 거의 내주지 않은 곳도 있습니다(${zero.join("·")}). 지급 수단은 지방정부가 정했습니다.`;
+    }
+    drawPay();
+    const ids = new Set(); K.forEach((k) => S[k].forEach((p) => ids.add(p[2])));
+    document.getElementById("r-src").innerHTML = `근거 보도자료: 신청 현황 보도참고자료 등 ${ids.size}건 (점에 마우스를 올리면 기준 시각이 나옵니다). 지급 방식: ` + src(Object.values(P).map((p) => p.ntt)).replace("근거 보도자료: ", "");
+  }
+
+  /* ---------- 3. 생활인구 ---------- */
+  function life() {
+    const L = D.life, Ms = L.months, REG25 = 485;
+    const pk = L.peak, may = Ms.find((m) => m[0] === "2026-05"), lo = Math.min(...Ms.map((m) => m[1]));
+    document.getElementById("l-claim").innerHTML =
+      `인구가 줄어드는 89개 시군구에 주민으로 등록된 사람은 약 ${fmt(Math.round(may[4] || L.reg2026_5))}만 명입니다. 그런데 한 달에 하루 3시간 이상 머물다 간 사람까지 세면 <b>${fmt(lo)}만~${fmt(pk[1])}만 명</b>이 됩니다. 2026년 5월에는 주민 한 명당 <b>${may[2]}명</b>이 다녀갔고, 추석 연휴가 열흘이던 2025년 10월에는 생활인구가 <b>${fmt(pk[1])}만 명</b>으로 집계 이래 가장 많았습니다.`;
+    let sel = Ms.findIndex((m) => m[0] === "2026-05");
+    function draw() {
+      const el = document.getElementById("months"); el.innerHTML = "";
+      const W = 620, H = 320, Lf = 40, base = 270, top = 20, max = 3600;
+      const svg = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "2025년 4월부터 2026년 6월까지 달마다의 생활인구" }, el);
+      const y = (v) => base - (v / max) * (base - top);
+      [0, 1000, 2000, 3000].forEach((v) => { s("line", { x1: Lf, x2: W, y1: y(v), y2: y(v), stroke: css("--grid") }, svg); const t = s("text", { x: Lf - 6, y: y(v) + 4, "text-anchor": "end", fill: css("--muted"), "font-size": 12, "font-family": "IBM Plex Mono, monospace" }, svg); t.textContent = v ? `${v / 1000}천만` : "0"; });
+      const bw = (W - Lf) / Ms.length;
+      Ms.forEach((m, i) => {
+        const reg = m[4] || REG25, x = Lf + i * bw + 3, w = bw - 6;
+        const g = s("g", { class: "bar-hit", tabindex: 0, role: "button", "aria-label": `${m[0].slice(0, 4)}년 ${+m[0].slice(5)}월 생활인구 ${fmt(m[1])}만 명` }, svg);
+        s("rect", { x: x - 2, y: top, width: w + 4, height: base - top, fill: i === sel ? css("--grid") : "transparent" }, g);
+        s("rect", { x, y: y(m[1]), width: w, height: y(reg) - y(m[1]), fill: css("--vis"), opacity: i === sel ? 1 : 0.78, class: i === sel ? "sel" : "" }, g);
+        s("rect", { x, y: y(reg), width: w, height: base - y(reg), fill: css("--res") }, g);
+        if (i === sel || m[0] === pk[0]) { const t = s("text", { x: x + w / 2, y: y(m[1]) - 6, "text-anchor": "middle", fill: css("--ink"), "font-size": 12, "font-weight": 700, "font-family": "IBM Plex Mono, monospace" }, g); t.textContent = fmt(m[1]); }
+        const mt = s("text", { x: x + w / 2, y: base + 16, "text-anchor": "middle", fill: css(i === sel ? "--ink" : "--muted"), "font-size": 12, "font-weight": i === sel ? 700 : 400 }, g); mt.textContent = +m[0].slice(5);
+        const pickIt = () => { sel = i; draw(); show(); };
+        g.addEventListener("click", pickIt); g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pickIt(); } });
+      });
+      ["2025", "2026"].forEach((yr) => { const i = Ms.findIndex((m) => m[0].startsWith(yr)); const t = s("text", { x: Lf + i * bw + 3, y: base + 36, fill: css("--ink-2"), "font-size": 13, "font-family": "IBM Plex Mono, monospace" }, svg); t.textContent = yr; });
+    }
+    function show() {
+      const m = Ms[sel], reg = m[4] || REG25, ratio = m[2] ?? (m[1] - reg) / reg;
+      document.getElementById("pick-when").textContent = `${m[0].slice(0, 4)}년 ${+m[0].slice(5)}월`;
+      document.getElementById("pick-x").textContent = `주민 1명 : 손님 ${fmt(ratio, 1)}명`;
+      document.getElementById("pick-txt").textContent = `생활인구 ${fmt(m[1])}만 명 = 등록 ${fmt(reg)}만 + 체류 ${fmt(m[1] - reg)}만`;
+      const full = Math.floor(ratio), part = ratio - full;
+      const person = (c, op = 1, clip = 1) => `<svg viewBox="0 0 26 46"><defs><clipPath id="cp${Math.round(clip * 100)}"><rect x="0" y="0" width="${26 * clip}" height="46"/></clipPath></defs><g clip-path="url(#cp${Math.round(clip * 100)})" fill="${c}" opacity="${op}"><circle cx="13" cy="8" r="6.5"/><path d="M3 44 V24 Q3 16 13 16 Q23 16 23 24 V44 Z"/></g></svg>`;
+      let h = person(css("--res"));
+      h += `<span style="width:10px"></span>`;
+      for (let j = 0; j < full; j++) h += person(css("--vis"));
+      if (part > 0.05) h += person(css("--vis"), 1, part);
+      document.getElementById("people").innerHTML = h;
+      document.getElementById("pick-note").textContent = m[2] != null ? "배수는 보도자료에 실린 값입니다." : "이 달은 보도자료에 배수가 없어, 등록인구를 약 485만 명으로 두고 계산했습니다.";
+    }
+    draw(); show(); draws.push(draw); draws.push(show);
+    document.getElementById("records").innerHTML = L.records.map((r) => `<div><strong class="num">${r.x}배</strong><span><b>${r.place}</b> · ${r.when}</span></div>`).join("");
+    document.getElementById("l-src").innerHTML = src([...new Set(Ms.map((m) => m[3]).concat(L.records.map((r) => r.ntt)))]);
+  }
+})();
+</script>
