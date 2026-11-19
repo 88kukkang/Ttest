@@ -1,0 +1,317 @@
+<title>꺼지는 창문</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: one school building per 시도, every window a school that has closed. At dusk all windows are lit; as the replay runs
+   from 1975 to 2026 each window goes dark in the year its school closed. The sky darkens with the count. */
+:root {
+  --paper: #f3f1ec; --card: #fdfcf9; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #dbe1dd; --grid: #e8e7e3; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --accent: #3e6f90; --sky1: #c6d6cc; --sky2: #8eabc9; --night: #2f3b4a; --wall: #ead0b9; --wall2: #d8b29b; --roof: #8b4d3e;
+  --lit: #ebcf7a; --lit2: #f6e3a8; --dark: #4c433e; --frame: #67453c;
+  --kid: #d56b41; --school: #3e6f90; --kid-ink: #a8451f; --school-ink: #3e6f90; --c-hi: #67453c; --c-lo: #ebdac0; --mark: #2f3133;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #8eabc9; --sky1: #3a4a55; --sky2: #2f3b4a; --night: #131820; --wall: #5a5551; --wall2: #4c433e; --roof: #8b4d3e;
+  --lit: #ebcf7a; --lit2: #f6e3a8; --dark: #1d1e1f; --frame: #928a7f;
+  --kid: #dc8c67; --school: #8eabc9; --kid-ink: #dc8c67; --school-ink: #8eabc9; --c-hi: #d8b29b; --c-lo: #3a3431; --mark: #ebeeec; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #8eabc9; --sky1: #3a4a55; --sky2: #2f3b4a; --night: #131820; --wall: #5a5551; --wall2: #4c433e; --roof: #8b4d3e;
+  --lit: #ebcf7a; --lit2: #f6e3a8; --dark: #1d1e1f; --frame: #928a7f;
+  --kid: #dc8c67; --school: #8eabc9; --kid-ink: #dc8c67; --school-ink: #8eabc9; --c-hi: #d8b29b; --c-lo: #3a3431; --mark: #ebeeec; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.yr { background-image: none; font-family: var(--serif); font-size: 26px }
+</style>
+
+<main class="page">
+  <header>
+    <h1>학생이 줄면 학교는 바로 사라질까<span>아니다. 1999년부터 2026년까지 초등학생은 44% 줄었는데 초등학교는 오히려 12% 늘었다. 학교는 아이가 줄어든 곳보다 아이가 새로 생긴 곳을 따라 움직이고, 문을 닫는 일은 정책이 몰아친 해에 한꺼번에 일어났다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 19</dd>
+      <dt>한 줄</dt><dd>교육기본통계로 초등학생은 1999년 393만 5,537명에서 2026년 221만 9,370명으로 43.6% 줄었지만, 초등학교는 5,544곳에서 6,191곳으로 11.7% 늘었다. 서울은 학생이 57% 줄었는데 학교는 529곳에서 609곳이 됐다. 교육청이 아직 가진 폐교 1,216곳 가운데 598곳(49%)은 2000년 전에 문을 닫았고, 1999년 한 해에만 178곳이 닫혔다. 2008–2026년 0–9세 인구가 40% 넘게 준 시군구는 225곳 중 178곳인데, 그중 61곳(서울 대부분)은 2009년 이후 남아 있는 폐교가 하나도 없다. 폐교 1,216곳 중 350곳(28.8%)은 지금도 쓰이지 않는다.</dd>
+      <dt>분류</dt><dd>건강·복지·교육</dd>
+      <dt>본능</dt><dd>직선 본능 · 학생 수가 줄면 그만큼 학교도 곧바로 줄어들 것이라고 여긴다</dd>
+      <dt>그림 방식</dt><dd>꺼지는 창문 · 시도마다 학교 건물을 세우고 창문 하나를 폐교 하나로 삼았다. 1975–2026년을 재생하면 문 닫은 해에 창문의 불이 꺼진다. 아이 수와 학교 수는 갈라지는 두 선, 시군구는 지도 위의 꺼진 창문으로 그렸다</dd>
+      <dt>기간</dt><dd>폐교 1976–2026년 · 학교·학생 1999–2026년 · 0–9세 인구 2008–2026년</dd>
+      <dt>엮은 데이터</dt><dd>3개 · 교육부 전국폐교재산 표준데이터 · 교육부·한국교육개발원 교육기본통계(초등학교 개황) · 행정안전부 시군구 연령별 주민등록 인구</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">서울의 초등학생은 1999년 75만 명에서 2026년 32만 명으로 57% 줄었다. 같은 기간 서울의 초등학교 수는?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>절반쯤으로 줄었다</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>조금 줄었다</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>오히려 늘었다</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. 529곳 → <span class="n">609곳</span></span>
+      학생이 줄어든 오래된 동네의 학교는 대부분 그대로 남고, 새 아파트 단지에는 학교가 새로 생겼다. 학교 한 곳의 학생은 1,425명에서 530명으로 줄었다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">불이 꺼지는 창문</h2>
+      <p>시도마다 학교 건물을 하나씩 세웠다. 창문 하나가 지금 교육청이 가진 폐교 하나다. 재생하면 창문마다 그 학교가 문을 닫은 해에 불이 꺼진다. 1990년대에 불이 우수수 꺼진다. 특히 1999년 한 해에만 178개 창문이 꺼진다. 작은 학교를 합치라는 정부 정책이 몰아친 해다. 2000년대에는 해마다 6–36개, 2020년대에는 15–46개씩 꺼진다.</p>
+      <p>경북(224)·경남(217)·강원(200) 건물의 창문이 가장 많다. 서울 건물의 창문은 여섯 개뿐이고, 모두 2015년 이후에 꺼졌다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">시도별 폐교, 문 닫은 해에 꺼지는 창문</p>
+      <p class="fs">창문 하나 = 폐교 하나(교육청이 지금 가진 것). 노란 창 = 아직 운영 중, 어두운 창 = 문 닫음</p>
+      <div class="player" id="p1"></div>
+      <p class="stat" id="st1" aria-live="polite"></p>
+      <div class="chart" id="c1"></div>
+      <figcaption>교육부 「전국폐교재산기본정보 표준데이터」(시도교육청 제공, 2025–2026년 기준). 이미 팔린 폐교는 목록에 없어, 오래전에 닫은 학교일수록 실제보다 적게 들어 있다. 전남은 옛 전라남도교육청판과 통합교육청판이 겹쳐 최신판만 썼다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">갈라지는 두 선</h2>
+      <p>1999년을 100으로 놓고 초등학생 수와 초등학교 수를 이었다. 학생 선은 2026년 56으로 떨어지고, 학교 선은 112로 올라간다. 학생이 줄어드는 동안 학교는 오히려 늘었다. 같은 학교에 다니는 아이가 줄어든 것이다. 학교 한 곳의 학생은 평균 710명에서 358명으로 반이 됐다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">초등학생 수와 초등학교 수, 1999년 = 100</p>
+      <p class="fs">아래 그림 = 학교 한 곳의 평균 학생(아이 하나 = 20명)</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>교육부·한국교육개발원 「교육기본통계」 초등학교 개황(KOSIS, 해마다 4월 1일). 1999·2005·2010·2015·2020·2026년.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">시도마다 다른 방향</h2>
+      <p>시도마다 1999년부터 2026년까지 학생 수와 학교 수가 얼마나 변했는지 찍었다. 모든 시도에서 학생이 줄었다(가로는 모두 0보다 왼쪽). 그런데 특별·광역시 일곱 곳과 경기·제주·충남(세종 포함)은 학교가 늘었고(위쪽), 경기는 69% 늘었다. 학교가 줄어든 곳은 강원·전북·전남·경북·경남이다. 전남은 학생이 56% 줄고 학교가 24% 줄었다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">시도별 초등학생 수와 초등학교 수의 변화, 1999→2026년</p>
+      <p class="fs">%. 세종은 1999년 충남에 들어 있어 충남과 합쳤다</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>교육기본통계 초등학교 개황.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">아이가 준 곳과 학교가 닫힌 곳</h2>
+      <p>시군구를 0–9세 인구가 2008년부터 2026년까지 얼마나 줄었는지에 따라 칠하고, 2009년 이후 문 닫은 폐교를 어두운 창문으로 올렸다. 아이가 40% 넘게 준 시군구가 225곳 중 178곳으로 지도의 대부분이다. 그러나 꺼진 창문은 강원·경북·전남·경남의 시와 군에 몰려 있다. 서울은 아이가 절반 가까이 줄었어도 남아 있는 폐교가 거의 없다. 학생이 줄어도, 학교가 모자랄 만큼 작아지기 전까지는 문을 닫지 않는다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">0–9세 인구 변화(2008→2026)와 2009년 이후 폐교</p>
+      <p class="fs">땅 색이 짙을수록 아이가 많이 줄었다. 어두운 창문 하나 = 폐교 하나</p>
+      <div class="chart" id="c4"></div>
+      <figcaption>행정안전부 시군구 연령별 주민등록 인구(2008년 12월, 2026년 9월), 교육부 폐교재산 표준데이터. 일반구는 시로 묶었다. 2026년 개편된 인천 중·동·서구와 세종은 2026년 값을 맞출 수 없어 회색으로 두었다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 학생이 줄면 학교는 바로 사라질까</h2>
+      <p>아니다. 아이가 줄어든 만큼 학교가 줄어들지는 않았다. 학교는 새 아파트 단지를 따라 늘었고, 아이가 줄어든 오래된 동네의 학교는 작아진 채로 남았다. 문을 닫는 일은 아이가 줄어든 해가 아니라, 작은 학교를 합치라는 정책이 몰아친 해(1990년대, 특히 1999년)와 아이가 거의 남지 않은 시골에서 일어났다. 그리고 닫은 학교의 넷 중 하나는 지금도 비어 있다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>폐교재산 표준데이터는 교육청이 아직 가진 폐교만 담는다. 팔린 폐교는 빠져 있어, 전체 폐교 수와 다르고 오래된 폐교일수록 더 많이 빠졌다. 충남(37곳)처럼 많이 판 시도는 적게 보인다.</li>
+      <li>폐교 연도는 학교가 문을 닫은 해다. 분교장이 본교에 합쳐진 경우도 폐교로 들어 있다(대부분 초등학교 분교장).</li>
+      <li>학교 수와 학생 수는 4월 1일 기준이다. 시군구별 학교 수는 쓰지 않았고, 아이 수는 주민등록 0–9세 인구로 대신했다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15107729/standard.do" target="_blank" rel="noopener">전국폐교재산기본정보 표준데이터</a> (15107729)</td><td>교육부(시도교육청)</td><td>폐교명, 시도·시군구, 폐교연도, 학교급, 활용현황</td><td>1976–2026</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=334&amp;tblId=DT_1963003_002" target="_blank" rel="noopener">교육기본통계 초등학교 개황</a> (KOSIS 334)</td><td>교육부·한국교육개발원</td><td>시도별 초등학교 수, 학생 수</td><td>1999–2026</td></tr>
+        <tr><td><a href="https://jumin.mois.go.kr/ageStatMonth.do" target="_blank" rel="noopener">연령별 인구현황</a></td><td>행정안전부</td><td>시군구별 0–9세 인구</td><td>2008·2026</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>폐교 1,216곳 · 초등학교 개황 6개 시점 · 시군구 아이 수 2개 시점</dd>
+      <dt>도구</dt><dd>Python(엑셀 읽기·이름 맞추기) · SVG 학교 건물과 창문 애니메이션, 지도(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>폐교 연도 분포 · 1999년 대비 지수 · 시군구 아이 수 감소율과 폐교 수의 상관(0.01)</dd>
+      <dt>검증</dt><dd>교육기본통계의 시도 합이 총계와 같은지 확인했다(2026년 6,191곳, 221만 9,370명). 폐교 목록은 학교명·주소가 겹치는 행이 없는지 확인했고, 전남의 두 교육청판에서 112곳이 겹쳐 최신판만 남겼다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>신입생이 한 명도 없는 학교는 몇 곳일까</h3><p>학교알리미의 학교별 학년 학생 수로 입학생이 없는 학교를 셀 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15037483/fileData.do" target="_blank" rel="noopener">초중등학교 현황(학생수·학급수)</a> · 교육부</li></ul></div>
+      <div class="q"><h3>빈 폐교는 무엇으로 바뀌었나</h3><p>폐교의 대부·자체활용 내용을 보면 캠핑장·마을회관·연수원으로 바뀐 모습을 볼 수 있다.</p></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.6</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const S = DATA.S, Y0 = 1975, Y1 = 2026, NY = Y1 - Y0 + 1;
+  const SIDO = ["경북", "경남", "강원", "충북", "전남", "경기", "전북", "충남", "부산", "제주", "울산", "인천", "광주", "대구", "서울", "대전"];
+  const USE = { l: "빌려줌(대부)", u: "쓰지 않음", s: "교육청이 씀" };
+  const LV = { e: "초등학교", m: "중학교", h: "고등학교" };
+
+  /* ---------- 1. school buildings with windows ---------- */
+  let lay1 = null;
+  function build1() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, cols = W >= 900 ? 4 : W >= 600 ? 3 : 2, gap = 12, bw = (W - gap * (cols - 1)) / cols;
+    const ww = narrow ? 7 : 9, wh = narrow ? 9 : 11, wg = narrow ? 2.5 : 3.5, per = Math.max(6, Math.floor((bw - 24) / (ww + wg)));
+    const groups = SIDO.map((sd) => ({ sd, ss: S.filter((x) => x[0] === sd).sort((a, b) => a[3] - b[3]) }));
+    const bh = (n) => 34 + Math.ceil(n / per) * (wh + wg) + 26;
+    const rows = []; for (let i = 0; i < groups.length; i += cols) rows.push(Math.max(...groups.slice(i, i + cols).map((g) => bh(g.ss.length))) + 34);
+    const H = rows.reduce((a, b) => a + b, 0);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "시도별 폐교를 학교 건물의 창문으로 그린 그림" }, box), pts = [];
+    const sky = s("rect", { x: 0, y: 0, width: W, height: H, fill: "var(--sky1)" }, v);
+    const wins = [];
+    groups.forEach((g, i) => {
+      const c = i % cols, r = Math.floor(i / cols), x = c * (bw + gap), yTop = rows.slice(0, r).reduce((a, b) => a + b, 0) + 26, h = bh(g.ss.length), base = yTop + rows[r] - 26;
+      const y = base - h;
+      tx(v, x + 6, yTop + 4, g.sd, "vl", 13, "start", { style: "fill:var(--ink)" });
+      const cnt = tx(v, x + bw - 6, yTop + 4, "", "tk", 11.5, "end", { style: "fill:var(--ink)" });
+      // building: roof, wall, door, flagpole
+      s("path", { d: `M${x + 4},${y + 18} L${x + bw / 2},${y} L${x + bw - 4},${y + 18} Z`, fill: "var(--roof)" }, v);
+      s("rect", { x: x + 8, y: y + 18, width: bw - 16, height: h - 18, fill: "var(--wall)" }, v);
+      s("circle", { cx: x + bw / 2, cy: y + 11, r: 4.5, fill: "var(--card)", stroke: "var(--roof)", "stroke-width": 1.2 }, v);
+      s("path", { d: `M${x + bw / 2},${y + 8.5} L${x + bw / 2},${y + 11} L${x + bw / 2 + 2},${y + 12}`, stroke: "var(--ink)", "stroke-width": .9, fill: "none" }, v);
+      s("rect", { x: x + bw / 2 - 8, y: base - 18, width: 16, height: 18, fill: "var(--wall2)" }, v);
+      s("line", { x1: x, x2: x + bw, y1: base, y2: base, stroke: "var(--axis)", "stroke-width": 2 }, v);
+      const ox = x + 8 + ((bw - 16) - per * (ww + wg) + wg) / 2;
+      g.ss.forEach((sc, k) => {
+        const wx = ox + (k % per) * (ww + wg), wy = y + 24 + Math.floor(k / per) * (wh + wg);
+        const el = s("rect", { x: wx, y: wy, width: ww, height: wh, rx: 1, fill: "var(--lit)", stroke: "var(--frame)", "stroke-width": .6 }, v);
+        wins.push({ el, yr: sc[3] });
+        pts.push({ x: wx + ww / 2, y: wy + wh / 2, r: ww, fn: () => [sc[2], [[`${sc[3]}년`, "문 닫은 해"], [`${sc[0]} ${sc[1]}`, LV[sc[4]]], [USE[sc[5]], "지금"]]] });
+      });
+      g.cnt = cnt;
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 창문을 하나씩 옮겨 볼 수 있다");
+    lay1 = { W, wins, groups, sky };
+  }
+  function c1(pos) {
+    const box = document.getElementById("c1");
+    if (!lay1 || Math.abs(lay1.W - Math.max(300, box.clientWidth)) > 1) build1();
+    const yr = Y0 + pos; let off = 0;
+    lay1.wins.forEach((w) => { const out = w.yr <= yr; if (out) off++; w.el.setAttribute("fill", out ? "var(--dark)" : "var(--lit)"); });
+    lay1.groups.forEach((g) => { g.cnt.textContent = `${g.ss.filter((x) => x[3] <= yr).length} / ${g.ss.length}`; });
+    lay1.sky.setAttribute("fill", `color-mix(in oklab, var(--night) ${Math.round(off / S.length * 75)}%, var(--sky1))`);
+    const y = Math.floor(yr), st = document.getElementById("st1"); st.replaceChildren();
+    st.append(`${y}년까지 꺼진 창문 `, bEl(`${fmt(off)}곳`), ` / ${fmt(S.length)}곳 · 그해 `, bEl(`${S.filter((x) => x[3] === y).length}곳`));
+  }
+  const p1 = Player("p1", "꺼지는 창문", c1, NY, (i) => String(Y0 + i), 14);
+  {
+    const dec = {}; S.forEach((x) => { const d = x[3] < 1990 ? "1989년 이전" : `${Math.floor(x[3] / 5) * 5}–${Math.floor(x[3] / 5) * 5 + 4}`; dec[d] = (dec[d] || 0) + 1; });
+    table("t1", ["시도", "폐교", "2000년 전", "2009년 이후", "쓰지 않음"], SIDO.map((sd) => { const ss = S.filter((x) => x[0] === sd); return [sd, ss.length, ss.filter((x) => x[3] < 2000).length, ss.filter((x) => x[3] >= 2009).length, ss.filter((x) => x[5] === "u").length]; }));
+  }
+
+  /* ---------- 2. diverging lines + students per school ---------- */
+  const EY = Object.keys(DATA.E).map(Number).sort();
+  const IX = EY.map((y) => ({ y, sch: DATA.E[y]["전국"][0], stu: DATA.E[y]["전국"][1] }));
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, H1 = narrow ? 230 : 260, l = 40, r = narrow ? 96 : 108, top = 16, bot = 26;
+    const per = narrow ? 10 : 18, gw = narrow ? 13 : 15, rowsK = Math.ceil(36 / per), H2 = 40 + rowsK * 20 + 30;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H1 + H2}`, role: "img", "aria-label": "초등학생 수와 초등학교 수 지수 1999–2026" }, box);
+    const sx = (y) => l + (y - 1999) / 27 * (W - l - r), sy = (p) => top + (1 - (p - 40) / 90) * (H1 - top - bot);
+    [50, 75, 100, 125].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t === 100 ? "ax" : "gl" }, v); tx(v, l - 6, sy(t) + 4, String(t), "tk", 11.5, "end"); });
+    EY.forEach((y) => tx(v, sx(y), H1 - 6, String(y), "tk", 11.5, "middle"));
+    const lines = [["sch", "var(--school)", "초등학교"], ["stu", "var(--kid)", "초등학생"]].map(([k, col, nm]) => {
+      const p = s("path", { d: "M" + IX.map((o) => `${sx(o.y).toFixed(1)},${sy(o[k] / IX[0][k] * 100).toFixed(1)}`).join("L"), fill: "none", stroke: col, "stroke-width": 3.2, "stroke-linejoin": "round" }, v);
+      IX.forEach((o) => s("circle", { cx: sx(o.y), cy: sy(o[k] / IX[0][k] * 100), r: 3.5, fill: col }, v));
+      const last = IX[IX.length - 1]; tx(v, sx(2026) + 8, sy(last[k] / IX[0][k] * 100) + 4, `${nm} ${Math.round(last[k] / IX[0][k] * 100)}`, "vl halo", 12.5, "start", { style: `fill:${k === "sch" ? "var(--school-ink)" : "var(--kid-ink)"}`, "stroke-width": 4 });
+      return p;
+    });
+    timeLayer(v, tipFor(fig), IX.length, (i) => sx(IX[i].y), top, H1 - bot, (i) => [`${IX[i].y}년`, [[fmt(IX[i].sch) + "곳", "초등학교", "var(--school)"], [fmt(IX[i].stu) + "명", "초등학생", "var(--kid)"], [fmt(IX[i].stu / IX[i].sch) + "명", "학교 한 곳의 학생"]]], "좌우 화살표로 해를 옮겨 볼 수 있다");
+    // students per school: kids in front of one school, 1999 vs 2026
+    const y2 = H1 + 20; [IX[0], IX[IX.length - 1]].forEach((o, j) => {
+      const x0 = j ? W / 2 + 6 : 0, w = W / 2 - 6, n = Math.round(o.stu / o.sch / 20);
+      tx(v, x0, y2 + 10, `${o.y}년 · 학교 한 곳에 ${fmt(o.stu / o.sch)}명`, "lb", 12.5, "start", { style: "font-weight:600" });
+      s("path", { d: `M${x0},${y2 + 44} L${x0},${y2 + 26} L${x0 + 12},${y2 + 18} L${x0 + 24},${y2 + 26} L${x0 + 24},${y2 + 44} Z`, fill: "var(--school)" }, v);
+      const pp = Math.max(4, Math.floor((w - 34) / gw));
+      for (let k = 0; k < n; k++) { const cx = x0 + 34 + (k % pp) * gw, cy = y2 + 24 + Math.floor(k / pp) * 20; s("circle", { cx, cy, r: 3.4, fill: "var(--kid)" }, v); s("path", { d: `M${cx - 4},${cy + 13} Q${cx},${cy + 2} ${cx + 4},${cy + 13} Z`, fill: "var(--kid)" }, v); }
+    });
+    if (!reduce) { lines.forEach((p) => { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; }); const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); lines.forEach((p) => { p.style.transition = "stroke-dashoffset 1.6s ease-out"; p.style.strokeDashoffset = 0; }); }, { threshold: .3 }); io.observe(box); }
+  }
+  table("t2", ["연도", "초등학교", "초등학생", "학교 한 곳의 학생"], IX.map((o) => [o.y, fmt(o.sch), fmt(o.stu), fmt(o.stu / o.sch)]));
+
+  /* ---------- 3. 시도 scatter ---------- */
+  const SD = ["서울", "부산", "대구", "인천", "광주", "대전", "울산", "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주"].map((sd) => {
+    const a = DATA.E[1999][sd], b = sd === "충남" ? [DATA.E[2026]["충남"][0] + DATA.E[2026]["세종"][0], DATA.E[2026]["충남"][1] + DATA.E[2026]["세종"][1]] : DATA.E[2026][sd];
+    return { sd, ds: (b[0] / a[0] - 1) * 100, dk: (b[1] / a[1] - 1) * 100, a, b };
+  });
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), H = Math.min(420, Math.max(300, W * .55)), l = 44, r = 14, top = 14, bot = 34;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "시도별 초등학생 수와 초등학교 수 변화" }, box), pts = [];
+    const sx = (p) => l + (p + 70) / 70 * (W - l - r), sy = (p) => top + (1 - (p + 40) / 120) * (H - top - bot);
+    [-60, -40, -20, 0].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top, y2: H - bot, class: t ? "gl" : "ax" }, v); tx(v, sx(t), H - bot + 16, `${t}%`, "tk", 11.5, "middle"); });
+    [-40, -20, 0, 20, 40, 60].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t ? "gl" : "ax" }, v); tx(v, l - 6, sy(t) + 4, `${t > 0 ? "+" : ""}${t}%`, "tk", 11.5, "end"); });
+    tx(v, W - r, H - 4, "초등학생 변화 →", "mt", 12, "end"); tx(v, l + 4, top + 12, "↑ 초등학교 변화", "mt", 12, "start");
+    SD.forEach((o) => { const up = o.ds >= 0; s("circle", { cx: sx(o.dk), cy: sy(o.ds), r: 6, fill: up ? "var(--school)" : "var(--kid)" }, v); tx(v, sx(o.dk) + 9, sy(o.ds) + 4, o.sd, "lb halo", 12, "start", { "stroke-width": 4 }); pts.push({ x: sx(o.dk), y: sy(o.ds), r: 6, fn: () => [o.sd, [[`${o.ds >= 0 ? "+" : ""}${f1(o.ds)}%`, `학교 ${fmt(o.a[0])} → ${fmt(o.b[0])}곳`], [`${f1(o.dk)}%`, `학생 ${man(o.a[1])} → ${man(o.b[1])}명`]]] }); });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 시도를 옮겨 볼 수 있다");
+  }
+  table("t3", ["시도", "학교 1999", "학교 2026", "변화", "학생 1999", "학생 2026", "변화"], SD.map((o) => [o.sd, fmt(o.a[0]), fmt(o.b[0]), pc(o.ds), fmt(o.a[1]), fmt(o.b[1]), pc(o.dk)]));
+
+  /* ---------- 4. map: children lost vs closures since 2009 ---------- */
+  const PL = DATA.P.map(([sd, name, cx, cy, k08, k26, cl, units]) => ({ sd, name, cx, cy, k08, k26, cl: cl.filter((y) => y >= 2009), units, ch: k08 && k26 ? (k26 / k08 - 1) * 100 : null }));
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), xs = PL.map((p) => p.cx), ys = PL.map((p) => p.cy), m = 20, x0 = Math.min(...xs) - m, x1 = Math.max(...xs) + m, y0 = Math.min(...ys) - m, y1 = Math.max(...ys) + m;
+    const sc = Math.min(W / (x1 - x0), 1.6), H = (y1 - y0) * sc + 30, ox = (W - (x1 - x0) * sc) / 2;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "시군구 0–9세 인구 변화와 2009년 이후 폐교 지도" }, box), pts = [];
+    const g = s("g", { transform: `translate(${ox - x0 * sc},${-y0 * sc + 6}) scale(${sc})` }, v);
+    const byCode = new Map(); PL.forEach((p) => p.units.forEach((c) => byCode.set(c, p)));
+    DATA.U.forEach(([code, d]) => { const p = byCode.get(code), ch = p && p.ch; const t = ch == null ? null : Math.max(0, Math.min(1, -ch / 70)); s("path", { d, fill: t == null ? "var(--grid)" : `color-mix(in oklab, var(--c-hi) ${Math.round(t * 100)}%, var(--c-lo))`, stroke: "var(--card)", "stroke-width": .4 / sc * 1.4 }, g); });
+    (DATA.sidoPaths || []).forEach((sp) => s("path", { d: sp.d, fill: "none", stroke: "var(--axis)", "stroke-width": 1 / sc }, g));
+    const ww = W < 560 ? 4 : 5.5;
+    PL.forEach((p) => {
+      const X = ox + (p.cx - x0) * sc, Y = (p.cy - y0) * sc + 6, n = p.cl.length, per = Math.ceil(Math.sqrt(n));
+      for (let k = 0; k < n; k++) s("rect", { x: X - per * (ww + 1) / 2 + (k % per) * (ww + 1), y: Y - Math.ceil(n / per) * (ww + 1) / 2 + Math.floor(k / per) * (ww + 1), width: ww, height: ww, fill: "var(--mark)", stroke: "var(--lit)", "stroke-width": .6 }, v);
+      pts.push({ x: X, y: Y, r: 6, fn: () => [`${p.sd} ${p.name}`, [[p.ch == null ? "–" : `${f1(p.ch)}%`, "0–9세 인구 변화 2008→2026"], [`${n}곳`, "2009년 이후 폐교(남아 있는 것)"]]] });
+    });
+    // legend strip
+    const lg = s("g", { transform: `translate(${W - 150},${H - 18})` }, v);
+    for (let k = 0; k < 5; k++) s("rect", { x: k * 22, y: 0, width: 22, height: 8, fill: `color-mix(in oklab, var(--c-hi) ${k * 25}%, var(--c-lo))` }, lg);
+    tx(lg, 0, -4, "0%", "tk", 11, "start"); tx(lg, 110, -4, "−70%", "tk", 11, "end");
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 시군구를 옮겨 볼 수 있다");
+  }
+  table("t4", ["시도", "시군구", "0–9세 2008", "0–9세 2026", "변화", "폐교(2009–)"], [...PL].sort((a, b) => (a.ch ?? 0) - (b.ch ?? 0)).map((p) => [p.sd, p.name, p.k08 ? fmt(p.k08) : "–", p.k26 ? fmt(p.k26) : "–", p.ch == null ? "–" : pc(p.ch), p.cl.length]));
+
+  const all = () => { p1.render(); c2(); c3(); c4(); };
+  all(); onResize(all);
+})();
+</script>

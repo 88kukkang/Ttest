@@ -1,0 +1,350 @@
+<title>모래사장 줍기</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a strip of sand with 100 pieces of litter in the mix found by the national beach survey; the reader picks
+   them up one by one (or all at once) and each piece drops into a basket by where it was used: on land, at sea
+   (fishing), abroad, or unknown. Then a map of the 60 survey beaches (weight, count, foreign share), two bars that
+   show plastic by count and by weight, and a dune of the 60 beaches sorted by how much was found. */
+:root {
+  --paper: #f4f2ec; --card: #fcfbf7; --ink: #2c2c2a; --ink2: #494843; --muted: #5d5b55; --line: #e1ddd3; --grid: #eae7de; --axis: #a7a8a3;
+  --accent: #3e6f90; --intl: #3e6f90; --board: #2c2c2a; --board-ink: #f4f2ec; --sea: #fcfbf7;
+  --sand: #ebdac0; --sand2: #e2ccb5; --wave: #8ab5bb; --water: #c6d6cc; --land: #efece4;
+  --s0: #d56b41; --s1: #3e6f90; --s2: #9b3737; --s3: #939594; --s0-ink: #a8451f; --s1-ink: #2f5a77; --s2-ink: #8a2f2f; --s3-ink: #5d5b55;
+  --w: #4c433e; --e0: #416e59; --e1: #4e6aa9; --e2: #80a15a; --e3: #b87b68;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1b1b19; --card: #252523; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3a3a37; --grid: #2f2f2d; --axis: #62635d;
+  --accent: #8ab5bb; --intl: #8ab5bb; --board: #dcd9cf; --board-ink: #1b1b19; --sea: #252523;
+  --sand: #4c433e; --sand2: #5a5551; --wave: #3e6f90; --water: #2c3539; --land: #2f2f2d;
+  --s0: #dc8c67; --s1: #8eabc9; --s2: #d0605c; --s3: #a7a8a3; --s0-ink: #e7a08a; --s1-ink: #abbdc9; --s2-ink: #eaa6a0; --s3-ink: #bcbbb6;
+  --w: #dcd9cf; --e0: #91b0a1; --e1: #8eabc9; --e2: #abc07b; --e3: #cd9886; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1b1b19; --card: #252523; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3a3a37; --grid: #2f2f2d; --axis: #62635d;
+  --accent: #8ab5bb; --intl: #8ab5bb; --board: #dcd9cf; --board-ink: #1b1b19; --sea: #252523;
+  --sand: #4c433e; --sand2: #5a5551; --wave: #3e6f90; --water: #2c3539; --land: #2f2f2d;
+  --s0: #dc8c67; --s1: #8eabc9; --s2: #d0605c; --s3: #a7a8a3; --s0-ink: #e7a08a; --s1-ink: #abbdc9; --s2-ink: #eaa6a0; --s3-ink: #bcbbb6;
+  --w: #dcd9cf; --e0: #91b0a1; --e1: #8eabc9; --e2: #abc07b; --e3: #cd9886; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.i0 { fill: var(--s0-ink) } .i1 { fill: var(--s1-ink) } .i2 { fill: var(--s2-ink) } .i3 { fill: var(--s3-ink) }
+::selection { background: var(--wave); color: #1b1b19 }
+.btn { font: inherit; font-size: 15px; font-weight: 600; color: var(--paper); background: var(--ink); border: 0; border-radius: 10px; padding: 10px 18px; min-height: 46px; cursor: pointer }
+.btn:hover { background: var(--intl) } .btn[disabled] { opacity: .45; cursor: default }
+.btn.ghost { color: var(--ink); background: var(--paper); border: 1px solid var(--axis) } .btn.ghost:hover { background: var(--grid) }
+.ctl { display: flex; gap: 10px; flex-wrap: wrap; align-items: center } .ctl .hint { font-size: 13.5px; color: var(--muted); flex: 1 1 200px }
+#c1 svg { cursor: pointer }
+.pk { transition: transform .75s cubic-bezier(.4, .1, .3, 1), opacity .3s }
+@media (prefers-reduced-motion: reduce) { .pk { transition: none } }
+.mapwrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 22px; align-items: start }
+@media (max-width: 800px) { .mapwrap { grid-template-columns: minmax(0, 1fr) } }
+.side { display: grid; gap: 14px; font-size: 13.5px; color: var(--ink2); min-width: 0 }
+.side ol { margin: 0; padding: 0; list-style: none } .side li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--grid) } .side li b { font-variant-numeric: tabular-nums; white-space: nowrap }
+</style>
+
+<main class="page">
+  <header>
+    <h1>바닷가 쓰레기는 어디서 올까<span>대부분 우리나라에서 온다. 해양환경공단이 전국 해변 60곳에서 주운 쓰레기 48만 개 가운데 외국에서 온 것으로 확인된 것은 1.8%(8,753개)다. 무게로는 11.1%로 더 크지만, 그래도 열에 하나다. 2018–2019년에 주운 6만 2천 개를 하나하나 보면 39%는 음료수병·과자봉지·비닐봉지처럼 육지에서 쓰던 물건이고, 24%는 밧줄·부표처럼 바다에서 고기를 잡을 때 쓰던 물건이다. 다만 백령도는 다르다. 거기서 주운 쓰레기는 셋 중 둘이 외국에서 왔다.</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 46</dd>
+      <dt>한 줄</dt><dd>국가 해안쓰레기 모니터링 2018–2023년 48만 52개, 23.5톤 가운데 플라스틱이 개수로 87.4%, 무게로 52.9%다. 외국에서 온 것은 서해(6.6%)와 제주(5.8%)에서 많고 남해·동해는 0.3% 이하다. 통영 욕지도 한 곳에서 주운 것이 전체 개수의 33%다.</dd>
+      <dt>분류</dt><dd>환경·교통·정치</dd>
+      <dt>본능</dt><dd>비난 본능 · 해변의 쓰레기를 보면 "중국에서 떠밀려 왔다"를 먼저 떠올리고, 우리가 버린 병과 우리 배가 쓰던 밧줄은 세지 않는다</dd>
+      <dt>그림 방식</dt><dd>모래사장 줍기 · 조사에서 나온 비율대로 쓰레기 100개를 모래 위에 뿌리고 독자가 하나씩 주워 출처별 바구니에 담는다. 해변 60곳 지도(무게·개수·외국 비중), 개수와 무게의 막대, 해변 60곳을 줄 세운 모래 언덕</dd>
+      <dt>기간</dt><dd>2018–2023년(세부 항목은 2018–2019년)</dd>
+      <dt>엮은 데이터</dt><dd>5개 · 해양쓰레기 모니터링 통계(유형별·지역별·시기별) · 유형별 자료(2018·2019) · 국가 해안쓰레기 모니터링 조사 정점</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">전국 해변 60곳에서 주운 쓰레기가 100개라면, 외국에서 온 것으로 확인된 것은 몇 개일까?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>A</i>2개쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>15개쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>40개쯤</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">A. <span class="n">1.8개</span></span>
+      2018–2023년에 주운 48만 52개 가운데 8,753개다. 외국 글자가 적힌 병이나 외국 부표처럼 어디서 왔는지 알 수 있는 것만 센다. 무게로는 11.1%로 커진다. 외국 부표처럼 무거운 것이 많아서다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">직접 주워 보자</h2>
+      <p>2018–2019년 해변 40곳에서 주운 6만 2,444개를 쓰레기 100개로 줄여 모래 위에 뿌렸다. 하나를 누르면 그 쓰레기가 어디서 쓰던 물건인지에 따라 바구니로 들어간다. 주황 바구니는 음료수병·과자봉지·담배꽁초처럼 <b>육지에서 쓰던 것</b>, 파랑은 밧줄·부표·어상자처럼 <b>바다에서 고기 잡을 때 쓰던 것</b>, 빨강은 <b>외국에서 온 것</b>, 회색은 플라스틱 조각처럼 <b>알 수 없는 것</b>이다.</p>
+      <p>다 주우면 바구니는 육지 39개, 바다 24개, 외국 1개, 알 수 없음 36개쯤이 된다. 가장 많이 나온 한 가지는 어업용 밧줄이고, 그다음이 플라스틱 조각, 음료수병과 뚜껑이다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">해변에서 주운 쓰레기 100개</p>
+      <p class="fs">쓰레기 하나 = 2018–2019년에 주운 쓰레기의 1%(반올림). 쓰레기를 누르면 바구니로 간다</p>
+      <div class="ctl"><span class="hint" id="hint1" aria-live="polite">모래 위의 쓰레기를 누른다. 키보드는 그림을 고른 뒤 Enter.</span><button class="btn" type="button" id="all1">한꺼번에 줍기</button><button class="btn ghost" type="button" id="re1">다시 뿌리기</button></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>해양환경공단 「해양쓰레기 모니터링 유형별 자료(2기 방법론)」(공공데이터포털 15044008), 2018년·2019년 정점별 세부 항목. "어디서 쓰던 물건인지"는 원자료의 분류가 아니라 이 장이 세부 항목 이름으로 나눈 것이다. 캔과 낚시추, 나무젓가락과 양식장 목재처럼 한 항목에 섞인 것은 "알 수 없음"에 넣었다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">해변 60곳</h2>
+      <p>조사하는 해변 60곳을 지도에 놓고, 2021–2023년에 한 해 동안 주운 쓰레기 무게만큼 원을 키웠다. 가장 큰 원은 신안 우이도(한 해 808kg), 통영 욕지도(518kg), 신안 흑산도(384kg), 울릉 현포(282kg)로 모두 섬이다. 해변 하나의 무게를 바다별로 보면 가운데 값이 서해 45kg, 남해 44kg, 제주 34kg, 동해 29kg이다.</p>
+      <p><b>외국 비중</b>을 누르면 지도가 바뀐다. 2018–2019년 세부 항목이 있는 40곳만 칠해진다. 인천 백령도 하나만 붉게 튄다. 여기서 주운 쓰레기 418개 가운데 280개(67.0%)가 외국에서 왔다. 그다음은 신안 임자도(11.9%), 신안 고장(10.1%)이다. 서해 전체로는 6.6%, 제주 5.8%이고 남해와 동해는 0.2–0.3%다. 40곳 가운데 7곳에서는 외국 쓰레기가 하나도 나오지 않았다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">국가 해안쓰레기 모니터링 해변 60곳</p>
+      <p class="fs" id="fs2"></p>
+      <div class="chips" id="k2" role="group" aria-label="보여 줄 값"></div>
+      <div class="mapwrap">
+        <div class="chart" id="c2"></div>
+        <div class="side"><div class="legend" id="lg2"></div><div><p class="label" id="tl2" style="margin-bottom:4px"></p><ol id="top2"></ol></div></div>
+      </div>
+      <figcaption>해양환경공단 「해양쓰레기 모니터링 통계_2기 조사방법_지역별」(15069306), 해양수산부 「국가 해안쓰레기 모니터링 조사 정점」(15129575). 정점 20곳(0042–0061)은 원자료의 경도 소수점이 한 자리 앞에 찍혀 있어(예: 12.82) 10을 곱해 고쳤다. 바다 구분(서해·남해·동해·제주)은 이 장이 위도·경도로 나눈 것이다. 2018–2020년에는 40곳, 2021년부터 60곳을 조사했다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">개수로 세면, 무게로 달면</h2>
+      <p>같은 쓰레기를 개수로 세면 플라스틱이 87.4%다. 무게로 달면 52.9%로 줄어든다. 플라스틱은 가볍고 잘게 부서져 개수가 많다. 대신 무게에서는 나무(22.4%)와 외국에서 온 것(11.1%)이 커진다. 나무는 개수로는 1.7%뿐이다.</p>
+      <p>외국에서 온 것이 개수로 1.8%인데 무게로 11.1%인 것은, 외국 것으로 확인되는 쓰레기에 부표처럼 크고 무거운 것이 많기 때문이다. "외국 쓰레기가 많다"는 말은 무게로 볼 때 조금 더 맞고, 개수로 볼 때는 거의 맞지 않는다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">재질별 해안 쓰레기, 2018–2023년</p>
+      <p class="fs">%. 위 = 개수(48만 52개), 아래 = 무게(23.5톤)</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>해양환경공단 「해양쓰레기 모니터링 통계_2기 조사방법_유형별」(15069304). "외국기인"은 재질과 상관없이 외국에서 온 것으로 확인된 쓰레기를 따로 센 분류다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">한 해변이 3분의 1</h2>
+      <p>해변 60곳을 주운 개수대로 모래 언덕처럼 줄 세웠다. 맨 앞 하나가 통영 욕지도다. 2021–2023년에 15만 7,446개가 나왔는데, 같은 기간 60곳 전체(38만 5,302개)의 40.9%다. 2022년에는 10만 5,781개로 그해 전국의 58%였다. 그 뒤를 여수 안도(7.8%), 신안 흑산도(4.2%)가 잇는다. 무게로 줄 세우면 맨 앞이 신안 우이도(17.1%)로 바뀌고 욕지도(11.0%), 흑산도(8.1%)가 뒤따른다. 개수든 무게든 앞자리는 섬이다.</p>
+      <p>그래서 전국 합계는 몇 곳의 사정에 크게 흔들린다. 전국 개수는 2020년 3만 2,213개에서 2022년 18만 2,374개로 늘었다가 2023년 7만 8,476개로 줄었다. 2021년에 조사 해변이 40곳에서 60곳으로 늘었고 욕지도가 새로 들어왔다. "바닷가 쓰레기가 다섯 배 늘었다"고 읽으면 안 되는 숫자다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">해변별 주운 쓰레기, 2021–2023년</p>
+      <p class="fs" id="fs4"></p>
+      <div class="chips" id="k4" role="group" aria-label="세는 단위"></div>
+      <div class="chart" id="c4"></div>
+      <figcaption>해양환경공단 「해양쓰레기 모니터링 통계_2기 조사방법_지역별」(15069306). 해변마다 같은 길이(100m)의 구간에서 두 달마다 한 번, 한 해 여섯 번 줍는다.</figcaption>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 바닷가 쓰레기는 어디서 올까</h2>
+      <p>대부분 우리 안에서 온다. 외국에서 온 것으로 확인된 쓰레기는 개수로 2%가 안 되고, 무게로도 열에 하나다. 주운 것의 40%쯤은 음료수병, 과자봉지, 비닐봉지, 컵, 담배꽁초처럼 육지에서 쓰던 물건이고, 4분의 1쯤은 밧줄, 부표, 어상자처럼 바다에서 고기를 잡거나 기르며 쓰던 물건이다.</p>
+      <p>외국 쓰레기 이야기가 틀린 것은 아니다. 중국과 가까운 백령도는 셋 중 둘이 외국 쓰레기이고, 서해와 제주는 남해·동해보다 스무 배쯤 많다. 다만 그것은 몇몇 해변의 이야기다. 전국의 바닷가에서는 우리가 버린 것과 우리 배가 쓰던 것이 훨씬 많다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>"외국기인"은 외국 글자가 적혀 있거나 외국 제품으로 알아볼 수 있는 것만 센다. 글자가 지워진 조각은 어디서 왔는지 모르므로, 실제 외국 쓰레기는 이보다 많을 수 있다.</li>
+      <li>"육지에서 쓰던 것"과 "바다에서 쓰던 것"은 이 장이 세부 항목 이름으로 나눈 것이다. 음료수병은 배 위에서도 버려질 수 있고, 밧줄이 육지에서 흘러들 수도 있다. 버린 사람이 누구인지 가르는 자료가 아니다.</li>
+      <li>세부 항목은 2018–2019년 40곳만 공개돼 있다. 그 뒤의 해마다 세부 항목과 새로 들어온 20곳의 세부 항목은 이 장에 없다.</li>
+      <li>해변 60곳은 전국 해안을 고르게 나눈 표본이 아니다. 섬과 외진 해변이 많이 들어 있고, 한 곳(욕지도)이 전체 개수를 크게 흔든다.</li>
+      <li>2021년부터 조사 해변이 40곳에서 60곳으로 늘었다. 해마다 전국 합계를 그대로 견주면 안 된다.</li>
+      <li>원자료의 정점 좌표 20곳은 경도의 소수점 위치가 틀려 있어 고쳐서 썼다. 바다 구분은 이 장이 정한 경계다.</li>
+      <li>이 조사는 해변에 밀려온 쓰레기를 줍는 것이고, 바다 밑이나 물에 떠 있는 쓰레기는 세지 않는다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15069304/fileData.do" target="_blank" rel="noopener">해양쓰레기 모니터링 통계_2기 조사방법_유형별</a> (15069304)</td><td>해양환경공단</td><td>재질별 개수·무게(외국기인 포함)</td><td>2018–2023</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15069306/fileData.do" target="_blank" rel="noopener">해양쓰레기 모니터링 통계_2기 조사방법_지역별</a> (15069306)</td><td>해양환경공단</td><td>해변 60곳의 해마다 개수·무게</td><td>2018–2023</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15044008/fileData.do" target="_blank" rel="noopener">해양쓰레기 모니터링 유형별 자료(2기 방법론)</a> (15044008)</td><td>해양환경공단</td><td>해변별 세부 항목 개수</td><td>2018, 2019</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15129575/fileData.do" target="_blank" rel="noopener">국가 해안쓰레기 모니터링 조사 정점</a> (15129575)</td><td>해양수산부</td><td>해변 60곳의 위도·경도</td><td>–</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15069303/fileData.do" target="_blank" rel="noopener">해양쓰레기 모니터링 통계_2기 조사방법_시기별</a> (15069303)</td><td>해양환경공단</td><td>조사 회차별 개수·무게(확인용)</td><td>2018–2023</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>해변 60곳 × 6개 연도 × 개수·무게 · 재질 9가지 · 2018–2019년 세부 항목 6만 2,444개(40곳)</dd>
+      <dt>도구</dt><dd>Python(수집·집계, 세부 항목 분류) · Node(d3-geo, 정점 좌표를 지도에) · SVG 모래사장, 지도, 막대, 모래 언덕(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>재질별 비중(개수·무게) · 세부 항목을 육지·바다·외국·알 수 없음으로 나누기(이 장의 분류) · 바다별 외국 비중 · 해변별 2021–2023년 연평균과 집중도</dd>
+      <dt>검증</dt><dd>재질별 합(48만 52개, 2만 3,450.8kg)과 해변별 합(48만 52개, 2만 3,451.3kg)이 같다. 세부 항목 파일의 옛 정점 이름(예: "인천 백령도 사곶해안")을 지금 이름에 맞췄다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>해마다 바다에서 건져 내는 쓰레기는 얼마나 될까</h3><p>시군구마다 해마다 수거한 해양쓰레기 양이 있다. 섬이 많은 곳과 그렇지 않은 곳을 견줄 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15069295/fileData.do" target="_blank" rel="noopener">해양쓰레기 조사_지역별</a> · 해양환경공단</li></ul></div>
+      <div class="q"><h3>10년 전 해변과 지금 해변은 다를까</h3><p>2008–2017년 1기 조사와 2018년 이후 2기 조사를 이으면 오래된 변화를 볼 수 있다(조사 방법이 달라 주의가 필요하다).</p>
+        <ul><li><a href="https://www.data.go.kr/data/15069302/fileData.do" target="_blank" rel="noopener">해양쓰레기 모니터링 통계_1기 조사방법_지역별</a> · 해양환경공단</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.18</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const SR = ["육지", "바다", "외국", "모름"], SN = ["육지에서 쓰던 것", "바다에서 쓰던 것", "외국에서 온 것", "알 수 없는 것"], SC = [0, 1, 2, 3].map((k) => `var(--s${k})`);
+  const split100 = (parts) => { const tot = parts.reduce((a, b) => a + b, 0), raw = parts.map((p) => p / tot * 100), fl = raw.map(Math.floor); let left = 100 - fl.reduce((a, b) => a + b, 0); raw.map((v, i) => [v - fl[i], i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (left > 0) { fl[i]++; left--; } }); return fl; };
+  const IN = { rope: "밧줄·끈·그물", frag: "플라스틱 조각", bottle: "플라스틱 병·용기", bag: "비닐봉지·포장지", foam: "스티로폼", buoy: "부표", glass: "유리병·유리 조각", can: "캔·쇠붙이", cup: "컵·종이·일회용품", wood: "나무", misc: "그 밖의 물건", butt: "담배꽁초", cloth: "옷·천", foreign: "외국 쓰레기" };
+
+  /* ---------- icons ---------- */
+  function item(g, kind, x, y, u, col) {
+    const e = s("g", { transform: `translate(${x},${y})` }, g), st = { stroke: col, "stroke-width": u * .09, fill: "none", "stroke-linecap": "round", "stroke-linejoin": "round" };
+    if (kind === "bottle" || kind === "foreign") { s("path", { d: `M${-u * .14},${-u * .46} h${u * .28} v${u * .12} q${u * .16},${u * .08} ${u * .16},${u * .26} v${u * .5} h${-u * .6} v${-u * .5} q0,${-u * .18} ${u * .16},${-u * .26} z`, fill: col }, e); if (kind === "foreign") s("path", { d: `M${-u * .16},${u * .08} h${u * .32} M0,${-u * .06} v${u * .3}`, stroke: "var(--card)", "stroke-width": u * .08 }, e); }
+    else if (kind === "rope") s("path", { d: `M${-u * .45},${u * .1} q${u * .15},${-u * .35} ${u * .3},0 t${u * .3},0 t${u * .3},0`, ...st, "stroke-width": u * .14 }, e);
+    else if (kind === "buoy") { s("ellipse", { rx: u * .4, ry: u * .28, fill: col }, e); s("line", { x1: -u * .4, x2: u * .4, y1: 0, y2: 0, stroke: "var(--card)", "stroke-width": u * .06 }, e); }
+    else if (kind === "bag") s("path", { d: `M${-u * .35},${-u * .2} l${u * .1},${u * .6} h${u * .5} l${u * .1},${-u * .6} q${-u * .35},${u * .15} ${-u * .7},0 z M${-u * .2},${-u * .2} q${u * .2},${-u * .3} ${u * .4},0`, ...st, fill: col, "fill-opacity": .35 }, e);
+    else if (kind === "foam") s("rect", { x: -u * .38, y: -u * .26, width: u * .76, height: u * .52, rx: u * .08, fill: col, opacity: .75 }, e);
+    else if (kind === "frag") s("path", { d: `M${-u * .3},${-u * .2} l${u * .45},${-u * .1} l${u * .15},${u * .35} l${-u * .4},${u * .2} z`, fill: col }, e);
+    else if (kind === "glass") s("path", { d: `M${-u * .3},${u * .25} l${u * .15},${-u * .45} l${u * .35},${u * .05} l${u * .1},${u * .4} z`, ...st, fill: col, "fill-opacity": .3 }, e);
+    else if (kind === "can") { s("rect", { x: -u * .2, y: -u * .32, width: u * .4, height: u * .64, rx: u * .06, fill: col }, e); s("line", { x1: -u * .2, x2: u * .2, y1: -u * .2, y2: -u * .2, stroke: "var(--card)", "stroke-width": u * .05 }, e); }
+    else if (kind === "cup") s("path", { d: `M${-u * .28},${-u * .3} h${u * .56} l${-u * .08},${u * .6} h${-u * .4} z`, fill: col }, e);
+    else if (kind === "wood") s("rect", { x: -u * .45, y: -u * .1, width: u * .9, height: u * .2, rx: u * .05, fill: col, transform: "rotate(-18)" }, e);
+    else if (kind === "butt") { s("rect", { x: -u * .3, y: -u * .07, width: u * .6, height: u * .14, fill: col }, e); s("rect", { x: u * .1, y: -u * .07, width: u * .2, height: u * .14, fill: "var(--card)", opacity: .6 }, e); }
+    else if (kind === "cloth") s("path", { d: `M${-u * .35},${-u * .25} h${u * .7} l${-u * .1},${u * .5} h${-u * .5} z`, fill: col, opacity: .8 }, e);
+    else s("rect", { x: -u * .22, y: -u * .22, width: u * .44, height: u * .44, rx: u * .1, fill: col, transform: "rotate(20)" }, e);
+    return e;
+  }
+
+  /* ---------- 1. beach pick-up ---------- */
+  const G = DATA.game, GT = G.reduce((a, r) => a + r[2], 0), PER = split100(G.map((r) => r[2]));
+  let pieces = [], picked = 0, seed = 7;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  function scatter() { pieces = []; G.forEach(([kind, sr], k) => { for (let i = 0; i < PER[k]; i++) pieces.push({ kind, src: SR.indexOf(sr), x: rnd(), y: rnd(), r: rnd() * 60 - 30, done: false }); }); pieces.sort(() => rnd() - .5); picked = 0; }
+  const m1 = {};
+  function c1() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, sandH = narrow ? 300 : 260, basketH = narrow ? 210 : 150, H = sandH + basketH + 20, u = narrow ? 17 : 22;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "application", tabindex: 0, "aria-label": "모래사장에 뿌린 쓰레기 100개. Enter를 누르면 하나씩 주워 바구니에 담는다" }, box);
+    s("rect", { x: 0, y: 0, width: W, height: 34, fill: "var(--water)" }, v);
+    s("path", { d: `M0,34 ${Array.from({ length: Math.ceil(W / 40) + 1 }, (_, i) => `Q${i * 40 + 20},${26} ${i * 40 + 40},34`).join(" ")} L${W},${sandH} L0,${sandH} Z`, fill: "var(--sand)" }, v);
+    for (let i = 0; i < 70; i++) s("circle", { cx: (i * 137.5) % W, cy: 44 + (i * 61.8) % (sandH - 56), r: 1.2, fill: "var(--sand2)" }, v);
+    const bw = narrow ? (W - 12) / 2 : (W - 36) / 4, bh = narrow ? 92 : 128, bpos = SR.map((_, k) => narrow ? [(k % 2) * (bw + 12), sandH + 18 + Math.floor(k / 2) * (bh + 12)] : [k * (bw + 12), sandH + 18]);
+    m1.counts = [0, 0, 0, 0]; m1.lab = [];
+    SR.forEach((_, k) => { const [bx, by] = bpos[k]; s("path", { d: `M${bx},${by} h${bw} l-8,${bh} h${-bw + 16} z`, fill: "none", stroke: SC[k], "stroke-width": 2 }, v); for (let q = 1; q < 4; q++) s("line", { x1: bx + 3 + q * 2, x2: bx + bw - 3 - q * 2, y1: by + bh * q / 4, y2: by + bh * q / 4, stroke: SC[k], "stroke-width": .8, opacity: .4 }, v); tx(v, bx + 8, by + 18, SN[k], "lb", narrow ? 12.5 : 13.5, "start", { "font-weight": 700 }); m1.lab[k] = tx(v, bx + bw - 10, by + 18, "0", `vl i${k}`, 15, "end"); });
+    const slot = [0, 0, 0, 0];
+    m1.els = pieces.map((p, i) => {
+      const hx = 12 + p.x * (W - 24), hy = 50 + p.y * (sandH - 70), e = item(v, p.kind, 0, 0, u, SC[p.src]); e.classList.add("pk");
+      const place = () => { const [bx, by] = bpos[p.src], n = slot[p.src]++, cols = Math.max(4, Math.floor((bw - 20) / (u * .78))), sx = bx + 14 + (n % cols) * u * .78, sy = by + 34 + Math.floor(n / cols) * u * .7; return [sx, sy]; };
+      p.home = [hx, hy]; p.basket = null;
+      e.style.transform = `translate(${hx}px,${hy}px) rotate(${p.r}deg)`; e.dataset.i = i;
+      if (p.done) { p.basket = place(); e.style.transform = `translate(${p.basket[0]}px,${p.basket[1]}px) scale(.62)`; m1.counts[p.src]++; }
+      p.place = place; return e;
+    });
+    m1.counts.forEach((c, k) => { m1.lab[k].textContent = c; });
+    v.addEventListener("click", (ev) => { const g = ev.target.closest(".pk"); if (g) pick(+g.dataset.i); });
+    v.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); const i = pieces.findIndex((p) => !p.done); if (i >= 0) pick(i); } });
+    const tip = tipFor(fig); v.addEventListener("pointermove", (ev) => { const g = ev.target.closest && ev.target.closest(".pk"); if (!g || ev.pointerType === "touch") { tip.hide(); return; } const p = pieces[+g.dataset.i]; tip.show(ev, IN[p.kind], [[SN[p.src], "", SC[p.src]]]); }); v.addEventListener("pointerleave", () => tip.hide());
+    upd1();
+  }
+  function pick(i) {
+    const p = pieces[i]; if (!p || p.done) return; p.done = true; picked++;
+    const [x, y] = p.place(); m1.els[i].style.transform = `translate(${x}px,${y}px) scale(.62)`; m1.counts[p.src]++; m1.lab[p.src].textContent = m1.counts[p.src];
+    document.getElementById("hint1").textContent = `${IN[p.kind]} → ${SN[p.src]} · ${picked}개 주웠다`; upd1();
+  }
+  function upd1() { if (picked === 100) document.getElementById("hint1").textContent = `다 주웠다. 육지 ${m1.counts[0]}개, 바다 ${m1.counts[1]}개, 외국 ${m1.counts[2]}개, 알 수 없음 ${m1.counts[3]}개.`; document.getElementById("all1").disabled = picked === 100; }
+  document.getElementById("all1").addEventListener("click", () => { const left = pieces.map((p, i) => [p, i]).filter(([p]) => !p.done); if (reduce) { left.forEach(([, i]) => pick(i)); return; } left.forEach(([, i], n) => setTimeout(() => pick(i), n * 28)); });
+  document.getElementById("re1").addEventListener("click", () => { seed = (seed * 31 + 11) % 2147483647 || 7; scatter(); c1(); document.getElementById("hint1").textContent = "새로 뿌렸다. 다시 주워 보자."; });
+  const srcTot = SR.map((sr) => G.filter((r) => r[1] === sr).reduce((a, r) => a + r[2], 0));
+  table("t1", ["무엇", "어디서 쓰던 것", "개수(2018–2019)", "비중", "판 위의 개수"], G.map((r, k) => [IN[r[0]], SN[SR.indexOf(r[1])], fmt(r[2]), pc(r[2] / GT * 100), PER[k]]).concat(SR.map((sr, k) => ["합계", SN[k], fmt(srcTot[k]), pc(srcTot[k] / GT * 100), ""])));
+
+  /* ---------- 2. map ---------- */
+  const SITES = DATA.sites, SEA = ["서해", "남해", "동해", "제주"], EC = [0, 1, 2, 3].map((k) => `var(--e${k})`), geo = DATA.geo;
+  const avg = (a) => a.slice(3).reduce((x, y) => x + y, 0) / 3;
+  const fshare = (s0) => { const c = Object.values(s0.src || {}).reduce((a, cc) => { SR.forEach((k) => { a[k] = (a[k] || 0) + (cc[k] || 0); }); return a; }, {}); const t = SR.reduce((a, k) => a + (c[k] || 0), 0); return t ? { f: (c["외국"] || 0) / t * 100, n: c["외국"] || 0, t } : null; };
+  let mode2 = "kg";
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const bx0 = Math.min(geo.box[0], ...SITES.map((q) => q.xy[0] - 46)), by0 = Math.min(geo.box[1], ...SITES.map((q) => q.xy[1] - 30)), bx1 = Math.max(geo.box[2], ...SITES.map((q) => q.xy[0] + 30)), by1 = Math.max(geo.box[3], ...SITES.map((q) => q.xy[1] + 30)), W = Math.max(280, box.clientWidth), sc = W / (bx1 - bx0), H = (by1 - by0) * sc, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": mode2 === "fr" ? "해변별 외국 쓰레기 비중 지도. 인천 백령도가 67%로 가장 높다" : `해변 60곳의 한 해 ${mode2 === "kg" ? "무게" : "개수"} 지도` }, box);
+    const g = s("g", { transform: `translate(${-bx0 * sc},${-by0 * sc}) scale(${sc})` }, v);
+    geo.paths.forEach((p) => s("path", { d: p.d, fill: "var(--land)", stroke: "var(--axis)", "stroke-width": .7 / sc }, g));
+    const vals = SITES.map((s0) => mode2 === "kg" ? avg(s0.kg) : mode2 === "cnt" ? avg(s0.cnt) : (fshare(s0) || { f: null }).f), mx = Math.max(...vals.filter((x) => x != null));
+    const R = (W < 400 ? 22 : 30) / sc;
+    SITES.map((s0, i) => [s0, vals[i]]).sort((a, b) => (b[1] ?? -1) - (a[1] ?? -1)).forEach(([s0, val]) => {
+      const [x, y] = s0.xy, si = SEA.indexOf(s0.sea);
+      if (val == null) { s("circle", { cx: x, cy: y, r: 2.5 / sc, fill: "none", stroke: "var(--axis)", "stroke-width": 1 / sc }, g); }
+      else if (mode2 === "fr") { const r = Math.max(2.6 / sc, Math.sqrt(val / 70) * R); s("circle", { cx: x, cy: y, r, fill: val > 0 ? "var(--s2)" : "none", "fill-opacity": .7, stroke: "var(--s2)", "stroke-width": 1 / sc }, g); }
+      else { const r = Math.max(2 / sc, Math.sqrt(val / mx) * R); s("circle", { cx: x, cy: y, r, fill: EC[si], "fill-opacity": .62, stroke: EC[si], "stroke-width": .9 / sc }, g); }
+      const fs_ = fshare(s0);
+      pts.push({ x: (x - bx0) * sc, y: (y - by0) * sc, r: 6, fn: () => [`${s0.n} · ${s0.sea}`, [[`${f1(avg(s0.kg))}kg`, "한 해 무게(2021–2023)"], [`${fmt(avg(s0.cnt))}개`, "한 해 개수(2021–2023)"], [fs_ ? `${f1(fs_.f)}% (${fs_.n}/${fmt(fs_.t)}개)` : "세부 항목 없음", "외국 쓰레기(2018–2019)"]]] });
+    });
+    const big = SITES.map((s0, i) => [s0, vals[i]]).filter((x) => x[1] != null).sort((a, b) => b[1] - a[1]).slice(0, 4);
+    const used = []; big.forEach(([s0]) => { if (used.some(([ux, uy]) => Math.abs(ux - s0.xy[0]) < 70 && Math.abs(uy - s0.xy[1]) < 18)) return; used.push(s0.xy); const [x, y] = s0.xy, left = x > 330; tx(g, x + (left ? -10 : 10) / sc, y - 6 / sc, s0.n, "lb halo", 12 / sc, left ? "end" : "start", { "stroke-width": 3 / sc }); });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 해변을 옮겨 볼 수 있다");
+    document.getElementById("fs2").textContent = mode2 === "kg" ? "원의 넓이 = 2021–2023년 한 해 평균 무게(kg). 색 = 바다" : mode2 === "cnt" ? "원의 넓이 = 2021–2023년 한 해 평균 개수. 색 = 바다" : "원의 넓이 = 2018–2019년에 주운 것 가운데 외국 쓰레기의 비중. 빈 점 = 세부 항목이 없는 해변";
+    const lg = document.getElementById("lg2"); lg.replaceChildren();
+    if (mode2 === "fr") { const sp = document.createElement("span"), i = document.createElement("i"); i.className = "sw dot"; i.style.background = "var(--s2)"; sp.append(i, "외국 쓰레기 비중"); lg.append(sp); }
+    else SEA.forEach((n, k) => { const sp = document.createElement("span"), i = document.createElement("i"); i.className = "sw dot"; i.style.background = EC[k]; sp.append(i, n); lg.append(sp); });
+    document.getElementById("tl2").textContent = mode2 === "kg" ? "한 해 무게가 많은 해변" : mode2 === "cnt" ? "한 해 개수가 많은 해변" : "외국 쓰레기 비중이 높은 해변";
+    const ol = document.getElementById("top2"); ol.replaceChildren();
+    SITES.map((s0, i) => [s0, vals[i]]).filter((x) => x[1] != null).sort((a, b) => b[1] - a[1]).slice(0, 7).forEach(([s0, val]) => { const li = document.createElement("li"); li.append(`${s0.n} (${s0.sea})`, bEl(mode2 === "kg" ? `${f1(val)}kg` : mode2 === "cnt" ? `${fmt(val)}개` : `${f1(val)}%`)); ol.append(li); });
+  }
+  chips("k2", [["kg", "무게"], ["cnt", "개수"], ["fr", "외국 비중"]], "kg", (k) => { mode2 = k; c2(); });
+  table("t2", ["해변", "바다", ...DATA.YS.map((y) => `${y} 개수`), ...DATA.YS.map((y) => `${y} kg`), "외국 비중(2018–19)"], [...SITES].sort((a, b) => SEA.indexOf(a.sea) - SEA.indexOf(b.sea) || a.n.localeCompare(b.n, "ko")).map((s0) => [s0.n, s0.sea, ...s0.cnt.map(fmt), ...s0.kg.map(f1), fshare(s0) ? pc(fshare(s0).f) : "–"]));
+
+  /* ---------- 3. count vs weight ---------- */
+  const TY = DATA.types, TCOL = { "플라스틱": "var(--s1)", "외국기인": "var(--s2)", "목재": "var(--e3)", "유리": "var(--e0)", "금속": "var(--s3)" };
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, bh = narrow ? 52 : 64, gap = 74, top = 24, H = top + bh * 2 + gap + 30, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "재질별 해안 쓰레기 비중. 개수로는 플라스틱 87.4%, 무게로는 52.9%. 나무는 개수 1.7%, 무게 22.4%. 외국에서 온 것은 개수 1.8%, 무게 11.1%" }, box);
+    [[1, "개수로 세면", 0], [2, "무게로 달면", 1]].forEach(([col, label, row]) => {
+      const tot = TY.reduce((a, t) => a + t[col], 0), y = top + row * (bh + gap); let x = 0;
+      tx(v, 0, y - 8, label, "lb", 14, "start", { "font-weight": 700 });
+      TY.forEach((t) => { const w = W * t[col] / tot, sh = t[col] / tot * 100; s("rect", { x, y, width: Math.max(0, w - 1.5), height: bh, fill: TCOL[t[0]] || "var(--grid)" }, v); if (w > 46) { tx(v, x + 6, y + 20, t[0] === "외국기인" ? "외국" : t[0], "lb", 12.5, "start", { fill: TCOL[t[0]] ? "var(--card)" : "var(--ink)" }); tx(v, x + 6, y + 38, `${f1(sh)}%`, "vl", 13, "start", { fill: TCOL[t[0]] ? "var(--card)" : "var(--ink)" }); } pts.push({ x: x + w / 2, y: y + bh / 2, r: Math.max(6, Math.min(w, bh) / 2), fn: () => [t[0], [[`${f1(sh)}%`, label], [col === 1 ? `${fmt(t[1])}개` : `${fmt(t[2])}kg`, "2018–2023년 합"]]] }); x += w; });
+    });
+    // links between the two bars for wood and foreign
+    ["목재", "외국기인", "플라스틱"].forEach((n) => { const a = (col) => { const tot = TY.reduce((p, t) => p + t[col], 0); let x = 0; for (const t of TY) { if (t[0] === n) return [x, x + W * t[col] / tot]; x += W * t[col] / tot; } }; const [a0, a1] = a(1), [b0, b1] = a(2), y0 = top + bh, y1 = top + bh + gap; s("path", { d: `M${a0},${y0} L${b0},${y1} L${b1},${y1} L${a1},${y0} Z`, fill: TCOL[n], opacity: .16 }, v); });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 칸을 옮겨 볼 수 있다");
+  }
+  const tcn = TY.reduce((a, t) => a + t[1], 0), tkg = TY.reduce((a, t) => a + t[2], 0);
+  table("t3", ["재질", "개수", "개수 비중", "무게(kg)", "무게 비중"], TY.map((t) => [t[0], fmt(t[1]), pc(t[1] / tcn * 100), f1(t[2]), pc(t[2] / tkg * 100)]).concat([["합계", fmt(tcn), "100.0%", f1(tkg), "100.0%"]]));
+
+  /* ---------- 4. dune ---------- */
+  let mode4 = "cnt";
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const key = mode4, list = [...SITES].map((s0) => ({ s0, v: s0[key].slice(3).reduce((a, b) => a + b, 0) })).sort((a, b) => b.v - a.v), tot = list.reduce((a, o) => a + o.v, 0);
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, H = narrow ? 280 : 320, l = 4, top = 70, base = H - 28, bw = (W - l) / list.length, mx = list[0].v, y = (val) => base - (base - top) * val / mx;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `해변 60곳을 2021–2023년 ${key === "cnt" ? "개수" : "무게"}대로 줄 세운 그림. ${list[0].s0.n}이 ${pc(list[0].v / tot * 100)}` }, box);
+    s("path", { d: `M${l},${base} ` + list.map((o, k) => `L${l + k * bw + bw / 2},${y(o.v)}`).join(" ") + ` L${W},${base} Z`, fill: "var(--sand)" }, v);
+    list.forEach((o, k) => { const si = SEA.indexOf(o.s0.sea); s("rect", { x: l + k * bw + bw * .2, y: y(o.v), width: bw * .6, height: base - y(o.v), fill: EC[si] }, v); });
+    s("line", { x1: 0, x2: W, y1: base, y2: base, class: "ax" }, v);
+    [0, 1, 2].forEach((k) => { const o = list[k], x = l + k * bw + bw / 2, ly = top - 10 + k * 18, lx = l + 3 * bw + 10; s("path", { d: `M${x},${y(o.v)} L${x},${ly - 4} L${lx - 4},${ly - 4}`, fill: "none", stroke: "var(--axis)", "stroke-width": 1 }, v); tx(v, lx, ly, `${k + 1}. ${o.s0.n} ${pc(o.v / tot * 100)}`, "lb halo", 12.5, "start", { "stroke-width": 4 }); });
+    tx(v, 0, H - 8, "← 많은 곳", "mt", 12); tx(v, W, H - 8, "적은 곳 →", "mt", 12, "end");
+    document.getElementById("fs4").textContent = `${key === "cnt" ? "개수" : "무게(kg)"}. 막대 하나 = 해변 하나, 색 = 바다(서해·남해·동해·제주). 2021–2023년 합 ${key === "cnt" ? fmt(tot) + "개" : fmt(tot) + "kg"}`;
+    timeLayer(v, tipFor(fig), list.length, (k) => l + k * bw + bw / 2, top, base, (k) => { const o = list[k]; return [`${k + 1}위 · ${o.s0.n}`, [[key === "cnt" ? `${fmt(o.v)}개` : `${f1(o.v)}kg`, "2021–2023년 합"], [pc(o.v / tot * 100), "60곳 합 가운데"], [o.s0.sea, "바다", EC[SEA.indexOf(o.s0.sea)]]]]; }, "좌우 화살표 키로 해변을 옮겨 볼 수 있다");
+  }
+  chips("k4", [["cnt", "개수"], ["kg", "무게"]], "cnt", (k) => { mode4 = k; c4(); });
+
+  /* ---------- first view + resize ---------- */
+  scatter(); c1(); c2(); c3(); c4();
+  onResize(() => { c1(); c2(); c3(); c4(); });
+})();
+</script>

@@ -1,0 +1,298 @@
+<title>청약 막대 숲</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a forest of 2,202 apartment complexes. One row per 시도 along a 2020–2025 time axis;
+   each complex is a tree whose height is its 1st-round competition ratio (log scale), roots hang below 1:1 when undersubscribed. */
+:root {
+  --paper: #f3f2ec; --card: #fcfbf8; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #dbe1dd; --grid: #e8e7e3; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --board: #2f3133; --board-ink: #ebdac0; --accent: #3e6f90;
+  --seoul: #903a43; --cap: #d56b41; --local: #3e6f90; --seoul-ink: #903a43; --cap-ink: #a8451f; --local-ink: #3e6f90; --root: #a7a8a3; --soil: #ead0b9;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Nanum Myeongjo", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --board: #131415; --board-ink: #ebdac0; --accent: #8eabc9;
+  --seoul: #d6b0a7; --cap: #dc8c67; --local: #8eabc9; --seoul-ink: #d6b0a7; --cap-ink: #dc8c67; --local-ink: #8eabc9; --root: #5f6062; --soil: #3a3431; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --board: #131415; --board-ink: #ebdac0; --accent: #8eabc9;
+  --seoul: #d6b0a7; --cap: #dc8c67; --local: #8eabc9; --seoul-ink: #d6b0a7; --cap-ink: #dc8c67; --local-ink: #8eabc9; --root: #5f6062; --soil: #3a3431; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 800; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+:focus-visible { outline-color: var(--accent) }
+</style>
+
+<main class="page">
+  <header>
+    <h1>청약은 서울만 붐빌까<span>꼭대기만 보면 아니다. 1순위 경쟁률 상위 50개 단지 가운데 29곳이 서울 밖(동탄·과천·세종·부산·아산)이다. 그러나 보통 단지로 보면 서울은 한 곳도 미달이 없고, 서울 밖은 셋 중 하나가 미달이다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 5</dd>
+      <dt>한 줄</dt><dd>청약홈 경쟁률 원자료로 2020년 2월부터 2025년 11월까지 모집공고한 아파트 2,202개 단지의 1순위 경쟁률(1순위 접수 ÷ 일반공급 세대)을 셌다. 일반공급 50세대 이상 단지 1,930곳의 상위 50곳 중 서울은 21곳이고, 1·2위는 동탄역 디에트르 퍼스티지(809:1)와 세종 가락마을6단지(801:1)다. 반면 단지 경쟁률의 중앙값은 서울 49.9:1, 부산 2.4:1, 대구 1.8:1이고, 서울 밖 단지의 36.6%는 1순위에서 공급 세대만큼도 접수되지 않았다.</dd>
+      <dt>분류</dt><dd>주거·일·경제</dd>
+      <dt>본능</dt><dd>크기 본능 · 뉴스에 나오는 수백 대 1의 숫자가 그 지역 전체의 모습이라고 여긴다</dd>
+      <dt>그림 방식</dt><dd>막대 숲 · 단지 하나를 나무 하나로 세웠다. 시도마다 한 줄, 왼쪽에서 오른쪽으로 2020–2025년. 나무 높이가 경쟁률이고, 1:1에 못 미치면 땅 아래로 뿌리만 내린다</dd>
+      <dt>기간</dt><dd>2020년 2월 – 2025년 11월 모집공고</dd>
+      <dt>엮은 데이터</dt><dd>2개 · 한국부동산원 청약홈 APT 경쟁률 · 청약홈 APT 분양정보</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2020–2025년 일반공급 50세대 이상 아파트 1,930곳 가운데 1순위 경쟁률 상위 50곳. 이 중 서울 단지는?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>45곳 넘게</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>35곳쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>절반이 안 된다</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. <span class="n">21곳</span>, 42%</span>
+      경기 14곳(동탄·과천·위례·하남 등 신도시), 부산 6곳, 세종 3곳, 충남 2곳(아산 탕정), 인천·울산·광주·전북 1곳씩이다. 1위와 2위도 서울이 아니다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">2,202그루의 막대 숲</h2>
+      <p>단지 하나가 나무 하나다. 시도마다 한 줄로 세웠고, 왼쪽에서 오른쪽으로 모집공고 날짜순이다. 나무 높이는 1순위 경쟁률(로그 눈금)이고, 1순위 접수가 공급 세대보다 적으면 땅 아래로 뿌리만 내렸다.</p>
+      <p>서울 줄은 나무가 고르게 높고 땅 아래가 없다. 세종은 나무가 몇 그루뿐이지만 모두 높다(세종은 전국에서 청약할 수 있다). 다른 줄에서도 키 큰 나무가 군데군데 솟는다. 2020–2021년 경기·부산, 2022년 부산·세종이 그렇다. 2023년부터는 서울 밖 숲이 낮아지고 뿌리가 늘어난다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">단지별 1순위 경쟁률, 2020–2025년</p>
+      <p class="fs">나무 하나 = 단지 하나. 높이 = 1순위 접수 ÷ 일반공급 세대(로그 눈금), 땅 아래 = 1:1 미만(미달). 점선 = 10:1과 100:1, 실선 = 1,000:1. 시도는 중앙값이 높은 순</p>
+      <div class="legend"><span><i class="sw" style="background:var(--seoul)"></i>서울</span><span><i class="sw" style="background:var(--cap)"></i>경기·인천</span><span><i class="sw" style="background:var(--local)"></i>그 밖의 시도</span><span><i class="sw" style="background:var(--root)"></i>미달(1:1 미만)</span></div>
+      <div class="chips" id="chips1" role="group" aria-label="보기"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>한국부동산원 「청약홈 APT 경쟁률」(2026.10.22 판), 「청약홈 APT 분양정보」(2025.11.28 판)를 주택관리번호로 엮었다. 분양정보 판 이후(2025년 12월–) 공고한 231개 단지는 지역을 알 수 없어 뺐다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">한 집 앞에 줄 선 사람</h2>
+      <p>경쟁률이 가장 높았던 12개 단지 앞에 집 한 채당 줄 선 사람을 세웠다. 사람 모양 하나가 20명이다. 동탄역 디에트르 퍼스티지는 302세대에 1순위 24만 4천 명이 몰려 한 채에 809명이 줄을 섰다. 12곳 중 서울은 4곳이다. 맨 아래는 서울 단지와 서울 밖 단지의 중앙값이다. 서울의 보통 단지에도 한 채에 50명이 서지만, 서울 밖의 보통 단지에는 세 명이 채 안 된다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">집 한 채에 줄 선 1순위 청약자</p>
+      <p class="fs">사람 모양 하나 = 20명. 일반공급 50세대 이상 단지</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>한국부동산원 청약홈. 1순위 접수는 해당지역·기타지역(경기 포함)을 더했다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">해마다 바뀌는 꼭대기</h2>
+      <p>해마다 경쟁률 상위 20개 단지가 어디였는지 셌다. 2020–2022년에는 서울이 20곳 중 2–5곳뿐이었고, 2022년에는 부산이 6곳으로 가장 많았다. 2023–2024년에는 서울이 10–11곳으로 절반을 차지했다. 2025년에는 다시 경기(8곳)가 서울(6곳)보다 많다. "서울만 붐빈다"는 말은 2023–2024년에 가장 잘 맞았다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">해마다 1순위 경쟁률 상위 20개 단지의 지역</p>
+      <p class="fs">단지 수. 일반공급 50세대 이상</p>
+      <div class="legend"><span><i class="sw" style="background:var(--seoul)"></i>서울</span><span><i class="sw" style="background:var(--cap)"></i>경기·인천</span><span><i class="sw" style="background:var(--local)"></i>그 밖의 시도</span></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>한국부동산원 청약홈. 2025년은 1–11월 공고.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">보통 단지로 보면 차이가 크다</h2>
+      <p>시도마다 1순위에서 미달된 단지의 비율을 셌다. 서울 150개 단지는 한 곳도 미달이 없었다. 제주는 64%, 울산 58%, 경북 53%, 경남 51%가 미달이었다. 꼭대기에는 서울 밖 단지가 많지만, 대부분의 서울 밖 단지는 조용하다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">시도별 1순위 미달 단지의 비율, 2020–2025년</p>
+      <p class="fs">%. 1순위 접수가 일반공급 세대보다 적은 단지. 괄호 = 단지 수</p>
+      <div class="legend"><span><i class="sw" style="background:var(--seoul)"></i>서울</span><span><i class="sw" style="background:var(--cap)"></i>경기·인천</span><span><i class="sw" style="background:var(--local)"></i>그 밖의 시도</span></div>
+      <div class="chart" id="c4"></div>
+      <figcaption>한국부동산원 청약홈. 공급 세대가 적은 단지도 모두 넣었다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 청약은 서울만 붐빌까</h2>
+      <p>가장 붐빈 단지만 보면 아니다. 수백 대 1의 단지는 동탄·과천 같은 신도시, 세종, 부산에도 있고, 1·2위도 서울 밖이다. 그러나 "보통의" 단지로 보면 서울만 붐빈다는 말이 더 맞다. 서울은 모든 단지가 1순위에서 찼고, 서울 밖은 셋 중 하나가 미달이다. 뉴스의 "역대급 경쟁률"은 숲에서 가장 키 큰 나무의 이야기다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>경쟁률은 1순위 접수 건수를 일반공급 세대 수로 나눈 값이다. 특별공급(신혼부부·생애최초 등)과 무순위 접수는 들어 있지 않다. 1순위에서 미달이어도 2순위나 무순위에서 다 팔릴 수 있다.</li>
+      <li>공급 세대가 적은 단지는 경쟁률이 크게 튄다. 상위 단지 순위는 일반공급 50세대 이상만 셌다. 숲 그림과 미달 비율은 모든 단지를 넣었다.</li>
+      <li>세종은 해당지역 외 전국에서 청약할 수 있어 경쟁률이 높게 나온다. 공공분양·신혼희망타운도 함께 들어 있다.</li>
+      <li>경쟁률이 높다고 집값이 높거나 오르는 것은 아니다. 분양가 상한제로 시세보다 싸게 나온 단지에 사람이 몰린다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15101048/fileData.do" target="_blank" rel="noopener">청약홈 APT 경쟁률</a> (15101048)</td><td>한국부동산원</td><td>단지·주택형별 공급 세대, 순위·거주지역별 접수 건수</td><td>2020–2026</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15101046/fileData.do" target="_blank" rel="noopener">청약홈 APT 분양정보</a> (15101046)</td><td>한국부동산원</td><td>단지 이름, 공급 지역·위치, 모집공고일</td><td>2020–2025.11</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>경쟁률 54,654행(2,433개 단지) · 분양정보 2,594개 단지 · 엮인 단지 2,202곳</dd>
+      <dt>도구</dt><dd>Python(엮기·집계) · SVG 막대 숲과 줄 선 사람(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>단지별 1순위 경쟁률 · 시도별 중앙값과 미달 비율 · 해마다 상위 20곳의 지역 구성</dd>
+      <dt>검증</dt><dd>상위 단지(청담 르엘 667:1, 래미안 원펜타스 527:1 등)의 경쟁률을 청약홈 발표 경쟁률과 견줘 같은 자릿수인지 확인했다. 단지 경쟁률은 주택형별 경쟁률을 공급 세대로 가중한 값과 같다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>경쟁률이 높은 단지는 분양가가 쌌을까</h3><p>주택형별 분양정보의 분양가와 주변 실거래가를 견주면 "로또 청약"이 얼마나 많았는지 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15101047/fileData.do" target="_blank" rel="noopener">청약홈 APT 주택형별 분양정보</a> · 한국부동산원</li></ul></div>
+      <div class="q"><h3>미달 단지는 결국 다 팔렸을까</h3><p>무순위 잔여세대 분양정보와 미분양 통계로 미달 단지의 뒷이야기를 볼 수 있다.</p></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const U = DATA.U.map(([date, sido, city, name, sup, r1, pub]) => ({ date, sido, city, name, sup, r1, pub, r: r1 / sup, t: +date.slice(0, 4) + (+date.slice(5, 7) - 1) / 12 + (+date.slice(8, 10) - 1) / 365 }));
+  const grp = (sd) => sd === "서울" ? "seoul" : sd === "경기" || sd === "인천" ? "cap" : "local";
+  const GN = { seoul: "서울", cap: "경기·인천", local: "그 밖의 시도" };
+  const med = (a) => { const b = [...a].sort((x, y) => x - y), m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
+  const ratioTxt = (r) => r >= 100 ? `${fmt(r)}:1` : r >= 10 ? `${f1(r)}:1` : `${r.toFixed(2)}:1`;
+  const BIG = U.filter((u) => u.sup >= 50), TOP = new Set([...BIG].sort((a, b) => b.r - a.r).slice(0, 50));
+  const SIDO = [...new Set(U.map((u) => u.sido))].map((sd) => ({ sd, us: U.filter((u) => u.sido === sd) })).map((o) => ({ ...o, m: med(o.us.map((u) => u.r)) })).sort((a, b) => b.m - a.m);
+
+  /* ---------- 1. forest ---------- */
+  let hl = "all";
+  chips("chips1", [["all", "모든 단지"], ["top", "상위 50곳만 진하게"]], hl, (k) => { hl = k; c1(); });
+  function c1() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, l = narrow ? 2 : 4, r = narrow ? 2 : 4, up = narrow ? 30 : 38, dn = 7, head = 18, rowH = head + up + dn + 12, top = 22;
+    const H_ = top + SIDO.length * rowH + 6;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H_}`, role: "img", "aria-label": "시도별 단지 1순위 경쟁률 막대 숲 2020–2025" }, box), pts = [];
+    const t0 = 2020 + 1 / 12, t1 = 2025 + 11 / 12, sx = (t) => l + (t - t0) / (t1 - t0) * (W - l - r);
+    const hUp = (q) => Math.min(1, Math.log10(q) / 3) * up, hDn = (q) => Math.min(1, -Math.log10(Math.max(q, .01)) / 2) * dn;
+    for (let yy = 2021; yy <= 2025; yy++) { s("line", { x1: sx(yy), x2: sx(yy), y1: top - 4, y2: H_ - 4, class: "gl" }, v); tx(v, sx(yy), top - 8, String(yy), "tk", 11.5, "middle"); }
+    tx(v, sx(t0), top - 8, "2020", "tk", 11.5, "start");
+    SIDO.forEach((o, i) => {
+      const y0 = top + i * rowH, base = y0 + head + up;
+      const lab = tx(v, l, y0 + 13, o.sd, "vl", 13, "start");
+      const sub = s("tspan", { class: "mt", dx: 6, "font-size": 12 }, lab); sub.textContent = `${o.us.length}곳 · 중앙값 ${ratioTxt(o.m)}`;
+      s("rect", { x: l, y: base, width: W - l - r, height: dn + 2, fill: "var(--soil)", opacity: .7 }, v);
+      [10, 100, 1000].forEach((q) => s("line", { x1: l, x2: W - r, y1: base - hUp(q), y2: base - hUp(q), stroke: "var(--grid)", "stroke-width": 1, "stroke-dasharray": q === 1000 ? null : "2 3" }, v));
+      o.us.forEach((u) => {
+        const x = sx(u.t), g = grp(u.sido), dim = hl === "top" && !TOP.has(u);
+        if (u.r >= 1) s("rect", { x: x - .8, y: base - Math.max(1, hUp(u.r)), width: 1.6, height: Math.max(1, hUp(u.r)), fill: `var(--${g})`, opacity: dim ? .15 : .85 }, v);
+        else s("rect", { x: x - .8, y: base, width: 1.6, height: Math.max(1, hDn(u.r)), fill: "var(--root)", opacity: dim ? .15 : .9 }, v);
+        if (TOP.has(u) && hl === "top") s("circle", { cx: x, cy: base - hUp(u.r) - 2.5, r: 2.5, fill: `var(--${g})` }, v);
+        pts.push({ x, y: u.r >= 1 ? base - hUp(u.r) : base + 2, r: 1.5, fn: () => [`${u.name}`, [[ratioTxt(u.r), "1순위 경쟁률"], [`${fmt(u.sup)}세대 / ${fmt(u.r1)}건`, "일반공급 / 1순위 접수"], [`${u.sido} ${u.city}`, u.date]]] });
+      });
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 단지를 하나씩 옮겨 볼 수 있다");
+  }
+  table("t1", ["시도", "단지", "중앙값", "미달 단지", "가장 높은 단지"], SIDO.map((o) => { const b = o.us.reduce((a, u) => u.r > a.r ? u : a); return [o.sd, o.us.length, ratioTxt(o.m), o.us.filter((u) => u.r < 1).length, `${b.name} ${ratioTxt(b.r)}`]; }));
+
+  /* ---------- 2. queues ---------- */
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const top12 = [...BIG].sort((a, b) => b.r - a.r).slice(0, 12);
+    const mS = med(U.filter((u) => u.sido === "서울").map((u) => u.r)), mN = med(U.filter((u) => u.sido !== "서울").map((u) => u.r));
+    const rows = [...top12.map((u) => ({ u, name: u.name, sub: `${u.sido} ${u.city} · ${u.date.slice(0, 7)}`, r: u.r, g: grp(u.sido) })), { name: "서울 보통 단지(중앙값)", sub: "150곳", r: mS, g: "seoul", ref: 1 }, { name: "서울 밖 보통 단지(중앙값)", sub: "2,052곳", r: mN, g: "local", ref: 1 }];
+    const W = Math.max(300, box.clientWidth), gw = 7, gh = 13, per = Math.max(10, Math.floor((W - 70) / gw)), PER = 20;
+    let y = 4; const v = s("svg", { viewBox: `0 0 ${W} 10`, role: "img", "aria-label": "경쟁률 상위 12개 단지와 중앙값 단지의 집 한 채당 1순위 청약자" }, box), pts = [];
+    rows.forEach((o, i) => {
+      if (o.ref && !rows[i - 1].ref) { y += 6; s("line", { x1: 0, x2: W, y1: y, y2: y, stroke: "var(--line)", "stroke-dasharray": "3 3" }, v); y += 10; }
+      const one = W >= 620, nm = !one && o.name.length > 30 ? o.name.slice(0, 29) + "…" : o.name;
+      const t = tx(v, 0, y + 13, nm, "lb", 13, "start", { style: "font-weight:600" });
+      if (one) { const st = s("tspan", { class: "mt", dx: 6, "font-size": 12 }, t); st.textContent = o.sub; }
+      else { y += 17; tx(v, 0, y + 13, o.sub, "mt", 12, "start"); }
+      y += 20;
+      // house
+      s("path", { d: `M2,${y + 7} L10,${y} L18,${y + 7} L18,${y + 16} L2,${y + 16} Z`, fill: "none", stroke: "var(--ink2)", "stroke-width": 1.4, "stroke-linejoin": "round" }, v);
+      s("rect", { x: 8, y: y + 10, width: 4, height: 6, fill: "var(--ink2)" }, v);
+      const n = o.r / PER, full = Math.floor(n), frac = n - full, x0 = 26, cap = Math.max(10, Math.floor((W - x0 - 66) / gw));
+      const lines = Math.max(1, Math.ceil((full + (frac > .05 ? 1 : 0)) / cap));
+      for (let k = 0; k < full + (frac > .05 ? 1 : 0); k++) {
+        const cx = x0 + (k % cap) * gw + 3, cy = y + Math.floor(k / cap) * (gh + 3), part = k === full ? frac : 1;
+        const gg = s("g", { opacity: part < 1 ? .35 + part * .5 : 1 }, v);
+        s("circle", { cx, cy: cy + 3, r: 2.2, fill: `var(--${o.g})` }, gg);
+        s("rect", { x: cx - 2.6, y: cy + 6, width: 5.2, height: 7, rx: 2.2, fill: `var(--${o.g})` }, gg);
+      }
+      const lastX = x0 + Math.min(cap, Math.max(1, full + (frac > .05 ? 1 : 0))) * gw + 6, lastY = y + (lines - 1) * (gh + 3) + 12;
+      tx(v, lastX, lastY, `${ratioTxt(o.r)}`, "vl", 12.5, "start", { style: `fill:var(--${o.g}-ink)` });
+      pts.push({ x: 10, y: y + 8, r: 10, fn: () => [o.name, o.u ? [[ratioTxt(o.r), "1순위 경쟁률"], [`${fmt(o.u.sup)}세대`, "일반공급"], [`${fmt(o.u.r1)}건`, "1순위 접수"]] : [[ratioTxt(o.r), "중앙값"]]] });
+      y += lines * (gh + 3) + 12;
+    });
+    v.setAttribute("viewBox", `0 0 ${W} ${y}`);
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 단지를 옮겨 볼 수 있다");
+    table("t2", ["단지", "지역", "공고", "일반공급", "1순위 접수", "경쟁률"], top12.map((u) => [u.name, `${u.sido} ${u.city}`, u.date, fmt(u.sup), fmt(u.r1), ratioTxt(u.r)]));
+  }
+
+  /* ---------- 3. top 20 by year ---------- */
+  const YS = [2020, 2021, 2022, 2023, 2024, 2025];
+  const TY = YS.map((yy) => { const t = BIG.filter((u) => +u.date.slice(0, 4) === yy).sort((a, b) => b.r - a.r).slice(0, 20); const c = { seoul: 0, cap: 0, local: 0 }; t.forEach((u) => c[grp(u.sido)]++); const sd = {}; t.forEach((u) => sd[u.sido] = (sd[u.sido] || 0) + 1); return { yy, c, sd }; });
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), l = 44, r = 6, rowH = 34, top = 18, H_ = top + YS.length * rowH + 4;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H_}`, role: "img", "aria-label": "해마다 경쟁률 상위 20개 단지의 지역 구성" }, box), pts = [];
+    const sx = (n) => l + n / 20 * (W - l - r);
+    [0, 5, 10, 15, 20].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top - 4, y2: H_ - 2, class: "gl" }, v); tx(v, sx(t), top - 6, String(t), "tk", 11.5, t === 20 ? "end" : t ? "middle" : "start"); });
+    TY.forEach((o, i) => {
+      const y = top + i * rowH + 4; let acc = 0;
+      tx(v, l - 6, y + 17, String(o.yy), "tk", 11.5, "end");
+      ["seoul", "cap", "local"].forEach((g) => {
+        const n = o.c[g]; if (!n) return;
+        for (let k = 0; k < n; k++) s("rect", { x: sx(acc + k) + 1, y, width: sx(1) - sx(0) - 2, height: rowH - 10, rx: 2, fill: `var(--${g})` }, v);
+        acc += n;
+      });
+      pts.push({ x: sx(10), y: y + 12, r: (W - l) / 2, fn: () => [`${o.yy}년 상위 20곳`, [[o.c.seoul + "곳", "서울", "var(--seoul)"], [o.c.cap + "곳", "경기·인천", "var(--cap)"], [o.c.local + "곳", "그 밖의 시도", "var(--local)"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 해를 옮겨 볼 수 있다");
+    table("t3", ["연도", "서울", "경기·인천", "그 밖의 시도", "시도별"], TY.map((o) => [o.yy, o.c.seoul, o.c.cap, o.c.local, Object.entries(o.sd).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ${n}`).join(", ")]));
+  }
+
+  /* ---------- 4. undersubscribed share ---------- */
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const rows = SIDO.map((o) => ({ sd: o.sd, n: o.us.length, p: o.us.filter((u) => u.r < 1).length / o.us.length * 100 })).sort((a, b) => a.p - b.p);
+    const W = Math.max(300, box.clientWidth), l = 74, r = 50, rowH = 22, top = 18, H_ = top + rows.length * rowH + 4;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H_}`, role: "img", "aria-label": "시도별 1순위 미달 단지 비율" }, box), pts = [];
+    const sx = (p) => l + p / 100 * (W - l - r);
+    [0, 25, 50, 75, 100].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top - 4, y2: H_ - 2, class: t ? "gl" : "ax" }, v); tx(v, sx(t), top - 6, `${t}%`, "tk", 11.5, "middle"); });
+    rows.forEach((o, i) => {
+      const y = top + i * rowH + 4, g = grp(o.sd);
+      const t = tx(v, l - 6, y + 11, o.sd, "lb", 12.5, "end"); const st = s("tspan", { class: "mt", dx: 3, "font-size": 11.5 }, t); st.textContent = `(${o.n})`;
+      s("rect", { x: l, y, width: Math.max(1, sx(o.p) - l), height: 14, rx: 2, fill: `var(--${g})` }, v);
+      tx(v, sx(o.p) + 6, y + 11, pc(o.p), "tk", 11.5, "start");
+      pts.push({ x: sx(o.p), y: y + 7, r: 6, fn: () => [o.sd, [[pc(o.p), "1순위 미달 단지"], [o.n + "곳", "단지"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 시도를 옮겨 볼 수 있다");
+    table("t4", ["시도", "단지", "미달 단지 비율"], rows.map((o) => [o.sd, o.n, pc(o.p)]));
+  }
+
+  const all = () => { c1(); c2(); c3(); c4(); };
+  all(); onResize(all);
+})();
+</script>

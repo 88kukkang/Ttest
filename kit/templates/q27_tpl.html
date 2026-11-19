@@ -1,0 +1,266 @@
+<title>원자로 표시등</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a control-room panel. Each of 28 reactors has a row of status lamps, one lamp per month from 2011 to 2026:
+   green while it may run, amber while it is down for planned maintenance, dark before it opened or after it closed.
+   The lamps switch on month by month when the panel comes into view, and the amber ones pulse. */
+:root {
+  --paper: #f1f1ee; --card: #fbfbf9; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #dbe1dd; --grid: #e8e7e3; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --accent: #416e59; --panel: #2a2f2c; --panel2: #3a403c; --panel-ink: #dbe1dd; --panel-mut: #a7a8a3;
+  --run: #689daf; --run-hi: #c6d6cc; --oh: #dc8c67; --oh-hi: #d56b41; --off: #3a403c; --line-c: #416e59; --band: #c6d6cc; --oh-ink: #a8451f;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #91b0a1; --panel: #161918; --panel2: #2a2f2c; --line-c: #91b0a1; --band: #2f3b35; --oh-ink: #dc8c67; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #91b0a1; --panel: #161918; --panel2: #2a2f2c; --line-c: #91b0a1; --band: #2f3b35; --oh-ink: #dc8c67; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+:focus-visible { outline-color: var(--accent) }
+.board { position: relative; background: var(--panel); border-radius: 14px; padding: 14px 12px 12px; box-shadow: inset 0 0 0 3px var(--panel2) }
+.board canvas { display: block; width: 100%; touch-action: pan-y }
+.board .lab { position: absolute; font: 500 11.5px var(--mono); color: var(--panel-ink); pointer-events: none; white-space: nowrap }
+.board .lab.m { color: var(--panel-mut) }
+.board .screw { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--panel2) }
+</style>
+
+<main class="page">
+  <header>
+    <h1>원전은 늘 같은 양을 만들까<span>아니다. 원자로는 1–2년마다 두세 달씩 멈춰 정비를 받고, 어떤 해에는 원자로가 머문 날의 3분의 1이 정비였다. 그래서 원전 전체가 만드는 전기는 해마다 수십 TWh씩 출렁인다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 27</dd>
+      <dt>한 줄</dt><dd>한수원 원전 28기의 2011–2026년 계획예방정비(OH) 233번을 보면 한 번에 걸린 기간의 중앙값은 73일이다. 그러나 한빛4호기는 2017년 5월부터 2022년 12월까지 2,033일을 멈췄고, 고리2호기는 계속운전 준비로 2023년 4월부터 1,092일을 멈췄다. 원전이 있던 날 가운데 정비로 멈춘 날의 비율은 2018년 32.4%로 가장 높았고, 그해 호기 평균 이용률은 64.6%로 1980년 이후 가장 낮았다. 원전 발전량은 2018년 133.5TWh에서 2024년 187.3TWh까지 출렁였다.</dd>
+      <dt>분류</dt><dd>환경·교통·정치</dd>
+      <dt>본능</dt><dd>직선 본능 · 발전소는 한 번 지으면 늘 같은 양을 꾸준히 만든다고 여긴다</dd>
+      <dt>그림 방식</dt><dd>원자로 표시등 · 제어반에 원자로마다 한 줄씩, 한 달마다 표시등 하나를 달았다. 파랑 = 운전 가능, 주황 = 계획예방정비, 꺼짐 = 운영 전·영구정지. 2011년부터 지금까지 달마다 불이 켜진다</dd>
+      <dt>기간</dt><dd>정비 2011–2026년 · 이용률 1978–2025년 · 발전량 2014–2025년</dd>
+      <dt>엮은 데이터</dt><dd>4개 · 한수원 원전 호기별 발전량 및 이용률 · 한수원 원전 호기별 계획예방정비 현황(2011–) · 한수원 가동원전 계획예방정비 계획(2026) · 원자력안전위원회 국내원전 호기별 연도별 이용률(1978–)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">원자로 한 기가 계획예방정비로 멈추는 기간은 한 번에 보통 얼마나 될까? (2011–2026년 233번의 중앙값)</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>일주일쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>B</i>두 달 반쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>1년쯤</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">B. <span class="n">73일</span></span>
+      대부분 한두 달 반이지만 긴 꼬리가 있다. 한빛4호기(2,033일), 고리2호기(1,092일), 한빛3호기(918일)처럼 몇 해씩 멈춘 정비도 있다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">원자로 28기의 표시등</h2>
+      <p>제어반에 원자로마다 한 줄을 두고, 2011년 1월부터 2026년 10월까지 한 달마다 표시등을 하나씩 달았다. 그달에 계획예방정비로 멈춘 날이 있으면 주황(멈춘 날이 많을수록 진하게), 없으면 파랑이다. 문을 열기 전이거나 영구히 멈춘 뒤에는 꺼져 있다.</p>
+      <p>파랑 줄 사이사이로 주황 점이 1–2년마다 박힌다. 한 기도 빠짐없이 그렇다. 그리고 2017–2022년에는 한빛3·4호기, 2023년부터는 고리2·3·4호기에 주황이 길게 이어진다. 몇 해씩 이어진 긴 정비다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">원전 호기별 월별 상태, 2011–2026년</p>
+      <p class="fs">표시등 하나 = 원자로 한 기의 한 달. 파랑 = 운전 가능, 주황 = 계획예방정비, 꺼짐 = 운영 전·영구정지</p>
+      <div class="legend"><span><i class="sw dot" style="background:var(--run)"></i>운전 가능</span><span><i class="sw dot" style="background:var(--oh)"></i>계획예방정비</span><span><i class="sw dot" style="background:var(--off)"></i>운영 전·정지</span></div>
+      <div class="board" id="c1"></div>
+      <figcaption>한국수력원자력 「원전 호기별 계획예방정비 현황」(2011–2025), 「가동원전 호기별 계획예방정비 계획」(2026). 운영 기간은 원자력안전위원회 연도별 이용률이 있는 해로 잡아 연 단위로 근사했다. 파랑은 계획예방정비가 아닌 달이라는 뜻이고, 고장으로 잠시 멈춘 날까지 빼지는 못했다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">출렁이는 이용률</h2>
+      <p>원자력안전위원회가 공개한 호기별 이용률로 1978년부터의 평균을 이었다. 2000년대에는 해마다 90–95%로 거의 쉬지 않고 돌렸다. 2012–2013년에 한 번 내려가고, 2017–2019년에는 한빛3·4호기 같은 긴 정비가 여럿 겹쳐 2018년 64.6%까지 내려갔다. 그해 원자로가 있던 날의 32.4%가 정비였다. 같은 해에도 호기마다 0%에서 108%까지 크게 다르다(옅은 띠).</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">원전 호기 평균 이용률, 1978–2025년</p>
+      <p class="fs">%. 선 = 호기 평균, 옅은 띠 = 가장 낮은 호기와 가장 높은 호기, 점 = 호기 하나</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>원자력안전위원회 「국내원전 호기별 연도별 이용률 현황」. 평균은 그해 이용률이 있는 호기의 단순 평균이다. 이용률이 100%를 넘는 것은 정격보다 조금 높게 돌린 해다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">233번의 정비, 짧은 것과 긴 것</h2>
+      <p>2011년부터의 계획예방정비 233번을 기간 순으로 늘어놓았다. 대부분은 30–100일에 몰려 있다. 오른쪽 끝에는 몇 해씩 걸린 정비가 홀로 떨어져 있다. 한빛4호기 2,033일, 고리2호기 1,092일, 한빛3호기 918일, 한울4호기 705일이다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">계획예방정비 한 번의 기간, 2011–2026년</p>
+      <p class="fs">점 하나 = 정비 한 번. 가로 = 기간(일, 로그 눈금)</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>한수원 계획예방정비 현황·계획. 2026년에 진행 중인 정비는 계획된 끝나는 날까지 셌다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">그래서, 원전은 늘 같은 양을 만들까</h2>
+      <p>아니다. 원자로는 핵연료를 갈고 설비를 점검하려고 1–2년마다 두세 달씩 반드시 멈춘다. 여기에 큰 보수나 계속운전 준비가 겹치면 몇 해씩 멈추기도 한다. 그래서 원전 전체의 발전량은 해마다 수십 TWh씩 달라진다(2018년 133.5TWh, 2024년 187.3TWh). "기저 전원"이라는 말은 하루 안에서는 맞지만, 해와 해 사이에서는 원전도 출렁인다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>표시등의 주황은 계획예방정비만이다. 고장·사고로 인한 갑작스러운 정지(2020–2025년 28기 합계 23번의 자동·수동 정지)나 출력 감소는 따로 표시하지 못했다.</li>
+      <li>운영 시작과 영구정지는 원자력안전위원회 이용률이 있는 해로 연 단위로 근사했다. 첫해와 마지막 해의 표시등은 실제보다 몇 달 일찍 켜지거나 늦게 꺼져 있을 수 있다.</li>
+      <li>2011년 이전에 시작해 2011년까지 이어진 정비는 목록에 없을 수 있다.</li>
+      <li>신고리 1·2호기와 새울 1·2호기 등 이름은 한수원 자료를 따랐다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15002302/fileData.do" target="_blank" rel="noopener">원자력발전소 호기별 발전량 및 이용률</a> (15002302)</td><td>한국수력원자력</td><td>호기별 연간 발전량</td><td>2014–2025</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15114951/fileData.do" target="_blank" rel="noopener">원전 호기별 계획예방정비 현황</a> (15114951)</td><td>한국수력원자력</td><td>정비 시작일·종료일</td><td>2011–2025</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15060801/fileData.do" target="_blank" rel="noopener">가동원전 호기별 계획예방정비 계획</a> (15060801)</td><td>한국수력원자력</td><td>진행·예정 정비</td><td>2026</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15046075/fileData.do" target="_blank" rel="noopener">국내원전 호기별 연도별 이용률 현황</a> (15046075)</td><td>원자력안전위원회</td><td>호기별 연간 이용률</td><td>1978–2025</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15074543/fileData.do" target="_blank" rel="noopener">연도별 원전 사고고장 현황</a> (15074543)</td><td>한국원자력안전기술원</td><td>호기별 자동·수동 정지 건수</td><td>2020–2025</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>원자로 28기 · 정비 233번 · 이용률 48개 연도</dd>
+      <dt>도구</dt><dd>Python(호기 이름 맞추기·집계) · 캔버스 제어반 표시등, SVG 이용률 띠와 정비 기간 점(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>달별 정비 일수 · 원자로-일 가운데 정비 비율 · 정비 기간 분포</dd>
+      <dt>검증</dt><dd>원안위 이용률과 한수원 이용률이 같은 해·같은 호기에서 같은지 견줬다(예: 2025년 신고리1호기 86.2%). 같은 정비가 현황과 계획에 함께 있으면 시작일로 하나만 남겼다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>원전이 멈추면 그 전기는 무엇이 채울까</h3><p>전력거래소 발전원별 발전량과 원전 정비 기간을 엮으면 석탄·가스가 얼마나 대신했는지 볼 수 있다.</p></div>
+      <div class="q"><h3>오래된 원전일수록 더 오래 멈출까</h3><p>호기별 운전 연수와 정비 기간을 엮어 볼 수 있다.</p></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.6</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const U = DATA.U, M0 = 2011 * 12, M1 = 2026 * 12 + 9, NM = M1 - M0 + 1;
+  const css = (k) => getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+  const short = (u) => u.replace("호기", "");
+  const ys = (u) => Object.keys(DATA.util[u] || {}).map(Number).sort((a, b) => a - b);
+  const span = (u) => { const y = ys(u); if (!y.length) return [9999, 0]; const closed = u === "고리1호기" || u === "월성1호기"; return [y[0], closed ? y[y.length - 1] : 9999]; };
+  const OHD = Object.fromEntries(U.map((u) => [u, (DATA.oh[u] || []).map(([s, e, n]) => [new Date(s + "T00:00:00"), new Date(e + "T00:00:00"), n])]));
+  // per unit per month: -1 = off, else fraction of the month in planned maintenance
+  const ST = U.map((u) => { const [a, b] = span(u); return [...Array(NM).keys()].map((k) => { const y = Math.floor((M0 + k) / 12), m = (M0 + k) % 12; if (y < a || y > b) return -1; const s = new Date(y, m, 1), e = new Date(y, m + 1, 1), days = (e - s) / 864e5; let d = 0; OHD[u].forEach(([os, oe]) => { const x0 = Math.max(s, os), x1 = Math.min(e, new Date(+oe + 864e5)); if (x1 > x0) d += (x1 - x0) / 864e5; }); return Math.min(1, d / days); }); });
+  const ORDER = [...U.keys()];
+
+  /* ---------- 1. control panel ---------- */
+  let raf1 = 0, booted = false;
+  function c1() {
+    cancelAnimationFrame(raf1);
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth - 24), narrow = W < 560, dpr = Math.min(2, window.devicePixelRatio || 1);
+    // wide: reactors as rows, months across · phones: reactors across, months down
+    const lab = narrow ? 18 : 64, top = narrow ? 44 : 18, bot = narrow ? 6 : 22;
+    const cw = narrow ? (W - lab - 4) / U.length : (W - lab - 6) / NM, ch = narrow ? 3.6 : 16;
+    const H = narrow ? top + NM * ch + bot : top + U.length * ch + bot;
+    const cvs = document.createElement("canvas"); cvs.width = W * dpr; cvs.height = H * dpr; cvs.style.height = H + "px"; cvs.setAttribute("role", "img"); cvs.setAttribute("aria-label", "원전 28기의 2011–2026년 월별 운전·정비 상태 표시등. 표로 보기에 같은 내용이 있다"); box.append(cvs);
+    const ctx = cvs.getContext("2d"); ctx.scale(dpr, dpr);
+    const pos = (i, k) => narrow ? [lab + i * cw + cw / 2, top + k * ch + ch / 2] : [lab + k * cw + cw / 2, top + i * ch + ch / 2];
+    const r0 = narrow ? Math.min(cw * .34, 3.4) : Math.min(cw * .46, ch * .32);
+    const col = { run: css("--run"), oh: css("--oh"), ohHi: css("--oh-hi"), off: css("--off") };
+    const draw = (upto, t) => {
+      ctx.clearRect(0, 0, W, H);
+      ORDER.forEach((i) => ST[i].forEach((v, k) => {
+        const [x, y] = pos(i, k);
+        if (k > upto || v < 0) { ctx.globalAlpha = 1; ctx.fillStyle = col.off; ctx.beginPath(); ctx.arc(x, y, r0 * .7, 0, 6.283); ctx.fill(); return; }
+        if (v > 0) { const pulse = reduce ? 1 : .75 + .25 * Math.sin(t / 420 + k * .2); ctx.globalAlpha = (.45 + .55 * v) * pulse; ctx.fillStyle = v > .6 ? col.ohHi : col.oh; }
+        else { ctx.globalAlpha = .9; ctx.fillStyle = col.run; }
+        ctx.beginPath(); ctx.arc(x, y, r0, 0, 6.283); ctx.fill();
+      }));
+      ctx.globalAlpha = 1;
+    };
+    const lab_ = (txt, x, y, cls = "", al) => { const d = document.createElement("div"); d.className = "lab " + cls; d.textContent = txt; d.style.left = (x + 12) + "px"; d.style.top = (y + 14) + "px"; if (al === "c") d.style.transform = "translateX(-50%)"; if (al === "v") { d.style.transform = "rotate(-90deg)"; d.style.transformOrigin = "left top"; } box.append(d); };
+    if (narrow) { const G = [["고리", 0, 4], ["신고리", 4, 2], ["새울", 6, 2], ["월성", 8, 4], ["신월성", 12, 2], ["한빛", 14, 6], ["한울", 20, 6], ["신한울", 26, 2]]; G.forEach(([g, a, n], j) => { const x0 = pos(a, 0)[0] - cw / 2, x1 = pos(a + n - 1, 0)[0] + cw / 2; lab_(g, (x0 + x1) / 2, j % 2 ? 14 : 0, "", "c"); }); }
+    else U.forEach((u, i) => { const [x, y] = pos(i, 0); lab_(short(u), 0, y - 7); });
+    for (let yr = 2011; yr <= 2026; yr += narrow ? 1 : 3) { const k = (yr - 2011) * 12, [x, y] = pos(0, k); if (narrow) lab_(String(yr).slice(2), 0, y - 6, "m"); else lab_(String(yr), x, H - 18, "m", "c"); }
+    [[4, 4], [null, 4], [4, null], [null, null]].forEach(([l, t]) => { const sdiv = document.createElement("div"); sdiv.className = "screw"; if (l != null) sdiv.style.left = "4px"; else sdiv.style.right = "4px"; if (t != null) sdiv.style.top = "4px"; else sdiv.style.bottom = "4px"; box.append(sdiv); });
+    const tip = tipFor(fig);
+    cvs.addEventListener("pointermove", (ev) => {
+      const r = cvs.getBoundingClientRect(), x = ev.clientX - r.left, y = ev.clientY - r.top;
+      const i = Math.floor(narrow ? (x - lab) / cw : (y - top) / ch), k = Math.floor(narrow ? (y - top) / ch : (x - lab) / cw);
+      if (i < 0 || i >= U.length || k < 0 || k >= NM) { tip.hide(); return; }
+      const v = ST[i][k], yy = Math.floor((M0 + k) / 12), mm = (M0 + k) % 12 + 1;
+      const o = OHD[U[i]].find(([s, e]) => s <= new Date(yy, mm, 0) && e >= new Date(yy, mm - 1, 1));
+      tip.show(ev, `${U[i]} · ${yy}년 ${mm}월`, v < 0 ? [["운영 전·정지", ""]] : v > 0 ? [[`${Math.round(v * 100)}%`, "그달 정비로 멈춘 날"], [o ? `${o[2]}차 ${Math.round((o[1] - o[0]) / 864e5)}일` : "", "이번 정비"]] : [["운전 가능", "계획예방정비 없음"]]);
+    });
+    cvs.addEventListener("pointerleave", () => tip.hide());
+    const loop = (t0) => { const step = (t) => { const upto = booted ? NM : Math.min(NM, Math.floor((t - t0) / 12)); if (upto >= NM) booted = true; draw(upto, t); if (!reduce && document.body.contains(cvs)) raf1 = requestAnimationFrame(step); }; raf1 = requestAnimationFrame(step); };
+    if (reduce) { booted = true; draw(NM, 0); return; }
+    if (booted) { loop(performance.now()); return; }
+    draw(-1, 0);
+    const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); loop(performance.now()); }, { threshold: .2 });
+    io.observe(box);
+  }
+  table("t1", ["원자로", "정비 횟수(2011–)", "정비 일수 합계", "가장 긴 정비", "자동·수동 정지(2020–25)"], U.map((u) => { const L = OHD[u].map(([s, e]) => Math.round((e - s) / 864e5)); return [u, L.length, fmt(L.reduce((a, b) => a + b, 0)), L.length ? `${fmt(Math.max(...L))}일` : "–", DATA.acc[u] ?? "–"]; }));
+
+  /* ---------- 2. utilisation 1978–2025 ---------- */
+  const YRS = [...Array(48).keys()].map((i) => 1978 + i);
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), H = Math.min(320, Math.max(240, W * .42)), l = 40, r = 14, top = 14, bot = 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "원전 호기 평균 이용률 1978–2025" }, box);
+    const sx = (y) => l + (y - 1978) / 47 * (W - l - r), sy = (p) => top + (1 - p / 115) * (H - top - bot);
+    [0, 25, 50, 75, 100].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t ? "gl" : "ax" }, v); tx(v, l - 6, sy(t) + 4, `${t}%`, "tk", 11.5, "end"); });
+    [1980, 1990, 2000, 2010, 2020].forEach((y) => tx(v, sx(y), H - 6, String(y), "tk", 11.5, "middle"));
+    const lo = [], hi = [];
+    YRS.forEach((y) => { const vals = U.map((u) => DATA.util[u]?.[y]).filter((x) => x != null); if (vals.length) { lo.push([y, Math.min(...vals)]); hi.push([y, Math.max(...vals)]); vals.forEach((p) => s("circle", { cx: sx(y), cy: sy(p), r: 1.6, fill: "var(--axis)", opacity: .7 }, v)); } });
+    s("path", { d: "M" + hi.map(([y, p]) => `${sx(y)},${sy(p)}`).join("L") + "L" + [...lo].reverse().map(([y, p]) => `${sx(y)},${sy(p)}`).join("L") + "Z", fill: "var(--band)", opacity: .55 }, v);
+    const nat = YRS.filter((y) => DATA.nat[y] != null && DATA.ncount[y] >= 3);
+    s("path", { d: "M" + nat.map((y) => `${sx(y).toFixed(1)},${sy(DATA.nat[y]).toFixed(1)}`).join("L"), fill: "none", stroke: "var(--line-c)", "stroke-width": 3, "stroke-linejoin": "round" }, v);
+    [[2005, "95.3%"], [2018, "64.6%"]].forEach(([y, t]) => { s("circle", { cx: sx(y), cy: sy(DATA.nat[y]), r: 4.5, fill: "var(--line-c)" }, v); tx(v, sx(y), sy(DATA.nat[y]) + (y === 2018 ? 18 : -10), `${y} ${t}`, "vl halo", 12.5, "middle", { "stroke-width": 4 }); });
+    timeLayer(v, tipFor(fig), nat.length, (i) => sx(nat[i]), top, H - bot, (i) => { const y = nat[i], vals = U.map((u) => DATA.util[u]?.[y]).filter((x) => x != null); return [`${y}년`, [[pc(DATA.nat[y]), "호기 평균 이용률"], [`${vals.length}기`, "운영 원자로"], [`${f1(Math.min(...vals))}–${f1(Math.max(...vals))}%`, "호기별 범위"]]]; }, "좌우 화살표로 해를 옮겨 볼 수 있다");
+  }
+  table("t2", ["연도", "호기 평균 이용률", "원자로 수"], YRS.filter((y) => DATA.nat[y] != null).map((y) => [y, pc(DATA.nat[y]), DATA.ncount[y]]));
+
+  /* ---------- 3. outage lengths ---------- */
+  const EV = U.flatMap((u) => OHD[u].map(([s_, e, n]) => ({ u, n, s: s_, d: Math.round((e - s_) / 864e5) }))).filter((e) => e.d > 0).sort((a, b) => a.d - b.d);
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), H = 170, l = 20, r = 22, base = 120;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "계획예방정비 233번의 기간" }, box), pts = [];
+    const sx = (d) => l + Math.log10(d / 10) / Math.log10(250) * (W - l - r);
+    [10, 30, 100, 300, 1000, 2000].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: 20, y2: base + 10, class: "gl" }, v); tx(v, sx(t), base + 26, `${fmt(t)}일`, "tk", 11.5, "middle"); });
+    const med = EV[Math.floor(EV.length / 2)].d; s("line", { x1: sx(med), x2: sx(med), y1: 16, y2: base + 10, stroke: "var(--line-c)", "stroke-width": 2 }, v); tx(v, sx(med) + 4, 14, `중앙값 ${med}일`, "lb", 12, "start", { style: "font-weight:600" });
+    // beeswarm-ish stacking: dots that would overlap climb upward
+    const placed = [];
+    EV.forEach((e) => { const x = sx(e.d); let y = base; while (placed.some((p) => Math.abs(p.x - x) < 6 && Math.abs(p.y - y) < 6)) y -= 6; placed.push({ x, y }); const big = e.d > 300; s("circle", { cx: x, cy: y, r: big ? 4.5 : 2.8, fill: big ? "var(--oh)" : "var(--run)", stroke: big ? "var(--oh-ink)" : "none" }, v); pts.push({ x, y, r: 3, fn: () => [`${e.u} ${e.n}차`, [[`${fmt(e.d)}일`, "정비 기간"], [`${e.s.getFullYear()}년 ${e.s.getMonth() + 1}월`, "시작"]]] }); });
+    EV.slice(-4).forEach((e, i) => { const x = sx(e.d); tx(v, x, base - 12 - (i % 2) * 14, short(e.u), "lb halo", 11.5, i === 3 ? "end" : "middle", { style: "fill:var(--oh-ink)", "stroke-width": 4 }); });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 정비를 옮겨 볼 수 있다");
+  }
+  table("t3", ["원자로", "차수", "시작", "기간(일)"], [...EV].reverse().map((e) => [e.u, e.n, `${e.s.getFullYear()}.${e.s.getMonth() + 1}`, fmt(e.d)]));
+
+  const all = () => { c1(); c2(); c3(); };
+  all(); onResize(all);
+})();
+</script>

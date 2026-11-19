@@ -1,0 +1,277 @@
+<title>공공데이터 질문 51</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a working list. Short intro, a status strip of what is done, then one wide table grouped by theme. */
+:root {
+  --bg: #f4f5f7; --surface: #ffffff; --ink: #1c2027; --muted: #5d6573; --rule: #dde1e6; --accent: #2f6fd1; --done: #1a8a5a; --warn: #b26a00; --news: #953a4c;
+  --body: "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #14171c; --surface: #1b1f26; --ink: #e8ebef; --muted: #a0a8b4; --rule: #2d333c; --accent: #6ea2f0; --done: #4cc28c; --warn: #e3a345; --news: #e3a8b0; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #14171c; --surface: #1b1f26; --ink: #e8ebef; --muted: #a0a8b4; --rule: #2d333c; --accent: #6ea2f0; --done: #4cc28c; --warn: #e3a345; --news: #e3a8b0; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.7;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 64px }
+a { color: var(--accent); text-underline-offset: 3px }
+main { max-width: 72rem; margin-inline: auto; display: grid; gap: 32px }
+main > * { min-width: 0 }
+h1 { font-weight: 800; font-size: clamp(28px, 4.5vw, 40px); line-height: 1.2; margin: 0 0 10px; letter-spacing: -.01em }
+.lede { margin: 0; max-width: 46rem; color: var(--muted) }
+h2 { font-weight: 800; font-size: 20px; margin: 0 0 10px }
+.how { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 12px }
+.how div { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; font-size: 14px }
+.how b { display: block; font-size: 13px; color: var(--muted); font-weight: 700; margin-bottom: 2px }
+.done-list { margin: 0; padding-left: 1.1rem; display: grid; gap: 4px }
+.tablebox { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px }
+table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 52rem }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule) }
+th { font-size: 12px; color: var(--muted); font-weight: 700; letter-spacing: .03em; position: sticky; top: 0; background: var(--surface) }
+td.n { font-family: var(--mono); color: var(--muted); width: 2.5rem }
+td.q { font-weight: 700; width: 17rem }
+tr.theme td { background: var(--bg); font-weight: 800; font-size: 13px; color: var(--muted); padding-block: 6px }
+.tag { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 4px; padding: 0 6px; margin-left: 4px; border: 1px solid currentColor; white-space: nowrap }
+.tag.done { color: var(--done) } .tag.warn { color: var(--warn) } .tag.key { color: var(--accent) } .tag.pick { color: var(--ink) } .tag.news { color: var(--news) }
+.hook { display: block; font-size: 12px; font-weight: 400; color: var(--muted); margin-top: 4px }
+.notes { margin: 0; padding-left: 1.1rem; color: var(--muted); font-size: 14px; display: grid; gap: 4px; overflow-wrap: anywhere }
+</style>
+
+<main>
+  <header>
+    <h1>공공데이터 질문 51</h1>
+    <p class="lede">공공데이터포털 개방 목록 98,738건을 지역 한정·기관 내부·오래된·소량 자료를 걸러 27,567건으로 줄이고, 그중 추천 320건에서 뽑은 시각화 질문 목록입니다. 예시로 삼은 사이트(seohosung.com/facts)처럼 "흔한 생각을 질문으로 → 데이터로 뒤집기 → 주제에서 나온 그림" 순서로 만듭니다. 31번(청년 자살)은 목록을 만들기 전에 먼저 만든 페이지를 나중에 넣은 것이라 번호만 뒤에 있고, 표에서는 건강·복지·교육 칸에 함께 두었습니다. 32–50번은 추천 목록과 요즘 이슈를 섞어 더한 것으로, 꼭 반전을 노리지 않고 "<span class="tag news">요즘 이슈</span>" 표시에 계기가 된 보도를 적었습니다. 2026년 11월 3일 정리, 11월 6일 31번과 32–50번, 11월 7일 51번(국적 상실·이탈) 추가.</p>
+  </header>
+
+  <section>
+    <h2>만드는 방식</h2>
+    <div class="how">
+      <div><b>1. 질문</b>사람들이 흔히 믿는 것을 묻는다. "카페는 열자마자 문을 닫을까"</div>
+      <div><b>2. 확인</b>원자료를 받아 가설을 먼저 검증한다. 아래 "확인할 것"은 아직 검증 전이라 틀릴 수 있다.</div>
+      <div><b>3. 한 줄 답</b>데이터가 말하는 답을 한 문장으로. 틀렸으면 고친다(아기 페이지에서 실제로 고침).</div>
+      <div><b>4. 그림</b>차트 종류가 아니라 주제의 사물로 그린다. 간판 불빛, 아기 점, 도로 차선.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>이미 만든 것</h2>
+    <ul class="done-list">
+      <li><a href="https://claude.ai/artifact/91vkn6MDJbatNnoRhdQTx5" target="_blank" rel="noopener">공공데이터 목록 탐색기</a>: 98,738건 검색·필터, 추천 320건과 엮어 볼 조합 14개</li>
+      <li><a href="https://claude.ai/artifact/YAXXosp5zYWqVbCjMGZ16R" target="_blank" rel="noopener">아기는 도시에서 더 많이 태어날까</a>: 아기 26,148명을 점으로, 대도시 구의 출생 비율이 가장 낮음</li>
+      <li><a href="https://claude.ai/artifact/VrqvVUm1VrE7gaS1YfeUPc" target="_blank" rel="noopener">카페는 열자마자 문을 닫을까</a> (7번): 1년 생존 88%, 2023년 폐업이 개업을 따라잡음</li>
+      <li><a href="https://claude.ai/artifact/F65M7jFpchE2xmBSsPM5NK" target="_blank" rel="noopener">로드킬은 시골 국도의 일일까</a> (24번): 신고 절반이 고양이, 열에 넷은 도시 도로</li>
+      <li><a href="https://claude.ai/artifact/8hjD9RBBkCuh4b7V8doEW7" target="_blank" rel="noopener">한국은 청년 자살이 가장 심할까</a> (31번): 20대도 OECD 1위지만 80세 이상은 평균의 3.1배, 25년 새 두 배가 된 쪽은 청년</li>
+      <li><a href="https://claude.ai/artifact/5RMyF2uAjzFVz3SjtvYLkC" target="_blank" rel="noopener">범죄는 밤 골목에서 일어날까</a> (20번): 골목은 4.3%, 폭력은 집이 골목의 2.6배</li>
+      <li><a href="https://claude.ai/artifact/Exwx2kfwBXZjZ4FaegFg4u" target="_blank" rel="noopener">멸종위기종은 호랑이·곰 같은 동물일까</a> (26번): 282종 중 포유류 20종, 식물이 92종으로 가장 많음
+      <li><a href="https://claude.ai/artifact/ULa6zmm4SvsaqYXrockJYf" target="_blank" rel="noopener">암은 노인의 병일까</a> (14번): 새 환자 절반은 65세 미만, 20·30대 발생률 2.8배. 재생되는 시계열 그래프
+      <li><a href="https://claude.ai/artifact/52v76fhfwe4TGh3wMcbsXB" target="_blank" rel="noopener">비행기는 인천공항에서만 탈까</a> (28번): 인천은 공항 승객의 47.5%, 국제선의 77.4%. 서울 중심 하늘길 지도</li>
+      <li><a href="https://claude.ai/artifact/1ARfxP8V5cNKkwDKD3hNeQ" target="_blank" rel="noopener">유학생은 대부분 중국 학생일까</a> (3번): 중국 24.5%, 베트남 35.3%. 재생되는 물줄기 그래프</li>
+      <li><a href="https://claude.ai/artifact/W3Hde9GfVbrnkA6Dqx3gyy" target="_blank" rel="noopener">혼자 사는 노인은 시골에 많을까</a> (4번): 비율은 전남, 수는 경기·서울. 밤의 기둥 지도</li>
+      <li><a href="https://claude.ai/artifact/86VYXLJdBXqffJFDuBBLQk" target="_blank" rel="noopener">집값은 전국이 함께 오르내릴까</a> (6번): 함께 오른 달 21, 함께 내린 달 8. 경주 트랙</li>
+      <li><a href="https://claude.ai/artifact/4C1sqrZspXEHUrAjsyjkBm" target="_blank" rel="noopener">실업급여는 청년이 많이 받을까</a> (9번): 60대 29.7%, 29세 이하 13.3%. 재생되는 번호표 창구</li>
+      <li><a href="https://claude.ai/artifact/GdJMyLDSheH4WuYQVLmp1y" target="_blank" rel="noopener">기름값은 동네마다 비슷할까</a> (11번): 90%가 117원 폭 안. 서울 도심만 수백 원 차이</li>
+      <li><a href="https://claude.ai/artifact/T9t1oYPQ66WUDErVkhM1NY" target="_blank" rel="noopener">우리는 술을 덜 마시게 됐을까</a> (13번): 1인당 출고량 −15%, 여성 고위험 음주는 두 배. 차오르는 잔 일러스트</li>
+      <li><a href="https://claude.ai/artifact/WitF6WQM67tWeP5qavm7zz" target="_blank" rel="noopener">채소는 겨울에 비쌀까</a> (12번): 배추·무는 9월이 가장 비싸고 겨울이 가장 쌈. 귀여운 채소 달력</li>
+      <li><a href="https://claude.ai/artifact/7Pp4nrFPLg5iRPco2Uo8ju" target="_blank" rel="noopener">킥보드 사고는 10대가 낼까</a> (21번): 가해자 44.5%가 19세 이하, 사망은 65세 이상 쪽. 킥보드 줄</li>
+      <li><a href="https://claude.ai/artifact/PkVydvt8FCiuDL855oSbao" target="_blank" rel="noopener">전기는 여름에 가장 많이 쓸까</a> (25번): 여름 혹이 커진 쌍봉낙타. 2014년엔 겨울이 1위</li>
+      <li><a href="https://claude.ai/artifact/4JZtTXTxQY1XT47o1Pa66d" target="_blank" rel="noopener">아이들 키는 계속 커질까</a> (15번): 2016→2025 모든 학년 0.2–1.6cm 더 큼</li>
+      <li><a href="https://claude.ai/artifact/6gsx8YQSwGopmEMemWnREw" target="_blank" rel="noopener">국회의원이 낸 법안은 대부분 통과될까</a> (29번): 21대 의원 발의 5.9%만 가결</li>
+      <li><a href="https://claude.ai/artifact/PReq9myeZiiYt9yXaHb3wt" target="_blank" rel="noopener">결혼은 계속 줄고 있을까</a> (32번): 2022년 바닥에서 3년 새 +25.4%, 증가분 62%는 30–34세 남편</li>
+      <li>아이를 갖기 어려운 부부는 늘었을까 (33번, 다른 판·저장소 pages/seed-pots.html): 2010→2023년 +25.6%, 남성 2.5배 급증·출생아 100명당 118명 역전</li>
+      <li><a href="https://claude.ai/artifact/Uic3iNK1EzYiXWSe5gmbfs" target="_blank" rel="noopener">한국 국적을 버리는 사람은 늘고 있을까</a> (51번): 15년 내내 떠난 쪽이 더 많음. 미국 몫 57%</li>
+      <li><a href="https://claude.ai/artifact/Hb2v4PMY8AG22oFMpKcNeL" target="_blank" rel="noopener">우리 동네는 늘 같은 후보를 찍을까</a> (30번): 2002–2025 47.3%가 1위 계열 바뀜</li>
+      <li><a href="https://claude.ai/artifact/A34iM6uJyWHxsEYNEXMf7Z" target="_blank" rel="noopener">인구는 어디서나 줄고 있을까</a> (1번): 줄어든 시군구 173곳 중 125곳에 늘어난 동</li>
+      <li><a href="https://claude.ai/artifact/TKbVCsA2deF1hwqUXjnXGy" target="_blank" rel="noopener">외국인 주민은 대부분 일하러 온 사람일까</a> (2번): 90일 넘게 머무는 외국인 중 취업 비자 22.8%</li>
+      <li><a href="https://claude.ai/artifact/PVqDYSRNqDFkrmc1SVmYG2" target="_blank" rel="noopener">청약은 서울만 붐빌까</a> (5번): 상위 50곳 중 서울 21곳, 서울 밖 36.6% 미달</li>
+      <li><a href="https://claude.ai/artifact/75YYuNd6SJYJiWzHP8WriV" target="_blank" rel="noopener">대학을 졸업하면 다 취업할까</a> (8번): 졸업생 100명 중 취업 52, 기타·미상 26</li>
+      <li><a href="https://claude.ai/artifact/YLpgfwqUB4EKwyDsPzFM9e" target="_blank" rel="noopener">장애인은 일하기 어려울까</a> (10번): 15–64세 고용률 장애인 48.3% vs 전체 70.5%</li>
+      <li><a href="https://claude.ai/artifact/4yBoojUCrcgzuJGfDCNxHT" target="_blank" rel="noopener">식중독은 여름에만 날까</a> (16번): 노로바이러스는 1월, 살모넬라는 8월</li>
+      <li><a href="https://claude.ai/artifact/VRA7Ker8c3SWkvPGNnXrGN" target="_blank" rel="noopener">온열질환은 노인에게만 생길까</a> (17번): 환자 70%는 65세 미만, 열에 넷은 일터</li>
+      <li><a href="https://claude.ai/artifact/JzDS2bePdAsK7YCiwPKUGP" target="_blank" rel="noopener">기초연금은 시골 노인이 더 받을까</a> (18번): 고흥 85% vs 서초 23%, 혼자 사는 노인과 r=0.80</li>
+      <li><a href="https://claude.ai/artifact/4TL8sqJrcck4QAvMCsBnSB" target="_blank" rel="noopener">학생이 줄면 학교는 바로 사라질까</a> (19번): 학생 −44%, 학교 +12%</li>
+      <li><a href="https://claude.ai/artifact/Aw7atDtoKgGsyoeUKcGToc" target="_blank" rel="noopener">산업재해는 공장의 일일까</a> (22번): 재해자는 서비스업, 사고 사망은 건설</li>
+      <li><a href="https://claude.ai/artifact/WXv8GxVADBzUCbumje9MgF" target="_blank" rel="noopener">화재는 겨울 난방 때문일까</a> (23번): 가장 많은 달은 3월, 사망은 겨울</li>
+      <li><a href="https://claude.ai/artifact/FsYNvVHFZis5JJ8iUuhgC1" target="_blank" rel="noopener">원전은 늘 같은 양을 만들까</a> (27번): 2018년 원자로-일 32%가 정비</li>
+      <li><a href="https://claude.ai/artifact/AaqZg4UXPLgwQMJsBMi2Pe" target="_blank" rel="noopener">아이를 갖기 어려운 부부는 늘었을까</a> (33번): 40–44세 아기 100명당 시술 360건</li>
+      <li><a href="https://claude.ai/artifact/6v4xepfsewPTJgNG1MrB9z" target="_blank" rel="noopener">코스피는 몇 종목이 움직일까</a> (34번): 시가총액 절반이 두 종목</li>
+      <li><a href="https://claude.ai/artifact/5mBJcgW3sDXVtT2SRvKcCC" target="_blank" rel="noopener">K-뷰티 화장품은 중국에만 팔릴까</a> (35번): 2025년 미국이 처음 1위</li>
+      <li><a href="https://claude.ai/artifact/5ScXTPxGEa7rGcivyZwWDz" target="_blank" rel="noopener">물가는 모든 게 함께 오를까</a> (36번): 2.8% 오른 달에도 품목 21%는 내림</li>
+      <li><a href="https://claude.ai/artifact/4Ci8enVzsmMtz7P6ANxS62" target="_blank" rel="noopener">일도 구직도 안 하는 청년은 늘었을까</a> (37번): 20대 2.7→6.9명, 절반은 60세 이상</li>
+      <li><a href="https://claude.ai/artifact/KzHNTWm2PbEm7eQun8uEFD" target="_blank" rel="noopener">육아휴직은 엄마만 쓸까</a> (38번): 휴직자 열에 셋이 아빠, 태어난 해 사용률은 10%</li>
+      <li><a href="https://claude.ai/artifact/XrK36racauPzVEKcvgtCbu" target="_blank" rel="noopener">의사는 서울에만 몰려 있을까</a> (39번): 서울에 30%, 하지만 종로구 18명·관악구 1.4명</li>
+      <li><a href="https://claude.ai/artifact/GdtaenZv49i1w2tXUiYQMp" target="_blank" rel="noopener">수능은 재수생이 많이 볼까</a> (40번): 지원자 셋 중 하나가 졸업생·검정고시, 수는 1996학년도의 절반</li>
+      <li><a href="https://claude.ai/artifact/A62MCDM4A2ghtKj5BeTqNb" target="_blank" rel="noopener">전기차는 불이 더 자주 날까</a> (41번): 1만 대당 1.35건, 전체 자동차는 1.59건</li>
+      <li><a href="https://claude.ai/artifact/KGoxG3k4ySzWDvUdYTWJfN" target="_blank" rel="noopener">소방관은 불 끄다 가장 많이 다칠까</a> (42번): 화재 중 부상은 20%, 한 번 나갈 때의 위험은 구급의 70배</li>
+      <li><a href="https://claude.ai/artifact/J1Z8jHFjTsPup78Ac83p6D" target="_blank" rel="noopener">개인정보는 해킹으로 가장 많이 새어 나갈까</a> (43번): 원인을 나눈 617건은 실수 270건·해킹 266건</li>
+      <li><a href="https://claude.ai/artifact/R5NaiBDHAHXZPk8mZZe1J2" target="_blank" rel="noopener">AI 데이터센터는 전기를 얼마나 쓸까</a> (44번): 계약전력 1,986MW, 다 써도 전국의 3.2%</li>
+      <li><a href="https://claude.ai/artifact/BGdcS4RfkufCQxmh8mZzbE" target="_blank" rel="noopener">태풍은 더 세지고 늦게 올까</a> (45번): 가까이 올 때 9hPa 세졌고 날짜는 그대로</li>
+      <li><a href="https://claude.ai/artifact/VpkTWAme6WKQnFuEkqCMfT" target="_blank" rel="noopener">바닷가 쓰레기는 어디서 올까</a> (46번): 외국 쓰레기는 2개 남짓, 백령도만 셋 중 둘</li>
+      <li><a href="https://claude.ai/artifact/WYUz7ebCXwGJJYuSPtgZSj" target="_blank" rel="noopener">사람들은 어떤 기관을 가장 믿지 않을까</a> (47번): 국회는 13년 내내 꼴찌, 나이 차이는 작다</li>
+      <li><a href="https://claude.ai/artifact/Nw9xwLJ9xZAXKVDFRnTN3Z" target="_blank" rel="noopener">반려견 등록은 어디서 가장 많을까</a> (48번): 100세대에 12.8마리, 양평 22·신안 3</li>
+      <li><a href="https://claude.ai/artifact/D5mA3jwYovpCSd5UmBNf3o" target="_blank" rel="noopener">한국어는 어느 나라에서 배울까</a> (49번): 1위는 러시아, 아시아 밖 몫은 줄었다</li>
+      <li><a href="https://claude.ai/artifact/XmjPDa9vCvQamETeNuxkQz" target="_blank" rel="noopener">운동선수 병역 특례는 어떤 종목이 받을까</a> (50번): 축구 금메달 하나 = 20명, 특례의 70%가 축구·야구</li>
+      <li><a href="https://claude.ai/artifact/SnqMMgeehxDLh22viib6UF" target="_blank" rel="noopener">아이가 태어나는 곳</a>: 저출생 조합 대시보드(초기 버전)</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>질문 목록</h2>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>#</th><th>질문</th><th>확인할 것 (검증 전)</th><th>데이터 (공공데이터포털 목록키)</th><th>그림 아이디어</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>데이터를 받을 때 알아 둘 것</h2>
+    <ul class="notes">
+      <li>15125454(반려동물 등록 개체 수)는 시군구별 누계 한 시점뿐이다. 2023.12.08 '수정' 판과 2022.12.31 판의 값이 같다. 세종 인구는 KOSIS 표의 첫 줄(시 전체)만 써야 한다(읍·면·동 줄을 더하면 두 번 센다).</li>
+      <li>점묘 지도는 브라우저에서 시군구 경로의 isPointInFill로 점을 뽑는다(data/q48 → kit/templates/q48_tpl.html makeDots). SVG에서 transform 속성을 가진 요소에 CSS 애니메이션(scale)을 걸면 자리가 덮이므로 바깥 묶음에 클래스를 준다.</li>
+      <li>세계지도와 나라 가운데 점은 data/q49-sejong/world.mjs(=q35 방식, Equal Earth, 동경 150° 중심)와 나라 이름표 names.json으로 만든다. 세종학당 수강생 파일에 '대한민국' 줄이 있다(국내 세종학당).</li>
+      <li>체육요원 공개 파일(15086043)은 해마다 합계만 있다. 종목별 인원은 국정감사 의원실 자료 보도에만 있어 2차 자료로 표시했다. 법령 원문은 law.go.kr 화면을 Playwright로 열어 옮겼다(curl로는 본문이 iframe으로 따로 와서 안 받아진다). WebFetch는 이 환경에서 대부분의 한국 사이트가 막혀 있어, 기사도 Playwright로 열었다.</li>
+      <li>한국 법령 MCP 서버 주소가 2026-11-17에 https://mcp.gomdori.app/law 로 바뀌었다. 커넥터 설정에서 주소를 바꿔야 다시 쓸 수 있다.</li>
+      <li>기상청 태풍목록(15043569)은 포털에 링크만 있다. data.kma.go.kr/data/typhoonData/typList.do?pgmNo=688 에 startDt·endDt·schListCnt를 POST하면 로그인 없이 1951년부터 전체 표(영향도 포함)가 온다(data/q45-typhoon/fetch.py). 영향도의 '상륙'은 2002년부터 따로 적었다.</li>
+      <li>태풍의 길·세기는 일본기상청 RSMC 도쿄 최적경로(bst_all.zip, 6시간 위치·중심기압·최대풍속, 풍속은 1977년부터)를 쓴다. 기상청 번호와 연도·번호로 1,968개가 맞는다. 동아시아 지도는 data/q45-typhoon/map.mjs(d3-geo, world-atlas land-50m를 단순화).</li>
+      <li>국가 해안쓰레기 모니터링 조사 정점(15129575)은 0042–0061 정점 20곳의 경도 소수점이 한 자리 앞에 찍혀 있다(12.82 → 128.2). 세부 항목 파일(15044008)의 정점 이름은 옛 이름이라 맞춰야 한다(data/q46-beach/build.py의 ALIAS). 2018–2020년 40곳, 2021년부터 60곳이다.</li>
+      <li>한국 지도(q4·q19 틀, 600×720)에 위도·경도 점을 올릴 때는 data/q46-beach/proj_sites.mjs와 같은 투영(geoMercator를 시도 경계에 fitExtent [[8,8],[592,712]])을 쓴다.</li>
+      <li>사회통합실태조사 기관 신뢰는 KOSIS 417 DT_417001_0038(2013–2025, 17개 기관 × 네 단계 × 성·나이·직업·소득·학력·지역). 정치 성향별 값은 없고 원자료는 한국행정연구원에서 따로 받는다. 공기업은 2016년부터 물었다.</li>
+      <li>한글(hwp) 문서의 표는 data/q42-firefighters/parse_hwp.py처럼 읽는다(pip install olefile). BodyText 레코드에서 LIST_HEADER(72)를 칸의 시작으로 세어야 빈칸이 빠지지 않는다. PARA_TEXT만 모으면 빈칸이 사라져 열이 밀린다.</li>
+      <li>소방청 순직·공상자 현황(15131241)은 hwp 두 개가 든 zip이다(연도별 2016–2025, 본부별 2024·2025). 2025년 순직 칸은 비어 있다. 15033927은 2017년 한 해의 본부별 표다. 119 구급·구조 활동은 KOSIS 156 TX_15602_A018, TX_15602_A004.</li>
+      <li>작업 목록에 적혀 있던 15085102(개인정보 침해현황 통계)는 한국인터넷진흥원 자료가 아니라 서울시 2008년 설문이다. 유출 사고 원인은 개인정보보호위원회 「조사 및 처분 통계」(15177148, xlsx 4개 시트)에, 개인의 신고·상담 유형은 15119353(zip, 2021.4분기–2022.4분기)에 있다. KISA 보고서(15145110)는 PDF라 본문에서 옮겨 적고 그렇게 표시했다.</li>
+      <li>데이터센터 전기는 한국전력 15127315(2023.12.31 한 시점, 지역본부별 호수·계약전력)뿐이다. 사용량은 공개돼 있지 않다. KOSIS 310 DT_31002_A006(행정구역별 용도별 판매전력량)에는 정보통신업 항목이 없고, 2023년 서비스업 값이 앞뒤 해보다 20TWh쯤 낮다. bigdata.kepco.co.kr 자료(15101310)는 포털에 링크만 있다.</li>
+      <li>시도 지도 도형과 중심점은 data/geo_sido.py의 geo()로 얻는다(q19 도형 재사용).</li>
+      <li>공공데이터포털 검색은 curl로 selectDataSetList.do?keyword=…&dType=FILE 을 불러 /data/<번호>/fileData.do 링크를 뽑는다. 연결이 자주 끊기므로 재시도한다.</li>
+      <li>KOSIS에서 분류가 여러 단계인 표(시도 → 시군구)는 kosis_curl.tree(org, tbl)로 아래 단계 코드를 받는다. 시군구 이름은 시도마다 겹치므로(중구·동구) 시도 하나씩 따로 받는다(data/q39-doctors/fetch.py). 표마다 열 수가 다를 수 있다(세종은 2012년 이전 열이 없다): 열 이름으로 맞춘다.</li>
+      <li>의사 수는 KOSIS 354 DT_HIRA4T(시군구별 의료인력현황, 분기), 전문과목별 전문의는 DT_HIRA4S, 표시과목별 의원은 DT_HIRA4G. 포털 15066021은 심평원 링크뿐이다. 2024년 1분기–2025년 2분기는 전공의가 병원을 떠나 있던 때라 지역 비교에 쓰지 않는다.</li>
+      <li>KOSIS 주민등록인구(101 DT_1B040A3)와 자동차등록(116 DT_MLTM_5498)에 '전남광주통합특별시' 코드가 새로 생겼는데 과거 시점 자료가 없어 조회하면 에러가 난다. 그 코드만 건너뛴다.</li>
+      <li>전국 자동차 등록 대수: 포털 15024777은 국토교통 통계누리 링크이고 stat.molit.go.kr는 이 환경에서 연결이 끊긴다. 전체는 KOSIS 116 DT_MLTM_5498, 전기차는 한국전력공사 15039554(월별·시도별, 지난 판은 infuser 목록에서)에서 받는다. 2022년 3월까지의 한전 파일은 날짜가 '그달 1일'로 적혀 있지만 값은 그달 말이다.</li>
+      <li>수능 시도별 지원자(재학생·졸업생)는 시도교육청 보도자료에만 있고 한데 모은 공개 파일은 찾지 못했다. 평가원의 접수현황(15098903)·응시현황(15098904)은 전국 합계만 있다.</li>
+      <li>독자가 참여하는 장치를 처음 썼다: 값 맞혀 보기(막대), 선 직접 그리기(포인터 + 키보드, 건너뛰기 버튼), 버튼으로 돌리는 무작위 실험, 지도 ↔ 인구 크기 원 전환, 표시 다시 줄 세우기(CSS transform 전환). SVG 묶음에 CSS 애니메이션으로 transform을 주면 transform 속성이 덮이므로 바깥 묶음에 클래스를 준다.</li>
+      <li>KOSIS 표는 브라우저 없이 data/kosis/kosis_curl.py로 받는다(meta = 표의 항목·분류·기간, fetch = 자료). statHtmlContent.do와 html.do에 curl로 POST하되 빈 칸까지 모든 폼 필드를 보내야 한다(urllib parse_qsl은 keep_blank_values=True). 이전에 '다른 세션에서는 에러'라고 적은 것은 빈 필드가 빠져서였다. 분류가 여러 단계인 표(품목 484개 등)는 meta에 첫 단계만 나오므로 코드를 따로 넘긴다(data/q36-prices/cpi_codes.json). 응답 표의 단계는 이름 칸의 margin-left(0·10·20px)로 구분한다.</li>
+      <li>포털의 「품목별 소비자물가지수」(15128439)는 경기도 자료다. 전국 품목 지수는 KOSIS 101 DT_1J22112(품목성질별) 또는 DT_1J22001(지출목적별). 품목별 가중치는 이 표들에 없다.</li>
+      <li>육아휴직통계(KOSIS 101 DT_CC2024A001–A005, B001–B005, C001–C005, D001–D004, E001–E002, F001)는 2024년이 잠정치다. 「모성보호 지급자 현황」(3044234)은 파일이 없고 EIS 화면 링크뿐이다. 「성별 지역별 육아휴직급여 수급자수」(15100479)는 2025년 월별 값이 든 zip이다(파일 이름이 CP949).</li>
+      <li>KOSIS 표의 세부 분류(시군구·나이 등)는 data/q32-marriage/kosis_query.js로 받는다. 저출생 관련 출생 표는 DT_1B81A08(모의 연령·결혼생활기간별), 쌍둥이 이상은 DT_1B81A09.</li>
+      <li>국민건강보험공단 「연령별 요양기관종별 난임시술 진료건수」(15127541)는 체외수정이 해마다 1만 7천 건 안팎으로 다른 자료(2023년 17만 건)와 단위가 맞지 않아 쓰지 않았다.</li>
+      <li>KRX 정보데이터시스템은 로그인이 필요하고 금융위원회 주식시세(15094808)는 인증키가 필요해, 34번은 네이버 증권 모바일 JSON(m.stock.naver.com/api)을 2차 자료로 썼다(data/q34-kospi/fetch_naver.py). 지수는 Yahoo ^KS11과 대조했다.</li>
+      <li>관세청 무역통계(tradedata.go.kr)는 이 환경에서 연결이 끊긴다. 화장품 수출은 KOSIS 145(식약처) 연간 표와 포털 15119569(2018–2022 나라별)를 썼다. UN Comtrade 공개 미리보기는 한국 월별 HS3304가 2025년 12월까지 있다.</li>
+      <li>법무부 국적 통계(15100046–15100049)는 dg.sh로 바로 받는다(CP949 CSV, 2011–2025). 「국적취득 국적별」(15100047)의 귀화 합계는 2023–2025년에 「유형별」(15100046)보다 900–1,400명 적다. 국적선택은 「국적처리 연도별 추이」(3045189, 2024년까지)에만 있다.</li>
+      <li>「SGIS 혼인 및 이혼율 현황」(15140452)은 PDF 보고서 링크뿐이다. 같은 원자료인 KOSIS 인구동향조사 표를 받는다. KOSIS 화면은 기본으로 시도만 주므로, 화면이 보내는 html.do 요청을 같은 세션에서 다시 보내며 OV_L1_ID에 시군구 코드(treeInfo.do 응답의 itmId)를 넣는다(data/q32-marriage/kosis_query.js). 파일로 저장한 요청 본문을 다른 세션에서 보내면 '에러가 발생했습니다'가 난다.</li>
+      <li>「불임 및 유산 관련 상병별 진료현황」(15143044)은 공공데이터포털 파일 확장자가 .csv이나 내부 바이너리가 엑셀(.xlsx)이다. 주상병 N46(남성불임)·N97(여성불임) 시계열(2010–2023)과 특정기호 F021 난임시술(15127567, 15125614, 15127541, 2018–2022)을 결합했고, 출생아 대비 비율은 통계청 인구동향조사(DT_1B8000F)를 연계했다.</li>
+      <li>32–50번(2026-11-06 추가)은 추천 목록과 요즘 이슈를 섞었고, 꼭 반전을 노리지 않는다. '요즘 이슈'에 적은 보도 내용은 2차 자료이므로 페이지에서는 원자료 숫자로 다시 확인한다. 이슈 출처: 위키백과 2026년 10월(ko.wikipedia.org/wiki/2026년_10월), 서울경제 영문판 2026-11-06 코스피 기사(en.sedaily.com), 코리아중앙데일리 경제면(koreajoongangdaily.com), KED Global(kedglobal.com), 나무위키 2026년/사건(신뢰도 낮음).</li>
+      <li>「연간화재통계」(15060386)는 odcloud uddi로 2015–2024년 건별 원자료 10개 판을 받는다. 2015–2018년 판과 2019년 이후 판은 열 이름이 다르다(일시/화재발생년월일, 발화열원/발화열원대분류).</li>
+      <li>산업재해통계 마이크로데이터(15127634)는 파일이 없어 KOSIS 118 산업재해현황(업종별 DT_11806_N000, 사망 발생형태별 N022)을 썼다. 사망자에는 업무상 질병 사망이 들어 있다.</li>
+      <li>원전 정비는 한수원 「원전 호기별 계획예방정비 현황」(15114951, 2011–)과 「가동원전 계획예방정비 계획」(15060801)에 시작·종료일이 있다. 원안위 이용률(15046075)은 1978년부터이고 열 순서가 한수원 호기 순서와 같다.</li>
+      <li>온열질환 감시 연도별 결과표는 health.kdca.go.kr/healthhazard/file/heat/YYYY.xlsx(2012–2025)로 바로 받는다. 직업 분류는 2019년부터 같은 틀이다. 기상청 기상자료개방포털 폭염일수 화면은 이 환경에서 스크립트가 깨져 못 썼다.</li>
+      <li>기초연금 수급률(15048209)은 복지로 사회보장통계 iframe에서 selectAtchFileIdMult.do → ZipFileDown.do로 월별 시군구 CSV를 2년씩 받는다. 2023.3·2025.9·2026.1은 65세 이상 인구가 비어 있다. R-ONE 오픈API에는 시군구 평균 매매가격 표가 없다.</li>
+      <li>폐교재산 표준데이터(15107729)는 standard.do 화면의 다운로드 버튼(download/standard.json)으로 xls를 받는다. 팔린 폐교는 빠져 있고, 전남은 옛 도교육청판과 통합교육청판이 112곳 겹친다. 학교알리미 학교별 학생수(15037483)는 링크뿐이라 KOSIS 교육기본통계로 대신했다.</li>
+      <li>「졸업 후 상황」(15042211)에는 학교명·학위과정·계열이 없다. 계열은 학과명 낱말로 나눴고, 입학당시기취업자는 다른 칸과 겹친다(나머지 칸의 합 = 졸업자).</li>
+      <li>식품안전나라(foodsafetykorea.go.kr)는 이 환경에서 접속이 끊긴다. 식중독 통계는 KOSIS(145 DT_145012_A008·A009·A010)에서 받는다. KOSIS 표는 statHtml 화면을 띄운 뒤 html.do에 fieldList의 prdValue만 바꿔 연도마다 POST하면 된다(연도마다 열 구성이 다를 수 있음).</li>
+      <li>질병관리청 감염병포털 장관감염증 주별 신고는 POST /pot/is/st/gstrnftnChartAjax.do(infectiousGubun·subInfectious 코드)로 받는다.</li>
+      <li>「장애인경제활동실태조사」(15004124)는 파일이 없고 KOSIS 383 표로 받는다. 2022년부터는 반기(H,YYYY01) 시점이다.</li>
+      <li>동별 인구 시계열은 jumin.mois.go.kr downloadCsvAge.do(xlsStats=3, sltOrgLvl1=A, sltOrgLvl2=A)로 달마다 받는다. 「행정동 인구증감」(3033254)은 최근 한 달 치뿐이다. 부천시는 2019–2023년 광역동이라 동을 견줄 수 없다.</li>
+      <li>「체류외국인 현황」(3045188) 과거 판은 odcloud uddi 목록으로 받는다. 2012·2013·2020년 판은 없고, 2018년 판은 합계가 1,470만 명으로 체류 인원이 아니어서 쓰지 않았다. 연도마다 체류자격 열 이름 형식이 다르다.</li>
+      <li>「지역별 청약 경쟁률」(15110988)은 파일을 받을 수 없다. 「청약홈 APT 경쟁률」(15101048)에는 지역이 없어 「APT 분양정보」(15101046)와 주택관리번호로 엮는데, 분양정보가 2025.11.28 판이라 그 뒤 단지는 지역을 알 수 없다.</li>
+      <li>「학생건강검사 표본통계」(15051016)는 2016년 파일만 있다. 2025년 표본 원자료는 학교건강검사 표본통계 내려받기로 받았다(CP949가 아닌 UTF-8, 가중치는 최종가중치).</li>
+      <li>「국회의원 발의법률안」(15125946) API는 인증키가 필요하다. 대수별 접수·처리 집계는 열린국회정보 시트 조회(searchSheetData.do, infId=OOWY4R001216HX11477)로 받았다.</li>
+      <li>「대통령선거 개표결과」(15025528)의 과거 선거 파일은 odcloud 스웨거(infuser.odcloud.kr/oas/docs?namespace=…)의 uddi 목록으로 찾아 selectFileDataDownload.do로 받는다.</li>
+      <li>aT 「월별 소매 가격정보」(15087482)는 연월 칸이 2025년 자료까지 모두 2026-01…2026-12로 적혀 있어 해를 가를 수 없다.</li>
+      <li>「가구평균 전력사용량」(15039291)은 링크뿐이다. 전력데이터 개방포털(bigdata.kepco.co.kr)의 조회(cmsajax.do, pstate=X3)는 한 번에 10행만 주므로 반년씩 나눠 받는다.</li>
+      <li>「PM 교통사고 가해자연령대별」(15087988)은 그해 자료로 덮어써져 2025년만 받을 수 있다.</li>
+      <li>색 팔레트: 2026-11-05에 사람이 준 43색 팔레트를 design/palette.json에 저장했다. 12·21·25번부터 이 팔레트를 쓴다.</li>
+      <li>「구직급여 수급현황」(15029716)에는 연령 구분이 없다. 연령별은 고용행정통계(eis.work24.go.kr) OLAP 화면에서 1년씩(최대 기간 제한) 받는다.</li>
+      <li>오피넷 파일 내려받기(과거 가격 포함)는 접속 대기열(NetFunnel) 서버가 막아 이 환경에서 안 된다. 현재 가격은 지역별 주유소 화면(searRgSelect.do)을 시군구마다 조회해 모은다.</li>
+      <li>「주세 신고현황」(3059791)은 파일이 없다. 주종별 출고량은 한국건강증진개발원 절주 통계(15050202 등)에 있다. 「알코올 질환 사망률」(15050211)은 2022·2023년 행의 열 순서(총계·남·여)가 바뀌어 있다.</li>
+      <li>공공데이터포털의 한국부동산원 실거래가격지수 파일(15044283 등)은 내려받으면 0바이트다. 원 출처 R-ONE 통계표에서 받는다(공개 API는 키 없이 5행까지만 준다).</li>
+      <li>「65세 이상 1인가구」(15140446)는 PDF 링크뿐이다. 시군구별 2015–2024년 값은 SGIS 통계주제도 화면이 쓰는 자료에서 받는다.</li>
+      <li>법무부 유학생 국적별 월별 자료(15100039)는 2022년 1월부터만 있다.</li>
+      <li>한국공항공사 「공항별 여객실적」(15002610) 2025년 파일은 제주공항 국내선 정기편이 0으로 적혀 있다(약 2,600만 명 누락). 공항별 숫자는 항공정보포털(airportal.go.kr) 통계를 쓴다.</li>
+      <li>"행 수 미상" 표시는 포털에 행 수가 1로 적힌 파일입니다. 기관 사이트 링크로만 제공되는 경우가 많아, 받아 봐야 실제 크기를 압니다.</li>
+      <li>LOCALDATA(file.localdata.go.kr)는 자동 요청을 막습니다(403). 음식점 인허가처럼 거기 있는 자료는 사람이 직접 받아야 했습니다.</li>
+      <li>포털 수정일은 믿기 어렵습니다. PIR 자료는 수정일이 2026년 9월이지만 실제 값은 2021년에서 끝났습니다. 받은 뒤 내용의 기간을 꼭 확인합니다.</li>
+      <li>「한국의 멸종위기종」(3071040)은 수정일이 2025년이지만 내용은 2017년 267종 목록입니다. 현행 282종은 국립생태원 개정 목록(hwp)에 있습니다.</li>
+      <li>"인증키 필요"는 포털 API라 서비스키를 발급받아야 합니다.</li>
+      <li>예시 사이트가 이미 다룬 주제(전세, 고령 운전, 폭염, 응급실, 치매, 아동학대, 투표율, 태양광, 미세먼지, 유기동물, 공무원 시험, 프랜차이즈)는 피했거나 다른 각도로 잡았습니다.</li>
+    </ul>
+  </section>
+</main>
+
+<script type="application/json" id="questions">
+[
+{"n":1,"theme":"인구·가족","q":"인구는 어디서나 줄고 있을까","twist":"(완료) 시군구로는 거의 맞고 동으로는 아니다. 2016→2026년 10월 전국 −60만 명(−1.2%), 시군구 227곳 중 173곳 감소. 그러나 줄어든 시군구 안 동 2,623곳 중 398곳은 늘었고, 늘어난 동이 있는 곳이 125곳(72%). 늘어난 동은 0–9세 비율 7.3%(줄어든 동 4.3%)","data":"행정안전부 행정동별 연령별 주민등록 인구(2016–2026년 10월, jumin.mois.go.kr), 지역별(행정동) 성별 주민등록 인구증감 (3033254)","pic":"읍면동 3,493개 인구 바코드(재생), 섬 동 덤벨, 나이 구성","pick":true,"done":"https://claude.ai/artifact/A34iM6uJyWHxsEYNEXMf7Z"},
+{"n":2,"theme":"인구·가족","q":"외국인 주민은 대부분 일하러 온 사람일까","twist":"(완료) 비자로 보면 아니다. 2024년 말 90일 넘게 머무는 외국인 212만 명 중 취업 비자 22.8%, 재외동포(F-4·H-2) 30.6%, 유학·연수 12.5%, 가족 10.0%, 영주 9.6%, 결혼이민 7.0%. 인도네시아·캄보디아는 열에 아홉이 취업, 한국계 중국인은 74%가 동포 비자. 유학 몫은 2014년 6.1%→12.5%","data":"국적(지역) 및 체류자격별 체류외국인 현황 (3045188, 2011·2014–2017·2019·2021–2024 판)","pic":"나라별 여권 도장(재생), 체류 목적 구성비 띠","pick":true,"done":"https://claude.ai/artifact/TKbVCsA2deF1hwqUXjnXGy"},
+{"n":3,"theme":"인구·가족","q":"유학생은 대부분 중국 학생일까","twist":"(완료) 아니다. 2026년 9월 유학생 36만 6,343명 중 중국 24.5%, 베트남 35.3%. 학위과정(D-2)에서도 중국 몫은 41.8%(2023.9)→29.6%로 줄었고, 우즈베키스탄·네팔·미얀마·방글라데시·키르기즈가 9.6%→20.5%","data":"월별 외국인 유학생 국적(지역)별 현황 (15100039), 연도별 외국인 유학생 체류 현황 (15100038)","pic":"재생되는 나라별 물줄기(스트림그래프)","pick":true,"done":"https://claude.ai/artifact/1ARfxP8V5cNKkwDKD3hNeQ"},
+{"n":4,"theme":"인구·가족","q":"혼자 사는 노인은 시골에 많을까","twist":"(완료) 비율로는 맞고 수로는 틀리다. 2024년 혼자 사는 65세+ 228.9만 가구, 비율은 전남 26.4%가 최고·경기 19.5%, 수는 경기 44.4만·서울 35.6만이 1·2위. 도의 군 76곳은 13.7%뿐. 2015년 이후 도시의 비율이 더 빨리 올랐다","data":"SGIS 65세이상 1인가구(인구주택총조사, 15140446), 주민등록 연령별 인구(행정안전부), 독거노인 수 (15127846, 15127847)","pic":"밤의 기둥 지도: 색=비율, 기둥=수 (250개 시군구, 재생)","pick":true,"done":"https://claude.ai/artifact/W3Hde9GfVbrnkA6Dqx3gyy"},
+{"n":32,"theme":"인구·가족","q":"결혼은 계속 줄고 있을까","twist":"(완료) 아니다. 2022년 19만 1,690건(1970년 이후 최저)에서 3년 연속 늘어 2025년 24만 326건으로 2019년 수준을 되찾았고, 2026년 1–8월도 +5.2%(잠정). 늘어난 4만 8,636건의 62%는 남편 30–34세. 인구 효과는 거의 없고(2022년 나이별 혼인율 고정 시 −1,146건) 30–34세 여자 1천 명당 41.1→57.4건(2013년 이후 최고). 시군구 229곳 중 186곳이 늘었지만 2019년을 넘은 곳은 79곳, 군은 2019년보다 −14.7%","data":"국가데이터처 인구동향조사 KOSIS(인구동태 추이 DT_1B8000F, 월간 DT_1B8000G, 혼인부부 연령별 DT_1B83A02, 시군구 DT_1B8000I = 포털 15140452의 원자료), 주민등록 5세별 인구(DT_1B04005N)","pic":"56층 웨딩 케이크(혼인/이혼 전환), 남편×아내 나이 반지 격자(1990–2025 재생, 평균 나이 궤적), 나이별 혼인율 화살표와 인구 효과 막대, 시군구 반지 지도(서울 확대)","pick":true,"news":"혼인 건수 반등과 저출생 대책","done":"https://claude.ai/artifact/PReq9myeZiiYt9yXaHb3wt"},
+{"n":33,"theme":"인구·가족","q":"아이를 갖기 어려운 부부는 늘었을까","twist":"(완료) 그렇다. 난임 시술 진료 인원 2018년 12만 1,035명→2022년 14만 759명(+16%), 진료 건수 +39%(1인당 2.19→2.63건). 난임 진단 진료자 중 40세 이상 26.4%→34.1%, 2023년 시술 20만 3,101건 중 40세 이상 33.9%. 2023년 40–44세는 아기 100명당 시술 360건, 45세 이상 3,307건. 시술의 64.3%는 의원 112곳. 쌍둥이 이상 출생 2.2%(2005)→6.1%(2025)","data":"국민건강보험공단 연도별 난임시술 현황 (15125614), F021 난임진료 연령별 (15127567), 난임시술유형별 연령별 원인별 (15142614), 의료기관종별 (15142615), KOSIS 모의 연령별 출생·쌍태아 이상 출생 (DT_1B81A08·A09)","pic":"난임 대기실 의자(2018–2022 재생), 엄마 나이별 요람과 피펫, 원인 블리스터 팩, 쌍둥이 아기 줄(2005–2025 재생), 병원 건물 창문","pick":true,"news":"저출생 대책의 난임 지원 확대","done":"https://claude.ai/artifact/AaqZg4UXPLgwQMJsBMi2Pe"},
+{"n":51,"theme":"인구·가족","q":"한국 국적을 버리는 사람은 늘고 있을까","twist":"(완료) 조금 늘었다. 해마다 1만 7천~3만 6천 명으로 출렁이지만 일본 국적 취득이 몇 해(2016년 1만 5,318건 등)에 몰려 처리된 탓이고, 일본을 빼면 2011년 1만 6,673명→2025년 24만 117명(+45%), 늘어난 몫은 모두 미국. 2011–2025년 떠난 사람(상실·이탈) 37만 7,907명 vs 들어온 사람(귀화·회복) 21만 1,578명으로 15년 내내 떠난 쪽이 많았다. 새 국적은 미국 57.1%(2025년 72.1%). 이탈 3배(1,324→4,014), 국적회복 2,265→4,037명(64%가 미국 국적자)","data":"법무부 국적 상실·이탈 처리 현황 (15100048), 국적(지역)별 (15100049), 국적취득 유형별 (15100046), 국적취득 국적별 (15100047), 국적처리 연도별 추이 (3045189), 국적법 제10·14·15조","pic":"국적 저울(들어온 사람 vs 떠난 사람, 2011–2025 재생, 차이 막대), 출국 전광판(해 고르기, 뒤집히는 행), 목적지별 여행 가방 더미(일본 포함/제외), 미국으로 떠난 100명 중 돌아온 12명","done":"https://claude.ai/artifact/Uic3iNK1EzYiXWSe5gmbfs"},
+{"n":5,"theme":"주거·일·경제","q":"청약은 서울만 붐빌까","twist":"(완료) 꼭대기는 아니고 보통 단지는 그렇다. 2020–2025년 1순위 경쟁률 상위 50곳(일반공급 50세대 이상) 중 서울 21곳, 1·2위는 동탄(809:1)·세종(801:1). 단지 중앙값은 서울 49.9:1, 서울 밖 2.65:1. 서울 150곳은 미달 0곳, 서울 밖은 36.6%가 1순위 미달","data":"청약홈 APT 경쟁률 (15101048), 청약홈 APT 분양정보 (15101046)","pic":"단지 2,202곳 막대 숲, 한 채당 줄 선 사람, 해마다 상위 20곳 지역","pick":true,"done":"https://claude.ai/artifact/PVqDYSRNqDFkrmc1SVmYG2"},
+{"n":6,"theme":"주거·일·경제","q":"집값은 전국이 함께 오르내릴까","twist":"(완료) 대체로 아니다. 236개월 중 17개 시도가 함께 오른 달 21, 함께 내린 달 8뿐. 2008–13년 서울 −6.0%일 때 부산 +55.7%. 14곳은 2021–22년에 꼭대기를 함께 찍었지만 경남·경북은 2015년, 서울은 2026년 8월 지금이 꼭대기","data":"한국부동산원 공동주택 실거래가격지수 아파트 월별 지역별 매매 (R-ONE A_2024_00178 = 15044283)","pic":"같은 출발선의 경주 트랙(재생) + 변동률 줄무늬","pick":true,"done":"https://claude.ai/artifact/86VYXLJdBXqffJFDuBBLQk"},
+{"n":7,"theme":"주거·일·경제","q":"카페는 열자마자 문을 닫을까","twist":"(완료) 1년 생존 88%, 절반이 닫기까지 5.1년. 대신 2023년 폐업이 개업을 따라잡았다","data":"LOCALDATA 휴게·일반음식점 인허가 (15006730, 15045016, 직접 다운로드)","pic":"간판 불이 하나씩 꺼지는 거리","done":"https://claude.ai/artifact/VrqvVUm1VrE7gaS1YfeUPc"},
+{"n":8,"theme":"주거·일·경제","q":"대학을 졸업하면 다 취업할까","twist":"(완료) 아니다. 2024년 고등교육기관 졸업자 63만 명 중 취업(건보 등) 52.1%, 프리랜서·창업 7.3%, 진학 6.9%, 기타·미상 26.1%. 의약은 취업 69.7%, 인문은 39.3%·기타 30.7%. 화학과는 31.3%가 진학, 국어교육과는 52.8%가 기타·미상(임용 준비로 보임)","data":"고등교육기관 졸업자 학과별 졸업 후 상황 (15042211)","pic":"졸업 모자에서 떨어지는 구슬 100개(애니메이션), 학과 110개 별자리, 계열별 구슬 줄","pick":true,"done":"https://claude.ai/artifact/75YYuNd6SJYJiWzHP8WriV"},
+{"n":9,"theme":"주거·일·경제","q":"실업급여는 청년이 많이 받을까","twist":"(완료) 아니다. 2025년 월평균 실업급여 수급자 64만 3,894명 중 60대 29.7%로 가장 많고 29세 이하는 13.3%. 60대 수급자는 2015년의 3.3배로 2021년부터 50대를 앞섰고, 인구 1천 명당으로도 60대(24.4명)가 최고","data":"고용행정통계 성/연령별 실업급여신청현황(EIS), 구직급여 수급 현황 (15029716), 주민등록 연령별 인구","pic":"연령대별 창구에 쌓이는 대기 번호표(재생)","pick":true,"done":"https://claude.ai/artifact/4C1sqrZspXEHUrAjsyjkBm"},
+{"n":10,"theme":"주거·일·경제","q":"장애인은 일하기 어려울까","twist":"(완료) 그렇다. 2025년 5월 15–64세 고용률 장애인 48.3% vs 전체 70.5%, 30대는 54.0% vs 81.2%. 10년 새 틈이 18.0%p→22.2%p로 벌어짐. 정신 장애 10.0%, 지체·시각 42%대. 근로자 10만 명 넘는 시군구 15곳 중 8곳이 의무고용 미달(강남 87%, 중구 81%)","data":"장애인경제활동실태조사 (15004124, KOSIS 383), 경제활동인구조사(KOSIS 101 DT_1DA7002S), 지역별 장애인 고용 현황 (15080750)","pic":"고용률 높이의 출입문(2015/2025 전환), 벌어지는 틈, 시군구 228곳 여닫이 문 거리","pick":true,"done":"https://claude.ai/artifact/YLpgfwqUB4EKwyDsPzFM9e"},
+{"n":11,"theme":"주거·일·경제","q":"기름값은 동네마다 비슷할까","twist":"(완료) 대체로 비슷하다. 2026.11.5 전국 주유소 1만 203곳 휘발유 중앙값 1,849원, 90%가 1,798–1,915원(117원 폭). 시도 중앙값 차이 72원. 차이의 70%는 같은 시군구 안에서 나고, 서울 성북·강남·중구는 같은 구 안에서 600–700원 차이","data":"오피넷 지역별 주유소 판매가격(공공데이터포털 15044646과 같은 자료, 255개 시군구 수집)","pic":"주유기 계기판 위 점 + 시군구별 줄 + 전국 주유소 지도","pick":true,"done":"https://claude.ai/artifact/GdJMyLDSheH4WuYQVLmp1y"},
+{"n":12,"theme":"주거·일·경제","q":"채소는 겨울에 비쌀까","twist":"(완료) 품목마다 다르다. 평년 기준 배추는 9월(연평균의 165%)이 가장 비싸고 12월(71%)이 가장 싸며, 무도 9월(151%)이 최고. 겨울(12–2월)에 평균보다 비싼 건 대파(109%)·양파(103%)뿐이고 마늘·건고추는 1년 내내 ±8% 안","data":"주요 채소류 일일가격 현황 (15087352, 소매·평년가격)","pic":"비싼 달에 부풀고 땀 흘리는 채소 캐릭터 + 36칸 가격 달력","pick":true,"done":"https://claude.ai/artifact/WitF6WQM67tWeP5qavm7zz"},
+{"n":13,"theme":"주거·일·경제","q":"우리는 술을 덜 마시게 됐을까","twist":"(완료) 양으로는 그렇다. 20세 이상 1인당 출고량 2008년 90.3L→2023년 77.0L(−15%), 맥주·소주가 정점 대비 13·15% 감소. 하지만 연간 음주율은 남 84.8%·여 72.6%로 그대로이고, 여성 고위험 음주율은 3.4%→7.7%, 알코올 사망률도 9–10명대 유지","data":"절주 통계: 주류 출고현황 (15050202·15050201·15050200), 성인 음주율 (15050196), 고위험 음주율 (15050197), 알코올 질환 사망 (15050211), 주민등록 인구","pic":"포장마차 탁자 위 차오르는 여섯 잔(일러스트, 재생)","pick":true,"done":"https://claude.ai/artifact/T9t1oYPQ66WUDErVkhM1NY"},
+{"n":34,"theme":"주거·일·경제","q":"코스피는 몇 종목이 움직일까","twist":"(완료) 두 종목이다. 삼성전자(우선주 포함)·SK하이닉스가 시가총액의 49.7%. 11월 6일 종가 5,059.69(−6.02%, 장중 4,911.28)에 940종목 중 729개 하락·166개 상승, 중앙값 −1.79%. 6월 22일 고점 9,114.55 이후 −44.5%, 상위 60종목 시총 감소 3,015조 원의 73%가 두 종목. 2026년 하루 ±5% 넘은 날 40일(2024년 1일, 2025년 2일). 목록의 '−8.5%, 5,000 아래'는 장중 기준에 가까움","data":"네이버 증권 코스피 지수·종목 시세(한국거래소 시세, 2차 자료) — 금융위원회 주식시세정보 (15094808)는 인증키 필요","pic":"코스피 롤러코스터(2023.11–2026.11 재생, ±5% 불꽃), 940종목 시가총액 모자이크(하루/고점 이후), 점 군중, 녹아내린 시가총액 탑","pick":true,"news":"11월 6일 코스피 −8.5%, 9개월 만에 5,000 아래","done":"https://claude.ai/artifact/6v4xepfsewPTJgNG1MrB9z"},
+{"n":35,"theme":"주거·일·경제","q":"K-뷰티 화장품은 중국에만 팔릴까","twist":"(완료) 이제는 아니다. 중국 몫 2021년 53.2%→2025년 17.7%, 2025년 미국(19.1%)이 처음 1위. 상위 10개국 몫 92.7%(2016)→70.7%, 수출국 145곳(2018)→175곳(2022). 수출 2025년 114억 달러(2000년의 149배). 면세점 매출 중국 국적 몫 93.9%(2021)→71.8%(2024). 기사의 '10월 +60%'는 월별 자료를 받지 못해 확인 못함","data":"식약처 화장품 수입 및 수출액·상위 10개국 (KOSIS 145 DT_145011_A006·A008), 4대 소비재 국가별 수출금액(화장품) (15119569), 면세점 국적별·화장품 매출 비중 (15142237)","pic":"립스틱 26개(2000–2025), 왕관이 넘어간 순위표, 세계 지도의 화장품 병(2018–2022 재생), 아이섀도 팔레트, 면세점 쇼핑백","news":"10월 화장품 수출 약 60% 증가 보도","done":"https://claude.ai/artifact/5mBJcgW3sDXVtT2SRvKcCC"},
+{"n":36,"theme":"주거·일·경제","q":"물가는 모든 게 함께 오를까","twist":"(완료) 아니다. 물가가 2.82% 오른 2026년 10월, 457개 품목 중 340개(74%)가 오르고 96개(21%)는 내렸다(가운데 값 +2.02%). 6.3% 오른 2022년 7월에도 51개(11%)는 내렸고, 0.0%였던 2019년 10월에도 62%는 올랐다. 5% 넘게 오른 품목은 15%(2020.10)→53%(2023.3, 244개)→24%. 2020년 대비 전체 +20.7%, 귤 2.3배, TV 등 36개 품목은 2020년보다 쌈","data":"국가데이터처 품목별 소비자물가지수(품목성질별, 2020=100, KOSIS 101 DT_1J22112) 457개 품목 × 2014.1–2026.10 — 포털 15128439는 경기도 자료라 쓰지 않음","pic":"457개 품목 풍선 무리(2015–2026 142개월 재생), 물가 영수증(달 고르기), 등락으로 짠 목도리, 2020년 1만 원의 가격표","news":"10월 소비자물가 2.8% 상승","done":"https://claude.ai/artifact/5ScXTPxGEa7rGcivyZwWDz"},
+{"n":37,"theme":"주거·일·경제","q":"일도 구직도 안 하는 청년은 늘었을까","twist":"(완료) 늘었다. 20대 쉬었음 19만 7천 명(2003)→38만 명(2026년 1–10월 평균), 인구 100명당 2.7→6.9명. 30대는 11만 5천→29만 8천 명(1.3→4.3명). 다만 전체 255만 명의 48%는 60세 이상(121만 5천 명)이고, 20대 취업자 비율은 61%→59%로 거의 그대로. 15–29세가 꼽은 이유 1위는 '원하는 일자리를 찾기 어려워서'(35%), 60세 이상은 '몸이 좋지 않아서'(38%)","data":"국가데이터처 경제활동인구조사: 연령/활동상태별(쉬었음) 비경제활동인구 (KOSIS 101 DT_1DA7147S), 연령별 경제활동인구 총괄 (DT_1DA7002S), 연령별 쉬었음의 주된 이유 (DT_1DE5052S, DT_1DE5011S)","pic":"나이대별 쉬었음 소파(2003–2026 재생), 100명의 책상(2005 vs 2026), 쉬는 이유 말풍선, 100명당 쉬었음 선","news":"청년 고용 부진 보도","done":"https://claude.ai/artifact/4Ci8enVzsmMtz7P6ANxS62"},
+{"n":38,"theme":"주거·일·경제","q":"육아휴직은 엄마만 쓸까","twist":"(완료) 아니다. 2024년(잠정) 육아휴직자 20만 6,226명 중 아빠 6만 117명(29.2%), 2010년 1,967명(2.7%)의 31배. 하지만 아이가 태어난 해 사용률은 아빠 10.2%·엄마 72.2%. 아빠 사용률은 300명 이상 12.5%·4명 이하 6.2%(엄마 78.4%·41.0%), 아빠 휴직자의 67.9%가 300명 이상 기업. 출산일에 일하던 엄마는 39.8%(2016)→59.9%(2024)","data":"국가데이터처 육아휴직통계 (KOSIS 101 DT_CC2024A001–A004, B003, D001–D004, F001), 성별 지역별 육아휴직급여 수급자수 (15100479, 2025년) — 모성보호 지급자 현황 (3044234)은 파일 없음","pic":"아빠·엄마 유모차 행렬(2010–2024 재생), 사용률 젖병(기업 크기별), 빨랫줄의 아기 옷(산업별), 나이별 블록 탑, 엄마의 취업 미끄럼틀","pick":true,"done":"https://claude.ai/artifact/KzHNTWm2PbEm7eQun8uEFD"},
+{"n":14,"theme":"건강·복지·교육","q":"암은 노인의 병일까","twist":"(완료) 절반만 맞다. 2023년 새 환자 49.6%가 65세 미만, 갑상선·유방·고환암은 젊을 때 정점. 20~39세 발생률은 25년 새 2.8배","data":"암발생 통계 정보 (3039563), 24개종 암발생률 (15009644)","pic":"재생되는 나이 곡선, 24개 암 능선","pick":true,"done":"https://claude.ai/artifact/ULa6zmm4SvsaqYXrockJYf"},
+{"n":15,"theme":"건강·복지·교육","q":"아이들 키는 계속 커질까","twist":"(완료) 조금씩은 아직 크고, 지역 차이는 1cm도 안 된다. 2016→2025년 12개 학년 모두 0.2–1.6cm 컸다(고3 남 173.4→174.4cm, 여 160.8→161.8cm). 중1–중2 남학생이 가장 많이(1.6cm) 컸고, 시도별 평균 차이는 서울과 제주 사이도 0.8cm","data":"학생건강검사 표본 원자료 2016 (15051016)·2025(교육부 학교건강검사 표본통계), e-나라지표 학생 평균 키(2차 자료)","pic":"실제 크기의 키재기 벽, 학년별 덤벨","pick":true,"done":"https://claude.ai/artifact/4JZtTXTxQY1XT47o1Pa66d"},
+{"n":16,"theme":"건강·복지·교육","q":"식중독은 여름에만 날까","twist":"(완료) 여름이 가장 많지만 여름만은 아니다. 2018–2025년 사건의 45.8%가 6–9월, 24.8%는 12–3월. 노로바이러스 신고는 1월 셋째 주가 꼭대기(12–2월 53%)이고 원인이 밝혀진 사건 1위(405건). 사건은 음식점 57.5%, 환자는 집단급식소 39.4%(한 건에 41명)","data":"식중독 통계 정보 (15047682, KOSIS 145 DT_145012_A008·A009·A010), 질병관리청 장관감염증 표본감시(감염병포털)","pic":"균마다 1년 시계 배양 접시(애니메이션), 96개월 접시, 크기가 바뀌는 급식판 칸","pick":true,"done":"https://claude.ai/artifact/4yBoojUCrcgzuJGfDCNxHT"},
+{"n":17,"theme":"건강·복지·교육","q":"온열질환은 노인에게만 생길까","twist":"(완료) 아니다. 2025년 환자 4,460명 중 65세 이상 30.1%, 남성 79.7%, 50대가 가장 많고(865명) 실외 작업장 32.1%·실내 작업장 8.0%·논밭 12.2%, 단순노무 26.0%. 다만 인구 10만 명당은 80세 이상이 19.1명으로 평균(8.7명)의 2.2배","data":"질병관리청 온열질환 응급실 감시체계(15122866, 기후보건 연도별 xlsx 2012–2025), 행정안전부 연령별 주민등록 인구","pic":"폭염 지도책: 장소 풍경 아래 누운 사람(재생), 나이별 온도계(수/10만 명당 전환), 해시계","pick":true,"done":"https://claude.ai/artifact/VRA7Ker8c3SWkvPGNnXrGN"},
+{"n":18,"theme":"건강·복지·교육","q":"기초연금은 시골 노인이 더 받을까","twist":"(완료) 대체로 그렇다. 2026년 9월 수급률 전국 65.1%, 군 중앙값 76.2% vs 광역시 구 65.9%. 고흥 85.2% vs 서초 23.3%. 하지만 대구 서구 81.7%·부산 동구 80.7% 같은 원도심도 높고 양평군은 56.8%. 혼자 사는 노인 비율과 상관계수 0.80","data":"한국사회보장정보원 기초연금 인구대비 수급률(15048209, 복지로 월별 시군구 2015.9–2026.9), 통계청 SGIS 65세 이상 1인 가구(15140446), 주민등록 65세 이상 인구","pic":"기울인 지도 위 동전 탑(재생), 노인 10명의 봉투, 혼자 사는 노인 산점도","pick":true,"done":"https://claude.ai/artifact/JzDS2bePdAsK7YCiwPKUGP"},
+{"n":19,"theme":"건강·복지·교육","q":"학생이 줄면 학교는 바로 사라질까","twist":"(완료) 아니다. 1999→2026년 초등학생 −43.6%, 초등학교 +11.7%(서울 529→609곳). 남아 있는 폐교 1,216곳 중 49%는 2000년 전, 1999년 한 해 178곳. 0–9세가 40% 넘게 준 시군구 178곳 중 61곳은 2009년 이후 폐교가 없다. 폐교 28.8%는 미활용","data":"전국폐교재산 표준데이터(15107729), 교육기본통계 초등학교 개황(KOSIS 334 DT_1963003_002), 시군구 0–9세 주민등록 인구","pic":"시도별 학교 건물의 꺼지는 창문(재생), 갈라지는 학생·학교 선, 시도 산점도, 아이 감소 지도와 폐교 창문","pick":true,"done":"https://claude.ai/artifact/4TL8sqJrcck4QAvMCsBnSB"},
+{"n":31,"theme":"건강·복지·교육","q":"한국은 청년 자살이 가장 심할까","twist":"(완료) 20대도 OECD 1위지만 2위 일본과 8% 차이. 80세 이상은 OECD 평균의 3.1배로 격차가 훨씬 크다. 80세 이상은 2005년 정점의 절반 아래로, 20대는 2000년의 1.9배","data":"국가데이터처 사망원인통계, WHO Mortality Database, OECD 인구·노인빈곤·사망원인","pic":"연령대마다 OECD 38개국 줄 세우기","pick":true,"done":"https://claude.ai/artifact/8hjD9RBBkCuh4b7V8doEW7"},
+{"n":39,"theme":"건강·복지·교육","q":"의사는 서울에만 몰려 있을까","twist":"(완료) 서울에 많지만 '서울 전체'는 아니다. 2026년 2분기 의사 11만 7,608명 중 30.2%가 서울(인구는 18.2%), 1,000명당 전국 2.30명·서울 3.82명·세종 1.31명·경북 1.42명. 서울 안에서도 종로구 18.3명·관악구 1.40명이고 25개 구 중 7곳은 전국 평균 아래. 부산 서구 12.5명·대구 중구 11.7명·광주 동구 10.0명. 229곳 중 평균 이상은 53곳, 63곳은 2014년보다 줄었다. 소아청소년과 전문의 0명 15곳, 산부인과 10곳, 성형외과 전문의의 57%가 서울(강남구 34%)","data":"건강보험심사평가원 시군구별 의료인력현황 (KOSIS 354 DT_HIRA4T, 포털 15066021은 링크), 시군구별 전문과목별 전문의 인력현황 (DT_HIRA4S), 행정안전부 주민등록인구 (KOSIS 101 DT_1B040A3)","pic":"독자가 서울 몫을 먼저 맞혀 보는 100명 판, 시군구 의사 지도 ↔ 인구 크기 원 전환(우리 동네 찾기), 의사 스카이라인, 시도별 주사기(2014→2026), 전문의 0명 지도(과목 고르기), 전공의 가운 옷걸이(분기 재생)","pick":true,"warn":true,"news":"의대 정원·지역 의사 논의","done":"https://claude.ai/artifact/XrK36racauPzVEKcvgtCbu"},
+{"n":40,"theme":"건강·복지·교육","q":"수능은 재수생이 많이 볼까","twist":"(완료) 셋 중 하나꼴. 2026학년도 지원자 55만 4,174명 중 졸업생 28.9%(15만 9,922명), 검정고시 등 4.0%. 졸업생 비중은 35.7%(1996)→19.3%(2010)→31.7%(2024, 1997학년도 이후 최고). 하지만 졸업생 수는 1996학년도 30만 명의 절반 남짓이고, 2010→2024학년도에 졸업생 +2만 9천 명·재학생 −20만 6천 명이라 비중이 오른 것은 대부분 재학생이 줄어서다. 결시율 2.5%(2001)→10.9%(2026)","data":"한국교육과정평가원 대학수학능력시험 연도별 접수현황 (15098903), 연도별 응시현황 (15098904) — 채점현황 (15080201)은 hwpx 문서, 시도별 지원자 공개 파일은 찾지 못함","pic":"독자가 졸업생 비중 선을 직접 그리고 실제와 맞춰 보기, 책상 100개 시험장(1994–2026 재생, 내가 수능 본 해), 5만 명 한 칸 OMR 카드, 칠판의 두 선, 빈 책상(결시)","pick":true,"news":"11월 수능","done":"https://claude.ai/artifact/GdtaenZv49i1w2tXUiYQMp"},
+{"n":20,"theme":"안전","q":"범죄는 밤 골목에서 일어날까","twist":"(완료) 골목·보도는 4.3%. 강력·폭력은 밤에 많지만 집이 골목의 2.6배. 범죄의 45%는 장소가 기타·미상이고, 0–3시 칸 47%는 시각 미상이 0시로 적힌 것으로 보인다","data":"범죄 발생 장소별 (3074463), 범죄 발생시간 (3074459)","pic":"가상의 동네 지도에 점 1,000개, 24시간 시계","pick":true,"done":"https://claude.ai/artifact/5RMyF2uAjzFVz3SjtvYLkC"},
+{"n":21,"theme":"안전","q":"킥보드 사고는 10대가 낼까","twist":"(완료) 건수로는 그렇다. 2025년 PM 가해 사고 1,915건 중 19세 이하 852건(44.5%), 10–19세 10만 명당 18.4건으로 20대의 2.7배. 하지만 사망 23명 중 9명은 65세 이상이 낸 사고로, 100건당 사망 8.3명(19세 이하 0.1명)","data":"개인형이동장치(PM) 교통사고 월별 가해자연령대별 통계 (15087988), 주민등록 연령별 인구","pic":"나이대별 킥보드 줄(재생) + 100건당 사망","pick":true,"done":"https://claude.ai/artifact/7Pp4nrFPLg5iRPco2Uo8ju"},
+{"n":22,"theme":"안전","q":"산업재해는 공장의 일일까","twist":"(완료) 아니다. 2024년 재해자 14만 2,771명 중 서비스업(기타의 사업) 37.4%, 건설 24.1%, 제조 23.0%. 10년 새 운수·창고·통신업 4.0배. 사망 2,098명의 60.6%는 업무상 질병이고, 사고 사망 827명 중 건설 39.7%, 떨어짐 33.6%","data":"고용노동부 산업재해현황 업종별·사망 발생형태별(KOSIS 118 DT_11806_N000·N022), 근로복지공단 업종별 산재신청 승인현황 (15095104)","pic":"쏟아지는 안전모 탑(연도 전환), 사망 벽돌 벽, 업종별 승인율 선","pick":true,"done":"https://claude.ai/artifact/Aw7atDtoKgGsyoeUKcGToc"},
+{"n":23,"theme":"안전","q":"화재는 겨울 난방 때문일까","twist":"(완료) 절반만 맞다. 2015–2024년 화재 40만 6천 건 중 12–2월 27.7%로 조금 많지만 가장 많은 달은 3월(10.8%, 쓰레기 소각·담배꽁초). 아궁이·연탄 등 난방 불씨는 4.6%, 부주의 49.5%·전기 23.9%(7–8월 최다). 그러나 사망자의 36.2%가 12–2월","data":"연간화재통계 (15060386, 2015–2024 원자료 10개 판)","pic":"2024년 365일×24시간 불씨 하늘(캔버스), 원인별 불꽃 꽃잎, 달별 초(촛농=화재, 불꽃=사망)","pick":true,"done":"https://claude.ai/artifact/WXv8GxVADBzUCbumje9MgF"},
+{"n":24,"theme":"안전","q":"로드킬은 시골 국도의 일일까","twist":"(완료) 신고 절반이 고양이, 열에 넷은 도시 도로. 고속도로는 20년 새 6분의 1","data":"국립생태원 로드킬 신고 (15105476), 도로공사 (15061291), 국립공원 (3068387)","pic":"도로 차선 위에 늘어놓은 신고 네모","done":"https://claude.ai/artifact/F65M7jFpchE2xmBSsPM5NK"},
+{"n":41,"theme":"안전","q":"전기차는 불이 더 자주 날까","twist":"(완료) 아니다. 2021–2024년 전기차 화재 212건 ÷ 등록 대수 = 1만 대당 한 해 1.35건, 전체 자동차는 1.59건(네 해 모두 전기차가 낮음: 1.19–1.54 대 1.56–1.61). 212건 중 운행·정차 중 117건, 주차 중 58건, 충전 중 37건, 지하 22건. 48건은 화물차 짐칸에서 났고 담배꽁초가 원인인 화재가 33건. 다만 전기차 다섯에 넷이 2021년 이후 늘어난 새 차라 차 나이를 맞춘 비교는 못 했고, 건수는 피해 크기가 아니다","data":"소방청 전기차 화재 발생 현황 (15138615, 2021–2024), 연간화재통계 (15060386, 자동차 화재), 한국전력공사 지역별 전기차 현황정보 (15039554, 월말 등록 대수), 국토교통부 자동차등록대수현황 (KOSIS 116 DT_MLTM_5498), 한국교통안전공단 전기차 시군구별 등록대수 (15142951)","pic":"독자가 답을 먼저 고르는 자, 10만 대 주차장 두 곳에서 한 해씩 불을 내 보는 시뮬레이터, 해마다의 불꽃, 화재 212건 지도(2021–2024 재생, 상태별 모양), 212건 다시 줄 세우기","pick":true,"news":"지하주차장 전기차 화재 이후 충전·주차 규제","done":"https://claude.ai/artifact/A62MCDM4A2ghtKj5BeTqNb"},
+{"n":42,"theme":"안전","q":"소방관은 불 끄다 가장 많이 다칠까","twist":"(완료) 수로는 아니다. 2016–2025년 공상 9,876명 중 화재 1,969명(20%), 구급 2,111명(21%), 구조 763명, 생활안전 322명, 그 밖의 일(지원·예방 활동, 체력단련, 출퇴근 등) 4,711명(48%). 공상자는 511명(2016)→1,445명(2024). 하지만 화재 1만 건당 47.2명, 구급 출동 1만 건당 0.68명으로 한 번 나갈 때의 위험은 화재가 70배쯤이고, 순직 33명(2016–2024) 중 13명이 화재 현장","data":"소방청 연도별 소방공무원 순직 및 공상자 현황 (15131241, hwp 2개), 119 구급 운영 현황 (KOSIS 156 TX_15602_A018), 구조활동 총괄 (TX_15602_A004), 연간화재통계 (15060386) — 소방관 순직 및 사상자 현황 (15033927)은 2017년 한 해뿐이라 쓰지 않음","pic":"독자가 다섯 가지 일의 순서를 눌러 맞히기, 공상자 10명에 헬멧 하나(2016–2025 재생), '다친 사람 수 ↔ 1만 건당'을 오가는 사다리차, 순직자 33명의 헬멧, 소방본부별 원 지도","news":"부천 공장 화재로 소방관 순직","done":"https://claude.ai/artifact/KGoxG3k4ySzWDvUdYTWJfN"},
+{"n":43,"theme":"안전","q":"개인정보는 해킹으로 가장 많이 새어 나갈까","twist":"(완료) 절반만 맞다. 2024년 유출 신고 307건 중 해킹 171건(56%). 하지만 개인정보보호위원회가 원인을 나눈 617건은 업무 과실 270건(43.8%)·해킹 266건(43.1%)으로 같고, 공공기관은 과실 62%·해킹 26%. 신고된 유출 건수는 498만 건(2022)→1억 355만 건(2025), 2020–2026.6 합 1억 8,412만 건. 2022년 침해 신고·상담 15만 1,603건의 56%는 보이스피싱 등 금융사기 상담","data":"개인정보보호위원회 조사 및 처분 통계 (15177148), 개인정보침해 신고센터 신고 상담 현황 (15119353), 일반국민의 개인정보 침해 경험 실태 (15119394), 한국인터넷진흥원 2024년 개인정보 유출 신고 동향 (15145110, 보고서에서 옮김) — 원래 적어 둔 15085102는 서울시 2008년 설문이라 쓰지 않음","pic":"유출 사고 617건이 금고에서 떨어져 원인 13칸에 쌓이는 핀볼(전체·민간·공공, 다시 떨어뜨리기), 자물쇠 100개(2024년 공공·민간), 유출 건수 서류 더미와 인구 선, 전화기 100대와 '내가 겪은 일' 고르기","warn":true,"news":"은행 해킹으로 고객 정보 유출","done":"https://claude.ai/artifact/J1Z8jHFjTsPup78Ac83p6D"},
+{"n":25,"theme":"환경·교통·정치","q":"전기는 여름에 가장 많이 쓸까","twist":"(완료) 지금은 그렇다. 2025년 가구 평균 8월 347kWh가 최고이고 1–2월(244kWh)이 두 번째 봉우리인 쌍봉. 2014년엔 1월(270)이 8월(245)보다 많았고, 11년 새 여름 봉우리는 42% 커지고 겨울은 10% 낮아짐","data":"한전 가구 평균 전력 사용량 (15039291, 전력데이터 개방포털 시도별 월별)","pic":"월별 사용량으로 등을 그린 쌍봉낙타(재생)","pick":true,"done":"https://claude.ai/artifact/PkVydvt8FCiuDL855oSbao"},
+{"n":26,"theme":"환경·교통·정치","q":"멸종위기종은 호랑이·곰 같은 동물일까","twist":"(완료) 282종 중 포유류는 20종(7%), 식물 92종·조류 69종이 가장 많다. 호랑이·표범·늑대·스라소니는 이미 지역절멸(RE)로 평가","data":"한국의 멸종위기종 (3071040, 내용은 2017년 목록), 국립생태원 2022 개정 목록","pic":"282칸 스티커 도감, 숲 그림","pick":true,"done":"https://claude.ai/artifact/Exwx2kfwBXZjZ4FaegFg4u"},
+{"n":27,"theme":"환경·교통·정치","q":"원전은 늘 같은 양을 만들까","twist":"(완료) 아니다. 원전 28기의 계획예방정비 233번, 한 번에 중앙값 73일이지만 한빛4호기 2,033일·고리2호기 1,092일도 있다. 2018년엔 원자로-일의 32.4%가 정비, 호기 평균 이용률 64.6%(1980년 이후 최저). 발전량 133.5–187.3TWh로 출렁임","data":"원전 호기별 발전량 및 이용률 (15002302), 계획예방정비 현황 (15114951)·계획 (15060801), 원안위 호기별 연도별 이용률 (15046075), 원전 사고고장 현황 (15074543)","pic":"원전 28기 월별 제어반 표시등(캔버스, 켜짐 애니메이션), 1978–2025 이용률 띠, 정비 기간 점 무리","pick":true,"done":"https://claude.ai/artifact/FsYNvVHFZis5JJ8iUuhgC1"},
+{"n":28,"theme":"환경·교통·정치","q":"비행기는 인천공항에서만 탈까","twist":"(완료) 아니다. 2025년 공항 승객 1억 5,604만 명 중 인천은 47.5%(국제선만 보면 77.4%). 2위 제주·3위 김포는 국내선 공항이고 2020–22년엔 제주가 1위. 국제선 승객 52.8%는 1,500km 안(일본·중국·대만)을 오갔다","data":"항공정보포털 공항별·국가별 항공통계(국토교통부), 공항별 여객실적 (15002610, 대조용)","pic":"공항 지도와 서울 중심 세계 하늘길 지도(재생)","pick":true,"done":"https://claude.ai/artifact/52v76fhfwe4TGh3wMcbsXB"},
+{"n":29,"theme":"환경·교통·정치","q":"국회의원이 낸 법안은 대부분 통과될까","twist":"(완료) 아니다. 21대 국회 의원 발의 법률안 2만 3,655건 중 원안·수정 가결은 1,391건(5.9%), 위원회 대안 반영까지 더해도 30.5%. 68.2%는 임기 만료로 폐기. 의원 발의는 15대 806건에서 29배로 늘고 통과 비율은 15.3%→5.9%","data":"국회 열린국회정보 의안 처리 현황(대수별 발의주체별 접수·처리), 국회의원 발의법률안 (15125946)","pic":"좁아지는 깔때기, 대수별 발의 막대","pick":true,"key":true,"done":"https://claude.ai/artifact/6gsx8YQSwGopmEMemWnREw"},
+{"n":30,"theme":"환경·교통·정치","q":"우리 동네는 늘 같은 후보를 찍을까","twist":"(완료) 아니다. 2002–2025년 대선 여섯 번을 모두 견줄 수 있는 읍면동 2,392곳 중 47.3%가 1위 정당 계열이 한 번 이상 바뀌었다(2012–2025년만 보면 31.1%). 대전 77%·제주 70%·울산 67%는 절반 넘게 바뀌었고, 광주·대구·전북은 한 곳도 안 바뀜","data":"대통령선거 개표결과 읍면동·투표구별 (15025528, 과거 파일 2002·2007·2012·2017·2022·2025)","pic":"선거마다 색이 바뀌는 읍면동 타일(재생), 시도별 바뀐 비율","pick":true,"done":"https://claude.ai/artifact/Hb2v4PMY8AG22oFMpKcNeL"},
+{"n":44,"theme":"환경·교통·정치","q":"AI 데이터센터는 전기를 얼마나 쓸까","twist":"(완료) 공개 자료로는 정확히 알 수 없다. 공개된 것은 사용량이 아니라 계약전력이다. 2023년 말 데이터센터 150곳·1,986MW, 수도권이 90곳(60%)·1,403MW(71%). 1년 내내 전부 써도 17.4TWh로 전국 판매전력량(546TWh)의 3.2%가 상한이고, 절반을 쓰면 8.7TWh(1.6%). 서울은 다 쓰면 서울 전기의 11.6%. 전자·통신 제조업은 63.5TWh","data":"한국전력공사 데이터센터 전기공급 현황 (15127315, 2023.12.31), 한국전력통계 행정구역별 용도별 판매전력량 (KOSIS 310 DT_31002_A006), 인천데이터센터 전기사용량 (15086512) — 업종별 전력사용량 (15101310)은 링크뿐이고 시군구별 용도업종별 (15069678)에는 데이터센터 항목이 없음","pic":"계약전력 20MW에 서버 랙 하나인 불빛 지도, 독자가 가동률을 정하면 길이가 바뀌는 LED 막대(1칸 = 1TWh), 지역별 배터리, 공공 데이터센터 한 곳의 달마다 계량기","news":"AI 투자 논란과 데이터센터 규제, 11월 주가 급락","done":"https://claude.ai/artifact/R5NaiBDHAHXZPk8mZZe1J2"},
+{"n":45,"theme":"환경·교통·정치","q":"태풍은 더 세지고 늦게 올까","twist":"(완료) 더 세게 오는 것은 맞고 늦게 오는 것은 아니다. 1951–2025년 한국에 영향을 준 태풍 239개(해마다 3.2개, 수는 그대로). 한반도 400km 안에 들어왔을 때 중심기압 평균 985.3hPa(1951–1987)→976.3hPa(1988–2025), 960hPa 이하 6개(6%)→16개(19%), 뒤섞기 검정 p≈0.0001. 가장 가까이 온 날 평균 8월 13일→8월 16일, 9월 이후 28%→32%. 1987년까지 항공기 관측이 있어 측정 방법 차이 주의. 2025년은 0개(2009년 뒤 처음)","data":"기상청 태풍목록 (15043569, 기상자료개방포털 typList.do에서 영향도 포함 1,983개), 일본기상청 RSMC 도쿄 태풍 최적경로 bst_all (6시간 위치·중심기압) — 날씨 이슈별 데이터(태풍) (15095239)는 쓰지 않음","pic":"동아시아 지도에 영향 태풍의 길을 해마다 쌓기(1951–2026 재생, 그해 태풍은 소용돌이가 길을 따라 돎, 내가 태어난 해 고르기), 소용돌이 달력, 연대별 중심기압 띠(기준 고르기), 해마다 소용돌이 기둥","pick":true,"warn":true,"done":"https://claude.ai/artifact/BGdcS4RfkufCQxmh8mZzbE"},
+{"n":46,"theme":"환경·교통·정치","q":"바닷가 쓰레기는 어디서 올까","twist":"(완료) 대부분 우리 안에서. 해변 60곳 2018–2023년 48만 52개 가운데 외국기인 1.8%(무게 11.1%). 2018–2019년 세부 항목 6만 2,444개는 육지에서 쓰던 것 39%, 바다(어업)에서 쓰던 것 24%, 외국 1.4%, 알 수 없음 36%(이 장의 분류). 외국 비중은 서해 6.6%·제주 5.8%·남해 0.2%·동해 0.3%, 백령도만 67%. 플라스틱 개수 87.4%·무게 52.9%. 통영 욕지도 한 곳이 2021–2023년 개수의 40.9%","data":"해양환경공단 해양쓰레기 모니터링 통계 2기 유형별 (15069304)·지역별 (15069306)·시기별 (15069303), 유형별 자료 2기 방법론 2018·2019 (15044008), 해양수산부 국가 해안쓰레기 모니터링 조사 정점 (15129575, 경도 20곳 소수점 오류 고침) — 15110788은 제주 3곳 자료","pic":"모래사장에 쓰레기 100개를 뿌리고 독자가 하나씩 주워 출처별 바구니에 담기(한꺼번에 줍기, 다시 뿌리기), 해변 60곳 지도(무게·개수·외국 비중), 개수와 무게 막대, 해변 60곳 모래 언덕","pick":true,"done":"https://claude.ai/artifact/VpkTWAme6WKQnFuEkqCMfT"},
+{"n":47,"theme":"환경·교통·정치","q":"사람들은 어떤 기관을 가장 믿지 않을까","twist":"(완료) 국회. 2025년 믿는다(약간+매우) 37.5%로 17개 기관 중 꼴찌, 2013–2025년 13년 내내 꼴찌, 전혀 믿지 않는다 26.3%. 그다음 검찰 39.2%, 법원 43.7%. 가장 믿는 곳 의료기관 72.0%, 교육·금융기관 67.6%. 2016년에 거의 모든 기관이 바닥(국회 12.6%), 2021년에 높았다. 나이대별 차이는 기관마다 9%p 이하, 소득별로는 경찰 73.3%(100만 원 미만)·46.6%(600만 원 이상)처럼 더 벌어진다. 정치 성향별 표는 KOSIS에 없어 확인 못 함","data":"한국행정연구원 사회통합실태조사 기관별 신뢰 정도 (KOSIS 417 DT_417001_0038, 포털 15145315는 원자료 hwp·링크) — 원자료(마이크로데이터)는 쓰지 않음","pic":"독자가 17개 기관을 믿는다/안 믿는다로 답하고 같은 답을 한 국민 비율과 견주기, 믿음만큼 선 돌기둥(2013–2025 재생), 기관 묶음별 13년 선, 집단별 격자(나이·소득·학력·성별·지역), 전혀 믿지 않는다 100명 줄","pick":true,"warn":true,"news":"검찰청 폐지와 사법 개혁 논란","done":"https://claude.ai/artifact/WYUz7ebCXwGJJYuSPtgZSj"},
+{"n":48,"theme":"생활·문화","q":"반려견 등록은 어디서 가장 많을까","twist":"(완료) 마릿수로는 경기 큰 도시(수원 7만 5,009, 고양, 용인, 성남), 세대마다로는 서울 둘레의 군·시. 2022년 말 등록된 개 302만 5,859마리 = 100세대에 12.8마리(1,000명당 59). 양평군 21.6·담양군 20.1·가평군 19.7·포천시 18.4, 신안군 2.8·울릉군 2.9로 여덟 배 차이. 시도는 제주 17.0·인천 15.3·경기 15.2 … 세종 9.2·경북 9.5, 서울 12.1. 시 13.2·구 12.6·군 10.2. 고양이는 2만 8,483마리(개의 0.9%, 등록 의무 없음)","data":"농림축산검역본부 행정구역별 반려동물 등록 개체 수 현황 (15125454, 2022.12.31 누계; 2023.12.08 수정판도 값이 같음), 주민등록세대수 (KOSIS 101 DT_1B040B3), 주민등록인구 (DT_1B040A3) — 동물등록 현황 (15103156)은 받기 실패, 15078724는 전주시 자료","pic":"100세대 집 그림에 개를 맞혀 보기, 개 1천 마리를 점 하나로 시군구 경계 안에 흩어 찍은 점묘 지도 ↔ 100세대당 색칠 지도(우리 동네 찾기), 많은 곳·적은 곳 산책길, 시도·구시군 막대, 고양이 마당","pick":true,"done":"https://claude.ai/artifact/Nw9xwLJ9xZAXKVDFRnTN3Z"},
+{"n":49,"theme":"생활·문화","q":"한국어는 어느 나라에서 배울까","twist":"(완료) 러시아와 베트남. 2025년 세종학당 수강생 12만 3,427명 중 러시아 2만 2,410명(18.2%, 2024년 6,032명의 3.7배), 베트남 1만 7,821명(14.4%), 중국, 미국, 우즈베키스탄 다섯 나라가 절반. 2021년 8만 1,476명에서 51% 늘었고 러시아·중앙아시아 +137%, 북미 +113%, 유럽 +29%, 중남미 −13%. 아시아 밖 수강생은 33% 늘었지만 몫은 38.7%→34.1%로 줄었다(가설 반대)","data":"세종학당재단 국가별 세종학당 수강생 수 현황 (15127358, 2021–2025), 학습 앱 월별 다운로드 (15159571), 손안의 세종학당 신규 가입자 (15159589), 한국국제교류재단 해외대학 한국학 현황 (15041591)","pic":"밤하늘 세계지도에 나라마다 한글 자모 별(크기 = 수강생, 2021–2025 재생, 한국과 잇는 별자리), 지역별 쌓인 막대와 아시아 밖의 몫, 순위 기울기와 나라 고르기 카드, 학습 앱 달마다 내려받기","pick":true,"done":"https://claude.ai/artifact/D5mA3jwYovpCSd5UmBNf3o"},
+{"n":50,"theme":"생활·문화","q":"운동선수 병역 특례는 어떤 종목이 받을까","twist":"(완료) 축구와 야구. 2018·2023 아시안게임 체육요원 98명 중 축구 40·야구 28 = 68명(69%), 2026년 요건 충족 56명 중 축구 20·야구 16·농구 8·3대3 농구 4(단체종목 86%) — 보도(2차 자료). 축구는 금메달 하나에 20명. 공개 파일로는 1996–2024년 490명 중 332명(68%)이 아시안게임이 열린 해와 그다음 해. 기준은 병역법 시행령 제68조의11(올림픽 3위 이상, 아시안게임 1위), 한 메달당 인원 제한 없음","data":"병무청 체육요원 연도별 편입 현황 (15086043, 해마다 합계만), 병역법 시행령 제68조의11·12 (국가법령정보센터, 2026.10.2 시행), 파이낸셜뉴스 2026.10.14 김병주 의원실·병무청 자료 인용 보도(2차 자료)","pic":"축구 금메달 하나와 개인종목 금메달을 견주는 저울(독자가 메달을 올림, 야구로 바꾸기), 대회별 종목 메달 걸이(2018·2023·2026), 해마다 쌓인 메달(대회 표시), 시행령 조문 카드","news":"아시안게임 축구 병역 특례 논란","done":"https://claude.ai/artifact/XmjPDa9vCvQamETeNuxkQz"}
+]
+</script>
+<script>
+(() => {
+  const Q = JSON.parse(document.getElementById('questions').textContent);
+  const body = document.getElementById('rows');
+  let theme = '';
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const tag = (cls, text) => el('span', 'tag ' + cls, text);
+  Q.forEach((r) => {
+    if (r.theme !== theme) { theme = r.theme; const tr = el('tr', 'theme'); const td = el('td', '', theme); td.colSpan = 5; tr.append(td); body.append(tr); }
+    const tr = el('tr');
+    const q = el('td', 'q');
+    if (r.done) { const a = el('a', '', r.q); a.href = r.done; a.target = '_blank'; a.rel = 'noopener'; q.append(a, tag('done', '완료')); } else q.append(r.q);
+    if (r.pick) q.append(tag('pick', '추천'));
+    if (r.news) q.append(tag('news', '요즘 이슈'), el('span', 'hook', r.news));
+    const data = el('td', '', r.data);
+    if (r.warn) data.append(tag('warn', '행 수 미상'));
+    if (r.key) data.append(tag('key', '인증키 필요'));
+    tr.append(el('td', 'n', String(r.n)), q, el('td', '', r.twist), data, el('td', '', r.pic));
+    body.append(tr);
+  });
+})();
+</script>

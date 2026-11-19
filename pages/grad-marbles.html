@@ -1,0 +1,507 @@
+<title>졸업 구슬길</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a marble run. 100 marbles (1% of a field's graduates each) drop out of a graduation-cap hopper,
+   roll down branching pipes and pile up in six glass tubes. A second figure scatters 110 majors as a starfield. */
+:root {
+  --paper: #f4f1ea; --card: #fdfbf7; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #e2ccb5; --grid: #ece6dc; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --accent: #3e6f90; --pipe: #dbe1dd; --pipe2: #bcbbb6; --glass: #eef2f0; --cap: #2f3133; --tassel: #d56b41;
+  --k-job: #3e6f90; --k-free: #689daf; --k-study: #80a15a; --k-army: #928a7f; --k-other: #bcbbb6; --k-none: #d56b41;
+  --none-ink: #a8451f;
+  --f-의약: #953a4c; --f-공학: #3e6f90; --f-교육: #80a15a; --f-사회: #b87b68; --f-자연: #416e59; --f-예체능: #d56b41; --f-인문: #928a7f;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #8eabc9; --pipe: #3a3d3f; --pipe2: #5f6062; --glass: #2f3234; --cap: #ebdac0; --tassel: #dc8c67;
+  --k-job: #8eabc9; --k-free: #8ab5bb; --k-study: #abc07b; --k-army: #b6a392; --k-other: #5f6062; --k-none: #dc8c67; --none-ink: #dc8c67;
+  --f-의약: #d6b0a7; --f-공학: #8eabc9; --f-교육: #abc07b; --f-사회: #dabea9; --f-자연: #91b0a1; --f-예체능: #dc8c67; --f-인문: #b8ac9c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #8eabc9; --pipe: #3a3d3f; --pipe2: #5f6062; --glass: #2f3234; --cap: #ebdac0; --tassel: #dc8c67;
+  --k-job: #8eabc9; --k-free: #8ab5bb; --k-study: #abc07b; --k-army: #b6a392; --k-other: #5f6062; --k-none: #dc8c67; --none-ink: #dc8c67;
+  --f-의약: #d6b0a7; --f-공학: #8eabc9; --f-교육: #abc07b; --f-사회: #dabea9; --f-자연: #91b0a1; --f-예체능: #dc8c67; --f-인문: #b8ac9c; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 16.5px/1.78 var(--sans); word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 36px 80px }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--axis) }
+:focus-visible { outline: 2px solid var(--intl); outline-offset: 2px }
+.page { max-width: 1040px; margin: 0 auto; display: grid; gap: 64px }
+.prose { max-width: 660px; display: grid; gap: 14px; min-width: 0 }
+.prose p { margin: 0 }
+.n { font-weight: 700; font-variant-numeric: tabular-nums }
+.label { font: 500 12px/1.4 var(--mono); letter-spacing: .08em; color: var(--muted); margin: 0; text-transform: uppercase }
+
+header { display: grid; gap: 22px }
+h1 { font-weight: 700; font-size: clamp(32px, 5.6vw, 54px); line-height: 1.18; margin: 0; letter-spacing: -.03em; text-wrap: balance }
+h1 span { display: block; font-weight: 500; font-size: .46em; color: var(--ink2); margin-top: 12px; letter-spacing: -.01em; line-height: 1.45 }
+.sheet, .method { display: grid; grid-template-columns: 110px minmax(0, 1fr); border-top: 2px solid var(--ink); font-size: 14.5px; margin: 0 }
+.sheet dt, .sheet dd, .method dt, .method dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line) }
+.sheet dt, .method dt { font: 500 12px/2 var(--mono); color: var(--muted) }
+.sheet dd, .method dd { color: var(--ink2) }
+@media (max-width: 560px) { .sheet, .method { grid-template-columns: 84px minmax(0, 1fr) } }
+
+.quiz { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 14px }
+.quiz h2 { font-size: 20px; line-height: 1.5; margin: 0; font-weight: 700; text-wrap: balance }
+.opts { display: grid; gap: 8px }
+.opt { display: flex; gap: 12px; align-items: center; text-align: left; font: inherit; font-size: 15.5px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; cursor: pointer; min-height: 46px }
+.opt i { font: 500 12px var(--mono); color: var(--muted); font-style: normal; width: 14px }
+.opt[data-state="right"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink) }
+.opt[data-state="wrong"] { opacity: .5 }
+.reveal { font-size: 15px; color: var(--ink2); border-top: 1px solid var(--line); padding-top: 14px }
+.reveal .big { font-size: 28px; font-weight: 700; color: var(--ink); display: block; line-height: 1.3 }
+
+section.s { display: grid; gap: 22px }
+h2.h { font-size: clamp(23px, 3.3vw, 29px); line-height: 1.35; margin: 0; font-weight: 700; letter-spacing: -.02em; text-wrap: balance }
+figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 12px; position: relative; min-width: 0 }
+@media (max-width: 560px) { figure { padding: 14px } }
+.ft { font-weight: 700; font-size: 16px; margin: 0; line-height: 1.5 }
+.fs { font-size: 13.5px; color: var(--muted); margin: -8px 0 0; line-height: 1.6 }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y }
+figcaption { font-size: 12.5px; color: var(--muted); line-height: 1.65; border-top: 1px solid var(--grid); padding-top: 10px }
+details { font-size: 13px }
+summary { cursor: pointer; color: var(--ink2); width: max-content; font: 500 12px/2 var(--mono); padding: 6px 0 }
+.tw { overflow-x: auto; margin-top: 6px; max-height: 380px }
+table { border-collapse: collapse; font-size: 12.5px; min-width: 100% }
+th, td { padding: 5px 10px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums }
+th:first-child, td:first-child { text-align: left }
+th { font-weight: 700; color: var(--ink2); position: sticky; top: 0; background: var(--card) }
+
+/* player: play button, scrubber and a departures-board year */
+.player { display: flex; align-items: center; gap: 14px; flex-wrap: wrap }
+.play { width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; display: grid; place-items: center; flex: none }
+.play svg { width: 18px; height: 18px }
+.play:hover { background: var(--intl) }
+.yr { font: 600 30px/1 var(--mono); font-variant-numeric: tabular-nums; color: var(--board-ink); background: var(--board); border-radius: 6px; padding: 8px 10px; letter-spacing: .06em;
+  background-image: linear-gradient(transparent calc(50% - .5px), rgba(255,255,255,.14) calc(50% - .5px), rgba(255,255,255,.14) calc(50% + .5px), transparent calc(50% + .5px)) }
+.scrub { flex: 1 1 180px; min-width: 0; accent-color: var(--intl); height: 32px }
+.stat { font-size: 14px; color: var(--ink2); margin: 0; min-height: 1.6em }
+.stat b { font-variant-numeric: tabular-nums }
+.chips { display: flex; flex-wrap: wrap; gap: 8px }
+.chip { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; min-height: 40px; cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink) }
+.lb { fill: var(--ink); font-family: var(--sans) }
+.vl { fill: var(--ink); font-family: var(--sans); font-weight: 700; font-variant-numeric: tabular-nums }
+.tk { fill: var(--muted); font-family: var(--mono); font-variant-numeric: tabular-nums }
+.mt { fill: var(--muted); font-family: var(--sans) }
+.halo { paint-order: stroke; stroke: var(--card); stroke-linejoin: round }
+.halo-sea { paint-order: stroke; stroke: var(--sea); stroke-linejoin: round }
+.gl { stroke: var(--grid); stroke-width: 1 }
+.ax { stroke: var(--axis); stroke-width: 1 }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink2) }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block }
+.sw.line { height: 3px; width: 18px; border-radius: 2px }
+.sw.dot { border-radius: 50% }
+.tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--axis); border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.12); padding: 8px 10px; font-size: 12.5px; line-height: 1.5; min-width: 150px; max-width: 250px; z-index: 5 }
+.tip .tn { color: var(--muted) } .tip .tv { font-weight: 700; font-size: 14px }
+.ring { fill: none; stroke: var(--ink); }
+ul.care-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; color: var(--ink2) }
+.dt { overflow-x: auto; border-top: 2px solid var(--ink) }
+.dt td, .dt th { white-space: normal; text-align: left; vertical-align: top; padding: 8px 10px 8px 0; position: static }
+.next { display: grid; border-top: 2px solid var(--ink) }
+.q { padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px }
+.q h3 { font-size: 16px; margin: 0; font-weight: 700 }
+.q p { margin: 0; font-size: 14px; color: var(--ink2) }
+.q ul { margin: 0; padding-left: 18px; font-size: 13.5px }
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px }
+
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+:focus-visible { outline-color: var(--accent) }
+.run-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap }
+.again { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 999px; padding: 6px 14px; min-height: 40px; cursor: pointer }
+.chip .sw { margin-right: 6px; vertical-align: -1px }
+</style>
+
+<main class="page">
+  <header>
+    <h1>대학을 졸업하면 다 취업할까<span>100명 중 52명이 회사에 들어가고, 7명은 프리랜서·창업, 7명은 더 공부한다. 26명은 "기타·미상"으로 남는다. 그리고 학과마다 구슬이 굴러가는 길이 전혀 다르다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 8</dd>
+      <dt>한 줄</dt><dd>2024년 고등교육기관(전문대·대학·대학원) 졸업자 63만 4,904명의 졸업 후 상황을 학과별로 보면 건강보험 가입 취업 등 52.1%, 프리랜서·1인 창업·개인 창작 7.3%, 진학 6.9%, 입대 1.5%, 외국인 유학생·취업 불가 등 6.1%, 기타·미상 26.1%다. 의약 계열은 취업 69.7%·기타 19.7%, 인문 계열은 취업 39.3%·기타 30.7%, 예체능은 프리랜서·창업이 17.9%, 자연 계열은 진학이 14.0%다. 화학과는 졸업생 셋 중 한 명(31.3%)이 진학하고, 간호학과는 0.3%만 진학한다.</dd>
+      <dt>분류</dt><dd>주거·일·경제</dd>
+      <dt>본능</dt><dd>일반화 본능 · "대졸자"를 하나의 무리로 보고 한 가지 길만 있다고 여긴다</dd>
+      <dt>그림 방식</dt><dd>구슬길 · 졸업 모자에서 구슬 100개(졸업생 1%씩)가 떨어져 갈림길을 지나 여섯 유리관에 쌓인다. 계열을 바꾸면 구슬이 다시 굴러간다. 학과 110개는 별자리로 흩뿌렸다</dd>
+      <dt>기간</dt><dd>2024년 졸업자, 2024년 12월 31일 기준 상황</dd>
+      <dt>엮은 데이터</dt><dd>1개 · 한국교육개발원 고등교육기관 졸업자 학과별 졸업 후 상황</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2024년 대학·전문대·대학원 졸업생 100명 가운데 졸업 후 상황이 "기타·미상"(취업도 진학도 아닌, 또는 확인되지 않은)인 사람은?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>5명쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>12명쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>26명쯤</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. <span class="n">26.1명</span>, 16만 5,819명</span>
+      졸업생 넷 중 한 명이다. 의약 계열은 19.7명, 인문 계열은 30.7명으로 차이가 크다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">졸업 모자에서 떨어지는 구슬 100개</h2>
+      <p>졸업생을 구슬 100개로 바꿨다. 구슬 하나가 그 계열 졸업생의 1%다. 졸업 모자에서 떨어진 구슬은 첫 갈림길에서 일하는 쪽, 공부·군대 쪽, 기타·미상 쪽으로 나뉘고, 다시 갈라져 여섯 유리관에 쌓인다.</p>
+      <p>계열을 바꿔 보면 유리관의 높이가 달라진다. 의약 계열은 왼쪽 첫 관(취업)이 가장 높다. 예체능은 둘째 관(프리랜서·창업)이 두툼하고, 자연 계열은 셋째 관(진학)이 높다. 인문 계열은 맨 오른쪽 관(기타·미상)이 가장 높다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">졸업생 100명이 간 길, 2024년</p>
+      <p class="fs">구슬 하나 = 그 계열 졸업생의 1%(반올림). 계열은 학과 이름으로 나눴다</p>
+      <div class="chips" id="chips1" role="group" aria-label="계열"></div>
+      <div class="run-row"><button class="again" type="button" id="again">다시 굴리기</button><p class="stat" id="st1" aria-live="polite"></p></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>한국교육개발원 「고등교육기관 졸업자 학과별 졸업 후 상황」(2024년 12월 31일 기준). 취업 = 건강보험 직장가입자·교내·해외·농림어업 취업. 그 밖 = 외국인 유학생·취업 불가능자·제외 인정자.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">학과 110개의 별자리</h2>
+      <p>졸업생이 800명 넘는 학과 이름 110개를 별로 찍었다(같은 이름은 학교를 가리지 않고 합쳤다). 오른쪽으로 갈수록 진학이 많고, 위로 갈수록 기타·미상이 많다. 별 크기는 졸업생 수다.</p>
+      <p>별들은 졸업생 전체의 평균 자리(진학 7%, 기타·미상 26%)에서 터져 나와 흩어진다. 화학과는 오른쪽 끝에 홀로 떠 있다. 졸업생 2,741명 중 31.3%가 진학했다. 간호·치의·한의·수의학과는 아래쪽에 모였다. 진학도 기타도 적고 거의 모두 취업한다. 맨 위는 뜻밖에 사범 계열이다. 국어교육과 52.8%, 수학교육과 50.9%, 영어교육과 47.5%가 기타·미상인데, 졸업한 해에 교사 임용시험을 준비하는 사람이 많기 때문으로 보인다. 컴퓨터공학과도 35.5%로 영어영문학과(34.6%)보다 높다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">학과별 진학 비율과 기타·미상 비율, 2024년</p>
+      <p class="fs">%. 별 하나 = 학과 이름 하나(졸업생 800명 이상), 크기 = 졸업생 수, 색 = 계열</p>
+      <div class="legend" id="lg2"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>한국교육개발원 졸업 후 상황. 학과 이름이 같으면 학교·학위 과정과 관계없이 합쳤다(예: 간호학과).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">일곱 계열을 한 줄씩</h2>
+      <p>계열마다 구슬 100개를 한 줄로 늘어세웠다. 파란 구슬(취업)이 의약에서는 70개, 인문·예체능에서는 38–39개다. 주황 구슬(기타·미상)은 의약 20개에서 인문 31개까지다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">계열별 졸업생 100명의 졸업 후 상황</p>
+      <p class="fs">구슬 하나 = 졸업생 1%</p>
+      <div class="legend" id="lg3"></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>한국교육개발원 졸업 후 상황. 계열은 학과 이름의 낱말(예: 간호·공학·교육·디자인)로 나눈 것이라 공식 계열 분류와 다를 수 있다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">그래서, 대학을 졸업하면 다 취업할까</h2>
+      <p>아니다. 졸업한 해 연말에 회사(건강보험 직장가입)에 들어가 있는 사람은 절반을 조금 넘고, 넷 중 한 명은 기타·미상이다. 그리고 "대졸자"는 하나의 무리가 아니다. 간호·치위생처럼 면허로 바로 이어지는 학과는 거의 모두 취업하고, 화학·신소재처럼 대학원으로 이어지는 학과, 음악·체육처럼 프리랜서로 이어지는 학과가 따로 있다. 취업률 한 숫자로 학과를 줄 세우면 이 갈림길이 사라진다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>이 자료에는 학교 이름과 학위 과정(전문대·대학·대학원)이 따로 없다. 대학원 졸업자도 함께 들어 있다(예: "협동과정", "MBA"). 대학원 졸업자에는 입학할 때부터 일하던 사람(입학 당시 기취업자, 9만 9천 명)이 많아 취업 쪽이 커 보일 수 있다.</li>
+      <li>계열은 학과 이름에 든 낱말로 나눴다. "경영"은 사회, "간호"는 의약처럼 대부분 분명하지만, 융합학과처럼 애매한 이름은 사회로 들어갔을 수 있다.</li>
+      <li>"기타·미상"은 미취업만이 아니다. 취업 준비, 시험 준비, 확인되지 않은 사람이 함께 들어 있다. 이 페이지의 비율은 졸업생 전체를 분모로 한 것이라, 진학자 등을 빼고 계산하는 공식 "취업률"과 다르다.</li>
+      <li>졸업 후 몇 달 만의 상황(12월 31일 기준)이다. 1–2년 뒤의 모습은 다를 수 있다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15042211/fileData.do" target="_blank" rel="noopener">고등교육기관 졸업자 학과별 졸업 후 상황</a> (15042211)</td><td>한국교육개발원</td><td>학과별 졸업자, 취업 유형, 진학, 입대, 기타·미상(남녀)</td><td>2024년 12월 31일</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>학과 행 12,989개 · 졸업자 63만 4,904명</dd>
+      <dt>도구</dt><dd>Python(계열 나누기·집계) · SVG 구슬길 애니메이션과 별자리(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>졸업생 전체를 분모로 한 졸업 후 상황 구성비</dd>
+      <dt>검증</dt><dd>취업·프리랜서·진학·입대·외국인 유학생·취업 불가·제외·기타·미상을 모두 더하면 졸업자 수와 정확히 같다(63만 4,904명). 입학 당시 기취업자는 이 안에 겹쳐 들어 있어 따로 세지 않았다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>컴퓨터공학과 졸업생은 왜 기타·미상이 많을까</h3><p>해마다의 졸업 후 상황과 대학원 진학·프리랜서 비율을 견주면 IT 채용 시장의 변화를 볼 수 있다.</p></div>
+      <div class="q"><h3>같은 학과라도 여성과 남성의 길은 다를까</h3><p>이 자료에는 남녀가 나뉘어 있어 학과별 성별 차이를 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15042211/fileData.do" target="_blank" rel="noopener">고등교육기관 졸업자 학과별 졸업 후 상황</a> · 한국교육개발원</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = {"K":["job","free","study","army","other","none"],"F":["의약","공학","교육","사회","자연","예체능","인문"],"agg":{"의약":[52908,3033,2569,1656,727,14980,75873],"공학":[97615,7292,17566,2405,5930,45223,176031],"교육":[24040,3256,1479,349,1711,11516,42351],"사회":[80862,10657,6592,1415,15362,41689,156577],"자연":[22812,2932,6755,376,1589,13628,48092],"예체능":[33560,15817,5590,2609,6690,24162,88428],"인문":[18672,3629,3371,405,6854,14621,47552]},"tot":[330469,46616,43922,9215,38863,165819,634904],"maj":[["관광경영학과","사회",626,65,12,7,222,339,1271],["경제학과","사회",1502,153,149,13,315,993,3125],["기계공학과","공학",2342,134,485,31,181,1048,4221],["건축공학과","공학",1236,77,135,18,32,488,1986],["영어교육과","교육",370,156,29,10,4,515,1084],["컴퓨터공학과","공학",2243,179,343,43,290,1706,4804],["환경공학과","공학",508,24,82,3,22,346,985],["산업디자인학과","예체능",480,142,75,10,92,344,1143],["건축학과","공학",986,80,97,14,60,394,1631],["경영학부","사회",1979,198,91,18,521,1399,4206],["치위생학과","의약",1772,23,38,11,8,284,2136],["문헌정보학과","인문",568,40,69,6,19,470,1172],["유아교육과","교육",4691,309,419,16,54,1330,6819],["식품영양학과","자연",1675,171,369,24,112,1079,3430],["국제통상학과","사회",431,39,17,3,239,252,981],["전기전자공학과","공학",1151,39,82,11,31,274,1588],["산업경영공학과","공학",759,68,107,7,34,366,1341],["간호학과","의약",13761,512,60,98,73,3891,18395],["무역학과","사회",605,63,16,4,353,373,1414],["소프트웨어학과","공학",508,40,130,8,26,399,1111],["아동학과","자연",546,56,54,0,27,145,828],["정치외교학과","사회",648,82,144,8,157,552,1591],["컴퓨터공학전공","공학",547,45,78,10,55,582,1317],["한의학과","의약",824,18,13,13,10,65,943],["컴퓨터공학부","공학",747,83,89,12,26,608,1565],["수학교육과","교육",261,153,47,17,0,495,973],["회계학과","사회",457,39,10,1,81,405,993],["물리치료학과","의약",2833,124,56,79,61,430,3583],["사회복지학과","사회",7764,990,429,85,165,4017,13450],["행정학과","사회",2151,158,129,19,250,1385,4092],["국어국문학과","인문",1037,400,258,14,854,992,3555],["미디어커뮤니케이션학과","사회",504,87,27,1,324,319,1262],["경찰행정학과","사회",606,72,33,12,11,656,1390],["안경광학과","의약",833,96,37,39,22,263,1290],["임상병리학과","의약",1339,62,84,20,2,565,2072],["응급구조학과","의약",609,27,14,44,0,199,893],["음악학부","예체능",264,301,94,90,13,441,1203],["사회복지전공","사회",717,104,26,1,1,260,1109],["생명과학과","자연",507,63,384,14,43,409,1420],["화학공학과","공학",1052,61,365,7,66,510,2061],["사회학과","사회",532,77,90,3,162,423,1287],["작업치료학과","의약",1125,86,28,15,2,247,1503],["항공서비스학과","공학",459,65,18,3,62,311,918],["일본학과","인문",389,62,53,4,20,309,837],["전자공학과","공학",2064,141,502,34,94,1169,4004],["경영학과","사회",6747,632,336,65,2945,2928,13653],["영어영문학과","인문",1668,503,207,14,263,1407,4062],["경영학전공","사회",1225,114,34,12,804,753,2942],["교육학과","교육",2498,437,171,17,479,1087,4689],["부동산학과","사회",1008,205,36,3,14,243,1509],["정보통신공학과","공학",1009,77,152,14,43,591,1886],["전자전기공학부","공학",505,30,226,2,23,208,994],["광고홍보학과","사회",411,46,13,3,111,262,846],["전기공학과","공학",1804,114,268,43,53,977,3259],["건축공학전공","공학",438,29,70,2,29,234,802],["유아교육학과","교육",1467,58,42,0,26,280,1873],["시각디자인학과","예체능",371,102,18,4,78,314,887],["체육학과","예체능",791,291,79,119,277,307,1864],["수학과","자연",564,238,237,11,13,508,1571],["화학과","자연",1071,95,859,11,74,631,2741],["언어치료학과","의약",572,253,41,3,5,180,1054],["상담심리학과","사회",2262,435,271,13,37,1077,4095],["디자인학과","예체능",365,74,25,6,223,288,981],["농학과","자연",954,158,100,0,7,398,1617],["치위생과","의약",2186,68,133,5,5,448,2845],["토목공학과","공학",845,46,85,16,42,331,1365],["치의학과","의약",787,8,3,18,25,57,898],["사학과","인문",534,79,184,13,34,487,1331],["의학과","의약",2396,124,29,508,102,1064,4223],["글로벌경영학과","인문",623,41,12,3,208,152,1039],["중어중문학과","인문",924,148,101,4,135,569,1881],["철학과","인문",363,94,132,18,11,355,973],["신소재공학과","공학",1152,49,342,12,53,511,2119],["통계학과","자연",429,39,184,1,18,328,999],["산업공학과","공학",548,22,107,1,18,152,848],["보건행정학과","의약",706,29,39,6,3,289,1072],["군사학과","인문",852,20,14,80,0,40,1006],["세무회계학과","사회",742,68,39,30,36,332,1247],["신학과","인문",594,126,640,51,1029,866,3306],["법학과","사회",2763,204,122,22,77,1453,4641],["상담심리전공","사회",750,45,7,0,2,199,1003],["국어교육과","교육",307,108,46,18,23,562,1064],["음악학과","예체능",297,398,120,16,328,406,1565],["물리학과","자연",504,56,481,19,53,382,1495],["경제학부","사회",478,37,86,5,54,333,993],["간호학과(4년제)","의약",4813,105,4,45,1,1287,6255],["건설시스템공학과","공학",626,19,45,1,5,157,853],["건축과","공학",470,65,94,20,18,159,826],["전기전자공학부","공학",580,23,138,4,12,170,927],["컴퓨터과학과","공학",2360,387,68,5,34,690,3544],["방사선학과","의약",1207,25,51,24,7,278,1592],["물리치료과","의약",1539,50,126,73,0,232,2020],["미디어영상학과","예체능",451,96,39,3,5,212,806],["약학과","의약",852,23,69,63,99,175,1281],["기계공학부","공학",1327,49,463,5,75,455,2374],["경영학부(경영학전공)","사회",515,42,21,4,232,273,1087],["사회복지학부","사회",585,94,34,7,22,400,1142],["자동차과","공학",662,50,23,50,267,233,1285],["전기과","공학",902,74,77,59,3,396,1511],["심리학과","사회",661,118,333,7,149,606,1874],["수의학과","의약",575,21,115,55,23,62,851],["방사선과","의약",711,18,93,27,0,169,1018],["체육교육과","교육",275,104,32,37,3,364,815],["청소년교육과","교육",1161,331,85,0,16,659,2252],["생활과학부식품영양학전공","자연",631,72,40,0,1,247,991],["유아교육전공","교육",884,21,7,0,7,90,1009],["간호학부","의약",636,12,0,4,0,169,821],["사회복지과","사회",2226,455,587,70,11,1163,4512],["임상병리과","의약",645,41,148,18,1,242,1095],["세무회계과","사회",352,91,45,18,1,318,825]]};
+document.documentElement.lang = "ko";
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const s = (tag, a = {}, p) => { const e = document.createElementNS(NS, tag); for (const k in a) if (a[k] != null) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  const tx = (p, x, y, str, cls, size, anchor = "start", extra = {}) => { const t = s("text", { x, y, class: cls, "text-anchor": anchor, "font-size": size, ...extra }, p); t.textContent = str; return t; };
+  const fmt = (n) => Math.round(n).toLocaleString("ko-KR");
+  const f1 = (n) => n.toLocaleString("ko-KR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const pc = (n) => f1(n) + "%";
+  const man = (n) => n >= 1e5 ? f1(n / 1e4).replace(/\.0$/, "") + "만" : fmt(n);
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lerp = (arr, pos) => { const k = Math.floor(pos), f = pos - k; return k + 1 < arr.length ? arr[k] + (arr[k + 1] - arr[k]) * f : arr[k]; };
+  const bEl = (t) => Object.assign(document.createElement("b"), { textContent: t });
+
+  function table(id, head, rows) {
+    const t = document.createElement("table"), th = document.createElement("thead"), tr = document.createElement("tr");
+    head.forEach((h) => { const c = document.createElement("th"); c.textContent = h; tr.append(c); }); th.append(tr); t.append(th);
+    const tb = document.createElement("tbody");
+    rows.forEach((r) => { const row = document.createElement("tr"); r.forEach((v) => { const c = document.createElement("td"); c.textContent = v; row.append(c); }); tb.append(row); });
+    t.append(tb); document.getElementById(id).replaceChildren(t);
+  }
+  function tipFor(fig) {
+    const tip = fig.querySelector(".tip");
+    return {
+      show(ev, title, rows) {
+        tip.replaceChildren(); const h = document.createElement("div"); h.className = "tn"; h.textContent = title; tip.append(h);
+        rows.forEach(([v, k, col]) => { const d = document.createElement("div"); if (col) { const i = document.createElement("i"); i.className = "sw dot"; i.style.background = col; i.style.marginRight = "6px"; d.append(i); } const b = document.createElement("span"); b.className = "tv"; b.textContent = v + " "; const kk = document.createElement("span"); kk.textContent = k; d.append(b, kk); tip.append(d); });
+        tip.hidden = false;
+        const fr = fig.getBoundingClientRect(); let x, y;
+        if (ev.clientX != null) { x = ev.clientX - fr.left + 14; y = ev.clientY - fr.top + 14; } else { const r = (ev.rect || ev.target.getBoundingClientRect()); x = r.right - fr.left + 8; y = r.top - fr.top; }
+        const tw = tip.offsetWidth, th = tip.offsetHeight;
+        if (x + tw > fr.width - 8) x = Math.max(8, x - tw - 28);
+        if (y + th > fr.height - 8) y = Math.max(8, y - th - 28);
+        tip.style.left = x + "px"; tip.style.top = y + "px";
+      },
+      hide() { tip.hidden = true; },
+    };
+  }
+  /* Marks you can point at. One tab stop per chart; Left/Right step, Up/Down jump rows, Escape hides.
+     pts: {x, y, r, fn() -> [title, rows]} in viewBox units; u = viewBox units per CSS px. */
+  function pointLayer(v, tip, pts, label, u = 1) {
+    const ring = s("circle", { class: "ring", "stroke-width": 2 * u, opacity: 0 }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = i; const p = pts[i]; ring.setAttribute("cx", p.x); ring.setAttribute("cy", p.y); ring.setAttribute("r", p.r + 4 * u); ring.setAttribute("opacity", 1); const [t, rows] = p.fn(); tip.show(ev || { target: ring }, t, rows); };
+    const hide = () => { tip.hide(); ring.setAttribute("opacity", 0); };
+    const nearest = (e) => {
+      const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal, k = vb.width / r.width;
+      const x = vb.x + (e.clientX - r.left) * k, y = vb.y + (e.clientY - r.top) * k;
+      let best = -1, bd = Infinity;
+      pts.forEach((p, i) => { const d = Math.hypot(p.x - x, p.y - y) - p.r, reach = 18 * k; if (d < reach && d < bd) { bd = d; best = i; } });
+      return best;
+    };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerdown", (e) => { const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => { if (pts.length) show(idx < 0 ? 0 : idx); }); v.addEventListener("blur", hide);
+    const vert = (dir) => { const c = pts[Math.max(idx, 0)]; let best = -1, bd = Infinity; pts.forEach((p, i) => { const dy = (p.y - c.y) * dir; if (dy <= 0.5) return; const d = dy * 3 + Math.abs(p.x - c.x); if (d < bd) { bd = d; best = i; } }); return best < 0 ? Math.max(idx, 0) : best; };
+    v.addEventListener("keydown", (e) => {
+      if (!pts.length) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show((Math.max(idx, 0) + (e.key === "ArrowRight" ? 1 : -1) + pts.length) % pts.length); }
+      else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); show(vert(e.key === "ArrowDown" ? 1 : -1)); }
+      else if (e.key === "Escape") hide();
+    });
+  }
+  /* A time cursor over a chart: pointer or Left/Right picks a time index, a vertical rule follows it. */
+  function timeLayer(v, tip, n, xOf, y0, y1, fn, label, u = 1) {
+    const rule = s("line", { y1: y0, y2: y1, stroke: "var(--ink)", "stroke-width": u, opacity: 0, "pointer-events": "none" }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = Math.max(0, Math.min(n - 1, i)); const x = xOf(idx); rule.setAttribute("x1", x); rule.setAttribute("x2", x); rule.setAttribute("opacity", .5); const [t, rows] = fn(idx); const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; tip.show(ev || { rect: { right: r.left + (x - vb.x) / vb.width * r.width, top: r.top + 20 } }, t, rows); };
+    const hide = () => { tip.hide(); rule.setAttribute("opacity", 0); };
+    const at = (e) => { const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; const x = vb.x + (e.clientX - r.left) * vb.width / r.width; let best = 0, bd = Infinity; for (let i = 0; i < n; i++) { const d = Math.abs(xOf(i) - x); if (d < bd) { bd = d; best = i; } } return best; };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; show(at(e), e); });
+    v.addEventListener("pointerdown", (e) => show(at(e), e));
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => show(idx < 0 ? n - 1 : idx)); v.addEventListener("blur", hide);
+    v.addEventListener("keydown", (e) => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show(idx + (e.key === "ArrowRight" ? 1 : -1)); } else if (e.key === "Home") { e.preventDefault(); show(0); } else if (e.key === "End") { e.preventDefault(); show(n - 1); } else if (e.key === "Escape") hide(); });
+  }
+  /* A player: play/pause, scrubber and a large time readout. Frames 0..n-1; at rest it shows the last frame. */
+  function Player(id, label, draw, n, labelOf, seconds = 10) {
+    const box = document.getElementById(id);
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "play"; btn.setAttribute("aria-label", label + " 재생");
+    const icon = (playing) => { btn.replaceChildren(); const v = s("svg", { viewBox: "0 0 20 20", "aria-hidden": "true" }, btn); if (playing) { s("rect", { x: 4, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); s("rect", { x: 12, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); } else s("path", { d: "M5,3 L17,10 L5,17 Z", fill: "currentColor" }, v); };
+    const yr = document.createElement("div"); yr.className = "yr"; yr.setAttribute("aria-hidden", "true");
+    const sc = document.createElement("input"); sc.type = "range"; sc.className = "scrub"; sc.min = 0; sc.max = n - 1; sc.step = 1; sc.value = n - 1; sc.setAttribute("aria-label", label + " 시점");
+    box.append(btn, yr, sc);
+    let pos = n - 1, raf = 0, playing = false, t0 = 0, from = 0;
+    const render = () => { const k = Math.min(n - 1, Math.floor(pos + 1e-6)); yr.textContent = labelOf(k); sc.value = Math.round(pos); sc.setAttribute("aria-valuetext", labelOf(Math.round(pos))); draw(pos); };
+    const stop = () => { playing = false; cancelAnimationFrame(raf); icon(false); btn.setAttribute("aria-label", label + " 재생"); };
+    const tick = (now) => { pos = Math.min(n - 1, from + (now - t0) / (seconds * 1000) * (n - 1)); render(); if (pos < n - 1) raf = requestAnimationFrame(tick); else stop(); };
+    btn.addEventListener("click", () => {
+      if (playing) { stop(); return; }
+      if (reduce) { pos = n - 1; render(); return; }
+      from = pos >= n - 1 ? 0 : pos; pos = from; playing = true; icon(true); btn.setAttribute("aria-label", label + " 멈춤");
+      raf = requestAnimationFrame((t) => { t0 = t; tick(t); });
+    });
+    sc.addEventListener("input", () => { stop(); pos = +sc.value; render(); });
+    icon(false);
+    return { render, get pos() { return pos; } };
+  }
+  document.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".opt").forEach((o) => { o.setAttribute("aria-pressed", o === b); o.dataset.state = o.dataset.a === "1" ? "right" : "wrong"; });
+    document.getElementById("reveal").hidden = false;
+  }));
+  function chips(id, opts, cur, onPick) {
+    const box = document.getElementById(id);
+    opts.forEach(([k, name]) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = name; b.setAttribute("aria-pressed", k === cur); b.addEventListener("click", () => { box.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === b)); onPick(k); }); box.append(b); });
+  }
+  function onResize(fn) {
+    let lastW = 0, rt;
+    new ResizeObserver(() => { const w = document.querySelector(".page").clientWidth; if (Math.abs(w - lastW) < 2) return; lastW = w; clearTimeout(rt); rt = setTimeout(fn, 80); }).observe(document.querySelector(".page"));
+  }
+
+  const K = DATA.K, F = DATA.F;
+  const KN = { job: "취업", free: "프리랜서·창업·창작", study: "진학", army: "입대", other: "그 밖", none: "기타·미상" };
+  const KS = { job: "취업", free: "프리랜서·창업", study: "진학", army: "입대", other: "그 밖", none: "기타·미상" };
+  const kc = (k) => `var(--k-${k})`, fc = (f) => `var(--f-${f})`;
+  const share = (row) => K.map((_, i) => row[i] / row[6] * 100);
+  // largest-remainder rounding so the 100 marbles always add up to 100
+  const hundred = (p) => { const f = p.map(Math.floor); let left = 100 - f.reduce((a, b) => a + b, 0); p.map((x, i) => [x - Math.floor(x), i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (left > 0) { f[i]++; left--; } }); return f; };
+
+  /* ---------- 1. marble run ---------- */
+  let cur = "all", raf = 0;
+  {
+    const box = document.getElementById("chips1");
+    [["all", "모든 졸업생"], ...F.map((f) => [f, f])].forEach(([k, name]) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; if (k !== "all") { const i = document.createElement("i"); i.className = "sw"; i.style.background = fc(k); b.append(i); } b.append(name); b.setAttribute("aria-pressed", k === cur); b.addEventListener("click", () => { box.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === b)); cur = k; c1(true); }); box.append(b); });
+    document.getElementById("again").addEventListener("click", () => c1(true));
+  }
+  const rowOf = (k) => k === "all" ? DATA.tot : DATA.agg[k];
+  function c1(animate) {
+    cancelAnimationFrame(raf);
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, H = narrow ? 560 : 600;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "졸업생 100명이 간 길 구슬길" }, box);
+    const row = rowOf(cur), sh = share(row), n = hundred(sh);
+    // geometry
+    const cx = W / 2, capY = 46, tubeTop = narrow ? 330 : 350, tubeBot = H - 58, tw = Math.min(narrow ? 44 : 64, (W - 20) / 6 - 8), r = narrow ? 4.2 : 6, perRow = Math.max(3, Math.floor((tw - 4) / (r * 2 + .6)));
+    const tx6 = K.map((_, i) => W / 12 + i * W / 6);
+    const split1 = narrow ? 150 : 160, split2 = narrow ? 240 : 255;
+    const g1 = { work: cx - W * .27, more: cx, none: cx + W * .3 };
+    const route = { job: ["work", 0], free: ["work", 1], study: ["more", 2], army: ["more", 3], other: ["more", 4], none: ["none", 5] };
+    // graduation cap
+    s("path", { d: `M${cx - 46},${capY - 6} L${cx},${capY - 26} L${cx + 46},${capY - 6} L${cx},${capY + 14} Z`, fill: "var(--cap)" }, v);
+    s("path", { d: `M${cx - 26},${capY + 4} L${cx - 26},${capY + 20} Q${cx},${capY + 32} ${cx + 26},${capY + 20} L${cx + 26},${capY + 4}`, fill: "var(--cap)" }, v);
+    s("line", { x1: cx, y1: capY - 6, x2: cx + 38, y2: capY + 2, stroke: "var(--tassel)", "stroke-width": 2 }, v);
+    s("line", { x1: cx + 38, y1: capY + 2, x2: cx + 38, y2: capY + 22, stroke: "var(--tassel)", "stroke-width": 2.4, "stroke-linecap": "round" }, v);
+    tx(v, cx, capY + 52, cur === "all" ? `졸업생 ${fmt(row[6])}명` : `${cur} 계열 졸업생 ${fmt(row[6])}명`, "vl", 13, "middle");
+    // pipes: trunk -> 3 branches -> 6 tubes
+    const pipes = s("g", { fill: "none", "stroke-linecap": "round" }, v), paths = {};
+    const P = (k) => { const [b, i] = route[k]; const bx = g1[b], x = tx6[i]; return `M${cx},${capY + 62} L${cx},${split1 - 20} C${cx},${split1} ${bx},${split1 - 4} ${bx},${split1 + 24} L${bx},${split2 - 18} C${bx},${split2 + 6} ${x},${split2} ${x},${split2 + 30} L${x},${tubeTop - 4}`; };
+    K.forEach((k) => { s("path", { d: P(k), stroke: "var(--pipe)", "stroke-width": 13 }, pipes); });
+    K.forEach((k) => { paths[k] = s("path", { d: P(k), stroke: "var(--pipe2)", "stroke-width": 1, "stroke-dasharray": "2 5" }, pipes); });
+    [["work", "일한다"], ["more", "공부·군대·그 밖"], ["none", "기타·미상"]].forEach(([b, t]) => tx(v, g1[b], split1 + 44, t, "mt halo", 11.5, "middle", { "stroke-width": 4 }));
+    // tubes
+    const tubeH = tubeBot - tubeTop, pts = [];
+    K.forEach((k, i) => {
+      const x = tx6[i];
+      s("rect", { x: x - tw / 2, y: tubeTop, width: tw, height: tubeH, rx: tw / 2.4, fill: "var(--glass)", stroke: "var(--pipe2)", "stroke-width": 1.2 }, v);
+      s("rect", { x: x - tw / 2 + 3, y: tubeTop + 6, width: 2.5, height: tubeH - 24, rx: 1.2, fill: "var(--card)", opacity: .7 }, v);
+      tx(v, x, tubeBot + 18, KS[k], "lb", narrow ? 11 : 12.5, "middle");
+      tx(v, x, tubeBot + 36, `${f1(sh[i])}%`, "vl", narrow ? 12.5 : 14, "middle", { style: `fill:${k === "none" ? "var(--none-ink)" : "var(--ink)"}` });
+      pts.push({ x, y: tubeTop + tubeH / 2, r: tw / 2, fn: () => [KN[k], [[pc(sh[i]), cur === "all" ? "졸업생 중" : `${cur} 계열 졸업생 중`], [fmt(row[i]) + "명", ""]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 유리관을 옮겨 볼 수 있다");
+    // marbles
+    const slot = (i, j) => { const col = j % perRow, rw = Math.floor(j / perRow), off = (tw - perRow * (r * 2 + .6)) / 2; return [tx6[i] - tw / 2 + off + r + col * (r * 2 + .6), tubeBot - 6 - r - rw * (r * 1.85)]; };
+    const marbles = []; K.forEach((k, i) => { for (let j = 0; j < n[i]; j++) marbles.push({ k, i, j }); });
+    for (let a = marbles.length - 1; a > 0; a--) { const b = (a * 7919 + 13) % (a + 1); [marbles[a], marbles[b]] = [marbles[b], marbles[a]]; }
+    const layer = s("g", {}, v);
+    marbles.forEach((m) => { m.el = s("circle", { r, fill: kc(m.k), stroke: "var(--card)", "stroke-width": .8 }, layer); m.len = paths[m.k].getTotalLength(); m.end = slot(m.i, m.j); });
+    const st = document.getElementById("st1"); st.replaceChildren();
+    st.append(cur === "all" ? "모든 졸업생 · " : `${cur} 계열 · `, bEl(`취업 ${f1(sh[0])}%`), ` · 기타·미상 `, Object.assign(bEl(`${f1(sh[5])}%`), { style: "color:var(--none-ink)" }));
+    const place = (m, t) => {
+      if (t >= 1) { m.el.setAttribute("cx", m.end[0]); m.el.setAttribute("cy", m.end[1]); return; }
+      const ease = t < .82 ? t / .82 : 1;
+      if (t < .82) { const p = paths[m.k].getPointAtLength(m.len * (ease * ease * (3 - 2 * ease))); m.el.setAttribute("cx", p.x); m.el.setAttribute("cy", p.y); }
+      else { const q = (t - .82) / .18, top = paths[m.k].getPointAtLength(m.len); m.el.setAttribute("cx", top.x + (m.end[0] - top.x) * q); m.el.setAttribute("cy", top.y + (m.end[1] - top.y) * q * q); }
+    };
+    if (!animate || reduce) { marbles.forEach((m) => place(m, 1)); return; }
+    marbles.forEach((m) => { m.el.setAttribute("cx", cx); m.el.setAttribute("cy", capY + 62); m.el.setAttribute("opacity", 0); });
+    const t0 = performance.now(), gap = 28, dur = 1300;
+    const tick = (now) => {
+      let done = true;
+      marbles.forEach((m, a) => { const t = (now - t0 - a * gap) / dur; if (t <= 0) { done = false; return; } m.el.setAttribute("opacity", 1); place(m, Math.min(1, t)); if (t < 1) done = false; });
+      if (!done) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+  }
+  table("t1", ["계열", "졸업생", ...K.map((k) => KN[k])], [["모든 졸업생", DATA.tot], ...F.map((f) => [f, DATA.agg[f]])].map(([nm, r]) => [nm, fmt(r[6]), ...share(r).map(pc)]));
+
+  /* ---------- 2. starfield of majors ---------- */
+  {
+    const lg = document.getElementById("lg2");
+    F.forEach((f) => { const sp = document.createElement("span"); const i = document.createElement("i"); i.className = "sw dot"; i.style.background = fc(f); sp.append(i, f); lg.append(sp); });
+  }
+  const M = DATA.maj.map(([name, f, ...r]) => ({ name, f, r, g: r[6], st: r[2] / r[6] * 100, no: r[5] / r[6] * 100, jb: r[0] / r[6] * 100 }));
+  let starsShown = false;
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), H = Math.min(540, Math.max(380, W * .62)), l = 40, r = 14, top = 30, bot = 34;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "학과별 진학 비율과 기타·미상 비율" }, box), pts = [];
+    const sx = (p) => l + p / 35 * (W - l - r), sy = (p) => top + (1 - p / 56) * (H - top - bot);
+    [0, 10, 20, 30].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top, y2: H - bot, class: t ? "gl" : "ax" }, v); tx(v, sx(t), H - bot + 16, `${t}%`, "tk", 11.5, "middle"); });
+    [0, 10, 20, 30, 40, 50].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: "gl" }, v); tx(v, l - 6, sy(t) + 4, `${t}%`, "tk", 11.5, "end"); });
+    tx(v, W - r, H - 4, "진학 →", "mt", 12, "end"); tx(v, l - 34, 12, "↑ 기타·미상", "mt", 12, "start");
+    const rr = (g) => Math.max(2.5, Math.sqrt(g) / (W < 560 ? 14 : 10));
+    const sorted = [...M].sort((a, b) => b.g - a.g);
+    const els = sorted.map((m) => { const c = s("circle", { cx: sx(m.st), cy: sy(m.no), r: rr(m.g), fill: fc(m.f), "fill-opacity": .78, stroke: "var(--card)", "stroke-width": 1 }, v); pts.push({ x: sx(m.st), y: sy(m.no), r: rr(m.g), fn: () => [m.name, [[pc(m.st), "진학"], [pc(m.no), "기타·미상"], [pc(m.jb), "취업"], [fmt(m.g) + "명", `졸업생 · ${m.f}`]]] }); return { c, m }; });
+    const LAB = ["화학과", "간호학과", "컴퓨터공학과", "국어교육과", "수학교육과", "신학과", "치의학과", "경영학과", "심리학과"];
+    const labels = s("g", {}, v);
+    els.filter(({ m }) => LAB.includes(m.name) && !(W < 560 && m.name === "경영학과")).forEach(({ m }) => { const right = sx(m.st) < W * .7; tx(labels, sx(m.st) + (right ? 1 : -1) * (rr(m.g) + 4), sy(m.no) + 4, m.name, "lb halo", 12, right ? "start" : "end", { "stroke-width": 4 }); });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 학과를 하나씩 옮겨 볼 수 있다");
+    // stars burst out from the all-graduate average (7% study, 26% unknown) the first time the chart is seen
+    if (!starsShown && !reduce) {
+      labels.setAttribute("opacity", 0);
+      els.forEach(({ c }) => { c.dataset.x = c.getAttribute("cx"); c.dataset.y = c.getAttribute("cy"); c.setAttribute("cx", sx(7)); c.setAttribute("cy", sy(26)); c.setAttribute("r", 0); });
+      const io = new IntersectionObserver((ent) => { if (!ent.some((e) => e.isIntersecting)) return; io.disconnect(); starsShown = true;
+        const t0 = performance.now();
+        const step = (now) => { let done = true; els.forEach(({ c, m }, i) => { const t = Math.min(1, Math.max(0, (now - t0 - i * 9) / 900)); if (t < 1) done = false; const e = 1 - Math.pow(1 - t, 3); c.setAttribute("cx", sx(7) + (c.dataset.x - sx(7)) * e); c.setAttribute("cy", sy(26) + (c.dataset.y - sy(26)) * e); c.setAttribute("r", rr(m.g) * e); }); if (done) labels.setAttribute("opacity", 1); else requestAnimationFrame(step); };
+        requestAnimationFrame(step); }, { threshold: .3 });
+      io.observe(box);
+    }
+    table("t2", ["학과", "계열", "졸업생", "취업", "진학", "기타·미상"], sorted.map((m) => [m.name, m.f, fmt(m.g), pc(m.jb), pc(m.st), pc(m.no)]));
+  }
+
+  /* ---------- 3. strings of 100 marbles ---------- */
+  {
+    const lg = document.getElementById("lg3");
+    K.forEach((k) => { const sp = document.createElement("span"); const i = document.createElement("i"); i.className = "sw dot"; i.style.background = kc(k); sp.append(i, KN[k]); lg.append(sp); });
+  }
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, l = narrow ? 0 : 66, per = narrow ? 25 : 50, gap = (W - l) / per, r = Math.min(gap * .42, 5.2), rowH = (Math.ceil(100 / per)) * gap + (narrow ? 26 : 12);
+    const rows = [...F].sort((a, b) => DATA.agg[b][0] / DATA.agg[b][6] - DATA.agg[a][0] / DATA.agg[a][6]);
+    const H = rows.length * rowH + 4;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "계열별 졸업생 100명의 졸업 후 상황" }, box), pts = [];
+    rows.forEach((f, ri) => {
+      const sh = share(DATA.agg[f]), n = hundred(sh), y0 = ri * rowH + (narrow ? 18 : 6);
+      const ly = narrow ? y0 - 5 : y0 + gap / 2 + 4;
+      s("circle", { cx: 5, cy: ly - 4.5, r: 4.5, fill: fc(f) }, v); tx(v, 13, ly, f, "vl", 13, "start");
+      let k = 0;
+      K.forEach((key, i) => { for (let j = 0; j < n[i]; j++, k++) { const c = s("circle", { cx: l + (k % per) * gap + gap / 2, cy: y0 + Math.floor(k / per) * gap + gap / 2, r, fill: kc(key) }, v); if (!reduce) { c.style.transition = `opacity .3s ${k * 6}ms`; c.style.opacity = 0; requestAnimationFrame(() => requestAnimationFrame(() => { c.style.opacity = 1; })); } } });
+      pts.push({ x: l + (W - l) / 2, y: y0 + gap, r: (W - l) / 2, fn: () => [`${f} 계열 · ${fmt(DATA.agg[f][6])}명`, K.map((key, i) => [pc(sh[i]), KN[key], kc(key)])] });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 계열을 옮겨 볼 수 있다");
+    table("t3", ["계열", ...K.map((k) => KN[k])], rows.map((f) => [f, ...share(DATA.agg[f]).map(pc)]));
+  }
+
+  // start the marble run when the figure first scrolls into view
+  let ran = false;
+  const io = new IntersectionObserver((e) => { if (!ran && e.some((x) => x.isIntersecting)) { ran = true; c1(true); } }, { threshold: .25 });
+  io.observe(document.getElementById("c1"));
+  const all = () => { c1(false); c2(); c3(); };
+  all(); onResize(all);
+})();
+</script>

@@ -1,0 +1,242 @@
+<title>읍면동 타일</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a mosaic of 3,554 읍면동 tiles in the supplied palette (brick red, slate blue, warm grey).
+   Each tile takes the colour of the party bloc whose candidate came first there; the mosaic replays six elections. */
+:root {
+  --paper: #f3f1ed; --card: #fcfbf9; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #dbe1dd; --grid: #e8e7e3; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --board: #2f3133; --board-ink: #ebdac0; --accent: #3e6f90;
+  --c: #9b3737; --c2: #cd9886; --l: #3e6f90; --l2: #8eabc9; --o: #928a7f; --none: #dbe1dd; --c-ink: #8b2f2f;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Nanum Myeongjo", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --board: #131415; --board-ink: #ebdac0; --accent: #8eabc9;
+  --c: #cd9886; --c2: #9b3737; --l: #8eabc9; --l2: #3e6f90; --o: #928a7f; --none: #3a3d3f; --c-ink: #cd9886; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --board: #131415; --board-ink: #ebdac0; --accent: #8eabc9;
+  --c: #cd9886; --c2: #9b3737; --l: #8eabc9; --l2: #3e6f90; --o: #928a7f; --none: #3a3d3f; --c-ink: #cd9886; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 800; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.yr { background-image: none; font-family: var(--serif); font-size: 26px }
+</style>
+
+<main class="page">
+  <header>
+    <h1>우리 동네는 늘 같은 후보를 찍을까<span>동네의 절반 가까이는 아니다. 24년 동안 여섯 번의 대통령선거에서 1위 정당이 한 번이라도 바뀐 읍면동이 47%다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 17</dd>
+      <dt>한 줄</dt><dd>2002년부터 2025년까지 여섯 번의 대통령선거를 모두 견줄 수 있는 읍면동 2,392곳 가운데 1,132곳(47.3%)은 1위 후보의 정당 계열이 한 번 이상 바뀌었다. 2012–2025년 네 번만 보면 3,251곳 중 31.1%가 바뀌었다. 대전(77%)·제주(70%)·울산(67%)·부산(58%)·서울(56%)은 절반 넘게 바뀌었고, 광주·대구·전북은 한 곳도 바뀌지 않았다.</dd>
+      <dt>분류</dt><dd>환경·교통·정치</dd>
+      <dt>본능</dt><dd>운명 본능 · "여기는 원래 ○○ 동네"라고 지역의 선택을 바뀌지 않는 것으로 여긴다</dd>
+      <dt>그림 방식</dt><dd>선거마다 색이 바뀌는 타일 · 읍면동 3,554곳을 시도별 타일로 놓고, 1위 후보의 정당 계열 색을 칠해 여섯 번의 선거를 재생한다</dd>
+      <dt>기간</dt><dd>제16대(2002)–제21대(2025) 대통령선거</dd>
+      <dt>엮은 데이터</dt><dd>3개 · 중앙선거관리위원회 대통령선거 개표결과(2012·2017·2022·2025) · 제16대 개표결과 · 제17대 개표결과</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2012·2017·2022·2025년 네 번의 대통령선거에서, 1위 후보의 정당 계열이 한 번이라도 바뀐 읍면동은 얼마나 될까?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>열 곳에 한 곳</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>B</i>세 곳에 한 곳</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>세 곳에 두 곳</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">B. <span class="n">31.1%</span> (3,251곳 중 1,010곳)</span>
+      바뀐 동네에 사는 유권자로 따지면 44.8%다. 사람이 많이 사는 도시의 동일수록 더 자주 바뀌었다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">3,554개의 타일, 여섯 번의 선거</h2>
+      <p>타일 하나가 읍면동 하나다. 시도마다 묶고, 시도 안에서는 여섯 번 선거의 평균 득표 차가 보수 계열 쪽인 동네를 왼쪽 위에, 민주 계열 쪽인 동네를 오른쪽 아래에 놓았다. 재생하면 선거마다 경계선이 앞뒤로 움직인다. 2007년에는 대부분이 붉어졌다가 2017년에는 대부분이 푸르러진다. 그 사이에서 색이 계속 바뀌는 타일이 "흔들리는 동네"다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">읍면동별 1위 후보의 정당 계열</p>
+      <p class="fs">진할수록 1·2위 계열의 득표율 차이가 크다. 회색 = 그 밖의 후보 1위, 옅은 칸 = 그 선거 때 같은 이름의 읍면동이 없음</p>
+      <div class="legend" aria-hidden="true"><span><i class="sw" style="background:var(--c)"></i>보수 계열 1위</span><span><i class="sw" style="background:var(--l)"></i>민주 계열 1위</span><span><i class="sw" style="background:var(--o)"></i>그 밖의 후보</span><span><i class="sw" style="background:var(--none)"></i>비교 불가</span></div>
+      <div class="chips" role="group" aria-label="강조" id="chips1"></div>
+      <div class="player" id="p1"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>중앙선거관리위원회 대통령선거 개표결과(읍면동·투표구별). 보수 계열 = 한나라당·새누리당·자유한국당·국민의힘 후보, 민주 계열 = 새천년민주당·대통합민주신당·민주통합당·더불어민주당 후보. 읍면동 결과에는 관외사전투표·거소·재외투표가 들어 있지 않다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">도시는 흔들리고, 영호남은 그대로</h2>
+      <p>2012–2025년 네 번의 선거를 모두 비교할 수 있는 읍면동 가운데 1위 계열이 한 번이라도 바뀐 비율을 시도별로 셌다. 대전은 77곳 중 59곳(76.6%)이 바뀌었다. 반대로 광주·대구·전북은 한 곳도 바뀌지 않았고, 경북(1.3%)·전남(5.8%)·경남(16.1%)도 거의 그대로였다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">1위 계열이 한 번이라도 바뀐 읍면동 비율, 2012–2025</p>
+      <p class="fs">괄호 안은 네 번 모두 비교할 수 있는 읍면동 수</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>중앙선거관리위원회 대통령선거 개표결과. 이름이 바뀌거나 나뉜 읍면동은 빠졌다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">몇 번 바뀌었나</h2>
+      <p>여섯 번의 선거를 모두 비교할 수 있는 2,392곳에서, 앞 선거와 1위 계열이 달라진 횟수를 셌다. 1,260곳(52.7%)은 한 번도 바뀌지 않았다. 641곳은 두 번, 296곳은 세 번 이상 바뀌었다. 네 번 이상 바뀐 148곳은 선거마다 거의 매번 다른 계열을 1위로 뽑은 셈이다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">2002–2025년 1위 계열이 바뀐 횟수</p>
+      <p class="fs">읍면동 수. 여섯 번 선거 사이의 다섯 번 기회 가운데 몇 번 바뀌었나</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>중앙선거관리위원회 대통령선거 개표결과(2002·2007·2012·2017·2022·2025).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">그래서, 우리 동네는 늘 같은 후보를 찍을까</h2>
+      <p>절반쯤의 동네는 그렇고, 절반쯤은 아니다. 24년 동안 1위 계열이 한 번도 바뀌지 않은 읍면동은 52.7%이고, 47.3%는 적어도 한 번 바뀌었다. 바뀌지 않은 동네는 영남과 호남에 몰려 있고, 바뀐 동네는 수도권과 충청, 부산·울산 같은 대도시에 많다. "여기는 원래 ○○ 동네"라는 말은 일부 지역에서만 맞는다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>이 페이지는 1위 후보가 어느 정당 계열인지만 본다. 득표율이 51:49에서 49:51로 조금 움직여도 "바뀜"이 되고, 60:40이 52:48로 크게 움직여도 "그대로"다. 타일의 진하기로 차이를 함께 보였다.</li>
+      <li>읍면동별 개표 결과에는 관외사전투표(자기 동네 밖에서 한 사전투표)와 거소·재외투표가 들어 있지 않다. 사전투표가 늘어난 최근 선거일수록 읍면동 결과와 실제 그 동네 주민 전체의 선택이 다를 수 있다.</li>
+      <li>읍면동은 이름(시도·시군구·읍면동)으로 맞췄다. 2002년 이후 새로 생기거나 나뉘거나 이름이 바뀐 읍면동은 비교에서 빠진다(2002–2025 비교 가능 2,392곳). 2025년 기준 시군구로 맞추면서 청원군은 청주시로 묶었다.</li>
+      <li>보수·민주 계열은 정당의 이름을 이어 붙인 것으로, 후보 개인이나 정책의 연속성을 뜻하지 않는다. 2007년 이회창(무소속), 2017년 안철수(국민의당)가 1위인 곳은 "그 밖의 후보"로 칠했다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15025528/fileData.do" target="_blank" rel="noopener">대통령선거 개표결과</a> (15025528, 과거 판 포함)</td><td>중앙선거관리위원회</td><td>투표구별 후보 득표수(제18·19·20·21대)</td><td>2012–2025</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15104365/fileData.do" target="_blank" rel="noopener">제17대 대통령선거 개표결과</a> (15104365)</td><td>중앙선거관리위원회</td><td>투표구별 후보 득표수</td><td>2007</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15133805/fileData.do" target="_blank" rel="noopener">제16대 대통령선거 개표결과</a> (15133805)</td><td>중앙선거관리위원회</td><td>투표구별 후보 득표수</td><td>2002</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>6개 선거 · 투표구 행 약 100만 개를 읍면동으로 합산</dd>
+      <dt>도구</dt><dd>Python(집계·이름 맞추기) · SVG 타일과 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>읍면동별 1위 계열 · 계열 간 득표율 차 · 선거 간 바뀐 횟수</dd>
+      <dt>검증</dt><dd>읍면동 합계를 시도별로 다시 더해 1위 후보가 실제 시도 결과와 같은 방향인지 확인했다(관외사전투표가 빠진 만큼 득표율은 다르다). 2025년 결과는 읍면동 3,554곳 중 민주 계열 1위 1,790곳, 보수 계열 1위 1,764곳이다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>바뀐 동네는 어떤 동네일까</h3><p>읍면동별 연령 구성·아파트 비율과 엮으면 흔들리는 동네의 특징을 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15097972/fileData.do" target="_blank" rel="noopener">지역별(행정동) 성별 연령별 주민등록 인구수</a> · 행정안전부</li></ul></div>
+      <div class="q"><h3>국회의원 선거에서도 같은 동네가 흔들릴까</h3>
+        <ul><li><a href="https://www.data.go.kr/data/15025527/fileData.do" target="_blank" rel="noopener">국회의원선거 개표결과</a> · 중앙선거관리위원회</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const Y = DATA.years, U = DATA.units, NY = Y.length;
+  const ORDER = ["서울", "인천", "경기", "강원", "대전", "세종", "충북", "충남", "광주", "전북", "전남", "제주", "대구", "경북", "부산", "울산", "경남"];
+  const NAME = { C: "보수 계열", L: "민주 계열", O: "그 밖의 후보", "-": "비교 불가" };
+  const mean = (u) => { const m = u[4].filter((x) => x != null); return m.reduce((a, b) => a + b, 0) / Math.max(1, m.length); };
+  const ever4 = (u) => { const s = u[3].slice(2); return s.includes("-") ? null : new Set(s).size > 1; };
+  const groups = ORDER.map((sd) => ({ sd, us: U.filter((u) => u[0] === sd).sort((a, b) => mean(b) - mean(a)) }));
+  let hl = "all";
+  chips("chips1", [["all", "모든 동네"], ["swing", "바뀐 동네만 진하게"]], hl, (k) => { hl = k; p1.render(); });
+  const fillOf = (w, m) => { if (w === "-") return "var(--none)"; if (w === "O") return "var(--o)"; const t = Math.min(1, Math.abs(m || 0) / 30); return `color-mix(in oklab, ${w === "C" ? "var(--c)" : "var(--l)"} ${Math.round(35 + t * 65)}%, var(--card))`; };
+
+  /* ---------- 1. the mosaic ---------- */
+  function c1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, k = Math.min(NY - 1, Math.round(pos));
+    const t = narrow ? 5 : 7, gap = 1, step = t + gap, blockGap = narrow ? 10 : 16, labelH = 18;
+    // lay sido blocks out in rows; each block is a little rectangle of tiles
+    const blocks = []; let x = 0, y = 0, rowH = 0;
+    groups.forEach((g) => {
+      const n = g.us.length, cols = Math.max(6, Math.ceil(Math.sqrt(n * 1.6))), rows = Math.ceil(n / cols), bw = cols * step, bh = rows * step + labelH;
+      if (x + bw > W && x > 0) { x = 0; y += rowH + blockGap; rowH = 0; }
+      blocks.push({ g, x, y, cols }); x += bw + blockGap; rowH = Math.max(rowH, bh);
+    });
+    const H = y + rowH + 4;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${Y[k]}년 대통령선거 읍면동별 1위 정당 계열 타일` }, box);
+    const pts = [];
+    blocks.forEach(({ g, x: bx, y: by, cols }) => {
+      const ch = g.us.filter((u) => ever4(u)).length, cmp = g.us.filter((u) => ever4(u) !== null).length;
+      tx(v, bx, by + 12, `${g.sd}`, "vl", 12.5);
+      tx(v, bx + cols * step, by + 12, `${g.us.length}`, "tk", 10.5 > 0 ? 11 : 11, "end");
+      g.us.forEach((u, i) => {
+        const tx_ = bx + (i % cols) * step, ty_ = by + labelH + Math.floor(i / cols) * step, w = u[3][k];
+        const dim = hl === "swing" && ever4(u) === false;
+        s("rect", { x: tx_, y: ty_, width: t, height: t, rx: narrow ? .8 : 1.2, fill: fillOf(w, u[4][k]), opacity: dim ? .18 : 1 }, v);
+        pts.push({ x: tx_ + t / 2, y: ty_ + t / 2, r: t / 2, fn: () => [`${u[0]} ${u[1]} ${u[2]}`, Y.map((yy, j) => [u[3][j] === "-" ? "–" : (u[4][j] > 0 ? "보수 +" : u[4][j] < 0 ? "민주 +" : "") + Math.abs(u[4][j] ?? 0) + "%p", `${yy} ${NAME[u[3][j]]}`, u[3][j] === "C" ? "var(--c)" : u[3][j] === "L" ? "var(--l)" : "var(--o)"])] });
+      });
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 타일을 옮겨 볼 수 있다");
+  }
+  table("t1", ["시도", "시군구", "읍면동", ...Y.map(String), "2012–2025 바뀜"], U.map((u) => [u[0], u[1], u[2], ...u[3].split("").map((w, j) => (w === "-" ? "–" : `${NAME[w]} ${u[4][j] > 0 ? "+" : ""}${u[4][j]}`)), ever4(u) == null ? "–" : ever4(u) ? "예" : "아니오"]).slice(0, 4000));
+
+  /* ---------- 2. share changed by sido ---------- */
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const S = ORDER.map((sd) => { const us = U.filter((u) => u[0] === sd && ever4(u) !== null); const ch = us.filter((u) => ever4(u)).length; return { sd, n: us.length, ch, p: ch / us.length * 100 }; }).sort((a, b) => b.p - a.p);
+    const W = Math.max(300, box.clientWidth), l = 80, r = 60, rowH = 22, top = 8, H = top + S.length * rowH + 24;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "시도별 1위 계열이 바뀐 읍면동 비율 2012–2025" }, box), pts = [];
+    const sx = (p) => l + p / 100 * (W - l - r);
+    [0, 25, 50, 75, 100].forEach((t_) => { s("line", { x1: sx(t_), x2: sx(t_), y1: top, y2: H - 22, class: t_ ? "gl" : "ax" }, v); tx(v, sx(t_), H - 6, t_ + "%", "tk", 11, "middle"); });
+    S.forEach((q, j) => {
+      const yy = top + j * rowH + rowH / 2;
+      s("rect", { x: l, y: yy - 7, width: Math.max(1, sx(q.p) - l), height: 14, rx: 3, fill: "var(--accent)", opacity: .8 }, v);
+      tx(v, l - 8, yy + 4, `${q.sd} (${q.n})`, "lb", 12, "end"); tx(v, W - 4, yy + 4, pc(q.p), q.p >= 50 ? "vl" : "tk", 12, "end");
+      pts.push({ x: sx(q.p), y: yy, r: 6, fn: () => [q.sd, [[`${q.ch} / ${q.n}곳`, "바뀐 읍면동"], [pc(q.p), "비율"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 시도를 옮겨 볼 수 있다");
+    table("t2", ["시도", "비교 가능", "바뀐 곳", "비율"], S.map((q) => [q.sd, String(q.n), String(q.ch), pc(q.p)]));
+  }
+
+  /* ---------- 3. number of switches ---------- */
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const cnt = [0, 0, 0, 0, 0, 0]; U.forEach((u) => { const s_ = u[3]; if (s_.includes("-")) return; let c = 0; for (let i = 1; i < 6; i++) if (s_[i] !== s_[i - 1]) c++; cnt[c]++; });
+    const tot = cnt.reduce((a, b) => a + b, 0), W = Math.max(300, box.clientWidth), H = 230, l = 40, r = 10, bot = 30, narrow = (W - l - r) / 6 < 80, top = narrow ? 34 : 20;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "1위 계열이 바뀐 횟수별 읍면동 수" }, box), pts = [];
+    const bw = (W - l - r) / 6, sy = (n) => top + (1 - n / 1400) * (H - top - bot);
+    [0, 500, 1000].forEach((t_) => { s("line", { x1: l, x2: W - r, y1: sy(t_), y2: sy(t_), class: t_ ? "gl" : "ax" }, v); tx(v, l - 6, sy(t_) + 4, fmt(t_), "tk", 11, "end"); });
+    cnt.forEach((n, i) => { const x = l + i * bw + bw * .15, w = bw * .7; s("rect", { x, y: sy(n), width: w, height: sy(0) - sy(n), rx: 3, fill: i === 0 ? "var(--ghost)" : "var(--accent)" }, v); if (narrow) { tx(v, x + w / 2, sy(n) - 20, fmt(n), "tk", 11.5, "middle"); tx(v, x + w / 2, sy(n) - 6, pc(n / tot * 100), "tk", 11.5, "middle"); } else tx(v, x + w / 2, sy(n) - 6, `${fmt(n)} (${pc(n / tot * 100)})`, "tk", 11.5, "middle"); tx(v, x + w / 2, H - 10, `${i}번`, "lb", 12, "middle"); pts.push({ x: x + w / 2, y: sy(n), r: w / 2, fn: () => [`${i}번 바뀜`, [[fmt(n) + "곳", "읍면동"], [pc(n / tot * 100), "비율"]]] }); });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 막대를 옮겨 볼 수 있다");
+    table("t3", ["바뀐 횟수", "읍면동 수", "비율"], cnt.map((n, i) => [`${i}번`, fmt(n), pc(n / tot * 100)]));
+  }
+
+  const p1 = Player("p1", "선거 타일", c1, NY, (i) => String(Y[i]), 9);
+  const all = () => { p1.render(); c2(); c3(); };
+  all(); onResize(all);
+})();
+</script>

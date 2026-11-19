@@ -1,0 +1,314 @@
+<title>유학생의 물줄기</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a river atlas. Each nationality is a stream; the streams widen and change course month by month.
+   Serif headlines, sans body, mono numbers. Every time-series chart can be replayed. */
+:root {
+  --paper: #f3f1ea; --card: #fcfbf7; --ink: #1d2328; --ink2: #3d4850; --muted: #64707a; --line: #dedad0; --grid: #ebe7dd; --axis: #b9b3a6;
+  --ghost: #b9bfc4; --board: #1d2328; --board-ink: #f2efe6; --accent: #2a7f9e;
+  --c0: #2a7f9e; --c1: #d4573a; --c2: #7a5bb5; --c3: #3a9b5c; --c4: #c38a1e; --c5: #c25b8f; --c6: #4f7fd0; --c7: #8c6d4f; --c8: #3fb0a5; --c9: #8f9a2e; --c10: #c4c0b6;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --serif: "Nanum Myeongjo", "AppleMyungjo", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #121619; --card: #181d21; --ink: #e8ebe9; --ink2: #c1c9cc; --muted: #8f9a9f; --line: #283036; --grid: #20272c; --axis: #3d474e;
+  --ghost: #4a545b; --board: #e8ebe9; --board-ink: #121619; --accent: #5cb6d6;
+  --c0: #4fb1d4; --c1: #ec7a5b; --c2: #a68ae0; --c3: #5cc282; --c4: #e3ac42; --c5: #e283b4; --c6: #7aa5ef; --c7: #b8977a; --c8: #5fd1c5; --c9: #b9c457; --c10: #4d5459; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #121619; --card: #181d21; --ink: #e8ebe9; --ink2: #c1c9cc; --muted: #8f9a9f; --line: #283036; --grid: #20272c; --axis: #3d474e;
+  --ghost: #4a545b; --board: #e8ebe9; --board-ink: #121619; --accent: #5cb6d6;
+  --c0: #4fb1d4; --c1: #ec7a5b; --c2: #a68ae0; --c3: #5cc282; --c4: #e3ac42; --c5: #e283b4; --c6: #7aa5ef; --c7: #b8977a; --c8: #5fd1c5; --c9: #b9c457; --c10: #4d5459; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 800; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.yr { font-size: 26px }
+.multi { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px }
+.mini { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px 6px; background: var(--paper) }
+.mini h3 { margin: 0; font-size: 14px; font-weight: 700; display: flex; justify-content: space-between; gap: 6px; align-items: baseline }
+.mini h3 span { font: 600 13px var(--mono); color: var(--muted) }
+.mini p { margin: 0; font: 12px/1.5 var(--mono); color: var(--muted) }
+.mini svg { display: block; width: 100%; height: auto }
+</style>
+
+<main class="page">
+  <header>
+    <h1>유학생은 대부분 중국 학생일까<span>지금 한국의 유학생 넷 중 하나가 중국 학생이다. 셋 중 하나 이상은 베트남, 다섯 중 하나는 중앙·남아시아에서 왔다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 06</dd>
+      <dt>한 줄</dt><dd>2026년 9월 국내 유학생(학위과정 D-2와 한국어연수 D-4-1) 36만 6,343명 가운데 중국 국적은 24.5%다. 베트남이 35.3%로 가장 많고, 우즈베키스탄·네팔·미얀마·방글라데시·키르기즈가 20.5%다. 학위과정만 보면 중국이 아직 1위지만, 그 몫은 3년 새 41.8%에서 29.6%로 줄었다.</dd>
+      <dt>분류</dt><dd>인구·가족</dd>
+      <dt>본능</dt><dd>직선 본능 · 한때의 모습(중국 유학생 붐)이 그대로 이어진다고 여긴다</dd>
+      <dt>그림 방식</dt><dd>물줄기 지도 · 57개월 동안 나라별 유학생 수를 강줄기처럼 쌓고, 재생 버튼으로 강이 넓어지고 갈라지는 순서를 따라간다</dd>
+      <dt>기간</dt><dd>연도별 2011–2025년 · 월별 국적별 2022년 1월–2026년 9월</dd>
+      <dt>엮은 데이터</dt><dd>2개 · 법무부 출입국·외국인정책 통계월보의 「연도별 외국인 유학생 체류 현황」과 「월별 외국인 유학생 국적(지역)별 현황」</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2026년 9월 국내 외국인 유학생 36만 6천 명 가운데 중국 국적 학생은 얼마나 될까?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>A</i>넷 중 하나</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>절반쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>셋 중 둘</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">A. <span class="n">24.5%</span>, 8만 9,813명</span>
+      가장 많은 나라는 베트남(35.3%, 12만 9,233명)이다. 중국 학생도 2022년 1월보다 1.9배로 늘었지만, 다른 나라 학생이 더 빨리 늘었다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">15년 새 3.5배, 코로나 때 한 번 꺾였다</h2>
+      <p>해마다 연말 기준으로 한국에 머문 유학생(D-2)과 한국어연수생(D-4-1)을 쌓았다. 2011년 <span class="n">8만 8,468명</span>이던 유학생은 2025년 <span class="n">30만 8,232명</span>이 됐다. 2014년부터 해마다 1만 명 넘게 늘다가, 입국이 막힌 2020년에 2만 7천 명 줄었고 2022년에야 2019년 수준을 넘었다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">연말 기준 외국인 유학생 수, 2011–2025년</p>
+      <p class="fs">명. 아래 짙은 층이 학위과정(D-2), 위 옅은 층이 한국어연수(D-4-1)</p>
+      <div class="player" id="p1"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>법무부 「연도별 외국인 유학생 체류 현황」(통계월보 46번 표). 외국어연수(D-4-7, 2025년 606명)는 너무 적어 뺐다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">강줄기는 베트남이 가장 넓고, 새 물줄기가 붙는다</h2>
+      <p>달마다 나라별 유학생 수를 강줄기처럼 쌓았다. 줄기의 두께가 그 나라 학생 수다. 2022년 1월 <span class="n">16만 834명</span>이던 강은 2026년 9월 <span class="n">36만 6,343명</span>으로 2.3배가 됐다. 해마다 3월과 9월, 새 학기에 맞춰 강폭이 한 번씩 껑충 넓어진다.</p>
+      <p>늘어난 20만 5천 명 가운데 베트남이 <span class="n">31.9%</span>, 중국이 <span class="n">20.7%</span>를 채웠다. 나머지 절반 가까이는 네팔(10.1%)·우즈베키스탄(7.3%)·미얀마(6.0%)·몽골·방글라데시 같은 새 물줄기다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft" id="f2t">나라별 유학생 물줄기, 2022년 1월–2026년 9월</p>
+      <p class="fs">달마다 체류 중인 사람 수. 위에서부터 2026년 9월에 많은 나라 순</p>
+      <div class="chips" role="group" aria-label="체류자격" id="chips2"></div>
+      <div class="player" id="p2"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>법무부 「월별 외국인 유학생 국적(지역)별 현황」(통계월보 47번 표). 한국계 중국인은 중국에, 이름이 바뀐 나라(러시아연방→러시아(연방), 터키→튀르키예, 태국→타이)는 하나로 합쳤다. 상위 10개국 밖은 "그 밖의 나라"로 묶었다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">학위과정의 중국 몫은 3년 새 12%p 줄었다</h2>
+      <p>"중국 학생이 대부분"이라는 인상은 대학 학위과정에서 나온다. 학위과정(D-2) 유학생 가운데 중국 국적은 2023년 9월 <span class="n">41.8%</span>로 정점을 찍은 뒤 2026년 9월 <span class="n">29.6%</span>까지 내려왔다. 같은 기간 베트남은 20.8%에서 27.1%로 올라와, 이제 거의 나란하다.</p>
+      <p>한국어연수(D-4-1)는 처음부터 베트남의 무대다. 연수생 셋 중 둘(<span class="n">65.2%</span>)이 베트남 학생이고, 중국은 6.0%다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">유학생 중 중국·베트남 국적 비율, 달마다</p>
+      <p class="fs">실선은 학위과정(D-2), 점선은 한국어연수(D-4-1) 안에서의 비율</p>
+      <div class="legend" aria-hidden="true"><span><i class="sw line" style="background:var(--c1)"></i>중국</span><span><i class="sw line" style="background:var(--c0)"></i>베트남</span><span><i class="sw line" style="background:repeating-linear-gradient(90deg,var(--muted) 0 4px,transparent 4px 7px)"></i>한국어연수</span></div>
+      <div class="player" id="p3"></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>법무부 「월별 외국인 유학생 국적(지역)별 현황」에서 계산.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">가장 빨리 불어난 물줄기</h2>
+      <p>2026년 9월 학생이 1,500명 넘는 나라를 2022년 1월 대비 몇 배가 됐는지 순으로 늘어놓았다. 미얀마(<span class="n">9.0배</span>)·네팔(<span class="n">8.5배</span>)·키르기즈(<span class="n">7.8배</span>)·방글라데시(<span class="n">7.6배</span>)가 맨 앞이다. 다섯 나라(우즈베키스탄·네팔·미얀마·방글라데시·키르기즈)의 몫은 9.6%에서 20.5%로 두 배가 됐다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">나라별 유학생 수 변화, 2022년 1월–2026년 9월</p>
+      <p class="fs">각 칸의 세로 눈금은 나라마다 다르다(모양 비교용). 오른쪽 위 숫자가 늘어난 배수</p>
+      <div class="multi" id="c4"></div>
+      <figcaption>법무부 「월별 외국인 유학생 국적(지역)별 현황」, 학위과정과 한국어연수 합계.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 유학생은 대부분 중국 학생일까</h2>
+      <p>아니다. 2026년 9월 기준 중국 학생은 넷 중 하나이고, 가장 많은 쪽은 베트남이다. 학위과정에서는 중국이 아직 1위지만 그 몫이 빠르게 줄고 있다. 유학생 수는 4년 반 만에 2.3배가 됐는데, 늘어난 사람의 절반 가까이는 중국도 베트남도 아닌 중앙아시아와 남아시아에서 왔다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:20px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>법무부 체류 통계라서 "그 달 말 한국에 머무는 유학 비자 소지자" 수다. 교육부가 4월 1일 기준으로 세는 대학 재학 유학생 통계와 숫자가 다르다.</li>
+      <li>국적별 월별 자료는 2022년 1월부터만 공개돼 있다. 그 전의 국적 구성은 이 페이지에서 계산하지 않았다.</li>
+      <li>3월·9월에 늘고 7월·12월에 줄어드는 톱니 모양은 학기와 졸업에 따른 계절 변동이다. 두 시점을 비교할 때는 같은 달끼리 견줬다.</li>
+      <li>교환학생·방문연구 등 다른 체류자격으로 공부하는 사람은 들어 있지 않다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:20px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15100039/fileData.do" target="_blank" rel="noopener">월별 외국인 유학생 국적(지역)별 현황</a> (15100039)</td><td>법무부</td><td>달 × 국적 × 체류자격(D-2, D-4-1) 유학생 수 (19,250행)</td><td>2022.1–2026.9</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15100038/fileData.do" target="_blank" rel="noopener">연도별 외국인 유학생 체류 현황</a> (15100038)</td><td>법무부</td><td>연말 기준 체류자격별 유학생 수</td><td>2011–2025</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:20px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>법무부 통계월보 표 2개 · 2011–2026</dd>
+      <dt>도구</dt><dd>Python(집계) · SVG 그림과 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>누적 영역(물줄기) · 비율 시계열 · 같은 달 대비 증가 배수</dd>
+      <dt>검증</dt><dd>월별 표의 12월 합계를 연도별 표와 대조했다. 2022·2023년은 같고, 2024·2025년은 1명씩 차이가 난다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:20px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>유학생은 서울에만 있을까</h3><p>학교별 유학생 자료로, 지방 대학의 유학생 의존도를 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/3069982/fileData.do" target="_blank" rel="noopener">유학생관리정보 데이터</a> · 법무부</li></ul></div>
+      <div class="q"><h3>졸업한 유학생은 한국에 남을까</h3><p>구직(D-10)·특정활동(E-7) 체류자격의 국적별 변화와 엮어 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15100033/fileData.do" target="_blank" rel="noopener">특정활동(E-7) 외국인 국적별 현황</a> · 법무부</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const M = DATA.months, NM = M.length, TOP = DATA.top;
+  const mLabel = (i) => `${M[i].slice(0, 4)}.${M[i].slice(4)}`;
+  const COL = (i) => `var(--c${i})`;
+  const NAMES = [...TOP, "그 밖의 나라"];
+  const ser = (k, g) => k < TOP.length ? (g === "all" ? DATA.nat[TOP[k]].d2.map((v, i) => v + DATA.nat[TOP[k]].d4[i]) : DATA.nat[TOP[k]][g]) : (g === "all" ? DATA.other.d2.map((v, i) => v + DATA.other.d4[i]) : DATA.other[g]);
+
+  /* ---------- 1. annual stacked area, grows year by year ---------- */
+  const A = DATA.annual, AY = A.years, NA = AY.length;
+  function c1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(290, box.clientWidth), H = Math.min(360, Math.max(260, W * .45)), l = 52, r = 64, top = 20, bot = 30;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "연말 기준 외국인 유학생 수 2011–2025" }, box);
+    const max = 320000, sx = (i) => l + i / (NA - 1) * (W - l - r), sy = (val) => top + (1 - val / max) * (H - top - bot);
+    [0, 100000, 200000, 300000].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t ? "gl" : "ax" }, v); tx(v, l - 8, sy(t) + 4, t ? t / 1e4 + "만" : "0", "tk", 11.5, "end"); });
+    AY.forEach((y, i) => { if (i % (W < 520 ? 7 : 2) === 0 || i === NA - 1) tx(v, sx(i), H - 8, String(y), "tk", 11.5, "middle"); });
+    const k = Math.floor(pos), f = pos - k, xs = [], d2 = [], tot = [];
+    for (let i = 0; i <= k; i++) { xs.push(sx(i)); d2.push(A.d2[i]); tot.push(A.d2[i] + A.d4[i]); }
+    if (k + 1 < NA && f > 0) { xs.push(sx(k + f)); d2.push(lerp(A.d2, pos)); tot.push(lerp(A.d2, pos) + lerp(A.d4, pos)); }
+    const area = (hi, lo, fill, op) => s("path", { d: "M" + xs.map((x, i) => `${x.toFixed(1)},${sy(hi[i]).toFixed(1)}`).join("L") + "L" + xs.map((x, i) => `${x.toFixed(1)},${sy(lo ? lo[i] : 0).toFixed(1)}`).reverse().join("L") + "Z", fill, "fill-opacity": op }, v);
+    area(tot, d2, "var(--c0)", .38); area(d2, null, "var(--c0)", .9);
+    s("path", { d: "M" + xs.map((x, i) => `${x.toFixed(1)},${sy(tot[i]).toFixed(1)}`).join("L"), fill: "none", stroke: "var(--ink)", "stroke-width": 1.5 }, v);
+    const ex = xs[xs.length - 1], et = tot[tot.length - 1], ed = d2[d2.length - 1];
+    s("circle", { cx: ex, cy: sy(et), r: 4, fill: "var(--ink)" }, v);
+    tx(v, ex + 7, sy(et) + 4, man(et), "vl halo", 13, "start", { "stroke-width": 4 });
+    if (W >= 420) { tx(v, ex + 7, sy(ed / 2) + 4, "학위", "mt", 12); tx(v, ex + 7, sy(ed + (et - ed) / 2) + 4, "연수", "mt", 12); }
+    if (pos >= 9) { const i = 9; s("circle", { cx: sx(i), cy: sy(A.d2[i] + A.d4[i]), r: 3, fill: "var(--c1)" }, v); tx(v, sx(i), sy(A.d2[i] + A.d4[i]) - 12, "2020 코로나", "mt halo", 12, "middle", { "stroke-width": 4 }); }
+    const tip = tipFor(fig);
+    timeLayer(v, tip, k + 1, sx, top, H - bot, (i) => [`${AY[i]}년 말`, [[fmt(A.d2[i] + A.d4[i]) + "명", "전체"], [fmt(A.d2[i]) + "명", "학위과정"], [fmt(A.d4[i]) + "명", "한국어연수"]]], "좌우 화살표로 해마다 볼 수 있다");
+  }
+  table("t1", ["연도", "학위과정(D-2)", "한국어연수(D-4-1)", "합계"], AY.map((y, i) => [String(y), fmt(A.d2[i]), fmt(A.d4[i]), fmt(A.d2[i] + A.d4[i])]));
+
+  /* ---------- 2. the river: stacked streams by nationality, drawn month by month ---------- */
+  let grp = "all";
+  const GN = { all: "전체", d2: "학위과정(D-2)", d4: "한국어연수(D-4-1)" };
+  function c2(pos) {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(290, box.clientWidth), narrow = W < 560, H = narrow ? 420 : Math.min(520, W * .52), l = 8, r = narrow ? 92 : 132, top = 16, bot = 30;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `나라별 유학생 물줄기, ${GN[grp]}, ${mLabel(Math.round(pos))}` }, box);
+    const S = NAMES.map((_, k) => ser(k, grp));
+    const T = M.map((_, i) => S.reduce((a, x) => a + x[i], 0));
+    const max = Math.max(...T) * 1.04, mid = top + (H - top - bot) / 2, sc = (H - top - bot) / max;
+    const sx = (i) => l + i / (NM - 1) * (W - l - r);
+    // centred streams (wiggle-free silhouette): baseline = -total/2
+    M.forEach((m, i) => { if (m.endsWith("01") || i === NM - 1 && !narrow) { s("line", { x1: sx(i), x2: sx(i), y1: top, y2: H - bot, class: "gl" }, v); if (m.endsWith("01")) tx(v, sx(i), H - 10, m.slice(0, 4), "tk", 11.5, i === 0 ? "start" : "middle"); } });
+    const k = Math.floor(pos), f = pos - k;
+    const idx = []; for (let i = 0; i <= k; i++) idx.push(i); if (k + 1 < NM && f > 0) idx.push(k + f);
+    const val = (arr, i) => lerp(arr, i);
+    const xs = idx.map((i) => l + i / (NM - 1) * (W - l - r));
+    let lower = idx.map((i) => mid - val(T, i) * sc / 2);
+    const ends = [];
+    S.forEach((arr, kk) => {
+      const upper = idx.map((i, j) => lower[j] + val(arr, i) * sc);
+      const d = "M" + xs.map((x, j) => `${x.toFixed(1)},${lower[j].toFixed(1)}`).join("L") + "L" + xs.map((x, j) => `${x.toFixed(1)},${upper[j].toFixed(1)}`).reverse().join("L") + "Z";
+      s("path", { d, fill: COL(kk === TOP.length ? 10 : kk), stroke: "var(--card)", "stroke-width": .6 }, v);
+      ends.push({ kk, y: (lower[lower.length - 1] + upper[upper.length - 1]) / 2, h: upper[upper.length - 1] - lower[lower.length - 1] });
+      lower = upper;
+    });
+    // right-edge labels with simple de-overlap
+    const ex = xs[xs.length - 1], fs = narrow ? 11.5 : 12.5, gap = fs * 1.25;
+    const lab = ends.filter((e) => e.h > 1.5).map((e) => ({ ...e, ly: e.y }));
+    for (let it = 0; it < 30; it++) for (let a = 1; a < lab.length; a++) { const d = lab[a].ly - lab[a - 1].ly; if (d < gap) { lab[a].ly += (gap - d) / 2; lab[a - 1].ly -= (gap - d) / 2; } }
+    const tc = lerp(T, pos);
+    lab.forEach((e) => {
+      const vv = lerp(S[e.kk], pos), sh = vv / tc * 100;
+      if (Math.abs(e.ly - e.y) > 2) s("line", { x1: ex + 2, x2: ex + 8, y1: e.y, y2: e.ly, stroke: "var(--axis)" }, v);
+      const t = tx(v, ex + 10, e.ly + 4, NAMES[e.kk], e.kk < 2 ? "vl" : "lb", fs);
+      if (!narrow || e.kk < 2) tx(v, ex + 10 + t.getComputedTextLength() + 5, e.ly + 4, pc(sh), "tk", 11);
+    });
+    const st = `${mLabel(Math.min(NM - 1, Math.round(pos)))} · ${GN[grp]} ${fmt(tc)}명`;
+    tx(v, l + 4, top + 12, st, "vl halo", 13, "start", { "stroke-width": 4 });
+    const tip = tipFor(fig);
+    timeLayer(v, tip, k + 1, sx, top, H - bot, (i) => { const rows = S.map((arr, kk) => [arr[i], kk]).sort((a, b) => b[0] - a[0]).slice(0, 7).map(([x, kk]) => [fmt(x) + "명", `${NAMES[kk]} ${pc(x / T[i] * 100)}`, COL(kk === TOP.length ? 10 : kk)]); return [`${mLabel(i)} · ${GN[grp]} ${fmt(T[i])}명`, rows]; }, "좌우 화살표로 달마다 볼 수 있다");
+  }
+  chips("chips2", Object.entries(GN), grp, (k) => { grp = k; p2.render(); });
+  table("t2", ["월", ...NAMES, "합계"], M.map((m, i) => { const r = NAMES.map((_, k) => ser(k, "all")[i]); return [mLabel(i), ...r.map(fmt), fmt(r.reduce((a, b) => a + b, 0))]; }));
+
+  /* ---------- 3. China and Vietnam shares within D-2 and D-4-1 ---------- */
+  const share = (nat, g) => M.map((_, i) => { const t = TOP.reduce((a, n) => a + DATA.nat[n][g][i], 0) + DATA.other[g][i]; return DATA.nat[nat][g][i] / t * 100; });
+  const SH = [{ d: share("중국", "d2"), c: COL(1), n: "중국 · 학위" }, { d: share("베트남", "d2"), c: COL(0), n: "베트남 · 학위" }, { d: share("중국", "d4"), c: COL(1), n: "중국 · 연수", dash: true }, { d: share("베트남", "d4"), c: COL(0), n: "베트남 · 연수", dash: true }];
+  function c3(pos) {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(290, box.clientWidth), H = Math.min(360, Math.max(260, W * .45)), l = 40, r = 112, top = 16, bot = 30;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "유학생 중 중국·베트남 비율" }, box);
+    const sx = (i) => l + i / (NM - 1) * (W - l - r), sy = (p) => top + (1 - p / 75) * (H - top - bot);
+    [0, 25, 50, 75].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t ? "gl" : "ax" }, v); tx(v, l - 6, sy(t) + 4, t + "%", "tk", 11.5, "end"); });
+    M.forEach((m, i) => { if (m.endsWith("01")) tx(v, sx(i), H - 8, m.slice(0, 4), "tk", 11.5, "middle"); });
+    const k = Math.floor(pos), f = pos - k;
+    const ends = [];
+    SH.forEach((q) => {
+      const pts = []; for (let i = 0; i <= k; i++) pts.push([sx(i), sy(q.d[i])]); if (k + 1 < NM && f > 0) pts.push([sx(k + f), sy(lerp(q.d, pos))]);
+      s("path", { d: "M" + pts.map((p) => p[0].toFixed(1) + "," + p[1].toFixed(1)).join("L"), fill: "none", stroke: q.c, "stroke-width": q.dash ? 2 : 3, "stroke-dasharray": q.dash ? "5 4" : "none", "stroke-linejoin": "round" }, v);
+      const e = pts[pts.length - 1]; s("circle", { cx: e[0], cy: e[1], r: 4, fill: q.c }, v); ends.push({ y: e[1], x: e[0], q });
+    });
+    ends.sort((a, b) => a.y - b.y); for (let a = 1; a < ends.length; a++) if (ends[a].y - ends[a - 1].y < 15) ends[a].y = ends[a - 1].y + 15;
+    ends.forEach((e) => tx(v, e.x + 8, e.y + 4, `${e.q.n} ${pc(lerp(e.q.d, pos))}`, e.q.dash ? "lb halo" : "vl halo", 12, "start", { "stroke-width": 4 }));
+    const pk = 20; if (pos >= pk) { s("circle", { cx: sx(pk), cy: sy(SH[0].d[pk]), r: 5, fill: "none", stroke: "var(--ink)" }, v); tx(v, sx(pk), sy(SH[0].d[pk]) - 12, "2023.09 정점 41.8%", "mt halo", 12, "middle", { "stroke-width": 4 }); }
+    timeLayer(v, tipFor(fig), k + 1, sx, top, H - bot, (i) => [mLabel(i), SH.map((q) => [pc(q.d[i]), q.n, q.c])], "좌우 화살표로 달마다 볼 수 있다");
+  }
+  table("t3", ["월", ...SH.map((q) => q.n)], M.map((m, i) => [mLabel(i), ...SH.map((q) => pc(q.d[i]))]));
+
+  /* ---------- 4. small multiples of growth ---------- */
+  function c4() {
+    const box = document.getElementById("c4"); box.replaceChildren();
+    const G = DATA.growth.filter((g) => g[1] > 0).map((g) => ({ n: g[0], a: g[1], b: g[2], x: g[2] / g[1] })).sort((p, q) => q.x - p.x);
+    G.forEach((g) => {
+      const d = document.createElement("div"); d.className = "mini";
+      const h = document.createElement("h3"); h.append(g.n); const sp = document.createElement("span"); sp.textContent = f1(g.x) + "배"; h.append(sp); d.append(h);
+      const series = DATA.gs[g.n];
+      const W = 150, H = 46, v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${g.n} ${fmt(g.a)}명에서 ${fmt(g.b)}명` }, d);
+      if (series) { const mx = Math.max(...series); const pts = series.map((val, i) => `${(i / (NM - 1) * (W - 4) + 2).toFixed(1)},${(H - 3 - val / mx * (H - 8)).toFixed(1)}`); s("path", { d: "M2," + (H - 3) + "L" + pts.join("L") + `L${W - 2},${H - 3}Z`, fill: g.x >= 5 ? "var(--c1)" : "var(--c0)", "fill-opacity": .22 }, v); s("path", { d: "M" + pts.join("L"), fill: "none", stroke: g.x >= 5 ? "var(--c1)" : "var(--c0)", "stroke-width": 1.8 }, v); }
+      else { const y0 = H - 3 - g.a / g.b * (H - 8); s("line", { x1: 2, x2: W - 2, y1: y0, y2: 5, stroke: g.x >= 5 ? "var(--c1)" : "var(--c0)", "stroke-width": 1.8 }, v); s("circle", { cx: 2.5, cy: y0, r: 2.5, fill: "var(--muted)" }, v); s("circle", { cx: W - 2.5, cy: 5, r: 2.5, fill: "var(--muted)" }, v); }
+      const p = document.createElement("p"); p.textContent = `${fmt(g.a)} → ${fmt(g.b)}명`; d.append(p);
+      box.append(d);
+    });
+    table("t4", ["나라", "2022.01", "2026.09", "배수"], G.map((g) => [g.n, fmt(g.a), fmt(g.b), f1(g.x)]));
+  }
+
+  const p1 = Player("p1", "연도별 유학생", c1, NA, (i) => String(AY[i]), 7);
+  const p2 = Player("p2", "물줄기", c2, NM, mLabel, 12);
+  const p3 = Player("p3", "중국·베트남 비율", c3, NM, mLabel, 10);
+  const all = () => { p1.render(); p2.render(); p3.render(); c4(); };
+  all(); onResize(all);
+})();
+</script>

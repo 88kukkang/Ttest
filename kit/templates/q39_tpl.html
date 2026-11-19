@@ -1,0 +1,486 @@
+<title>의사 지도</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: the reader first guesses Seoul's share of doctors on a 100-dot board. Then a map of 229 districts coloured by
+   doctors per 1,000 residents that can turn into circles sized by population, with a "find my district" box. A skyline
+   of 229 buildings (height = doctors per 1,000), syringes filled to each province's level in 2014 and 2026, a map of
+   districts with no specialist in a chosen field, and white coats on hangers for trainee doctors by quarter. */
+:root {
+  --paper: #f4f2ec; --card: #fcfbf7; --ink: #2c2c2a; --ink2: #494843; --muted: #5d5b55; --line: #e1ddd3; --grid: #eae7de; --axis: #a7a8a3;
+  --accent: #3e6f90; --intl: #3e6f90; --board: #2c2c2a; --board-ink: #f4f2ec; --sea: #fcfbf7;
+  --q0: #e3e8e4; --q1: #b5c6ce; --q2: #8ab5bb; --q3: #3e6f90; --q4: #1f4560; --q-ink: #2f5a77;
+  --pick: #d56b41; --pick-ink: #a8451f; --seoul: #d56b41; --bar: #8ab5bb; --cross: #9b3737; --zero: #9b3737; --zero-ink: #8a2f2f; --bub: #3e6f90;
+  --liq: #689daf; --liq2: #3e6f90; --glass: #f1ede3; --glass-edge: #8b8a84; --steel: #939594; --coat: #ffffff; --coat-edge: #8b8a84; --hanger: #b6a392; --gone: #d8d2c4;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1a1c1d; --card: #232627; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #383b3c; --grid: #2d3031; --axis: #62635d;
+  --accent: #8eabc9; --intl: #8eabc9; --board: #dcd9cf; --board-ink: #1a1c1d; --sea: #232627;
+  --q0: #2c3539; --q1: #35525f; --q2: #3e6f90; --q3: #8ab5bb; --q4: #dbe1dd; --q-ink: #a7c4c2;
+  --pick: #dc8c67; --pick-ink: #e7a08a; --seoul: #dc8c67; --bar: #3e6f90; --cross: #e0908a; --zero: #c55a5a; --zero-ink: #eaa6a0; --bub: #8ab5bb;
+  --liq: #689daf; --liq2: #a7c4c2; --glass: #2d3031; --glass-edge: #8b8a84; --steel: #a7a8a3; --coat: #eeede8; --coat-edge: #a7a8a3; --hanger: #928a7f; --gone: #3d4041; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1a1c1d; --card: #232627; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #383b3c; --grid: #2d3031; --axis: #62635d;
+  --accent: #8eabc9; --intl: #8eabc9; --board: #dcd9cf; --board-ink: #1a1c1d; --sea: #232627;
+  --q0: #2c3539; --q1: #35525f; --q2: #3e6f90; --q3: #8ab5bb; --q4: #dbe1dd; --q-ink: #a7c4c2;
+  --pick: #dc8c67; --pick-ink: #e7a08a; --seoul: #dc8c67; --bar: #3e6f90; --cross: #e0908a; --zero: #c55a5a; --zero-ink: #eaa6a0; --bub: #8ab5bb;
+  --liq: #689daf; --liq2: #a7c4c2; --glass: #2d3031; --glass-edge: #8b8a84; --steel: #a7a8a3; --coat: #eeede8; --coat-edge: #a7a8a3; --hanger: #928a7f; --gone: #3d4041; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.hi { fill: var(--q-ink) } .pk { fill: var(--pick-ink) } .zr { fill: var(--zero-ink) }
+::selection { background: var(--q1); color: #1a1c1d }
+/* guess board */
+.guess { display: grid; gap: 14px }
+.guess .row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap }
+.guess input[type=range] { flex: 1 1 220px; min-width: 0; height: 40px; accent-color: var(--pick) }
+.guess output { font: 600 30px/1 var(--mono); font-variant-numeric: tabular-nums; min-width: 4.2ch; text-align: right }
+.btn { font: inherit; font-size: 15px; font-weight: 600; color: var(--paper); background: var(--ink); border: 0; border-radius: 10px; padding: 10px 18px; min-height: 46px; cursor: pointer }
+.btn:hover { background: var(--intl) } .btn[disabled] { opacity: .45; cursor: default }
+.btn.ghost { color: var(--ink); background: var(--paper); border: 1px solid var(--line) } .btn.ghost:hover { background: var(--grid) }
+/* map + side panel */
+.mapwrap { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 22px; align-items: start }
+@media (max-width: 800px) { .mapwrap { grid-template-columns: minmax(0, 1fr) } }
+.side { display: grid; gap: 14px; min-width: 0 }
+.find { display: grid; gap: 6px; font-size: 13.5px; color: var(--ink2) }
+.find input { font: inherit; font-size: 16px; color: var(--ink); background: var(--paper); border: 1px solid var(--axis); border-radius: 10px; padding: 9px 12px; min-height: 46px; width: 100% }
+.pcard { border: 1px solid var(--line); border-left: 4px solid var(--pick); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; background: var(--paper); min-height: 150px }
+.pcard .nm { font-weight: 700; font-size: 17px } .pcard .bigv { font: 600 34px/1.1 var(--mono); font-variant-numeric: tabular-nums } .pcard .bigv small { font: 500 13px var(--sans); color: var(--muted); margin-left: 6px }
+.pcard p { margin: 0; font-size: 13.5px; color: var(--ink2); line-height: 1.6 }
+.rank { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px }
+.rank h4 { margin: 0 0 4px; font: 500 12px/1.6 var(--mono); color: var(--muted); letter-spacing: .04em }
+.rank ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px }
+.rank button { font: inherit; font-size: 13px; color: var(--ink); background: none; border: 0; padding: 5px 0; min-height: 32px; width: 100%; display: flex; justify-content: space-between; gap: 8px; cursor: pointer; border-bottom: 1px solid var(--grid); text-align: left }
+.rank button:hover { color: var(--pick-ink) } .rank button b { font-variant-numeric: tabular-nums }
+.zlist { font-size: 13px; color: var(--ink2); line-height: 1.7; margin: 0 }
+.unit { cursor: pointer }
+</style>
+
+<main class="page">
+  <header>
+    <h1>의사는 서울에만 몰려 있을까<span>서울에 많은 것은 맞다. 2026년 6월 말 병·의원에서 일하는 의사 11만 7,608명 가운데 30.2%가 서울에 있고, 서울 인구는 전국의 18.2%다. 하지만 서울 안에서도 종로구는 인구 1,000명당 18.3명, 관악구는 1.4명이다. 의사가 몰린 곳은 서울 전체가 아니라 큰 병원이 있는 몇몇 구이고, 부산 서구·대구 중구·광주 동구도 그렇다.</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 39</dd>
+      <dt>한 줄</dt><dd>건강보험심사평가원에 신고된 의사 수를 주민등록 인구로 나누면 전국 평균은 1,000명당 2.30명이다. 서울 3.82명, 세종 1.31명, 경북 1.42명. 시군구 229곳 가운데 평균보다 많은 곳은 53곳이고, 63곳은 2014년보다 줄었다.</dd>
+      <dt>분류</dt><dd>건강·복지·교육</dd>
+      <dt>본능</dt><dd>일반화 본능 · "서울"이라는 한 덩어리로 묶어 보면, 서울 안의 차이와 지방 대도시의 병원 밀집 지역이 보이지 않는다</dd>
+      <dt>그림 방식</dt><dd>의사 지도 · 시군구 229곳을 인구 1,000명당 의사 수로 칠한 지도가 인구 크기 원으로 바뀐다. 우리 동네 찾기, 의사 스카이라인, 시도별 주사기(2014→2026), 전문의가 한 명도 없는 곳 지도, 전공의 가운 옷걸이(분기별 재생)</dd>
+      <dt>기간</dt><dd>2014년 4분기–2026년 2분기(전공의는 2019년 4분기부터 분기별)</dd>
+      <dt>엮은 데이터</dt><dd>3개 · 시군구별 의료인력현황 · 시군구별 전문과목별 전문의 인력현황 · 주민등록인구</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">전국에서 일하는 의사가 100명이라면, 그중 서울에서 일하는 의사는 몇 명일까? 막대를 움직여 답해 보자.</h2>
+    <div class="guess">
+      <div class="chart" id="gq"></div>
+      <div class="row">
+        <input type="range" id="gin" min="0" max="100" step="1" value="0" aria-label="서울에서 일하는 의사 수(100명 중)">
+        <output id="gout" for="gin">0명</output>
+        <button class="btn" type="button" id="gbtn" disabled>확인</button>
+      </div>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="greveal" hidden>
+      <span class="big">서울 <span class="n">30명</span></span>
+      <span id="gmsg"></span> 서울 인구는 100명 중 18명이니 인구에 견줘 1.7배 많다. 수도권 전체로는 의사 57명, 인구 51명이다. 경기(인구 27명, 의사 22명)와 인천(인구 6명, 의사 5명)은 오히려 인구 몫보다 적다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">의사 지도</h2>
+      <p>시군구 229곳을 주민 1,000명당 의사 수로 칠했다. 전국 평균은 2.30명이다. 평균보다 많은 곳은 53곳뿐이고, 여기에 인구의 38%가 산다. 1명이 안 되는 곳이 52곳이고 411만 명이 산다. 가장 적은 곳은 강원 양양군(0.33명, 의사 9명)과 고성군(0.37명, 10명), 경북 영양군(0.44명, 7명)이다.</p>
+      <p>땅 넓이로 그린 지도에서는 사람이 적은 넓은 군이 크게 보인다. <b>인구 크기 원</b>을 누르면 시군구가 인구만큼의 원으로 바뀐다. 서울과 경기가 부풀고, 진한 원은 그 안에서도 몇 개뿐이다. 아래 칸에 사는 곳을 적으면 그곳의 숫자와 순위가 나온다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">시군구별 주민 1,000명당 의사 수, 2026년 2분기</p>
+      <p class="fs">의사 = 병원·의원·보건소 등에 신고된 의사(치과의사·한의사 제외). 지도나 원을 누르면 그곳이 선택된다</p>
+      <div class="chips" id="k1" role="group" aria-label="지도 모양"></div>
+      <div class="mapwrap">
+        <div class="chart" id="c1"></div>
+        <div class="side">
+          <label class="find">우리 동네 찾기
+            <input id="find" list="plist" placeholder="예: 관악구, 춘천시" autocomplete="off" inputmode="search">
+          </label>
+          <datalist id="plist"></datalist>
+          <div class="pcard" id="pcard" aria-live="polite"></div>
+          <div class="legend" id="lg1"></div>
+          <div class="rank">
+            <div><h4>많은 곳</h4><ol id="rk1"></ol></div>
+            <div><h4>적은 곳</h4><ol id="rk2"></ol></div>
+          </div>
+        </div>
+      </div>
+      <figcaption>건강보험심사평가원 「시군구별 의료인력현황」(KOSIS 354 DT_HIRA4T, 2026년 2분기), 행정안전부 주민등록인구(KOSIS 101 DT_1B040A3, 2026년 6월). 구가 있는 시(수원·청주·창원 등)는 시 하나로 합쳤다. 의사는 일하는 곳 기준, 인구는 사는 곳 기준이다. 원의 넓이 = 주민등록 인구.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">의사 스카이라인</h2>
+      <p>229곳을 의사가 많은 순서로 세우고, 1,000명당 의사 수만큼 건물을 올렸다. 높은 건물은 왼쪽 몇 채뿐이다. 서울 종로구(18.3명), 부산 서구(12.5명), 대구 중구(11.7명), 서울 강남구(11.4명), 광주 동구(10.0명) 순이다. 다섯 곳 가운데 셋이 서울 밖이다.</p>
+      <p>주황 건물이 서울의 25개 구다. 종로·강남·중구·서초는 높지만, 관악구(1.40명)와 도봉구(1.41명)는 전국 평균(2.30명)에 한참 못 미친다. 서울 25개 구 가운데 7곳(마포·은평·중랑·강북·금천·도봉·관악)이 전국 평균 아래다. 전남 화순군(5.7명)은 서울 서대문구와 같은 높이다. 높은 건물이 선 곳은 모두 대학병원 같은 큰 병원이 있는 곳인데, 병원 이름은 이 자료에 없는 사실이다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">시군구 229곳의 주민 1,000명당 의사 수, 많은 순</p>
+      <p class="fs">건물 하나 = 시군구 하나, 높이 = 1,000명당 의사 수. 주황 = 서울의 구, 가로선 = 전국 평균 2.30명</p>
+      <div class="chips" id="k2" role="group" aria-label="보여 줄 범위"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>건강보험심사평가원 「시군구별 의료인력현황」(2026년 2분기), 주민등록인구(2026년 6월). 종로구나 대구 중구처럼 사는 사람은 적고 병원이 많은 도심은 숫자가 크게 나온다. 환자는 다른 구와 다른 시도에서도 온다.</figcaption>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">12년 동안 채워진 주사기</h2>
+      <p>시도마다 주사기를 하나씩 놓고 1,000명당 의사 수만큼 채웠다. 진한 부분이 2014년, 옅은 부분이 그 뒤 2026년까지 늘어난 양이다. 전국 의사는 9만 2,927명에서 11만 7,608명으로 27% 늘었고, 1,000명당 1.81명에서 2.30명이 됐다.</p>
+      <p>늘어난 양은 고르지 않다. 서울은 2.72명에서 3.82명으로 1.10명 늘었다. 경북은 1.28명에서 1.42명으로 0.14명, 충북은 0.15명, 전남은 0.16명 늘었다. 2014년에 서울은 경북의 2.1배였는데 지금은 2.7배다. 시군구로 보면 229곳 가운데 63곳은 인구가 줄었는데도 1,000명당 의사 수가 2014년보다 줄었다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">시도별 주민 1,000명당 의사 수, 2014년과 2026년</p>
+      <p class="fs">명. 진한 색 = 2014년 4분기, 옅은 색 = 2026년 2분기까지 늘어난 양</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>건강보험심사평가원 「시군구별 의료인력현황」(2014년 4분기, 2026년 2분기), 주민등록인구(2014년 12월, 2026년 6월). 세종시는 2012년에 생겼다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">전문의가 한 명도 없는 곳</h2>
+      <p>과목을 고르면 그 과목 전문의가 한 명도 없는 시군구가 붉게 칠해지고, 있는 곳에는 전문의 수만큼 원이 놓인다. 소아청소년과 전문의가 없는 곳은 15곳, 산부인과는 10곳이다. 경북 영양군과 전북 장수군, 강원 고성군, 경남 의령군은 둘 다 없다. 응급의학과 전문의가 없는 곳은 63곳이다.</p>
+      <p>과목마다 서울에 몰린 정도가 다르다. 성형외과 전문의는 57%가 서울에 있고, 강남구 한 곳에 838명(34%)이 있다. 피부과는 41%가 서울이다. 소아청소년과는 24%, 응급의학과는 21%로 전체 의사(30%)보다 덜 몰려 있다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">전문과목별 전문의가 일하는 곳, 2026년 2분기</p>
+      <p class="fs">붉은 곳 = 그 과목 전문의 0명, 원의 넓이 = 전문의 수</p>
+      <div class="chips" id="k4" role="group" aria-label="전문과목"></div>
+      <p class="stat" id="st4" aria-live="polite"></p>
+      <div class="mapwrap">
+        <div class="chart" id="c4"></div>
+        <div class="side">
+          <div><p class="label" style="margin-bottom:6px">한 명도 없는 시군구</p><p class="zlist" id="z4"></p></div>
+          <div><p class="label" style="margin-bottom:6px">가장 많은 시군구</p><p class="zlist" id="m4"></p></div>
+        </div>
+      </div>
+      <figcaption>건강보험심사평가원 「시군구별 전문과목별 전문의 인력현황」(KOSIS 354 DT_HIRA4S, 2026년 2분기). 전문의 자격 기준이다. 소아청소년과 전문의가 다른 과목으로 진료하는 경우도 여기에 들고, 전문의가 없는 곳에서도 일반의나 다른 과 전문의가 그 진료를 볼 수 있다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">옷걸이에서 사라진 가운</h2>
+      <p>의사 수는 일하는 곳에 신고된 숫자라서, 병원을 떠나면 줄어든다. 전공의(인턴과 레지던트) 500명을 가운 한 벌로 걸었다. 2023년 4분기에 1만 3,018명이던 전공의는 2024년 4분기에 1,225명이 됐고, 2025년 3분기에 1만 31명으로 돌아왔다. 2026년 2분기에는 1만 1,462명이다.</p>
+      <p>수련병원이 서울에 많아서 이때 서울 숫자가 가장 크게 움직였다. 서울의 전공의는 5,762명에서 527명이 됐고, 서울이 전국 의사에서 차지하는 몫은 29.5%에서 28.1%로 내려갔다가 지금은 30.2%다. 같은 기간 일반의는 6,041명에서 1만 684명으로 늘었다가 6,948명으로 돌아왔다. 2024년 숫자로 지역 차이를 재면 서울이 실제보다 작게 나온다.</p>
+    </div>
+    <figure id="f5">
+      <p class="ft">병원에 신고된 전공의(인턴 + 레지던트)</p>
+      <p class="fs">가운 한 벌 = 500명(반올림). 옷걸이는 가장 많았던 분기만큼 걸었고, 빈 옷걸이는 그때보다 줄어든 만큼이다</p>
+      <div class="player" id="p5"></div>
+      <p class="stat" id="st5" aria-live="polite"></p>
+      <div class="chart" id="c5"></div>
+      <figcaption>건강보험심사평가원 「시군구별 의료인력현황」 의사 구분(일반의·인턴·레지던트·전문의), 2019년 4분기–2026년 2분기. 분기 말에 요양기관이 신고한 인원이다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t5"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <div class="prose">
+      <h2 class="h" id="s6">그래서, 의사는 서울에만 몰려 있을까</h2>
+      <p>서울에 많다. 의사 열에 셋이 서울에 있고, 12년 동안 차이는 더 벌어졌다. 하지만 "서울"은 너무 큰 단위다. 서울 안에서 종로구와 관악구는 13배 차이가 나고, 서울 25개 구 가운데 7곳은 전국 평균보다 적다. 부산 서구, 대구 중구, 광주 동구, 전남 화순군은 서울 대부분의 구보다 많다. 경기와 인천은 수도권이지만 평균 아래다.</p>
+      <p>의사는 큰 병원이 있는 곳에 몰려 있다. 그래서 "서울 대 지방"보다 "병원이 있는 도심 대 나머지"로 보는 편이 숫자에 더 가깝다. 양양·고성·영양처럼 1,000명당 0.5명이 안 되는 곳과 소아청소년과·산부인과 전문의가 한 명도 없는 곳은 대부분 도시에서 먼 군이다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>의사는 일하는 곳, 인구는 사는 곳 기준이다. 종로구(주민 13만 6천 명)처럼 주민이 적고 큰 병원이 있는 도심은 숫자가 크게 나오지만, 그 의사들이 보는 환자는 전국에서 온다. 1,000명당 의사 수가 곧 그 동네 주민이 받는 진료의 양은 아니다.</li>
+      <li>이 숫자는 면허를 가진 의사 수가 아니라 병원·의원·보건소 등 요양기관이 건강보험심사평가원에 신고한 의사 수다. 진료를 쉬고 있거나 연구·행정만 하는 의사는 빠진다. OECD 통계의 "임상 의사 수"는 한의사를 포함하므로 이 숫자와 바로 견줄 수 없다.</li>
+      <li>보건소와 보건지소에서 일하는 공중보건의사도 들어 있다. 의사가 적은 군에서는 이들이 큰 몫을 차지하는데, 이 표로는 따로 나눌 수 없다.</li>
+      <li>시군구를 넘어 병원에 가는 것은 흔하다. 군에 의사가 적어도 옆 도시가 가까우면 사정이 다르다. 거리와 이동 시간은 이 자료에 없다.</li>
+      <li>전문의 숫자는 자격 기준이다. 소아청소년과 전문의가 0명인 곳에 소아 진료가 없다는 뜻은 아니고, 전문의가 있는 곳에 그 과목 병·의원이 있다는 뜻도 아니다.</li>
+      <li>2024년 1분기부터 2025년 2분기까지는 전공의 대부분이 병원을 떠나 있던 때라, 이 시기 숫자로 지역을 비교하면 수련병원이 많은 곳이 낮게 나온다. 이 장은 2026년 2분기와 2014년 4분기를 견줬다.</li>
+      <li>구가 있는 시는 시 하나로 합쳤다. 성남시 분당구나 수원시 영통구처럼 시 안에서도 차이가 크다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=354&amp;tblId=DT_HIRA4T" target="_blank" rel="noopener">시군구별 의료인력현황</a> (KOSIS 354 DT_HIRA4T, 공공데이터포털 <a href="https://www.data.go.kr/data/15066021/fileData.do" target="_blank" rel="noopener">15066021</a>)</td><td>건강보험심사평가원</td><td>시군구별 의사·일반의·인턴·레지던트·전문의 수</td><td>2014–2026.2분기</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=354&amp;tblId=DT_HIRA4S" target="_blank" rel="noopener">시군구별 전문과목별 전문의 인력현황</a> (DT_HIRA4S)</td><td>건강보험심사평가원</td><td>26개 전문과목 × 시군구 전문의 수</td><td>2026.2분기</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1B040A3" target="_blank" rel="noopener">행정구역(시군구)별 주민등록인구</a> (KOSIS 101 DT_1B040A3)</td><td>행정안전부</td><td>시군구 인구(분모)</td><td>2014.12, 2026.6</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>시군구 229곳 × 의사 구분 5개 × 8개 시점 · 전문과목 26개 · 시도 17개 × 27개 분기</dd>
+      <dt>도구</dt><dd>Python(수집·집계·원 자리 계산) · SVG 지도와 인구 크기 원, 스카이라인, 주사기, 가운 옷걸이(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>의사 수 ÷ 주민등록 인구 × 1,000 · 시군구 순위 · 시도별 2014→2026 변화 · 과목별 전문의 0명 시군구 · 인구 크기 원(겹치지 않게 밀어내기)</dd>
+      <dt>검증</dt><dd>시군구 229곳의 의사 수 합(11만 7,608명)과 인구 합(5,109만 1,769명)이 전국 표와 같다. 남구→미추홀구, 청원군→청주시, 군위군(경북→대구)처럼 이름이나 소속이 바뀐 곳은 이어 붙였다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s10">
+    <h2 class="h" id="s10" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>동네 의원은 어떤 과목이 늘었을까</h3><p>표시과목별 의원 수로, 소아청소년과·산부인과 의원이 줄고 피부·성형이 늘었는지 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=354&amp;tblId=DT_HIRA4G" target="_blank" rel="noopener">시군구별 표시과목별 의원 현황</a> · 건강보험심사평가원</li></ul></div>
+      <div class="q"><h3>간호사와 약사도 같은 곳에 몰려 있을까</h3><p>같은 표에 치과의사·한의사·약사가 있고, 간호사는 따로 표가 있다. 의사 지도와 겹쳐 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=354&amp;tblId=DT_HIRA4T" target="_blank" rel="noopener">시군구별 의료인력현황</a> · 건강보험심사평가원</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.16</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const once = (el, fn, th = .25) => { if (reduce) return false; const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); fn(); }, { threshold: th }); io.observe(el); return true; };
+  const f2 = (n) => n.toLocaleString("ko-KR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const L = DATA.per.length - 1, PLp = DATA.pper.length - 1, i14 = DATA.per.indexOf("2014.4/4"), j14 = DATA.pper.indexOf("2014.12");
+  const NAT = DATA.nat.doc[L] / DATA.nat.pop[PLp] * 1000;
+  const P = DATA.P.map((p, i) => ({ ...p, i, v: p.doc / p.pop * 1000, v14: p.p14 ? p.d14 / p.p14 * 1000 : null }));
+  const ranked = [...P].sort((a, b) => b.v - a.v); ranked.forEach((p, k) => { p.rank = k + 1; });
+  const byCode = new Map(); P.forEach((p) => p.codes.forEach((c) => byCode.set(c, p)));
+  const cls = (v) => v < 1 ? 0 : v < 1.5 ? 1 : v < NAT ? 2 : v < 4 ? 3 : 4;
+  const QC = [0, 1, 2, 3, 4].map((k) => `var(--q${k})`);
+  // map frame shared by every map in this page
+  const xs = P.flatMap((p) => [p.x, p.cx - p.cr, p.cx + p.cr]), ys = P.flatMap((p) => [p.y, p.cy - p.cr, p.cy + p.cr]);
+  const GX0 = Math.min(...P.map((p) => p.x)) - 22, GX1 = Math.max(...P.map((p) => p.x)) + 22, GY0 = Math.min(...P.map((p) => p.y)) - 22, GY1 = Math.max(...P.map((p) => p.y)) + 22;
+  const FX0 = Math.min(...xs) - 14, FX1 = Math.max(...xs) + 14, FY0 = Math.min(...ys) - 14, FY1 = Math.max(...ys) + 14;
+
+  /* ---------- 0. guess board ---------- */
+  const gin = document.getElementById("gin"), gout = document.getElementById("gout"), gbtn = document.getElementById("gbtn");
+  let revealed = false;
+  function person(g, x, y, u, fill, stroke) {
+    s("circle", { cx: x, cy: y - u * .62, r: u * .26, fill, stroke, "stroke-width": 1 }, g);
+    s("path", { d: `M${x - u * .42},${y + u * .5} Q${x - u * .42},${y - u * .26} ${x},${y - u * .26} Q${x + u * .42},${y - u * .26} ${x + u * .42},${y + u * .5} Z`, fill, stroke, "stroke-width": 1 }, g);
+  }
+  function drawGuess() {
+    const box = document.getElementById("gq"); box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), per = W < 520 ? 20 : 25, rows = 100 / per, cw = Math.min(30, W / per), u = cw * .62, H = rows * cw * 1.25 + 26;
+    const g = +gin.value, x0 = (W - per * cw) / 2;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": revealed ? `의사 100명 중 서울 30명. 내가 고른 답은 ${g}명` : `의사 100명 중 서울에 있다고 고른 사람 ${g}명` }, box);
+    for (let k = 0; k < 100; k++) {
+      const x = x0 + (k % per) * cw + cw / 2, y = 8 + Math.floor(k / per) * cw * 1.25 + cw * .7;
+      const real = revealed && k < 30, mine = k < g;
+      person(v, x, y, u, real ? "var(--q3)" : mine && !revealed ? "var(--pick)" : "var(--grid)", revealed && mine ? "var(--pick)" : "none");
+    }
+    const lg = s("g", {}, v), ly = H - 6;
+    if (revealed) { s("circle", { cx: x0 + 6, cy: ly - 4, r: 5, fill: "var(--q3)" }, lg); tx(lg, x0 + 16, ly, "실제 서울 30명", "lb", 12.5); s("circle", { cx: x0 + 122, cy: ly - 4, r: 5, fill: "none", stroke: "var(--pick)", "stroke-width": 1.5 }, lg); tx(lg, x0 + 132, ly, `내 답 ${g}명`, "lb", 12.5); }
+    else tx(lg, x0, ly, "사람 하나 = 의사 100명 가운데 1명", "mt", 12.5);
+  }
+  gin.addEventListener("input", () => { gout.textContent = gin.value + "명"; gbtn.disabled = false; drawGuess(); });
+  gbtn.addEventListener("click", () => {
+    revealed = true; gin.disabled = true; gbtn.disabled = true;
+    const g = +gin.value, d = g - 30;
+    document.getElementById("gmsg").textContent = d === 0 ? "정확히 맞혔다." : Math.abs(d) <= 3 ? `${g}명이라고 답했다. 거의 맞혔다.` : d > 0 ? `${g}명이라고 답했다. 실제보다 ${d}명 많게 봤다.` : `${g}명이라고 답했다. 실제보다 ${-d}명 적게 봤다.`;
+    document.getElementById("greveal").hidden = false; drawGuess();
+  });
+
+  /* ---------- 1. map <-> population circles ---------- */
+  let mode1 = 0, tm = 0, raf1 = 0, sel = P.find((p) => p.n === "관악구");
+  const m1 = { els: null };
+  function build1() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), sc = W / (FX1 - FX0), H = (FY1 - FY0) * sc;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "시군구별 주민 1,000명당 의사 수 지도. 서울 종로구·강남구, 부산 서구, 대구 중구, 광주 동구가 가장 진하다" }, box);
+    const g = s("g", { transform: `translate(${-FX0 * sc},${-FY0 * sc}) scale(${sc})` }, v);
+    const gp = s("g", {}, g), paths = [];
+    DATA.U.forEach(([code, d]) => { const p = byCode.get(code); const e = s("path", { d, fill: p ? QC[cls(p.v)] : "var(--grid)", stroke: "var(--card)", "stroke-width": .5 / sc, class: "unit" }, gp); e.dataset.i = p ? p.i : ""; paths.push([e, p]); });
+    const gs = s("g", {}, g); DATA.sidoPaths.forEach((sp) => s("path", { d: sp.d, fill: "none", stroke: "var(--axis)", "stroke-width": .9 / sc, "pointer-events": "none" }, gs));
+    const gc = s("g", {}, g), circles = P.map((p) => { const e = s("circle", { fill: QC[cls(p.v)], stroke: "var(--card)", "stroke-width": .6 / sc, class: "unit" }, gc); e.dataset.i = p.i; return e; });
+    const gl = s("g", { "pointer-events": "none" }, g), labels = P.filter((p) => p.cr * sc >= 17).map((p) => { const t = tx(gl, p.cx, p.cy + 4 / sc, p.n.replace(/(시|군|구)$/, ""), "lb", 11.5 / sc, "middle"); t.setAttribute("fill", cls(p.v) >= 3 ? "var(--card)" : "var(--ink)"); return t; });
+    const hl = s("g", { "pointer-events": "none" }, g);
+    m1.els = { v, g, gp, gs, gc, gl, hl, paths, circles, labels, sc, W, H };
+    v.addEventListener("click", (e) => { const i = e.target.dataset && e.target.dataset.i; if (i !== undefined && i !== "") pick(P[+i], true); });
+    const tip = tipFor(fig);
+    const pts = P.map((p) => ({ get x() { return ((mode1 ? p.cx : p.x) - FX0) * sc; }, get y() { return ((mode1 ? p.cy : p.y) - FY0) * sc; }, get r() { return mode1 ? p.cr * sc : 5; }, fn: () => [`${p.s} ${p.n}`, [[`${f2(p.v)}명`, "주민 1,000명당 의사"], [`${fmt(p.doc)}명`, "의사"], [`${fmt(p.pop)}명`, "인구"], [`${p.rank}위`, "229곳 중"]]] }));
+    pointLayer(v, tip, pts, "화살표 키로 시군구를 옮겨 볼 수 있다");
+    frame1(tm);
+  }
+  function frame1(t) {
+    const E = m1.els; if (!E) return; const e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    E.gp.setAttribute("opacity", 1 - e); E.gs.setAttribute("opacity", 1 - e); E.gp.style.pointerEvents = e > .5 ? "none" : "";
+    E.circles.forEach((c, i) => { const p = P[i]; c.setAttribute("cx", p.x + (p.cx - p.x) * e); c.setAttribute("cy", p.y + (p.cy - p.y) * e); c.setAttribute("r", Math.max(0, p.cr * e)); });
+    E.gl.setAttribute("opacity", Math.max(0, (e - .7) / .3));
+    E.hl.replaceChildren();
+    if (sel) {
+      if (e < .5) DATA.U.forEach(([code, d]) => { if (byCode.get(code) === sel) s("path", { d, fill: "none", stroke: "var(--pick)", "stroke-width": 2.4 / E.sc, "stroke-linejoin": "round" }, E.hl); });
+      s("circle", { cx: sel.x + (sel.cx - sel.x) * e, cy: sel.y + (sel.cy - sel.y) * e, r: Math.max(sel.cr * e, 0) + 3 / E.sc + (1 - e) * 6 / E.sc, fill: "none", stroke: "var(--pick)", "stroke-width": 2.4 / E.sc }, E.hl);
+    }
+  }
+  function go1(to) {
+    mode1 = to; cancelAnimationFrame(raf1);
+    if (reduce) { tm = to; frame1(tm); return; }
+    const from = tm, t0 = performance.now(), dur = 1100;
+    const tick = (now) => { const k = Math.min(1, (now - t0) / dur); tm = from + (to - from) * k; frame1(tm); if (k < 1) raf1 = requestAnimationFrame(tick); };
+    raf1 = requestAnimationFrame(tick);
+  }
+  function card() {
+    const c = document.getElementById("pcard"); c.replaceChildren(); const p = sel; if (!p) return;
+    const nm = document.createElement("div"); nm.className = "nm"; nm.textContent = `${p.s} ${p.n}`;
+    const bv = document.createElement("div"); bv.className = "bigv"; bv.textContent = f2(p.v); const sm = document.createElement("small"); sm.textContent = "명 · 주민 1,000명당"; bv.append(sm);
+    const a = document.createElement("p"); const ratio = p.v / NAT;
+    a.append(bEl(`229곳 중 ${p.rank}위`), ` · 전국 평균(${f2(NAT)}명)의 ${ratio >= 1 ? f1(ratio) + "배" : Math.round(ratio * 100) + "%"}`);
+    const b = document.createElement("p"); b.textContent = `의사 ${fmt(p.doc)}명(전문의 ${fmt(p.sp)}명, 전공의 ${fmt(p.tr)}명) · 인구 ${fmt(p.pop)}명`;
+    const d = document.createElement("p"); d.textContent = p.v14 == null ? "" : `2014년에는 ${f2(p.v14)}명이었다. ${p.v > p.v14 ? `${f2(p.v - p.v14)}명 늘었다` : `${f2(p.v14 - p.v)}명 줄었다`}(의사 ${fmt(p.d14)}명 → ${fmt(p.doc)}명).`;
+    c.append(nm, bv, a, b, d);
+  }
+  function pick(p, fromMap) { sel = p; card(); frame1(tm); if (!fromMap) document.getElementById("find").value = `${p.s} ${p.n}`; else document.getElementById("find").value = ""; }
+  const find = document.getElementById("find"), plist = document.getElementById("plist");
+  [...P].sort((a, b) => (a.s + a.n).localeCompare(b.s + b.n, "ko")).forEach((p) => { const o = document.createElement("option"); o.value = `${p.s} ${p.n}`; plist.append(o); });
+  const lookup = () => {
+    const q = find.value.trim().replace(/\s+/g, " "); if (!q) return;
+    const hit = P.find((p) => `${p.s} ${p.n}` === q) || P.find((p) => p.n === q) || P.find((p) => p.n.replace(/(시|군|구)$/, "") === q) || P.find((p) => `${p.s} ${p.n}`.includes(q));
+    if (hit) { sel = hit; card(); frame1(tm); }
+  };
+  find.addEventListener("change", lookup); find.addEventListener("input", lookup);
+  chips("k1", [[0, "땅 넓이 지도"], [1, "인구 크기 원"]], 0, (k) => go1(k));
+  const lg1 = document.getElementById("lg1");
+  [["1명 미만", 0], ["1–1.5명", 1], [`1.5–${f2(NAT)}명`, 2], [`${f2(NAT)}–4명`, 3], ["4명 이상", 4]].forEach(([name, k]) => { const sp = document.createElement("span"), i = document.createElement("i"); i.className = "sw"; i.style.background = QC[k]; sp.append(i, name); lg1.append(sp); });
+  const rk = (id, list) => { const ol = document.getElementById(id); list.forEach((p) => { const li = document.createElement("li"), b = document.createElement("button"); b.type = "button"; b.append(`${p.s} ${p.n}`, bEl(f2(p.v))); b.addEventListener("click", () => pick(p)); li.append(b); ol.append(li); }); };
+  rk("rk1", ranked.slice(0, 6)); rk("rk2", ranked.slice(-6).reverse());
+  table("t1", ["순위", "시도", "시군구", "1,000명당 의사", "의사", "전문의", "인구", "2014년 1,000명당"], ranked.map((p) => [p.rank, p.s, p.n, f2(p.v), fmt(p.doc), fmt(p.sp), fmt(p.pop), p.v14 == null ? "–" : f2(p.v14)]));
+
+  /* ---------- 2. skyline ---------- */
+  let mode2 = "all", grow2 = 1;
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, H = narrow ? 330 : 400, l = 34, r = 8, top = 26, bot = mode2 === "seoul" ? 64 : 30;
+    const list = mode2 === "seoul" ? ranked.filter((p) => p.s === "서울") : ranked, n = list.length, bw = (W - l - r) / n, max = 19;
+    const y = (val) => top + (H - top - bot) * (1 - val / max);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": mode2 === "seoul" ? "서울 25개 구의 주민 1,000명당 의사 수. 종로구 18.3명에서 관악구 1.4명까지" : "시군구 229곳의 주민 1,000명당 의사 수를 많은 순으로 세운 건물 그림. 왼쪽 몇 곳만 높다" }, box);
+    [0, 5, 10, 15].forEach((t) => { s("line", { x1: l, x2: W - r, y1: y(t), y2: y(t), class: "gl" }, v); tx(v, l - 6, y(t) + 4, t, "tk", 11, "end"); });
+    list.forEach((p, k) => {
+      const x = l + k * bw, h = (y(0) - y(p.v)) * grow2, seoul = p.s === "서울", w = Math.max(.8, bw - (bw > 6 ? 2 : bw > 2.4 ? .6 : 0));
+      s("rect", { x, y: y(0) - h, width: w, height: h, fill: seoul ? "var(--seoul)" : "var(--bar)" }, v);
+      if (bw > 9 && h > 14) for (let wy = y(0) - h + 5; wy < y(0) - 5; wy += 9) for (let wx = x + 3; wx + 3 < x + w - 1; wx += 6) s("rect", { x: wx, y: wy, width: 3, height: 4, fill: "var(--card)", opacity: .55 }, v);
+      if (mode2 === "seoul") { const t = tx(v, x + w / 2 + 4, y(0) + 8, p.n, "lb", narrow ? 11 : 12, "end"); t.setAttribute("transform", `rotate(${narrow ? -90 : -60} ${x + w / 2 + 4} ${y(0) + 8})`); if (h > 0 && grow2 === 1) tx(v, x + w / 2, y(0) - h - 4, p.v >= 10 ? f1(p.v) : f1(p.v), "vl halo", 11, "middle", { "stroke-width": 3 }); }
+    });
+    s("line", { x1: l, x2: W - r, y1: y(NAT), y2: y(NAT), stroke: "var(--ink)", "stroke-width": 1, "stroke-dasharray": "4 3" }, v);
+    tx(v, l + (W - l - r) * (mode2 === "seoul" ? .98 : .34), y(NAT) - 6, `전국 평균 ${f2(NAT)}명`, "lb halo", 12, mode2 === "seoul" ? "end" : "start", { "stroke-width": 4 });
+    if (mode2 === "all" && grow2 === 1) {
+      const by = (sd, nm) => P.find((p) => p.s === sd && p.n === nm), fs = narrow ? 11.5 : 12.5;
+      let ly = 0; const lx = l + (narrow ? 40 : 64);
+      [by("서울", "종로구"), by("부산", "서구"), by("대구", "중구"), by("서울", "강남구"), by("광주", "동구"), ...(narrow ? [] : [by("전남", "화순군")])].forEach((p) => {
+        const k = list.indexOf(p), x = l + k * bw + bw / 2, yy = y(p.v); ly = Math.max(ly + 18, yy + 2);
+        s("path", { d: `M${x},${yy} L${lx - 12},${ly - 4} L${lx - 3},${ly - 4}`, fill: "none", stroke: "var(--axis)", "stroke-width": 1 }, v); s("circle", { cx: x, cy: yy, r: 2, fill: "var(--ink)" }, v);
+        tx(v, lx, ly, `${p.s} ${p.n} ${f1(p.v)}명`, "lb halo " + (p.s === "서울" ? "pk" : ""), fs, "start", { "stroke-width": 4 });
+      });
+      [[by("서울", "관악구"), narrow ? -78 : -62], [by("강원", "양양군"), -54]].forEach(([p, dy]) => { const k = list.indexOf(p), x = l + k * bw + bw / 2, yy = y(p.v); s("line", { x1: x, x2: x, y1: yy - 2, y2: yy + dy + 5, stroke: "var(--axis)", "stroke-width": 1 }, v); tx(v, Math.min(x, W - r - 2), yy + dy, `${p.s} ${p.n} ${f2(p.v)}명`, "lb halo " + (p.s === "서울" ? "pk" : ""), fs, x > W - 120 ? "end" : "middle", { "stroke-width": 4 }); });
+      tx(v, l, H - 8, "← 많은 곳", "mt", 12); tx(v, W - r, H - 8, "적은 곳 →", "mt", 12, "end");
+    }
+    tx(v, l - 6, top - 10, "명", "tk", 11, "end");
+    timeLayer(v, tipFor(fig), n, (k) => l + k * bw + bw / 2, top, y(0), (k) => { const p = list[k]; return [`${p.rank}위 · ${p.s} ${p.n}`, [[`${f2(p.v)}명`, "주민 1,000명당 의사"], [`${fmt(p.doc)}명`, "의사"], [`${fmt(p.pop)}명`, "인구"]]]; }, "좌우 화살표 키로 시군구를 옮겨 볼 수 있다");
+  }
+  chips("k2", [["all", "전국 229곳"], ["seoul", "서울 25개 구만"]], "all", (k) => { mode2 = k; c2(); });
+
+  /* ---------- 3. syringes ---------- */
+  const SD = DATA.S.map((x) => ({ n: x.n, a: x.doc[i14] / x.pop[j14] * 1000, b: x.doc[L] / x.pop[PLp] * 1000, doc: x.doc[L], d14: x.doc[i14] })).sort((p, q) => q.b - p.b);
+  let grow3 = 1;
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, rh = narrow ? 30 : 34, l = 44, plg = 22, ndl = narrow ? 18 : 30, rr = narrow ? 56 : 104, top = 22, H = top + SD.length * rh + 8;
+    const bx0 = l + plg, bx1 = W - rr - ndl, max = 4.2, x = (val) => bx0 + (bx1 - bx0) * val / max, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "시도별 주민 1,000명당 의사 수를 주사기에 채운 그림. 서울 3.82명, 경북 1.42명, 세종 1.31명" }, box);
+    [0, 1, 2, 3, 4].forEach((t) => { tx(v, x(t), 12, t, "tk", 11, "middle"); s("line", { x1: x(t), x2: x(t), y1: 16, y2: H - 4, class: "gl" }, v); });
+    s("line", { x1: x(NAT), x2: x(NAT), y1: 16, y2: H - 4, stroke: "var(--ink)", "stroke-width": 1, "stroke-dasharray": "3 3" }, v);
+    SD.forEach((d, k) => {
+      const cy = top + k * rh + rh / 2, bh = rh * .5, b = d.a + (d.b - d.a) * grow3;
+      tx(v, l - 6, cy + 4.5, d.n, "lb", 13.5, "end");
+      // plunger rod + thumb rest, barrel, needle
+      s("rect", { x: bx0 - plg + 4, y: cy - 1.5, width: plg - 4, height: 3, fill: "var(--steel)" }, v); s("rect", { x: bx0 - plg, y: cy - bh * .55, width: 4, height: bh * 1.1, rx: 1.5, fill: "var(--steel)" }, v);
+      s("rect", { x: bx0, y: cy - bh / 2, width: bx1 - bx0, height: bh, rx: 3, fill: "var(--glass)", stroke: "var(--glass-edge)", "stroke-width": 1 }, v);
+      s("rect", { x: x(d.a), y: cy - bh / 2 + 1.5, width: Math.max(0, x(b) - x(d.a)), height: bh - 3, fill: "var(--liq)" }, v);
+      s("rect", { x: bx0 + 1.5, y: cy - bh / 2 + 1.5, width: x(d.a) - bx0 - 1.5, height: bh - 3, rx: 2, fill: "var(--liq2)" }, v);
+      s("rect", { x: x(b) - 1, y: cy - bh / 2 - 1.5, width: 3.5, height: bh + 3, rx: 1, fill: "var(--ink2)" }, v);
+      s("path", { d: `M${bx1},${cy - bh * .22} L${bx1 + 6},${cy - 2} L${bx1 + 6},${cy + 2} L${bx1},${cy + bh * .22} Z`, fill: "var(--glass-edge)" }, v); s("line", { x1: bx1 + 6, x2: bx1 + ndl, y1: cy, y2: cy, stroke: "var(--steel)", "stroke-width": 1.4 }, v);
+      tx(v, W - 2, cy + 4.5, f2(d.b), "vl", 13.5, "end"); if (!narrow) tx(v, W - 50, cy + 4.5, `+${f2(d.b - d.a)}`, "tk", 11.5, "end");
+      pts.push({ x: x(d.b), y: cy, r: 8, fn: () => [d.n, [[`${f2(d.b)}명`, "2026년 2분기"], [`${f2(d.a)}명`, "2014년 4분기"], [`+${f2(d.b - d.a)}명`, "늘어난 양"], [`${fmt(d.d14)} → ${fmt(d.doc)}명`, "의사 수"]]] });
+    });
+    tx(v, x(NAT) + 4, H - 6, `전국 ${f2(NAT)}`, "lb halo", 11.5, "start", { "stroke-width": 4 });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 시도를 옮겨 볼 수 있다");
+  }
+  table("t3", ["시도", "2014년", "2026년", "늘어난 양", "의사 2014", "의사 2026"], SD.map((d) => [d.n, f2(d.a), f2(d.b), "+" + f2(d.b - d.a), fmt(d.d14), fmt(d.doc)]));
+
+  /* ---------- 4. specialty map ---------- */
+  const SPK = ["소아청소년과", "산부인과", "응급의학과", "정신건강의학과", "안과", "피부과", "성형외과"]; let sp4 = SPK[0];
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const j = DATA.SPEC.indexOf(sp4), tot = DATA.natSpec[j];
+    const W = Math.max(280, box.clientWidth), sc = W / (GX1 - GX0), H = (GY1 - GY0) * sc, FX0 = GX0, FY0 = GY0;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${sp4} 전문의가 일하는 시군구 지도. 붉은 곳은 전문의가 한 명도 없는 곳` }, box);
+    const g = s("g", { transform: `translate(${-FX0 * sc},${-FY0 * sc}) scale(${sc})` }, v);
+    DATA.U.forEach(([code, d]) => { const p = byCode.get(code); s("path", { d, fill: p && p.spec[j] === 0 ? "var(--zero)" : "var(--q0)", stroke: "var(--card)", "stroke-width": .5 / sc }, g); });
+    DATA.sidoPaths.forEach((sp) => s("path", { d: sp.d, fill: "none", stroke: "var(--axis)", "stroke-width": .9 / sc }, g));
+    const mx = Math.max(...P.map((p) => p.spec[j])), R = (W < 400 ? 13 : 19) / sc, pts = [];
+    [...P].sort((a, b) => b.spec[j] - a.spec[j]).forEach((p) => { if (p.spec[j] > 0) s("circle", { cx: p.x, cy: p.y, r: Math.sqrt(p.spec[j] / mx) * R, fill: "var(--bub)", "fill-opacity": .38, stroke: "var(--bub)", "stroke-width": .7 / sc }, g); });
+    P.forEach((p) => pts.push({ x: (p.x - FX0) * sc, y: (p.y - FY0) * sc, r: Math.max(4, Math.sqrt(p.spec[j] / mx) * R * sc), fn: () => [`${p.s} ${p.n}`, [[`${fmt(p.spec[j])}명`, `${sp4} 전문의`], [`${fmt(p.pop)}명`, "인구"], [p.spec[j] ? `${f2(p.spec[j] / p.pop * 1e5)}명` : "0명", "인구 10만 명당"]]] }));
+    const zero = P.filter((p) => p.spec[j] === 0), seoul = P.filter((p) => p.s === "서울").reduce((a, p) => a + p.spec[j], 0), top = [...P].sort((a, b) => b.spec[j] - a.spec[j]).slice(0, 5);
+    const st = document.getElementById("st4"); st.replaceChildren(`${sp4} 전문의 `, bEl(`${fmt(tot)}명`), " · 한 명도 없는 시군구 ", bEl(`${zero.length}곳`), " · 서울에 ", bEl(pc(seoul / tot * 100)));
+    document.getElementById("z4").textContent = zero.length ? zero.map((p) => `${p.s} ${p.n}`).join(", ") : "없음";
+    document.getElementById("m4").textContent = top.map((p) => `${p.s} ${p.n} ${fmt(p.spec[j])}명`).join(", ");
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 시군구를 옮겨 볼 수 있다");
+  }
+  chips("k4", SPK.map((k) => [k, k]), sp4, (k) => { sp4 = k; c4(); });
+  table("t4", ["전문과목", "전문의", "0명인 시군구", "서울 비중", "가장 많은 곳"], DATA.SPEC.map((name, j) => { const z = P.filter((p) => p.spec[j] === 0).length, se = P.filter((p) => p.s === "서울").reduce((a, p) => a + p.spec[j], 0), t = [...P].sort((a, b) => b.spec[j] - a.spec[j])[0]; return [name, fmt(DATA.natSpec[j]), z + "곳", pc(se / DATA.natSpec[j] * 100), `${t.s} ${t.n} ${fmt(t.spec[j])}명`]; }));
+
+  /* ---------- 5. coats on hangers ---------- */
+  const QN = DATA.qper.length, QA = DATA.Q["전체"], QS = DATA.Q["서울"], TR = DATA.qper.map((_, k) => QA["인턴"][k] + QA["레지던트"][k]), kBase = DATA.qper.indexOf("2023.4/4"), NH = Math.round(Math.max(...TR) / 500);
+  const qlab = (k) => DATA.qper[k].replace(/(\d{4})\.(\d)\/4/, "$1.$2Q");
+  function coat(g, x, y, u, on) {
+    // hanger hook + bar, then the coat (or just the empty hanger)
+    s("path", { d: `M${x},${y - u * .16} q${u * .12},${-u * .16} 0,${-u * .26} q${-u * .1},${-u * .02} ${-u * .1},${u * .08}`, fill: "none", stroke: "var(--hanger)", "stroke-width": 1.3, "stroke-linecap": "round" }, g);
+    s("path", { d: `M${x - u * .44},${y + u * .06} L${x},${y - u * .16} L${x + u * .44},${y + u * .06}`, fill: "none", stroke: "var(--hanger)", "stroke-width": 1.5, "stroke-linecap": "round", "stroke-linejoin": "round" }, g);
+    if (!on) { s("line", { x1: x - u * .44, x2: x + u * .44, y1: y + u * .06, y2: y + u * .06, stroke: "var(--gone)", "stroke-width": 1.5, "stroke-dasharray": "3 3" }, g); return; }
+    s("path", { d: `M${x - u * .16},${y - u * .08} L${x - u * .5},${y + u * .1} L${x - u * .62},${y + u * .62} L${x - u * .42},${y + u * .66} L${x - u * .38},${y + u * .34} L${x - u * .36},${y + u * 1.36} L${x + u * .36},${y + u * 1.36} L${x + u * .38},${y + u * .34} L${x + u * .42},${y + u * .66} L${x + u * .62},${y + u * .62} L${x + u * .5},${y + u * .1} L${x + u * .16},${y - u * .08} L${x},${y + u * .22} Z`, fill: "var(--coat)", stroke: "var(--coat-edge)", "stroke-width": 1, "stroke-linejoin": "round" }, g);
+    s("line", { x1: x, x2: x, y1: y + u * .22, y2: y + u * 1.12, stroke: "var(--coat-edge)", "stroke-width": .8 }, g);
+    s("rect", { x: x + u * .1, y: y + u * .42, width: u * .16, height: u * .12, fill: "none", stroke: "var(--coat-edge)", "stroke-width": .7 }, g);
+    s("path", { d: `M${x - u * .22},${y + u * .5} h${u * .1} m${-u * .05},${-u * .05} v${u * .1}`, stroke: "var(--cross)", "stroke-width": 1.4, fill: "none" }, g);
+  }
+  function draw5(pos) {
+    const box = document.getElementById("c5"); const k = Math.min(QN - 1, Math.floor(pos + 1e-6));
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, per = narrow ? 7 : 14, rows = Math.ceil(NH / per), cw = Math.min(64, W / per), u = cw * .62, rh = u * 2.0, H = rows * rh + 14, x0 = (W - per * cw) / 2;
+    const n = Math.round(TR[k] / 500);
+    box.replaceChildren();
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${qlab(k)} 전공의 ${fmt(TR[k])}명을 가운 ${n}벌로 그린 그림. 옷걸이는 ${NH}개` }, box);
+    for (let r = 0; r < rows; r++) s("line", { x1: x0, x2: x0 + per * cw, y1: 6 + r * rh, y2: 6 + r * rh, stroke: "var(--axis)", "stroke-width": 2, "stroke-linecap": "round" }, v);
+    for (let i = 0; i < NH; i++) coat(v, x0 + (i % per) * cw + cw / 2, 6 + Math.floor(i / per) * rh + u * .42, u, i < n);
+    const st = document.getElementById("st5"); st.replaceChildren(`${qlab(k)} · 전공의 `, bEl(`${fmt(TR[k])}명`), ` (인턴 ${fmt(QA["인턴"][k])} + 레지던트 ${fmt(QA["레지던트"][k])}) · 일반의 ${fmt(QA["일반의"][k])}명 · 전문의 ${fmt(QA["전문의"][k])}명 · 서울 의사 비중 `, bEl(pc(QS["의사"][k] / QA["의사"][k] * 100)));
+  }
+  const pl5 = Player("p5", "전공의 수", draw5, QN, qlab, 9);
+  table("t5", ["분기", "의사", "전문의", "일반의", "인턴", "레지던트", "전공의 합", "서울 의사", "서울 비중"], DATA.qper.map((q, k) => [q, fmt(QA["의사"][k]), fmt(QA["전문의"][k]), fmt(QA["일반의"][k]), fmt(QA["인턴"][k]), fmt(QA["레지던트"][k]), fmt(TR[k]), fmt(QS["의사"][k]), pc(QS["의사"][k] / QA["의사"][k] * 100)]));
+
+  /* ---------- first view + resize ---------- */
+  const growOn = (el, set, draw) => { if (!once(el, () => { const t0 = performance.now(); const tick = (now) => { const k = Math.min(1, (now - t0) / 900); set(1 - Math.pow(1 - k, 3)); draw(); if (k < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); })) return; set(0); };
+  drawGuess(); build1(); card();
+  growOn(document.getElementById("c2"), (g) => { grow2 = g; }, c2); c2();
+  growOn(document.getElementById("c3"), (g) => { grow3 = g; }, c3); c3();
+  c4(); pl5.render();
+  onResize(() => { grow2 = 1; grow3 = 1; drawGuess(); build1(); c2(); c3(); c4(); pl5.render(); });
+})();
+</script>

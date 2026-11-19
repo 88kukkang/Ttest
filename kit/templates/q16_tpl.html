@@ -1,0 +1,324 @@
+<title>배양 접시 시계</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: six petri dishes that double as 52-week clocks. A hand sweeps round each dish and colonies of that germ grow where
+   it passes, as many as the weekly lab reports. Below, eight years of outbreaks as plates on a table, and a school meal tray
+   whose compartments resize between patients and outbreaks. */
+:root {
+  --paper: #f3f2ee; --card: #fdfcfa; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #dbe1dd; --grid: #e8e7e3; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --accent: #3e6f90; --agar: #f4e6c8; --agar2: #ead0b9; --glass: #c6d6cc; --hand: #2f3133;
+  --winter: #3e6f90; --summer: #d56b41; --plate: #ffffff; --plate-rim: #dbe1dd; --tray: #c6d6cc; --tray2: #a7c4c2;
+  --g-noro: #3e6f90; --g-rota: #689daf; --g-sal: #d56b41; --g-camp: #9b3737; --g-perf: #80a15a; --g-epec: #b87b68;
+  --summer-ink: #a8451f;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #8eabc9; --agar: #3a3431; --agar2: #4c433e; --glass: #5f6062; --hand: #ebeeec;
+  --winter: #8eabc9; --summer: #dc8c67; --plate: #34373a; --plate-rim: #4c4d50; --tray: #416e59; --tray2: #3e6f42;
+  --g-noro: #8eabc9; --g-rota: #8ab5bb; --g-sal: #dc8c67; --g-camp: #cd9886; --g-perf: #abc07b; --g-epec: #dabea9; --summer-ink: #dc8c67; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #8eabc9; --agar: #3a3431; --agar2: #4c433e; --glass: #5f6062; --hand: #ebeeec;
+  --winter: #8eabc9; --summer: #dc8c67; --plate: #34373a; --plate-rim: #4c4d50; --tray: #416e59; --tray2: #3e6f42;
+  --g-noro: #8eabc9; --g-rota: #8ab5bb; --g-sal: #dc8c67; --g-camp: #cd9886; --g-perf: #abc07b; --g-epec: #dabea9; --summer-ink: #dc8c67; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+:focus-visible { outline-color: var(--accent) }
+.again { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 999px; padding: 6px 14px; min-height: 40px; cursor: pointer; justify-self: start }
+</style>
+
+<main class="page">
+  <header>
+    <h1>식중독은 여름에만 날까<span>여름이 가장 많은 건 맞다. 그러나 사건 넷 중 하나는 12–3월에 났고, 노로바이러스는 1월에 가장 많이 잡힌다. 균마다 시계가 다르다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 16</dd>
+      <dt>한 줄</dt><dd>식약처 식중독 통계로 2018–2025년 식중독 사건 2,312건(환자 5만 4,967명)을 달별로 보면 6–9월이 사건의 45.8%, 환자의 55.8%다. 그래도 12–3월에도 사건의 24.8%가 났다. 질병관리청 장관감염증 표본감시(2016–2025년)에서 노로바이러스는 1월 셋째 주에 가장 많이 신고되고 신고의 53%가 12–2월에 몰린다. 살모넬라는 8월 말, 캄필로박터는 7월 말이 꼭대기다. 사건은 음식점에서 57.5%가 났지만, 환자는 학교·회사 같은 집단급식소가 39.4%로 가장 많다(한 건에 평균 41명).</dd>
+      <dt>분류</dt><dd>건강·복지·교육</dd>
+      <dt>본능</dt><dd>일반화 본능 · "식중독 = 더운 날 상한 음식"이라는 한 가지 그림으로 모든 식중독을 본다</dd>
+      <dt>그림 방식</dt><dd>배양 접시 시계 · 균마다 배양 접시를 1년짜리 시계로 놓고 바늘이 지나가는 주마다 신고된 만큼 군락이 자란다. 사건은 8년 × 12달의 접시로, 시설은 급식판 칸으로 그렸다</dd>
+      <dt>기간</dt><dd>식중독 사건 2018–2025년 · 장관감염증 신고 2016–2025년</dd>
+      <dt>엮은 데이터</dt><dd>2개 · 식품의약품안전처 식중독 발생현황(KOSIS) · 질병관리청 장관감염증 표본감시</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">대표적인 식중독 원인인 노로바이러스. 1년 가운데 신고가 가장 많은 때는?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>장마철인 7월</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>늦여름인 8–9월</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>한겨울인 1월</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. 1월 셋째 주</span>
+      노로바이러스는 낮은 온도에서 오래 살아남고 사람 사이로도 옮는다. 2016–2025년 신고의 53%가 12–2월에 몰렸고, 6–9월은 14%다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">균마다 다른 시계</h2>
+      <p>배양 접시 하나를 1년짜리 시계로 놓았다. 맨 위가 1월 첫 주이고, 시계 방향으로 돌아 3시 방향이 4월, 6시 방향이 7월, 9시 방향이 10월이다. 바늘이 한 바퀴 도는 동안 그 주에 전국 병원 표본감시에서 신고된 만큼 군락이 자란다(2016–2025년 평균).</p>
+      <p>노로바이러스는 원인이 밝혀진 식중독 사건 가운데 가장 많은 원인이기도 하다(2018–2025년 405건, 살모넬라 319건). 노로바이러스와 로타바이러스 접시는 위쪽(겨울·봄)에 군락이 몰린다. 살모넬라·캄필로박터·장병원성대장균 접시는 아래쪽(여름)에 몰린다. 클로스트리디움 퍼프린젠스는 비교적 고르게 퍼져 있다. 큰 솥에 끓여 식혀 두는 음식에서 계절과 관계없이 자라기 때문이다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">장관감염증 병원체별 주간 신고, 2016–2025년 평균</p>
+      <p class="fs">접시 하나 = 병원체 하나, 맨 위 = 1월 1주, 시계 방향(3시 = 4월, 6시 = 7월, 9시 = 10월). 군락 수는 접시마다 가장 많은 주가 비슷한 수가 되도록 맞췄다(접시 아래 숫자)</p>
+      <button class="again" type="button" id="again">다시 배양하기</button>
+      <div class="chart" id="c1"></div>
+      <figcaption>질병관리청 감염병포털 「장관감염증 표본감시」(전국 약 200개 병원 실험실 신고, 2016년 1주–2025년 52주). 식중독 사건이 아닌 개별 환자 신고이고, 음식 말고 사람 사이로 옮은 경우도 들어 있다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">8년 동안 차린 96개의 접시</h2>
+      <p>식약처가 집계한 식중독 사건(같은 음식으로 2명 넘게 아픈 경우)을 해마다 달별로 접시에 담았다. 접시에 담긴 음식의 양이 환자 수다. 7–9월 접시가 가장 수북하다. 8년 동안 6–9월에 사건의 45.8%, 환자의 55.8%가 몰렸다. 그러나 12–3월 접시도 비어 있지 않다. 사건의 24.8%, 환자의 18.4%다. 가장 큰 접시는 2018년 9월로, 사건 56건에 환자 5,239명이 나왔다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">달별 식중독 사건과 환자, 2018–2025년</p>
+      <p class="fs">접시 하나 = 한 달. 음식 크기 = 환자 수, 숫자 = 사건 수</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>식품의약품안전처 「시도별, 월별 식중독 발생건수 및 환자 현황」(KOSIS). 2020–2021년은 코로나로 외식·급식이 줄어든 해다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">급식판의 칸</h2>
+      <p>식중독이 난 곳을 급식판의 칸으로 나눴다. 칸의 넓이가 환자 수의 몫이다. 학교·회사·병원 같은 집단급식소가 39.4%로 가장 넓다. "사건 수로 보기"를 누르면 칸이 바뀐다. 사건으로는 음식점이 57.5%로 가장 많고 집단급식소는 23.1%다. 집단급식소 사건은 한 번에 평균 41명이 아프다. 음식점(15명)의 세 배 가까이다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">식중독이 난 곳, 2018–2025년</p>
+      <p class="fs">급식판 칸 넓이 = 환자(또는 사건) 수의 몫</p>
+      <div class="chips" id="chips3" role="group" aria-label="기준"></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>식품의약품안전처 「시도별, 시설별 식중독 발생건수 및 환자 현황」(KOSIS). 기타·불명 = 야외 행사·식품 판매업 등과 시설이 밝혀지지 않은 경우(2022·2024년의 불명 27건 포함).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">그래서, 식중독은 여름에만 날까</h2>
+      <p>여름에 가장 많지만 여름에만 나지는 않는다. 살모넬라·캄필로박터·병원성대장균처럼 더위에 빨리 자라는 세균은 여름에, 노로바이러스는 겨울에 많다. 겨울 식중독은 끓이지 않은 굴·조개, 오염된 지하수, 그리고 아픈 사람의 손을 거쳐 퍼진다. 손 씻기와 익혀 먹기는 계절을 가리지 않는 예방법이다. 그리고 한 번에 많은 사람이 아픈 곳은 급식이다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>두 자료는 세는 대상이 다르다. 식약처 통계는 "사건"(같은 음식으로 2명 넘게 아픈 집단 발생)이고, 질병관리청 표본감시는 표본 병원에서 균이 확인된 "환자 한 명"이다. 표본감시에는 음식이 아니라 사람 사이에서 옮은 경우도 들어 있다.</li>
+      <li>식약처의 원인균별·시설별·달별 통계는 서로 엮여 있지 않아, 달별 원인균은 표본감시 자료로 보였다.</li>
+      <li>원인균이 밝혀지지 않은 "불명" 사건이 769건(33.3%)이다. 원인균별 몫은 밝혀진 사건만의 이야기다.</li>
+      <li>식품안전나라의 식중독 통계 화면은 이 환경에서 열리지 않아 같은 식약처 통계를 KOSIS에서 받았다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15047682/fileData.do" target="_blank" rel="noopener">식중독 통계 정보</a> (15047682, KOSIS 「식중독 발생현황」 145 DT_145012_A008·A009·A010)</td><td>식품의약품안전처</td><td>시도별·월별, 원인균별, 시설별 사건 수와 환자 수(전국 합계)</td><td>2018–2025</td></tr>
+        <tr><td><a href="https://dportal.kdca.go.kr/pot/is/st/gstrnftn.do" target="_blank" rel="noopener">장관감염증 표본감시</a> (감염병포털)</td><td>질병관리청</td><td>병원체 10종의 주별 신고 수</td><td>2016–2025</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>식중독 사건 2,312건 · 표본감시 신고 16만 7천여 건(병원체 10종, 520주)</dd>
+      <dt>도구</dt><dd>Python(집계) · SVG 배양 접시 시계, 접시, 급식판 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>주·달별 계절 분포 · 시설별 사건당 환자 수</dd>
+      <dt>검증</dt><dd>KOSIS 세 표의 해마다 총계(사건·환자)가 서로 같은지 확인했다(예: 2025년 319건·9,780명). 표본감시는 감염병포털 화면이 쓰는 주별 자료를 그대로 받았다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>학교 급식 식중독은 줄고 있을까</h3><p>시도별 학교 식중독 통계로 해마다 학교 사건과 환자를 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=145&amp;tblId=DT_145012_A011" target="_blank" rel="noopener">시도별 학교 식중독 발생건수 및 환자 현황</a> · 식품의약품안전처</li></ul></div>
+      <div class="q"><h3>폭염이 오면 식중독도 늘까</h3><p>기상청 식중독지수와 주별 신고를 견주면 기온과 세균성 장염의 관계를 볼 수 있다.</p></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const DISH = [["ND0615", "노로바이러스", "noro", "virus"], ["ND0612", "로타바이러스", "rota", "virus"], ["ND0601", "살모넬라", "sal", "rod"], ["ND0606", "캄필로박터", "camp", "spiral"], ["ND0605", "장병원성대장균", "epec", "rod"], ["ND0607", "퍼프린젠스", "perf", "rod"]];
+  // one colony per `per` reports, chosen per dish so its busiest week grows about 14 colonies: the dishes compare seasons, not sizes
+  const perOf = (code, top = 14) => { const m = Math.max(...DATA.P[code].avg) / top; return m >= 5 ? Math.round(m / 5) * 5 : Math.max(1, Math.round(m)); };
+  const MON = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+  // deterministic pseudo-random numbers so colonies sit in the same places every time
+  const rnd = (seed) => { let x = Math.sin(seed * 9301 + 49297) * 233280; return x - Math.floor(x); };
+
+  /* ---------- 1. petri-dish clocks ---------- */
+  let raf1 = 0;
+  function colony(g, kind, x, y, sz, col, rot) {
+    if (kind === "virus") { // a little spiked ball
+      const gg = s("g", { transform: `translate(${x.toFixed(1)},${y.toFixed(1)})` }, g);
+      for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2 + rot; s("line", { x1: 0, y1: 0, x2: Math.cos(a) * sz * 1.5, y2: Math.sin(a) * sz * 1.5, stroke: col, "stroke-width": .9 }, gg); }
+      s("circle", { r: sz, fill: col }, gg); return gg;
+    }
+    if (kind === "spiral") return s("path", { d: `M${x - sz * 1.4},${y} q${sz * .7},${-sz * 1.2} ${sz * 1.4},0 t${sz * 1.4},0`, fill: "none", stroke: col, "stroke-width": sz * .8, "stroke-linecap": "round", transform: `rotate(${rot * 57.3} ${x} ${y})` }, g);
+    return s("rect", { x: x - sz * 1.5, y: y - sz * .7, width: sz * 3, height: sz * 1.4, rx: sz * .7, fill: col, transform: `rotate(${rot * 57.3} ${x} ${y})` }, g);
+  }
+  function c1(animate) {
+    cancelAnimationFrame(raf1);
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, cols = W >= 860 ? 3 : 2, gap = 14, cw = (W - gap * (cols - 1)) / cols, R = Math.min(140, cw / 2 - 12), cellH = R * 2 + (narrow ? 84 : 76);
+    const H = Math.ceil(DISH.length / cols) * cellH;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "병원체별 주간 신고를 1년 시계 모양 배양 접시로 그린 그림" }, box), pts = [];
+    const dishes = DISH.map(([code, name, key, kind], i) => { const per = perOf(code, narrow ? 8 : 14);
+      const P = DATA.P[code], cx = (i % cols) * (cw + gap) + cw / 2, cy = Math.floor(i / cols) * cellH + 30 + R, col = `var(--g-${key})`;
+      tx(v, cx, cy - R - 14, name, "vl", 14, "middle");
+      // dish: glass rim, agar, season quadrants
+      s("circle", { cx, cy, r: R + 5, fill: "none", stroke: "var(--glass)", "stroke-width": 3 }, v);
+      s("circle", { cx, cy, r: R, fill: "var(--agar)" }, v);
+      [["겨울", -Math.PI / 2 - .05], ["봄", 0], ["여름", Math.PI / 2], ["가을", Math.PI]].forEach(([t, a], k) => {
+        const lx = cx + Math.cos(a) * (R - 12), ly = cy + Math.sin(a) * (R - 12) + 4;
+        if (k === 0) return; tx(v, lx, ly, t, "mt", 11, "middle", { opacity: .9 });
+      });
+      tx(v, cx, cy - R + 14, "1월", "mt", 11, "middle");
+      for (let m = 0; m < 12; m++) { const a = m / 12 * Math.PI * 2 - Math.PI / 2; s("line", { x1: cx + Math.cos(a) * (R - 4), y1: cy + Math.sin(a) * (R - 4), x2: cx + Math.cos(a) * R, y2: cy + Math.sin(a) * R, stroke: "var(--agar2)", "stroke-width": 1.4 }, v); }
+      const g = s("g", {}, v), hand = s("line", { x1: cx, y1: cy, x2: cx, y2: cy - R + 6, stroke: "var(--hand)", "stroke-width": 1.6, "stroke-linecap": "round", opacity: 0 }, v);
+      s("circle", { cx, cy, r: 3, fill: "var(--hand)" }, v);
+      // colonies: per week, count = avg/per, placed in that week's wedge
+      const cols_ = []; let seed = i * 1000;
+      P.avg.forEach((val, w) => {
+        const n = Math.round(val / per), a0 = w / 52 * Math.PI * 2 - Math.PI / 2;
+        for (let k = 0; k < n; k++) {
+          const a = a0 + rnd(++seed) * (Math.PI * 2 / 52), rr = (.16 + .78 * Math.sqrt(rnd(++seed))) * (R - 8), sz = (narrow ? 1.5 : 2) + rnd(++seed) * (narrow ? 1.2 : 1.8);
+          cols_.push({ w, x: cx + Math.cos(a) * rr, y: cy + Math.sin(a) * rr, sz, rot: rnd(++seed) * 6.28 });
+        }
+      });
+      const els = cols_.map((c) => { const e = colony(g, kind, c.x, c.y, c.sz, col, c.rot); return { e, w: c.w }; });
+      const peak = P.avg.indexOf(Math.max(...P.avg)) + 1, win = [...P.avg.slice(0, 9), ...P.avg.slice(47)].reduce((a, b) => a + b, 0) / P.avg.reduce((a, b) => a + b, 0) * 100;
+      tx(v, cx, cy + R + 24, `가장 많은 때 ${Math.ceil(peak / 4.35)}월 · 12–2월 ${Math.round(win)}%`, "lb", narrow ? 11.5 : 12.5, "middle");
+      tx(v, cx, cy + R + (narrow ? 40 : 42), `군락 하나 = 신고 ${per}건`, "mt", 11.5, "middle");
+      pts.push({ x: cx, y: cy, r: R, fn: () => [name, [[`${peak}주`, "신고가 가장 많은 주"], [`${Math.round(win)}%`, "12–2월에 신고된 몫"], [fmt(P.tot) + "건", "2016–2025년 신고"]]] });
+      return { els, hand, cx, cy, R };
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 접시를 옮겨 볼 수 있다");
+    if (!animate || reduce) return;
+    dishes.forEach((d) => { d.els.forEach((o) => o.e.setAttribute("opacity", 0)); d.hand.setAttribute("opacity", .8); });
+    const t0 = performance.now(), dur = 5200;
+    const tick = (now) => {
+      const t = Math.min(1, (now - t0) / dur), wk = t * 52, a = t * Math.PI * 2 - Math.PI / 2;
+      dishes.forEach((d) => {
+        d.hand.setAttribute("x2", d.cx + Math.cos(a) * (d.R - 6)); d.hand.setAttribute("y2", d.cy + Math.sin(a) * (d.R - 6));
+        d.els.forEach((o) => { if (o.w <= wk && o.e.getAttribute("opacity") === "0") o.e.setAttribute("opacity", 1); });
+      });
+      if (t < 1) raf1 = requestAnimationFrame(tick); else dishes.forEach((d) => d.hand.setAttribute("opacity", 0));
+    };
+    raf1 = requestAnimationFrame(tick);
+  }
+  document.getElementById("again").addEventListener("click", () => c1(true));
+  {
+    const rows = []; for (let m = 0; m < 12; m++) { const ws = [...Array(52).keys()].filter((w) => Math.min(11, Math.floor(w / (52 / 12))) === m); rows.push([MON[m], ...DISH.map(([code]) => f1(ws.reduce((a, w) => a + DATA.P[code].avg[w], 0) / ws.length))]); }
+    table("t1", ["달(주 평균)", ...DISH.map((d) => d[1])], rows);
+  }
+
+  /* ---------- 2. plates ---------- */
+  const YS = Object.keys(DATA.mon);
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, l = narrow ? 34 : 44, top = 22, cw = (W - l) / 12, ch = Math.max(cw, narrow ? 30 : 0), H = top + YS.length * ch + 6, R = Math.min(cw, ch) / 2 - 2;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "2018–2025년 달별 식중독 사건과 환자 수를 접시로 그린 그림" }, box), pts = [];
+    MON.forEach((m, i) => tx(v, l + i * cw + cw / 2, 14, narrow ? String(i + 1) : m, "tk", 11.5, "middle", { style: `fill:${i >= 5 && i <= 8 ? "var(--summer-ink)" : i === 11 || i <= 2 ? "var(--winter)" : "var(--muted)"}` }));
+    const maxP = Math.max(...YS.flatMap((y) => DATA.mon[y].map((x) => x[1])));
+    YS.forEach((y, yi) => {
+      tx(v, l - 6, top + yi * ch + ch / 2 + 4, y, "tk", 11.5, "end");
+      DATA.mon[y].forEach(([c, p], mi) => {
+        const cx = l + mi * cw + cw / 2, cy = top + yi * ch + ch / 2, food = Math.sqrt(p / maxP) * (R - 3);
+        const g = s("g", { class: "plate" }, v);
+        s("circle", { cx, cy, r: R, fill: "var(--plate)", stroke: "var(--plate-rim)", "stroke-width": 1 }, g);
+        s("circle", { cx, cy, r: R * .72, fill: "none", stroke: "var(--plate-rim)", "stroke-width": .8 }, g);
+        const f = s("circle", { cx, cy, r: food, fill: mi >= 5 && mi <= 8 ? "var(--summer)" : mi === 11 || mi <= 2 ? "var(--winter)" : "var(--ghost)", opacity: .85 }, g);
+        if (!reduce) { f.style.transformOrigin = `${cx}px ${cy}px`; f.style.transform = "scale(0)"; f.style.transition = `transform .5s cubic-bezier(.3,1.6,.5,1) ${(yi * 12 + mi) * 12}ms`; }
+        if (!narrow && c) tx(g, cx, cy + 4, String(c), "tk halo", 11, "middle", { style: "fill:var(--ink);stroke:var(--plate)", "stroke-width": 3 });
+        pts.push({ x: cx, y: cy, r: R, fn: () => [`${y}년 ${MON[mi]}`, [[fmt(c) + "건", "사건"], [fmt(p) + "명", "환자"]]] });
+      });
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 달을 옮겨 볼 수 있다");
+    if (!reduce) { const io = new IntersectionObserver((e) => { if (e.some((x) => x.isIntersecting)) { io.disconnect(); v.querySelectorAll(".plate circle:nth-child(3)").forEach((c) => { c.style.transform = "scale(1)"; }); } }, { threshold: .2 }); io.observe(box); }
+  }
+  table("t2", ["연도", ...MON.map((m) => m + " 사건/환자")], YS.map((y) => [y, ...DATA.mon[y].map(([c, p]) => `${fmt(c)} / ${fmt(p)}`)]));
+
+  /* ---------- 3. meal tray ---------- */
+  const AF = DATA.agg.fac;
+  const FAC = [["음식점(식품접객업체)", AF["식품접객업체"]], ["집단급식소(학교·회사 등)", AF["집단급식소"]], ["기타·불명", [AF["기타"][0] + AF["불명"][0], AF["기타"][1] + AF["불명"][1]]], ["가정집", AF["가정집"]]].map(([name, [c, p]]) => ({ name, c, p }));
+  let trayBy = "p", trayEls = null;
+  chips("chips3", [["p", "환자 수로 보기"], ["c", "사건 수로 보기"]], trayBy, (k) => { trayBy = k; layoutTray(true); });
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), TW = Math.min(W, 640), H = Math.round(TW * .62), x0 = (W - TW) / 2;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "식중독이 난 곳의 몫을 급식판 칸으로 그린 그림" }, box), pts = [];
+    s("rect", { x: x0 + 2, y: 2, width: TW - 4, height: H - 4, rx: 26, fill: "var(--tray)" }, v);
+    const pad = 16, inner = { x: x0 + pad, y: pad, w: TW - pad * 2, h: H - pad * 2 };
+    const cols = ["#dc8c67", "#8eabc9", "#abc07b", "#d6b0a7"]; // light fills in both themes so the dark labels stay readable
+    trayEls = FAC.map((f, i) => {
+      const r = s("rect", { rx: 14, fill: cols[i] }, v);
+      const t1 = tx(v, 0, 0, f.name, "vl", 13, "middle", { style: "fill:#1d1e1f" }), t2 = tx(v, 0, 0, "", "vl", 20, "middle", { style: "fill:#1d1e1f" });
+      pts.push({ x: 0, y: 0, r: 30, fn: () => [f.name, [[fmt(f.p) + "명", "환자"], [fmt(f.c) + "건", "사건"], [f1(f.p / f.c) + "명", "사건 한 번에"]]], ref: i });
+      return { r, t1, t2, f };
+    });
+    trayEls.inner = inner; trayEls.pts = pts; trayEls.v = v;
+    layoutTray(false);
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 칸을 옮겨 볼 수 있다");
+  }
+  // slice-and-dice treemap inside the tray: first column = the biggest compartment, the rest stacked on the right
+  function rects(by, inner) {
+    const vals = FAC.map((f) => f[by]), tot = vals.reduce((a, b) => a + b, 0), g = 10;
+    const order = vals.map((v_, i) => i).sort((a, b) => vals[b] - vals[a]);
+    const out = []; const first = order[0], w0 = (inner.w - g) * vals[first] / tot;
+    out[first] = { x: inner.x, y: inner.y, w: w0, h: inner.h };
+    const rest = order.slice(1), rt = rest.reduce((a, i) => a + vals[i], 0); let y = inner.y;
+    rest.forEach((i, k) => { const h = (inner.h - g * (rest.length - 1)) * vals[i] / rt; out[i] = { x: inner.x + w0 + g, y, w: inner.w - w0 - g, h: Math.max(h, 2) }; y += h + g; });
+    return out.map((r, i) => ({ ...r, share: vals[i] / tot * 100 }));
+  }
+  let raf3 = 0;
+  function layoutTray(animate) {
+    if (!trayEls) return; cancelAnimationFrame(raf3);
+    const to = rects(trayBy, trayEls.inner), from = trayEls.map((e) => e.cur || to[trayEls.indexOf(e)]);
+    const apply = (t) => trayEls.forEach((e, i) => {
+      const a = from[i], b = to[i], q = (k) => a[k] + (b[k] - a[k]) * t, r = { x: q("x"), y: q("y"), w: q("w"), h: q("h"), share: q("share") };
+      e.cur = r; e.r.setAttribute("x", r.x); e.r.setAttribute("y", r.y); e.r.setAttribute("width", Math.max(0, r.w)); e.r.setAttribute("height", Math.max(0, r.h));
+      const big = r.h > 54 && r.w > 90, mid = r.h > 22;
+      e.t1.setAttribute("x", r.x + r.w / 2); e.t1.setAttribute("y", r.y + r.h / 2 - (big ? 6 : -4)); e.t1.setAttribute("opacity", mid && r.w > 70 ? 1 : 0);
+      e.t1.textContent = r.w < 170 ? e.f.name.replace(/\(.*\)/, "") : e.f.name;
+      e.t2.setAttribute("x", r.x + r.w / 2); e.t2.setAttribute("y", r.y + r.h / 2 + 20); e.t2.setAttribute("opacity", big ? 1 : 0); e.t2.textContent = pc(r.share);
+      trayEls.pts[i].x = r.x + r.w / 2; trayEls.pts[i].y = r.y + r.h / 2; trayEls.pts[i].r = Math.max(8, Math.min(r.w, r.h) / 2);
+    });
+    if (!animate || reduce) { apply(1); return; }
+    const t0 = performance.now(); const step = (now) => { const t = Math.min(1, (now - t0) / 700), e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; apply(e); if (t < 1) raf3 = requestAnimationFrame(step); }; raf3 = requestAnimationFrame(step);
+  }
+  table("t3", ["시설", "사건", "사건 몫", "환자", "환자 몫", "사건 한 번에 환자"], FAC.map((f) => [f.name, fmt(f.c), pc(f.c / FAC.reduce((a, x) => a + x.c, 0) * 100), fmt(f.p), pc(f.p / FAC.reduce((a, x) => a + x.p, 0) * 100), f1(f.p / f.c)]));
+
+  let ran = false;
+  const io1 = new IntersectionObserver((e) => { if (!ran && e.some((x) => x.isIntersecting)) { ran = true; c1(true); } }, { threshold: .2 });
+  io1.observe(document.getElementById("c1"));
+  const all = () => { c1(false); c2(); c3(); };
+  all(); onResize(all);
+})();
+</script>

@@ -1,0 +1,342 @@
+<title>동네 강아지</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: the reader guesses how many registered dogs live in 100 households, shown as a street of 100 houses. Then a
+   dot map where each dot is 1,000 registered dogs scattered inside its district (switchable to a map coloured by dogs
+   per 100 households), two walking paths of dogs for the ten highest and lowest districts, bars by province and by
+   district type, and a small yard of cats. */
+:root {
+  --paper: #f4f2ec; --card: #fcfbf7; --ink: #2c2c2a; --ink2: #494843; --muted: #5d5b55; --line: #e1ddd3; --grid: #eae7de; --axis: #a7a8a3;
+  --accent: #8b4d3e; --intl: #8b4d3e; --board: #2c2c2a; --board-ink: #f4f2ec; --sea: #fcfbf7;
+  --dog: #8b4d3e; --dog-ink: #7a4033; --dog2: #cd9886; --cat: #4e6aa9; --cat-ink: #3f5890; --house: #d8d2c4; --roof: #b6a392; --me: #d56b41; --me-ink: #a8451f;
+  --q0: #f1ede3; --q1: #e2ccb5; --q2: #d8b29b; --q3: #b87b68; --q4: #8b4d3e; --land: #efece4;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1c1a19; --card: #262322; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3b3735; --grid: #302d2b; --axis: #62635d;
+  --accent: #cd9886; --intl: #cd9886; --board: #dcd9cf; --board-ink: #1c1a19; --sea: #262322;
+  --dog: #d8b29b; --dog-ink: #e2ccb5; --dog2: #8b4d3e; --cat: #8eabc9; --cat-ink: #abbdc9; --house: #4c433e; --roof: #67453c; --me: #dc8c67; --me-ink: #e7a08a;
+  --q0: #2d2a28; --q1: #4c433e; --q2: #67453c; --q3: #8b4d3e; --q4: #d8b29b; --land: #2d2a28; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1c1a19; --card: #262322; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3b3735; --grid: #302d2b; --axis: #62635d;
+  --accent: #cd9886; --intl: #cd9886; --board: #dcd9cf; --board-ink: #1c1a19; --sea: #262322;
+  --dog: #d8b29b; --dog-ink: #e2ccb5; --dog2: #8b4d3e; --cat: #8eabc9; --cat-ink: #abbdc9; --house: #4c433e; --roof: #67453c; --me: #dc8c67; --me-ink: #e7a08a;
+  --q0: #2d2a28; --q1: #4c433e; --q2: #67453c; --q3: #8b4d3e; --q4: #d8b29b; --land: #2d2a28; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.di { fill: var(--dog-ink) } .ci { fill: var(--cat-ink) } .mi { fill: var(--me-ink) }
+::selection { background: var(--dog2); color: #1c1a19 }
+.btn { font: inherit; font-size: 15px; font-weight: 600; color: var(--paper); background: var(--ink); border: 0; border-radius: 10px; padding: 10px 18px; min-height: 46px; cursor: pointer }
+.btn:hover { background: var(--intl) } .btn[disabled] { opacity: .45; cursor: default }
+.guess .row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap }
+.guess input[type=range] { flex: 1 1 220px; min-width: 0; height: 40px; accent-color: var(--me) }
+.guess output { font: 600 28px/1 var(--mono); font-variant-numeric: tabular-nums; min-width: 4ch; text-align: right }
+.mapwrap { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 22px; align-items: start }
+@media (max-width: 800px) { .mapwrap { grid-template-columns: minmax(0, 1fr) } }
+.side { display: grid; gap: 12px; font-size: 13.5px; color: var(--ink2); min-width: 0 }
+.side ol { margin: 0; padding: 0; list-style: none } .side li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--grid) } .side li b { font-variant-numeric: tabular-nums; white-space: nowrap }
+.find { display: grid; gap: 6px; font-size: 13.5px; color: var(--ink2) }
+.find input { font: inherit; font-size: 16px; color: var(--ink); background: var(--paper); border: 1px solid var(--axis); border-radius: 10px; padding: 9px 12px; min-height: 46px; width: 100% }
+.pcard { border: 1px solid var(--line); border-left: 4px solid var(--me); border-radius: 10px; padding: 12px 14px; background: var(--paper); display: grid; gap: 4px; min-height: 110px }
+.pcard .nm { font-weight: 700; font-size: 16px } .pcard .bigv { font: 600 28px/1.15 var(--mono); font-variant-numeric: tabular-nums } .pcard .bigv small { font: 500 13px var(--sans); color: var(--muted); margin-left: 6px } .pcard p { margin: 0; font-size: 13.5px }
+.pop { transform-box: fill-box; transform-origin: 50% 100%; animation: pop .5s ease-out both }
+@keyframes pop { 0% { transform: scale(.2); opacity: 0 } 70% { transform: scale(1.15); opacity: 1 } 100% { transform: scale(1) } }
+@media (prefers-reduced-motion: reduce) { .pop { animation: none } }
+</style>
+
+<main class="page">
+  <header>
+    <h1>반려견 등록은 어디서 가장 많을까<span>수로는 경기도 큰 도시, 집집마다로 보면 서울 가까운 군과 시다. 2022년 말까지 등록된 개는 302만 5,859마리로 전국 100세대에 12.8마리꼴이다. 경기 수원시(7만 5,009마리)와 고양시가 가장 많고, 세대 수로 나누면 경기 양평군이 100세대에 21.6마리로 가장 많다. 전남 신안군은 2.8마리로 여덟 배 차이가 난다. 서울은 12.1마리로 전국 평균보다 조금 적다.</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 48</dd>
+      <dt>한 줄</dt><dd>농림축산검역본부의 행정구역별 반려동물 등록 누계(2022년 말)를 시군구 229곳의 주민등록 세대수로 나눴다. 100세대당 개는 제주 17.0, 인천 15.3, 경기 15.2마리가 많고, 세종 9.2, 경북 9.5, 전북 9.7마리가 적다. 군(10.2마리)이 시(13.2마리)보다 적지만, 양평·가평·포천처럼 수도권 바깥 고리의 군과 시가 가장 많다.</dd>
+      <dt>분류</dt><dd>생활·문화</dd>
+      <dt>본능</dt><dd>일반화 본능 · "반려견은 아파트 많은 대도시에서 키운다"고 한데 묶지만, 집집마다로 나누면 서울 도심보다 서울 둘레의 전원 지역이 앞선다</dd>
+      <dt>그림 방식</dt><dd>동네 강아지 · 독자가 100세대의 개를 먼저 맞혀 본다. 점 하나가 개 1천 마리인 점묘 지도(100세대당 색칠 지도로 바꾸기, 우리 동네 찾기), 많은 곳·적은 곳 산책길, 시도와 구·시·군 막대, 고양이 마당</dd>
+      <dt>기간</dt><dd>2022년 12월 31일 누계(인구·세대는 2022년 12월)</dd>
+      <dt>엮은 데이터</dt><dd>3개 · 행정구역별 반려동물 등록 개체 수 현황 · 주민등록 세대수 · 주민등록인구</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">우리나라 100세대에 등록된 개는 몇 마리쯤일까? 막대를 움직여 답해 보자.</h2>
+    <div class="guess">
+      <div class="chart" id="gq"></div>
+      <div class="row">
+        <input type="range" id="gin" min="0" max="50" step="1" value="0" aria-label="100세대당 등록된 개의 수">
+        <output id="gout" for="gin">0마리</output>
+        <button class="btn" type="button" id="gbtn" disabled>확인</button>
+      </div>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="greveal" hidden>
+      <span class="big">100세대에 <span class="n">12.8마리</span></span>
+      <span id="gmsg"></span> 2022년 말까지 등록된 개 302만 5,859마리를 주민등록 세대 2,370만 5,814세대로 나눴다. 주민 1,000명에 59마리꼴이다. 등록하지 않은 개는 세지 않으므로 실제로 사는 개는 이보다 많다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">점 하나에 1천 마리</h2>
+      <p>등록된 개 1,000마리를 점 하나로 바꿔 그 시군구 안에 흩어 찍었다. 점 3천여 개가 수도권에 짙게 모인다. 경기도(89만 8,590마리)와 서울(53만 7,884마리)이 전국의 47%다. 수원·고양·용인·성남이 가장 빽빽하다.</p>
+      <p><b>100세대당</b>을 누르면 같은 지도를 세대 수로 나눈 값으로 칠한다. 그러면 짙은 곳이 서울 바깥으로 밀려난다. 양평군(21.6마리), 가평군(19.7), 포천시(18.4), 남양주시(16.8)처럼 서울을 둘러싼 고리가 짙고, 제주시(17.7)도 짙다. 아래 칸에 사는 곳을 적으면 그곳의 숫자가 나온다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">시군구별 등록된 개, 2022년 말</p>
+      <p class="fs" id="fs1"></p>
+      <div class="chips" id="k1" role="group" aria-label="지도 방식"></div>
+      <div class="mapwrap">
+        <div class="chart" id="c1"></div>
+        <div class="side">
+          <label class="find">우리 동네 찾기<input id="find" list="plist" placeholder="예: 양평군, 마포구" autocomplete="off"></label>
+          <datalist id="plist"></datalist>
+          <div class="pcard" id="pcard" aria-live="polite"></div>
+          <div class="legend" id="lg1"></div>
+        </div>
+      </div>
+      <figcaption>농림축산식품부 농림축산검역본부 「행정구역별 반려동물 등록 개체 수 현황」(공공데이터포털 15125454, 2022년 12월 31일 누계). 세대·인구: 행정안전부 주민등록(KOSIS 101 DT_1B040B3, DT_1B040A3, 2022년 12월). 점의 자리는 시군구 안에 무작위로 놓았고 실제 위치가 아니다. 구가 있는 시는 시 하나로 합쳤다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">산책길 두 줄</h2>
+      <p>100세대당 등록된 개가 가장 많은 열 곳과 가장 적은 열 곳을 산책길에 세웠다. 개 하나가 100세대당 한 마리다. 위 길의 맨 앞 양평군은 22마리, 아래 길의 맨 뒤 신안군은 3마리다.</p>
+      <p>위 길에는 경기의 군과 시가 일곱 곳이다. 아래 길은 섬이 많은 군(신안, 울릉, 옹진, 완도)과 경북 북부의 군(봉화, 의성, 청송)이다. 개를 덜 키워서인지, 등록을 덜 해서인지는 이 자료로 가를 수 없다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">100세대당 등록된 개가 많은 곳과 적은 곳</p>
+      <p class="fs">개 하나 = 100세대당 1마리(반올림)</p>
+      <div class="chart" id="c2"></div>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">시도로, 구·시·군으로</h2>
+      <p>시도로 묶으면 제주(17.0마리), 인천(15.3), 경기(15.2), 대전(14.1)이 앞에 있고 세종(9.2), 경북(9.5), 전북(9.7)이 뒤에 있다. 서울은 12.1마리로 가운데쯤이다.</p>
+      <p>구·시·군으로 나누면 시가 13.2마리로 가장 많고 구(12.6마리), 군(10.2마리) 순이다. 군은 평균으로는 적지만 양평·담양·가평처럼 가장 많은 곳도 군이다. 군 사이의 차이가 가장 크다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">100세대당 등록된 개</p>
+      <p class="fs">마리. 가로선 = 전국 12.8마리</p>
+      <div class="chips" id="k3" role="group" aria-label="묶는 방법"></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>시도 값은 그 시도의 등록 개 합 ÷ 세대수 합이다. 군위군은 2023년 7월 대구로 옮겼지만 2022년 말 숫자라 경북 표에 있던 값을 대구로 옮겨 그렸다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">고양이 마당</h2>
+      <p>같은 자료에 고양이도 있다. 등록된 고양이는 2만 8,483마리로 개의 0.9%다. 개는 법으로 등록해야 하지만 고양이는 그렇지 않아서, 고양이 숫자는 키우는 수보다 등록을 시작한 곳의 사정을 더 많이 보여 준다. 제주시 한 곳에 2,499마리(9%)가 등록돼 있다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">등록된 개와 고양이, 2022년 말</p>
+      <p class="fs">그림 하나 = 1만 마리(반올림, 고양이는 1만 마리가 안 돼 크기로 나타냈다)</p>
+      <div class="chart" id="c4"></div>
+      <figcaption>농림축산검역본부 「행정구역별 반려동물 등록 개체 수 현황」. 동물보호법은 2개월 이상인 개를 등록하게 한다. 고양이 등록은 의무가 아니다.</figcaption>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 반려견 등록은 어디서 가장 많을까</h2>
+      <p>마릿수로는 경기도의 큰 도시다. 수원, 고양, 용인, 성남이 각각 6만–7만 마리다. 하지만 집집마다로 나누면 서울을 둘러싼 전원 지역이 가장 많다. 양평, 가평, 포천, 남양주는 100세대에 17–22마리로 서울(12.1)보다 훨씬 많다. 마당이 있는 집이 많은 곳일 수 있지만, 집의 형태는 이 자료에 없다.</p>
+      <p>가장 적은 곳은 섬과 농촌의 군이다. 신안, 울릉, 옹진, 봉화는 100세대에 3–4마리다. 이 차이가 개를 덜 키워서인지, 등록을 덜 해서인지는 등록 자료만으로는 알 수 없다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>등록 누계다. 죽거나 잃어버린 개를 신고하지 않으면 계속 남아 있으므로 지금 살아 있는 개보다 많을 수 있다. 반대로 등록하지 않은 개는 빠져 있다.</li>
+      <li>개는 주인이 등록한 시군구에 세어진다. 이사한 뒤 바꾸지 않으면 옛 주소에 남는다.</li>
+      <li>공공데이터포털의 파일은 2023년 12월 8일 "수정" 판이 있지만 값이 2022년 12월 31일 판과 같다. 이 장은 2022년 말 숫자로 보고 인구·세대도 2022년 12월을 썼다. 해마다 새로 등록한 수는 이 파일에 없다.</li>
+      <li>세대는 주민등록상 세대다. 1인 세대가 많은 곳은 세대당 값이 낮아 보일 수 있다. 인구로 나눈 값(1,000명당)도 표에 함께 적었다.</li>
+      <li>시군구가 바뀐 곳(여주군→여주시, 청원군→청주시, 당진군→당진시)은 옛 이름으로 남은 등록 98마리를 지금 시군구에 더했다. 창원시는 원자료의 세 묶음(마산합포회원구, 의창성산구, 진해구)을 합쳤다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15125454/fileData.do" target="_blank" rel="noopener">행정구역별 반려동물 등록 개체 수 현황</a> (15125454)</td><td>농림축산검역본부</td><td>시군구별 개·고양이 등록 누계</td><td>2022.12.31</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1B040B3" target="_blank" rel="noopener">행정구역(시군구)별 주민등록세대수</a> (KOSIS 101 DT_1B040B3)</td><td>행정안전부</td><td>세대수(분모)</td><td>2022.12</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1B040A3" target="_blank" rel="noopener">행정구역(시군구)별 주민등록인구</a> (KOSIS 101 DT_1B040A3)</td><td>행정안전부</td><td>인구(분모)</td><td>2022.12</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>시군구 229곳 × 개·고양이 등록 누계 · 세대수 · 인구</dd>
+      <dt>도구</dt><dd>Python(수집·집계) · SVG 점묘 지도(시군구 경계 안에 무작위 점), 색칠 지도, 산책길, 막대(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>등록 개 ÷ 세대수 × 100 · 등록 개 ÷ 인구 × 1,000 · 시도·구·시·군 묶음 합 · 점 하나 = 1,000마리(반올림)</dd>
+      <dt>검증</dt><dd>시군구 합(개 302만 5,859마리, 고양이 2만 8,483마리)이 시도 합과 같다. 세대수 합(2,370만 5,814세대)과 인구 합(5,143만 9,038명)이 전국 값과 같다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>잃어버린 개는 어디서 가장 많이 신고될까</h3><p>동물등록 분실 신고를 등록 수로 나누면 잃어버리는 비율을 지역마다 견줄 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15121750/fileData.do" target="_blank" rel="noopener">동물등록 분실신고</a> · 농림축산검역본부</li></ul></div>
+      <div class="q"><h3>우리 동네에는 어떤 이름의 개가 많을까</h3><p>몇몇 구가 등록 동물의 이름을 공개한다. 이름 순위가 동네마다 다른지 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15049777/fileData.do" target="_blank" rel="noopener">양천구 동물 이름 등록 현황</a> · 서울특별시 양천구</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.18</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const P = DATA.P.map((p, i) => ({ ...p, i, v: p.dog / p.hh * 100 })), N = DATA.nat, NAT = N.dog / N.hh * 100;
+  const byCode = new Map(); P.forEach((p) => p.codes.forEach((c) => byCode.set(c, p)));
+  const ranked = [...P].sort((a, b) => b.v - a.v); ranked.forEach((p, k) => { p.rank = k + 1; });
+  const cls = (v) => v < 8 ? 0 : v < 11 ? 1 : v < 14 ? 2 : v < 17 ? 3 : 4, QC = [0, 1, 2, 3, 4].map((k) => `var(--q${k})`);
+  function dog(g, x, y, u, col, cls_) {
+    // side view: body, head with ear, tail, legs
+    const w = cls_ ? s("g", { class: cls_ }, g) : g, e = s("g", { transform: `translate(${x},${y})` }, w);   // CSS 애니메이션은 바깥 묶음에 (transform 속성을 덮지 않게)
+    s("path", { d: `M${-u * .42},${-u * .3} q${u * .12},${-u * .2} ${u * .5},${-u * .14} l${u * .2},${-u * .18} q${u * .2},${-u * .06} ${u * .26},${u * .1} l${-u * .06},${u * .14} l${-u * .1},${u * .02} l${-u * .04},${u * .46} h${-u * .1} l${-u * .02},${-u * .28} h${-u * .36} l${-u * .04},${u * .28} h${-u * .1} l${-u * .02},${-u * .36} q${-u * .16},${-u * .06} ${-u * .18},${-u * .32} z`, fill: col }, e);
+    s("path", { d: `M${-u * .42},${-u * .3} q${-u * .14},${-u * .08} ${-u * .16},${-u * .26}`, fill: "none", stroke: col, "stroke-width": u * .08, "stroke-linecap": "round" }, e);
+    return e;
+  }
+
+  /* ---------- 0. guess: 100 houses ---------- */
+  const gin = document.getElementById("gin"); let rev = false;
+  function house(g, x, y, u) { s("path", { d: `M${x - u * .4},${y} v${-u * .5} l${u * .4},${-u * .32} l${u * .4},${u * .32} v${u * .5} z`, fill: "var(--house)" }, g); s("path", { d: `M${x - u * .48},${y - u * .46} l${u * .48},${-u * .38} l${u * .48},${u * .38}`, fill: "none", stroke: "var(--roof)", "stroke-width": u * .08, "stroke-linejoin": "round" }, g); }
+  function drawG() {
+    const box = document.getElementById("gq"); box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), per = W < 520 ? 10 : 20, cw = Math.min(46, W / per), u = cw * .8, rh = u * 1.25, rows = 100 / per, H = rows * rh + 28, x0 = (W - per * cw) / 2, g = +gin.value, real = Math.round(NAT);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": rev ? `100세대 가운데 등록된 개 ${real}마리, 내 답 ${g}마리` : `100세대 그림. 내가 고른 개 ${g}마리` }, box);
+    for (let i = 0; i < 100; i++) { const x = x0 + (i % per) * cw + cw / 2, y = 6 + Math.floor(i / per) * rh + rh * .82; house(v, x, y - u * .05, u * .78); const mine = i < g, isReal = rev && i < real; if (isReal || (!rev && mine)) dog(v, x + u * .1, y + u * .02, u * .62, isReal ? "var(--dog)" : "var(--me)"); if (rev && mine) s("circle", { cx: x, cy: y - u * .3, r: u * .5, fill: "none", stroke: "var(--me)", "stroke-width": 1.4 }, v); }
+    tx(v, x0, H - 6, rev ? `갈색 개 = 실제 ${real}마리(12.8) · 주황 동그라미 = 내 답 ${g}마리` : "집 하나 = 1세대", "mt", 12.5);
+  }
+  gin.addEventListener("input", () => { document.getElementById("gout").textContent = gin.value + "마리"; document.getElementById("gbtn").disabled = false; drawG(); });
+  document.getElementById("gbtn").addEventListener("click", () => { rev = true; gin.disabled = true; document.getElementById("gbtn").disabled = true; const g = +gin.value, d = g - NAT; document.getElementById("gmsg").textContent = Math.abs(d) < 1.5 ? `${g}마리라고 답했다. 거의 맞혔다.` : d > 0 ? `${g}마리라고 답했다. 실제보다 ${Math.round(d)}마리 많게 봤다.` : `${g}마리라고 답했다. 실제보다 ${Math.round(-d)}마리 적게 봤다.`; document.getElementById("greveal").hidden = false; drawG(); });
+
+  /* ---------- 1. dot density / choropleth ---------- */
+  let mode1 = "dots", sel = P.find((p) => p.n === "양평군"); const DOTS = 1000;
+  const xs = P.map((p) => p.x), ys = P.map((p) => p.y), X0 = Math.min(...xs) - 22, X1 = Math.max(...xs) + 22, Y0 = Math.min(...ys) - 22, Y1 = Math.max(...ys) + 22;
+  let dotCache = null;
+  function makeDots(svgPaths) {
+    // rejection-sample points inside each district path (isPointInFill), seeded so the picture is stable
+    let seed = 11; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    const out = []; const svgEl = svgPaths.length ? svgPaths[0][0].ownerSVGElement : null;
+    const pt = svgEl ? svgEl.createSVGPoint() : null;
+    const byP = new Map(); svgPaths.forEach(([el, p]) => { if (!p) return; if (!byP.has(p)) byP.set(p, []); byP.get(p).push(el); });
+    byP.forEach((els, p) => {
+      const n = Math.round(p.dog / DOTS); if (!n) return; const boxes = els.map((e) => [e, e.getBBox()]); const area = boxes.reduce((a, [, b]) => a + b.width * b.height, 0);
+      for (let k = 0, tries = 0; k < n && tries < n * 60; tries++) {
+        let r = rnd() * area, pick = boxes[0]; for (const bb of boxes) { r -= bb[1].width * bb[1].height; if (r <= 0) { pick = bb; break; } }
+        const [el, b] = pick; pt.x = b.x + rnd() * b.width; pt.y = b.y + rnd() * b.height;
+        if (el.isPointInFill(pt)) { out.push([pt.x, pt.y, p.i]); k++; }
+      }
+    });
+    return out;
+  }
+  function c1() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), sc = W / (X1 - X0), H = (Y1 - Y0) * sc, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": mode1 === "dots" ? "등록된 개 1천 마리를 점 하나로 찍은 지도. 수도권에 점이 몰려 있다" : "시군구별 100세대당 등록된 개 지도. 양평군·가평군·포천시가 가장 짙다" }, box);
+    const g = s("g", { transform: `translate(${-X0 * sc},${-Y0 * sc}) scale(${sc})` }, v), paths = [];
+    DATA.U.forEach(([code, d]) => { const p = byCode.get(code); const e = s("path", { d, fill: mode1 === "dots" ? "var(--land)" : p ? QC[cls(p.v)] : "var(--grid)", stroke: mode1 === "dots" ? "var(--line)" : "var(--card)", "stroke-width": .5 / sc }, g); paths.push([e, p]); });
+    DATA.sidoPaths.forEach((sp) => s("path", { d: sp.d, fill: "none", stroke: "var(--axis)", "stroke-width": .9 / sc }, g));
+    if (mode1 === "dots") { if (!dotCache) dotCache = makeDots(paths); const gd = s("g", {}, g); dotCache.forEach(([x, y]) => s("circle", { cx: x, cy: y, r: 1.25, fill: "var(--dog)", opacity: .85 }, gd)); }
+    if (sel) DATA.U.forEach(([code, d]) => { if (byCode.get(code) === sel) s("path", { d, fill: "none", stroke: "var(--me)", "stroke-width": 2.4 / sc }, g); });
+    P.forEach((p) => pts.push({ x: (p.x - X0) * sc, y: (p.y - Y0) * sc, r: 5, fn: () => [`${p.s} ${p.n}`, [[`${fmt(p.dog)}마리`, "등록된 개"], [`${f1(p.v)}마리`, "100세대당"], [`${p.rank}위`, "229곳 중(100세대당)"]]] }));
+    v.addEventListener("click", (e) => { const r = v.getBoundingClientRect(), k = W / r.width, x = (e.clientX - r.left) * k / sc + X0, y = (e.clientY - r.top) * k / sc + Y0; let best = null, bd = 1e9; P.forEach((p) => { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = p; } }); if (best && bd < 20) { sel = best; card(); c1(); } });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 시군구를 옮겨 볼 수 있다");
+    document.getElementById("fs1").textContent = mode1 === "dots" ? "점 하나 = 등록된 개 1,000마리(반올림, 시군구 안에 흩어 찍음). 지도를 누르면 그 시군구가 선택된다" : "100세대당 등록된 개(마리). 지도를 누르면 그 시군구가 선택된다";
+    const lg = document.getElementById("lg1"); lg.replaceChildren();
+    if (mode1 === "dots") { const sp = document.createElement("span"), i = document.createElement("i"); i.className = "sw dot"; i.style.background = "var(--dog)"; sp.append(i, "개 1,000마리"); lg.append(sp); }
+    else [["8마리 미만", 0], ["8–11", 1], ["11–14", 2], ["14–17", 3], ["17마리 이상", 4]].forEach(([n, k]) => { const sp = document.createElement("span"), i = document.createElement("i"); i.className = "sw"; i.style.background = QC[k]; i.style.border = "1px solid var(--axis)"; sp.append(i, n); lg.append(sp); });
+  }
+  function card() {
+    const c = document.getElementById("pcard"); c.replaceChildren(); const p = sel; if (!p) return;
+    const nm = document.createElement("div"); nm.className = "nm"; nm.textContent = `${p.s} ${p.n}`;
+    const bv = document.createElement("div"); bv.className = "bigv"; bv.textContent = f1(p.v); const sm = document.createElement("small"); sm.textContent = "마리 · 100세대당"; bv.append(sm);
+    const a = document.createElement("p"); a.append(bEl(`229곳 중 ${p.rank}위`), ` · 등록된 개 ${fmt(p.dog)}마리, 고양이 ${fmt(p.cat)}마리`);
+    const b = document.createElement("p"); b.textContent = `세대 ${fmt(p.hh)} · 주민 1,000명당 ${f1(p.dog / p.pop * 1000)}마리 · 전국 평균(${f1(NAT)})의 ${Math.round(p.v / NAT * 100)}%`;
+    c.append(nm, bv, a, b);
+  }
+  const find = document.getElementById("find"), pl = document.getElementById("plist");
+  [...P].sort((a, b) => (a.s + a.n).localeCompare(b.s + b.n, "ko")).forEach((p) => { const o = document.createElement("option"); o.value = `${p.s} ${p.n}`; pl.append(o); });
+  const look = () => { const q = find.value.trim(); if (!q) return; const hit = P.find((p) => `${p.s} ${p.n}` === q) || P.find((p) => p.n === q) || P.find((p) => p.n.replace(/(시|군|구)$/, "") === q); if (hit) { sel = hit; card(); c1(); } };
+  find.addEventListener("change", look); find.addEventListener("input", look);
+  chips("k1", [["dots", "점 하나 1천 마리"], ["rate", "100세대당"]], "dots", (k) => { mode1 = k; c1(); });
+  table("t1", ["순위", "시도", "시군구", "등록된 개", "고양이", "세대", "100세대당 개", "1,000명당 개"], ranked.map((p) => [p.rank, p.s, p.n, fmt(p.dog), fmt(p.cat), fmt(p.hh), f1(p.v), f1(p.dog / p.pop * 1000)]));
+
+  /* ---------- 2. walking paths ---------- */
+  const once = (el, fn, th = .3) => { if (reduce) return false; const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); fn(); }, { threshold: th }); io.observe(el); return true; };
+  let anim2 = false;
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, l = narrow ? 92 : 132, rr = 44, rh = narrow ? 24 : 28, top = ranked.slice(0, 10), bot = ranked.slice(-10).reverse(), H = 20 * rh + 70, u = Math.min(rh * .9, (W - l - rr) / 23), pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "100세대당 등록된 개가 많은 열 곳과 적은 열 곳. " + top.slice(0, 3).map((p) => `${p.n} ${f1(p.v)}마리`).join(", ") + " … " + bot.slice(0, 3).map((p) => `${p.n} ${f1(p.v)}마리`).join(", ") }, box);
+    [["많은 곳", top, 0], ["적은 곳", bot, 1]].forEach(([lab, list, k]) => {
+      const y0 = 18 + k * (10 * rh + 40); tx(v, 0, y0, lab, "lb", 14, "start", { "font-weight": 700 });
+      list.forEach((p, n) => { const y = y0 + 14 + n * rh + rh * .78; tx(v, l - 8, y - 2, narrow ? p.n : `${p.s} ${p.n}`, "lb", 12.5, "end"); s("line", { x1: l, x2: W - rr, y1: y + 1, y2: y + 1, stroke: "var(--grid)", "stroke-width": 1 }, v); const m = Math.round(p.v); for (let q = 0; q < m; q++) { const e = dog(v, l + q * u + u * .55, y, u * .95, "var(--dog)", anim2 ? "pop" : null); if (anim2) e.parentNode.style.animationDelay = `${(n * 30 + q * 25)}ms`; } tx(v, W, y - 2, f1(p.v), "vl di", 12.5, "end"); pts.push({ x: l + m * u / 2, y: y - u * .3, r: Math.max(8, m * u / 2), fn: () => [`${p.s} ${p.n}`, [[`${f1(p.v)}마리`, "100세대당"], [`${fmt(p.dog)}마리`, "등록된 개"], [`${fmt(p.hh)}세대`, "세대"]]] }); });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표 키로 시군구를 옮겨 볼 수 있다");
+  }
+
+  /* ---------- 3. bars ---------- */
+  let mode3 = "sido";
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    let rows;
+    if (mode3 === "sido") { const m = new Map(); P.forEach((p) => { const o = m.get(p.s) || { n: p.s, dog: 0, hh: 0 }; o.dog += p.dog; o.hh += p.hh; m.set(p.s, o); }); rows = [...m.values()]; }
+    else rows = [["구", "구"], ["시", "시"], ["군", "군"]].map(([n, suf]) => { const ps = P.filter((p) => p.n.endsWith(suf)); return { n: `${n} ${ps.length}곳`, dog: ps.reduce((a, p) => a + p.dog, 0), hh: ps.reduce((a, p) => a + p.hh, 0), ps }; });
+    rows.forEach((r) => { r.v = r.dog / r.hh * 100; }); rows.sort((a, b) => b.v - a.v);
+    const W = Math.max(300, box.clientWidth), l = 70, rr = 52, rh = mode3 === "sido" ? 24 : 54, H = rows.length * rh + 26, max = mode3 === "sido" ? 20 : 24, x = (val) => l + (W - l - rr) * val / max, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "100세대당 등록된 개. " + rows.map((r) => `${r.n} ${f1(r.v)}마리`).join(", ") }, box);
+    rows.forEach((r, k) => { const y = 4 + k * rh; tx(v, l - 8, y + 15, r.n, "lb", 13, "end"); s("rect", { x: l, y: y + 4, width: x(r.v) - l, height: Math.min(rh - 8, 16), rx: 2, fill: r.n === "서울" ? "var(--me)" : "var(--dog)" }, v); tx(v, x(r.v) + 6, y + 16, f1(r.v), "vl", 12.5);
+      if (r.ps) r.ps.forEach((p) => s("circle", { cx: x(p.v), cy: y + 36, r: 2.6, fill: "var(--dog2)", opacity: .8 }, v));
+      pts.push({ x: x(r.v) / 2 + l / 2, y: y + 12, r: 10, fn: () => [r.n, [[`${f1(r.v)}마리`, "100세대당"], [`${fmt(r.dog)}마리`, "등록된 개"]]] }); });
+    s("line", { x1: x(NAT), x2: x(NAT), y1: 0, y2: H - 20, stroke: "var(--ink)", "stroke-dasharray": "4 3" }, v); tx(v, x(NAT), H - 6, `전국 ${f1(NAT)}`, "tk", 11.5, "middle");
+    if (mode3 !== "sido") tx(v, W - rr, H - 6, "작은 점 = 시군구 하나", "mt", 11.5, "end");
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표 키로 옮겨 볼 수 있다");
+  }
+  chips("k3", [["sido", "시도"], ["type", "구·시·군"]], "sido", (k) => { mode3 = k; c3(); });
+  (() => { const m = new Map(); P.forEach((p) => { const o = m.get(p.s) || { n: p.s, dog: 0, cat: 0, hh: 0, pop: 0 }; o.dog += p.dog; o.cat += p.cat; o.hh += p.hh; o.pop += p.pop; m.set(p.s, o); }); table("t3", ["시도", "등록된 개", "고양이", "세대", "100세대당 개", "1,000명당 개", "100세대당 고양이"], [...m.values()].sort((a, b) => b.dog / b.hh - a.dog / a.hh).map((o) => [o.n, fmt(o.dog), fmt(o.cat), fmt(o.hh), f1(o.dog / o.hh * 100), f1(o.dog / o.pop * 1000), (o.cat / o.hh * 100).toFixed(2)])); })();
+
+  /* ---------- 4. cats ---------- */
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, per = narrow ? 15 : 31, cw = (W - 8) / per, u = cw * .92, n = Math.round(N.dog / 1e4), rows = Math.ceil(n / per), H = rows * u * .9 + 100;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `등록된 개 ${fmt(N.dog)}마리를 그림 ${n}개로, 고양이 ${fmt(N.cat)}마리를 그림 하나의 크기로 그렸다` }, box);
+    for (let i = 0; i < n; i++) dog(v, 4 + (i % per) * cw + cw / 2, 4 + Math.floor(i / per) * u * .9 + u * .78, u, "var(--dog)");
+    const cy = rows * u * .9 + 40, cu = u * Math.sqrt(N.cat / 1e4);
+    const c = s("g", { transform: `translate(${4 + cw / 2},${cy + 16})` }, v);
+    s("path", { d: `M${-cu * .35},${cu * .1} q0,${-cu * .5} ${cu * .3},${-cu * .5} l${cu * .06},${-cu * .2} l${cu * .1},${cu * .16} l${cu * .1},${-cu * .16} l${cu * .06},${cu * .24} q${cu * .14},${cu * .2} ${cu * .06},${cu * .46} z`, fill: "var(--cat)" }, c);
+    tx(v, 4 + cw + cu, cy + 18, `고양이 ${fmt(N.cat)}마리 (개의 ${pc(N.cat / N.dog * 100)})`, "vl ci", 13.5);
+    tx(v, 4, cy - 10, `개 ${fmt(N.dog)}마리`, "vl di", 13.5);
+  }
+
+  /* ---------- first view + resize ---------- */
+  drawG(); c1(); card(); c3(); c4();
+  if (once(document.getElementById("c2"), () => { anim2 = true; c2(); anim2 = false; })) c2(); else c2();
+  onResize(() => { drawG(); dotCache = null; c1(); c2(); c3(); c4(); });
+})();
+</script>

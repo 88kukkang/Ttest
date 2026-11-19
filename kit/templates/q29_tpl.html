@@ -1,0 +1,241 @@
+<title>법안 깔때기</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a parliamentary record in the supplied palette (slate, steel blue, leaf green, terracotta).
+   Each Assembly term is a funnel: bills received at the mouth, laws passed at the spout. */
+:root {
+  --paper: #f1f1ee; --card: #fbfbf9; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #dbe1dd; --grid: #e7e9e6; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --board: #2f3133; --board-ink: #ebdac0; --accent: #4e6aa9;
+  --mp: #4e6aa9; --mp2: #8eabc9; --gov: #d56b41; --gov-ink: #8b4d3e; --gov2: #ebcfa7; --pass: #3e6f42; --pass2: #80a15a; --merge: #abc07b; --drop: #bcbbb6; --wait: #ebdac0;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Nanum Myeongjo", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1e1f20; --card: #27292a; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #303335; --axis: #5f6062;
+  --ghost: #5a5551; --board: #141516; --board-ink: #ebdac0; --accent: #8eabc9;
+  --mp: #8eabc9; --mp2: #4e6aa9; --gov: #dc8c67; --gov-ink: #dc8c67; --gov2: #8b4d3e; --pass: #abc07b; --pass2: #80a15a; --merge: #416e59; --drop: #5a5551; --wait: #67453c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1e1f20; --card: #27292a; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #303335; --axis: #5f6062;
+  --ghost: #5a5551; --board: #141516; --board-ink: #ebdac0; --accent: #8eabc9;
+  --mp: #8eabc9; --mp2: #4e6aa9; --gov: #dc8c67; --gov-ink: #dc8c67; --gov2: #8b4d3e; --pass: #abc07b; --pass2: #80a15a; --merge: #416e59; --drop: #5a5551; --wait: #67453c; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 800; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.yr { background-image: none; font-family: var(--serif); font-size: 24px }
+</style>
+
+<main class="page">
+  <header>
+    <h1>국회의원이 낸 법안은 대부분 통과될까<span>아니다. 21대 국회의원이 낸 법안 열에 하나도 안 되는 5.9%가 본회의를 통과했고, 68%는 임기와 함께 폐기됐다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 16</dd>
+      <dt>한 줄</dt><dd>21대 국회(2020–2024)에서 국회의원이 낸 법률안 2만 3,655건 가운데 그대로(358건) 또는 고쳐서(1,033건) 본회의를 통과한 것은 1,391건(5.9%)이다. 내용 일부가 위원회 대안에 녹아든 5,829건까지 더해도 30.5%다. 1만 6,143건(68.2%)은 임기가 끝나며 폐기됐다. 의원 발의는 15대 806건에서 29배로 늘었고, 통과 비율은 15.3%에서 5.9%로 줄었다.</dd>
+      <dt>분류</dt><dd>환경·교통·정치</dd>
+      <dt>본능</dt><dd>크기 본능 · "법안 ○○건 발의"라는 큰 숫자를 그만큼의 법이 생긴 것으로 받아들인다</dd>
+      <dt>그림 방식</dt><dd>좁아지는 깔때기 · 대수마다 접수된 법안이 깔때기 위로 들어가 아래로 법이 되어 나오는 모습을 그리고, 제헌국회부터 22대까지 재생한다</dd>
+      <dt>기간</dt><dd>제헌국회(1948)–제22대(2024–, 진행 중)</dd>
+      <dt>엮은 데이터</dt><dd>1개 · 국회사무처 처리 의안통계(발의주체별 법률안), 열린국회정보</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">21대 국회의원이 낸 법률안 2만 3,655건 가운데 본회의를 통과한(원안 또는 수정안 가결) 비율은?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>A</i>약 6%</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>약 30%</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>약 60%</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">A. <span class="n">5.9%</span>, 1,391건</span>
+      B(30.5%)는 위원회 대안에 내용이 반영된 법안까지 넣었을 때다. 같은 국회에서 정부가 낸 법률안은 25.5%가 가결됐고, 58.6%가 반영됐다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">깔때기의 입은 넓어지고, 주둥이는 그대로</h2>
+      <p>국회 한 대(4년)에 국회의원이 낸 법률안을 깔때기 위로 붓고, 단계마다 남는 만큼 폭을 줄였다. 맨 아래가 처음 낸 그대로 통과한 법이다. 재생하면 제헌국회부터 14대까지는 깔때기가 거의 보이지 않다가, 17대(2004–2008)부터 입이 급격히 넓어진다. 하지만 아래로 빠져나오는 양은 크게 늘지 않는다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft" id="f1t">의원 발의 법률안의 깔때기</p>
+      <p class="fs">폭 = 건수. 위에서부터 접수 → 내용이 반영됨(대안 포함) → 본회의 가결 → 원안 그대로 가결</p>
+      <div class="chips" role="group" aria-label="폭을 정하는 방법" id="chips1"></div>
+      <div class="player" id="p1"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>국회사무처 「처리 의안통계(발의주체별 법률안)」(열린국회정보). "반영"은 원안가결·수정안가결·대안반영·수정안반영의 합이다. 22대는 진행 중(2026년 11월 현재 의원 법안의 74%가 심사 중)이라 깔때기에서 뺐다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">통과 비율은 3분의 1로 줄었다</h2>
+      <p>대수마다 처리된 의원 법안 가운데 본회의를 통과한 비율과, 대안까지 포함해 반영된 비율을 이었다. 13대(1988–1992) 의원 법안의 가결률은 13.2%였는데, 21대는 5.9%다. 정부 법안도 가결률이 같은 기간 87.2%에서 25.5%로 떨어졌다. 위원회가 비슷한 법안 여러 건을 묶어 하나의 대안으로 내는 방식이 늘어난 것도 함께 작용한다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">처리된 법률안 중 가결·반영 비율</p>
+      <p class="fs">실선 = 본회의 가결(원안+수정안), 점선 = 반영(대안 포함)</p>
+      <div class="legend" aria-hidden="true"><span><i class="sw line" style="background:var(--mp)"></i>의원 발의</span><span><i class="sw line" style="background:var(--gov)"></i>정부 제출</span></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>국회사무처 「처리 의안통계(발의주체별 법률안)」. 비율의 분모는 처리 건수(접수 건수 중 임기 안에 처리가 끝난 것)이다. 22대는 진행 중이라 뺐다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">17대 이후 의원 발의가 폭발했다</h2>
+      <p>대수마다 접수된 법률안 수다. 16대까지 의원과 정부가 낸 법안은 수백–천여 건이었다. 17대에 의원 발의가 5,728건으로 뛰고, 21대 2만 3,655건이 됐다. 정부 제출은 같은 기간 1천 건 안팎에서 831건으로 오히려 줄었다. 22대는 임기 절반 남짓에 이미 2만 481건이다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">대수별 접수된 법률안 수</p>
+      <p class="fs">건</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>국회사무처 「처리 의안통계(발의주체별 법률안)」. 위원장 제안(대안 포함)은 막대에 넣지 않았다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">그래서, 국회의원이 낸 법안은 대부분 통과될까</h2>
+      <p>아니다. 21대 기준 의원 법안 열에 하나도 안 되는 5.9%만 본회의를 통과했고, 셋 중 둘은 임기가 끝나며 폐기됐다. 다만 "통과 못 한 법안 = 헛수고"는 아니다. 넷 중 한 건(23.7%)은 비슷한 법안들과 함께 위원회 대안으로 묶여 내용이 법에 들어갔다. "○○법 발의"라는 뉴스는 깔때기의 입구에 들어간 소식일 뿐이다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>"대안반영"은 법안 자체는 폐기되지만 내용이 위원장이 내는 대안에 담겨 통과된 경우다. 이 페이지는 이를 "가결"이 아닌 "반영"으로 나눴다.</li>
+      <li>폐기에는 임기 만료로 심사가 끝나지 않은 법안이 대부분 들어 있다. 부결로 떨어지는 법안은 21대에 3건뿐이다.</li>
+      <li>법안의 중요도는 서로 다르다. 조문 하나를 고치는 법안과 새 법을 만드는 법안이 똑같이 한 건으로 셈해진다.</li>
+      <li>22대는 2026년 11월 현재 진행 중이다. 처리된 법안만으로 비율을 내면 실제보다 높게 나오므로 그래프에서는 뺐다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://open.assembly.go.kr/portal/data/service/selectServicePage.do/OOWY4R001216HX11477" target="_blank" rel="noopener">처리 의안통계(발의주체별 법률안)</a> (공공데이터포털 15126104)</td><td>국회사무처</td><td>대수 × 발의 주체(의원·위원장·정부) 접수·처리·가결·대안반영·폐기·철회·계류 건수</td><td>제헌–22대</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>1개 통계표 · 97행(대수 × 발의 주체)</dd>
+      <dt>도구</dt><dd>Python(집계) · SVG 깔때기와 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>단계별 남는 비율 · 대수별 가결률·반영률</dd>
+      <dt>검증</dt><dd>대수마다 처리 건수 = 반영 소계 + 미반영 소계이고, 21대 의원 법안 접수 2만 3,655건 = 처리 2만 3,655건(계류 0)인 것을 확인했다. "국회의원 발의법률안"(15125946)은 인증키가 필요한 API라, 같은 기관이 공개한 통계표를 썼다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>통과되는 법안은 어떤 위원회에서 나올까</h3><p>위원회별 법률안 통계로, 깔때기가 넓은 위원회와 좁은 위원회를 견줄 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15126103/openapi.do" target="_blank" rel="noopener">처리 의안통계(위원회별 법률안)</a> · 국회사무처</li></ul></div>
+      <div class="q"><h3>법안은 임기 말에 몰려 처리될까</h3><p>본회의 처리일로 달마다 처리 건수를 세면 된다.</p></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const T = DATA.terms, NT = T.length, R = DATA.rows;
+  const short = (t) => t.replace("제", "").replace("대", "대");
+  const st = (t, who = "의원") => { const r = R[t][who]; if (!r) return null; const pass = r.OBIL_PSSG_CNT + r.AMND_PSSG_CNT; return { rcp: r.RCP_CNT, proc: r.PROC_CNT, reft: r.REFT_SUBT, pass, orig: r.OBIL_PSSG_CNT, drop: r.DSU_CNT, wthd: r.WTHD_CNT, rej: r.RJCTN_CNT, wait: r.RSVT_CNT, alt: r.ALTPL_REFT_CNT + r.AMND_REFT_CNT }; };
+  const MAX = Math.max(...T.map((t) => st(t).rcp)), TF = T.slice(0, -1); // the funnel stops at the last finished term
+  let mode = "n";
+  chips("chips1", [["n", "건수 그대로"], ["p", "비율로(입구 = 100%)"]], mode, (k) => { mode = k; p1.render(); });
+
+  /* ---------- 1. the funnel ---------- */
+  function c1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, Hh = narrow ? 380 : 420, cx = narrow ? W * .42 : W * .4, wMax = narrow ? W * .78 : W * .7;
+    const k = Math.min(TF.length - 1, Math.round(pos)), t = TF[k], q = st(t);
+    const v = s("svg", { viewBox: `0 0 ${W} ${Hh}`, role: "img", "aria-label": `${t} 국회 의원 발의 법률안 깔때기` }, box);
+    const stages = [["접수", q.rcp, "var(--mp2)"], ["반영(대안 포함)", q.reft, "var(--merge)"], ["본회의 가결", q.pass, "var(--pass2)"], ["원안 그대로 가결", q.orig, "var(--pass)"]];
+    const wOf = (n) => (mode === "n" ? Math.max(2, n / MAX * wMax) : Math.max(2, n / Math.max(1, q.rcp) * wMax));
+    const top = 30, lh = (Hh - top - 40) / stages.length, pts = [];
+    stages.forEach(([name, n, col], i) => {
+      const y0 = top + i * lh, y1 = y0 + lh * .78, w0 = wOf(n), w1 = i + 1 < stages.length ? wOf(stages[i + 1][1]) : w0 * .8;
+      s("path", { d: `M${cx - w0 / 2},${y0} L${cx + w0 / 2},${y0} L${cx + w1 / 2},${y1} L${cx - w1 / 2},${y1} Z`, fill: col, stroke: "var(--card)", "stroke-width": 1.5 }, v);
+      const lx = cx + Math.max(w0, 40) / 2 + 10;
+      tx(v, lx, y0 + 16, name, "lb", narrow ? 12 : 13);
+      tx(v, lx, y0 + 34, `${fmt(n)}건 · ${pc(n / q.rcp * 100)}`, i === 2 ? "vl" : "tk", narrow ? 12 : 13);
+      pts.push({ x: cx, y: (y0 + y1) / 2, r: Math.max(8, w0 / 4), fn: () => [`${t} · ${name}`, [[fmt(n) + "건", ""], [pc(n / q.rcp * 100), "접수 대비"]]] });
+    });
+    // drops leaving the funnel
+    const dropTxt = q.wait > 0 ? `심사 중 ${fmt(q.wait)}건(${pc(q.wait / q.rcp * 100)})` : `폐기 ${fmt(q.drop)}건(${pc(q.drop / q.rcp * 100)}) · 철회 ${fmt(q.wthd)} · 부결 ${q.rej}`;
+    tx(v, 0, Hh - 10, dropTxt, "mt", narrow ? 11.5 : 12.5);
+    tx(v, 0, 16, `${t} 국회 · 의원 발의 ${fmt(q.rcp)}건`, "vl", narrow ? 13 : 15);
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 단계를 옮겨 볼 수 있다");
+  }
+  table("t1", ["대수", "접수", "처리", "반영", "가결", "원안가결", "대안반영", "폐기", "철회", "부결", "계류"], T.map((t) => { const q = st(t); return [t, fmt(q.rcp), fmt(q.proc), fmt(q.reft), fmt(q.pass), fmt(q.orig), fmt(q.alt), fmt(q.drop), fmt(q.wthd), String(q.rej), fmt(q.wait)]; }));
+
+  /* ---------- 2. rates ---------- */
+  const T2 = T.slice(T.indexOf("제13대"), T.indexOf("제22대"));
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), Hh = Math.min(340, Math.max(240, W * .42)), l = 38, r = 96, top = 14, bot = 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${Hh}`, role: "img", "aria-label": "대수별 법률안 가결률과 반영률 13–21대" }, box);
+    const sx = (i) => l + i / (T2.length - 1) * (W - l - r), sy = (p) => top + (1 - p / 100) * (Hh - top - bot), pts = [];
+    [0, 25, 50, 75, 100].forEach((t_) => { s("line", { x1: l, x2: W - r, y1: sy(t_), y2: sy(t_), class: t_ ? "gl" : "ax" }, v); tx(v, l - 6, sy(t_) + 4, t_ + "%", "tk", 11.5, "end"); });
+    T2.forEach((t, i) => tx(v, sx(i), Hh - 6, short(t), "tk", 11, "middle"));
+    const lines = [["의원", "pass", "var(--mp)", false, "의원 가결"], ["의원", "reft", "var(--mp)", true, "의원 반영"], ["정부", "pass", "var(--gov)", false, "정부 가결"], ["정부", "reft", "var(--gov)", true, "정부 반영"]];
+    const ends = [];
+    lines.forEach(([who, key, col, dash, name]) => {
+      const vals = T2.map((t) => { const q = st(t, who); return q[key] / q.proc * 100; });
+      s("path", { d: "M" + vals.map((p, i) => `${sx(i).toFixed(1)},${sy(p).toFixed(1)}`).join("L"), fill: "none", stroke: col, "stroke-width": dash ? 2 : 3, "stroke-dasharray": dash ? "6 4" : "none" }, v);
+      vals.forEach((p, i) => { s("circle", { cx: sx(i), cy: sy(p), r: 3, fill: col }, v); pts.push({ x: sx(i), y: sy(p), r: 3, fn: () => [`${T2[i]} · ${name}`, [[pc(p), "처리 건수 대비"]]] }); });
+      ends.push({ y: sy(vals[vals.length - 1]), x: sx(T2.length - 1), t: `${name} ${f1(vals[vals.length - 1])}%`, dash, col: who === "정부" ? "var(--gov-ink)" : col });
+    });
+    ends.sort((a, b) => a.y - b.y); for (let a = 1; a < ends.length; a++) if (ends[a].y - ends[a - 1].y < 15) ends[a].y = ends[a - 1].y + 15;
+    ends.forEach((e) => tx(v, e.x + 8, e.y + 4, e.t, e.dash ? "lb halo" : "vl halo", 12, "start", { "stroke-width": 4, style: `fill:${e.col}` }));
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 점을 옮겨 볼 수 있다");
+    table("t2", ["대수", "의원 가결률", "의원 반영률", "정부 가결률", "정부 반영률"], T2.map((t) => { const a = st(t), b = st(t, "정부"); return [t, pc(a.pass / a.proc * 100), pc(a.reft / a.proc * 100), pc(b.pass / b.proc * 100), pc(b.reft / b.proc * 100)]; }));
+  }
+
+  /* ---------- 3. counts ---------- */
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), Hh = Math.min(320, Math.max(240, W * .4)), l = 48, r = 10, top = 14, bot = 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${Hh}`, role: "img", "aria-label": "대수별 접수 법률안 수" }, box);
+    const bw = (W - l - r) / NT, sy = (n) => top + (1 - n / 25000) * (Hh - top - bot), pts = [];
+    [0, 10000, 20000].forEach((t_) => { s("line", { x1: l, x2: W - r, y1: sy(t_), y2: sy(t_), class: t_ ? "gl" : "ax" }, v); tx(v, l - 6, sy(t_) + 4, t_ ? t_ / 1e4 + "만" : "0", "tk", 11.5, "end"); });
+    T.forEach((t, i) => {
+      const a = st(t), b = st(t, "정부") || { rcp: 0 }, x = l + i * bw + bw * .12, w = bw * .76;
+      s("rect", { x, y: sy(a.rcp), width: w, height: sy(0) - sy(a.rcp), fill: t === "제22대" ? "var(--mp2)" : "var(--mp)" }, v);
+      s("rect", { x, y: sy(a.rcp + b.rcp), width: w, height: sy(a.rcp) - sy(a.rcp + b.rcp), fill: "var(--gov)" }, v);
+      if (i % (W < 560 ? 3 : 2) === 1 || i === NT - 1) tx(v, x + w / 2, Hh - 6, short(t), "tk", 11, "middle");
+      pts.push({ x: x + w / 2, y: sy(a.rcp + b.rcp), r: w / 2, fn: () => [`${t} 국회`, [[fmt(a.rcp) + "건", "의원 발의"], [fmt(b.rcp) + "건", "정부 제출"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 대수를 옮겨 볼 수 있다");
+    table("t3", ["대수", "의원 발의", "위원장 제안", "정부 제출"], T.map((t) => [t, fmt(st(t).rcp), fmt((R[t]["위원장"] || {}).RCP_CNT || 0), fmt((st(t, "정부") || { rcp: 0 }).rcp)]));
+  }
+
+  const p1 = Player("p1", "깔때기", c1, TF.length, (i) => short(TF[i]), 11);
+  const all = () => { p1.render(); c2(); c3(); };
+  all(); onResize(all);
+})();
+</script>

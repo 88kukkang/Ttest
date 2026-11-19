@@ -1,0 +1,480 @@
+<title>메달 걸이</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a balance scale where the reader adds individual-event gold medals until they weigh as much as one football
+   gold (in people exempted). Then medal racks for the 2018, 2023 and 2026 Asian Games coloured by sport, a row of
+   medal stacks for every year's enrolment 1996-2024 with the Games marked, and the decree text with the two lines
+   that decide it highlighted. */
+:root {
+  --paper: #f4f2ec; --card: #fcfbf7; --ink: #2c2c2a; --ink2: #494843; --muted: #5d5b55; --line: #e1ddd3; --grid: #eae7de; --axis: #a7a8a3;
+  --accent: #416e59; --intl: #416e59; --board: #2c2c2a; --board-ink: #f4f2ec; --sea: #fcfbf7;
+  --gold: #ebcfa7; --gold-edge: #b6a392; --ribbon: #9b3737; --ribbon2: #3e6f90;
+  --sp0: #416e59; --sp1: #3e6f90; --sp2: #d56b41; --sp3: #b87b68; --sp4: #b6a392; --sp0-ink: #35594a; --sp1-ink: #2f5a77; --sp2-ink: #a8451f;
+  --beam: #5f6062; --pan: #939594; --ag: #d56b41; --og: #3e6f90; --mark: #fbf1e1;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1b1c1a; --card: #252623; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3a3b36; --grid: #2f302c; --axis: #62635d;
+  --accent: #91b0a1; --intl: #91b0a1; --board: #dcd9cf; --board-ink: #1b1c1a; --sea: #252623;
+  --gold: #d8b29b; --gold-edge: #8b4d3e; --ribbon: #d0605c; --ribbon2: #8eabc9;
+  --sp0: #91b0a1; --sp1: #8eabc9; --sp2: #dc8c67; --sp3: #cd9886; --sp4: #928a7f; --sp0-ink: #becbb7; --sp1-ink: #abbdc9; --sp2-ink: #e7a08a;
+  --beam: #a7a8a3; --pan: #62635d; --ag: #dc8c67; --og: #8eabc9; --mark: #2e2a25; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1b1c1a; --card: #252623; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3a3b36; --grid: #2f302c; --axis: #62635d;
+  --accent: #91b0a1; --intl: #91b0a1; --board: #dcd9cf; --board-ink: #1b1c1a; --sea: #252623;
+  --gold: #d8b29b; --gold-edge: #8b4d3e; --ribbon: #d0605c; --ribbon2: #8eabc9;
+  --sp0: #91b0a1; --sp1: #8eabc9; --sp2: #dc8c67; --sp3: #cd9886; --sp4: #928a7f; --sp0-ink: #becbb7; --sp1-ink: #abbdc9; --sp2-ink: #e7a08a;
+  --beam: #a7a8a3; --pan: #62635d; --ag: #dc8c67; --og: #8eabc9; --mark: #2e2a25; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 16.5px/1.78 var(--sans); word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 36px 80px }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--axis) }
+:focus-visible { outline: 2px solid var(--intl); outline-offset: 2px }
+.page { max-width: 1040px; margin: 0 auto; display: grid; gap: 64px }
+.prose { max-width: 660px; display: grid; gap: 14px; min-width: 0 }
+.prose p { margin: 0 }
+.n { font-weight: 700; font-variant-numeric: tabular-nums }
+.label { font: 500 12px/1.4 var(--mono); letter-spacing: .08em; color: var(--muted); margin: 0; text-transform: uppercase }
+
+header { display: grid; gap: 22px }
+h1 { font-weight: 700; font-size: clamp(32px, 5.6vw, 54px); line-height: 1.18; margin: 0; letter-spacing: -.03em; text-wrap: balance }
+h1 span { display: block; font-weight: 500; font-size: .46em; color: var(--ink2); margin-top: 12px; letter-spacing: -.01em; line-height: 1.45 }
+.sheet, .method { display: grid; grid-template-columns: 110px minmax(0, 1fr); border-top: 2px solid var(--ink); font-size: 14.5px; margin: 0 }
+.sheet dt, .sheet dd, .method dt, .method dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line) }
+.sheet dt, .method dt { font: 500 12px/2 var(--mono); color: var(--muted) }
+.sheet dd, .method dd { color: var(--ink2) }
+@media (max-width: 560px) { .sheet, .method { grid-template-columns: 84px minmax(0, 1fr) } }
+
+.quiz { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 14px }
+.quiz h2 { font-size: 20px; line-height: 1.5; margin: 0; font-weight: 700; text-wrap: balance }
+.opts { display: grid; gap: 8px }
+.opt { display: flex; gap: 12px; align-items: center; text-align: left; font: inherit; font-size: 15.5px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; cursor: pointer; min-height: 46px }
+.opt i { font: 500 12px var(--mono); color: var(--muted); font-style: normal; width: 14px }
+.opt[data-state="right"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink) }
+.opt[data-state="wrong"] { opacity: .5 }
+.reveal { font-size: 15px; color: var(--ink2); border-top: 1px solid var(--line); padding-top: 14px }
+.reveal .big { font-size: 28px; font-weight: 700; color: var(--ink); display: block; line-height: 1.3 }
+
+section.s { display: grid; gap: 22px }
+h2.h { font-size: clamp(23px, 3.3vw, 29px); line-height: 1.35; margin: 0; font-weight: 700; letter-spacing: -.02em; text-wrap: balance }
+figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 12px; position: relative; min-width: 0 }
+@media (max-width: 560px) { figure { padding: 14px } }
+.ft { font-weight: 700; font-size: 16px; margin: 0; line-height: 1.5 }
+.fs { font-size: 13.5px; color: var(--muted); margin: -8px 0 0; line-height: 1.6 }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y }
+figcaption { font-size: 12.5px; color: var(--muted); line-height: 1.65; border-top: 1px solid var(--grid); padding-top: 10px }
+details { font-size: 13px }
+summary { cursor: pointer; color: var(--ink2); width: max-content; font: 500 12px/2 var(--mono); padding: 6px 0 }
+.tw { overflow-x: auto; margin-top: 6px; max-height: 380px }
+table { border-collapse: collapse; font-size: 12.5px; min-width: 100% }
+th, td { padding: 5px 10px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums }
+th:first-child, td:first-child { text-align: left }
+th { font-weight: 700; color: var(--ink2); position: sticky; top: 0; background: var(--card) }
+
+/* player: play button, scrubber and a departures-board year */
+.player { display: flex; align-items: center; gap: 14px; flex-wrap: wrap }
+.play { width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; display: grid; place-items: center; flex: none }
+.play svg { width: 18px; height: 18px }
+.play:hover { background: var(--intl) }
+.yr { font: 600 30px/1 var(--mono); font-variant-numeric: tabular-nums; color: var(--board-ink); background: var(--board); border-radius: 6px; padding: 8px 10px; letter-spacing: .06em;
+  background-image: linear-gradient(transparent calc(50% - .5px), rgba(255,255,255,.14) calc(50% - .5px), rgba(255,255,255,.14) calc(50% + .5px), transparent calc(50% + .5px)) }
+.scrub { flex: 1 1 180px; min-width: 0; accent-color: var(--intl); height: 32px }
+.stat { font-size: 14px; color: var(--ink2); margin: 0; min-height: 1.6em }
+.stat b { font-variant-numeric: tabular-nums }
+.chips { display: flex; flex-wrap: wrap; gap: 8px }
+.chip { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; min-height: 40px; cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink) }
+.lb { fill: var(--ink); font-family: var(--sans) }
+.vl { fill: var(--ink); font-family: var(--sans); font-weight: 700; font-variant-numeric: tabular-nums }
+.tk { fill: var(--muted); font-family: var(--mono); font-variant-numeric: tabular-nums }
+.mt { fill: var(--muted); font-family: var(--sans) }
+.halo { paint-order: stroke; stroke: var(--card); stroke-linejoin: round }
+.halo-sea { paint-order: stroke; stroke: var(--sea); stroke-linejoin: round }
+.gl { stroke: var(--grid); stroke-width: 1 }
+.ax { stroke: var(--axis); stroke-width: 1 }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink2) }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block }
+.sw.line { height: 3px; width: 18px; border-radius: 2px }
+.sw.dot { border-radius: 50% }
+.tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--axis); border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.12); padding: 8px 10px; font-size: 12.5px; line-height: 1.5; min-width: 150px; max-width: 250px; z-index: 5 }
+.tip .tn { color: var(--muted) } .tip .tv { font-weight: 700; font-size: 14px }
+.ring { fill: none; stroke: var(--ink); }
+ul.care-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; color: var(--ink2) }
+.dt { overflow-x: auto; border-top: 2px solid var(--ink) }
+.dt td, .dt th { white-space: normal; text-align: left; vertical-align: top; padding: 8px 10px 8px 0; position: static }
+.next { display: grid; border-top: 2px solid var(--ink) }
+.q { padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px }
+.q h3 { font-size: 16px; margin: 0; font-weight: 700 }
+.q p { margin: 0; font-size: 14px; color: var(--ink2) }
+.q ul { margin: 0; padding-left: 18px; font-size: 13.5px }
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px }
+
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.i0 { fill: var(--sp0-ink) } .i1 { fill: var(--sp1-ink) } .i2 { fill: var(--sp2-ink) }
+::selection { background: var(--gold); color: #1b1c1a }
+.btn { font: inherit; font-size: 15px; font-weight: 600; color: var(--paper); background: var(--ink); border: 0; border-radius: 10px; padding: 10px 18px; min-height: 46px; cursor: pointer }
+.btn:hover { background: var(--intl) } .btn[disabled] { opacity: .45; cursor: default }
+.btn.ghost { color: var(--ink); background: var(--paper); border: 1px solid var(--axis) } .btn.ghost:hover { background: var(--grid) }
+.ctl { display: flex; align-items: center; gap: 10px; flex-wrap: wrap }
+.ctl output { font: 600 26px/1 var(--mono); font-variant-numeric: tabular-nums; min-width: 3ch; text-align: center }
+.beam { transition: transform .7s cubic-bezier(.3, 1.4, .5, 1) }
+@media (prefers-reduced-motion: reduce) { .beam { transition: none } }
+.law { border: 1px solid var(--line); border-radius: 12px; background: var(--paper); padding: 16px 18px; font-size: 14.5px; line-height: 1.8; color: var(--ink2); display: grid; gap: 8px }
+.law p { margin: 0 } .law mark { background: var(--mark); color: var(--ink); font-weight: 700; padding: 0 2px; border-bottom: 2px solid var(--ag) }
+.law .src { font-size: 12.5px; color: var(--muted) }
+</style>
+
+<main class="page">
+  <header>
+    <h1>운동선수 병역 특례는 어떤 종목이 받을까<span>축구와 야구다. 2018년과 2023년 아시안게임으로 체육요원이 된 98명 가운데 68명(69%)이 두 종목이었다. 개인종목은 금메달 하나에 한 사람이지만, 축구는 금메달 하나에 20명이 한꺼번에 편입된다. 공개 자료로 보면 1996년부터 2024년까지 체육요원은 490명이고, 그 셋 중 둘(68%)이 아시안게임이 열린 해와 그다음 해에 몰려 있다.</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 50</dd>
+      <dt>한 줄</dt><dd>병무청 공개 파일에는 해마다의 편입 인원만 있다(1996–2024년 490명, 가장 많은 해 2003년 53명). 종목별 숫자는 국회 국방위원회 김병주 의원실이 병무청에서 받아 공개한 자료를 보도에서 옮겼다(2차 자료): 2018년 41명 중 축구 20·야구 9, 2023년 57명 중 축구 20·야구 19, 2026년 편입 요건 충족 56명 중 축구 20·야구 16·농구 8·3대3 농구 4.</dd>
+      <dt>분류</dt><dd>생활·문화</dd>
+      <dt>본능</dt><dd>단일 관점 본능 · 금메달 하나는 한 사람의 이야기라고 여기지만, 단체종목에서는 금메달 하나가 스무 사람의 병역을 바꾼다</dd>
+      <dt>그림 방식</dt><dd>메달 걸이 · 독자가 저울에 개인종목 금메달을 올려 축구 금메달 하나와 맞춰 본다. 대회마다 종목별 메달 걸이(2018·2023·2026), 해마다 쌓인 메달(1996–2024, 대회 표시), 시행령 조문 카드</dd>
+      <dt>기간</dt><dd>1996–2024년(공개 파일), 2018·2023·2026년 아시안게임(보도)</dd>
+      <dt>엮은 데이터</dt><dd>공공데이터 1개(체육요원 연도별 편입 현황) · 병역법 시행령 제68조의11 · 보도 1건(2차 자료)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">아시안게임 남자 축구에서 금메달을 하나 따면, 체육요원(병역 특례)으로 편입되는 선수는 몇 명일까?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>1명(주장)</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>11명(선발 선수)</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>20명쯤(대표팀 명단)</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. <span class="n">20명</span></span>
+      2018년, 2023년, 2026년 아시안게임 모두 축구에서 20명씩이었다(보도). 경기에 나간 선수만 인정하던 규정이 없어져, 대표팀 명단에 들면 뛴 시간과 관계없이 편입 대상이 된다. 이미 병역을 마쳤거나 특례를 받은 선수는 빠지므로 명단 수와 조금 다를 수 있다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">금메달 저울</h2>
+      <p>저울 왼쪽에 축구 금메달 하나를 올려 두었다. 그 메달로 편입되는 사람은 20명이다. 오른쪽에 양궁·태권도 같은 개인종목 금메달을 하나씩 올려 보자. 개인종목 금메달 하나는 한 사람이다.</p>
+      <p>저울이 맞으려면 개인종목 금메달 20개가 필요하다. 2026년 아이치·나고야 아시안게임에서는 편입 요건을 채운 56명 가운데 48명(86%)이 축구·야구·농구·3대3 농구 선수였다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">축구 금메달 하나와 개인종목 금메달 몇 개가 같을까</p>
+      <p class="fs">무게 = 그 금메달로 체육요원 편입 대상이 되는 사람 수</p>
+      <div class="ctl">
+        <button class="btn" type="button" id="add">개인종목 금메달 올리기</button>
+        <button class="btn ghost" type="button" id="sub">하나 내리기</button>
+        <output id="nout" aria-live="polite">0개</output>
+        <button class="btn ghost" type="button" id="team">야구 금메달로 바꾸기</button>
+      </div>
+      <div class="chart" id="c1"></div>
+      <figcaption>단체종목의 편입 인원은 국회 국방위원회 김병주 의원실이 병무청에서 받은 자료를 보도한 파이낸셜뉴스(2026년 10월 14일)의 2018·2023·2026년 숫자다(2차 자료). 야구는 대회마다 9명, 19명, 16명으로 달라, 저울에는 2023년의 19명을 썼다. 개인종목은 금메달 1개가 1명이다.</figcaption>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">대회마다의 메달 걸이</h2>
+      <p>아시안게임마다 체육요원이 된 선수를 메달 하나씩으로 걸었다. 초록이 축구, 파랑이 야구, 주황이 농구다. 2018년에는 41명 가운데 축구 20명과 야구 9명이 29명(70.7%), 2023년에는 57명 가운데 축구 20명과 야구 19명이 39명(68.4%)이다.</p>
+      <p>2026년 대회에서 편입 요건을 채운 56명은 축구 20명, 야구 16명, 농구 8명, 3대3 농구 4명으로 단체종목이 48명(85.7%)이다. 병무청 분류로 단체종목의 몫은 2018년 80.5%에서 2023년 89.5%로 커졌다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">아시안게임으로 체육요원이 된 선수, 종목별</p>
+      <p class="fs">메달 하나 = 1명. 2026년은 편입 요건을 채운 사람(편입 전)</p>
+      <div class="chips" id="k2" role="group" aria-label="대회"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>파이낸셜뉴스 「[단독]아시안게임 병역특례 70% 축구·야구」(2026년 10월 14일), 김병주 의원실이 병무청에서 받은 자료(2차 자료). 2018·2023년 축구·야구 밖의 종목은 기사에 나뉘어 있지 않아 "그 밖의 종목"으로 묶었다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">해마다 쌓인 메달</h2>
+      <p>병무청이 공개한 해마다의 편입 인원을 메달로 쌓았다. 기둥이 솟은 해는 거의 아시안게임 뒤다. 1999년 49명(1998 방콕), 2003년 53명(2002 부산), 2007년과 2011년 29명(2006 도하, 2010 광저우), 2014–2015년 81명(2014 인천), 2023–2024년 57명(2023 항저우)이다. 이 해들을 더하면 490명 가운데 332명(68%)이다.</p>
+      <p>올림픽 뒤에는 기둥이 낮다. 2016년 리우 올림픽이 있던 해는 7명, 그다음 해는 2명이다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">해마다 체육요원으로 편입된 사람, 1996–2024년</p>
+      <p class="fs">메달 하나 = 1명. 주황 표시 = 아시안게임이 열린 해, 파랑 표시 = 올림픽(여름·겨울)이 열린 해</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>병무청 「체육요원 연도별 편입 현황」(공공데이터포털 15086043). 편입한 해 기준이라 대회가 가을이나 겨울에 열리면 다음 해로 넘어간다. 공개 파일의 2018–2019년 합(34명)은 보도된 2018년 대회 편입 인원(41명)보다 적어, 두 숫자의 기준이 다를 수 있다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">무엇이 정하나</h2>
+      <p>기준은 병역법 시행령 제68조의11이다. 올림픽에서 3위 이상, 아시아경기대회에서 1위로 입상한 사람이 체육요원이 될 수 있다. 종목이나 한 메달로 몇 명까지인지는 정하지 않는다. 그래서 단체종목은 금메달 하나로 대표팀 명단 전체가 대상이 된다.</p>
+      <p>체육요원은 복무 기간 동안 자기 종목에서 활동하면서 모두 544시간의 공익복무(취약계층 체육 활동, 어린이·청소년 지도 등)를 해야 한다(같은 시행령 제68조의12).</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">병역법 시행령 제68조의11(예술ㆍ체육요원의 추천 등) 제1항 중</p>
+      <div class="law" id="law"></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 운동선수 병역 특례는 어떤 종목이 받을까</h2>
+      <p>축구와 야구가 대부분을 받는다. 최근 두 번의 아시안게임에서 열에 일곱이 두 종목이었고, 농구까지 더하면 단체종목이 열에 아홉이다. 공개 자료로 봐도 체육요원 셋 중 둘은 아시안게임에서 나온다.</p>
+      <p>종목이 특례를 고르는 것이 아니라 규칙이 그렇게 만든다. 시행령은 메달의 색과 대회만 정하고 한 메달로 몇 명까지인지는 정하지 않는다. 금메달 하나가 개인종목에서는 한 사람, 축구에서는 스무 사람이다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>종목별 숫자는 공개 파일이 아니라 보도에서 옮긴 2차 자료다. 의원실이 병무청에서 받은 자료를 인용했지만 원자료 표는 공개돼 있지 않다.</li>
+      <li>공개 파일의 해마다 인원과 보도의 대회별 인원은 세는 기준이 다르다. 편입한 해와 대회가 열린 해가 다르고, 공개 파일 2018–2019년 합(34명)은 보도된 2018년 대회 인원(41명)보다 적다. 둘을 섞어 계산하지 않았다.</li>
+      <li>2026년 숫자(56명)는 편입 요건을 채운 사람이고, 실제로 편입했는지는 아직 집계되지 않았다.</li>
+      <li>이미 병역을 마쳤거나 다른 대회로 특례를 받은 선수는 다시 세지 않는다. 그래서 금메달을 딴 선수 수와 편입 인원은 다르다.</li>
+      <li>공개 파일은 체육요원만 있다. 같은 제도의 예술요원(국제 예술경연대회 입상 등)은 이 장에서 다루지 않았다.</li>
+      <li>시행령 조문은 국가법령정보센터의 현행본(2026년 10월 2일 시행)에서 옮겼다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15086043/fileData.do" target="_blank" rel="noopener">체육요원 연도별 편입 현황</a> (15086043)</td><td>병무청</td><td>해마다 편입 인원</td><td>1996–2024</td></tr>
+        <tr><td><a href="https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EB%B3%91%EC%97%AD%EB%B2%95%EC%8B%9C%ED%96%89%EB%A0%B9" target="_blank" rel="noopener">병역법 시행령</a> 제68조의11, 제68조의12</td><td>법제처 국가법령정보센터</td><td>편입 기준, 공익복무 시간</td><td>2026.10.2 시행</td></tr>
+        <tr><td><a href="https://www.fnnews.com/news/202610141013449159" target="_blank" rel="noopener">[단독]아시안게임 병역특례 70% 축구·야구</a> (2차 자료)</td><td>파이낸셜뉴스(김병주 의원실·병무청 자료 인용)</td><td>2018·2023·2026년 종목별 인원, 단체종목 비중</td><td>2026.10.14</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>29개 연도 편입 인원 · 3개 대회 종목별 인원(보도) · 시행령 조문</dd>
+      <dt>도구</dt><dd>Python(집계) · Playwright(법령·기사 화면에서 원문 옮기기) · SVG 저울, 메달 걸이, 메달 기둥(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>아시안게임이 열린 해와 그다음 해의 몫 · 대회별 축구·야구 비중 · 금메달 하나당 편입 인원</dd>
+      <dt>검증</dt><dd>공개 파일 29개 연도의 합 490명. 보도의 대회별 합(41 + 57 = 98명, 축구 20 + 20 = 40명, 야구 9 + 19 = 28명)이 기사 안에서 맞는다. 공개 파일은 2024년 말 판을 썼다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>예술요원은 어떤 대회에서 나올까</h3><p>같은 제도로 국제 예술경연대회 입상자도 예술요원이 된다. 어떤 분야(음악·무용 등)가 많은지 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15004572/fileData.do" target="_blank" rel="noopener">군별 복무유형별 복무기간</a> · 병무청</li></ul></div>
+      <div class="q"><h3>대체복무는 어디로 가장 많이 갈까</h3><p>사회복무요원, 산업기능요원, 전문연구요원 같은 대체복무의 인원을 견줄 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15004572/fileData.do" target="_blank" rel="noopener">병무청 공공데이터</a> · 병무청</li></ul></div>
+    </div>
+  </section>
+
+  <footer>공개 원자료는 스크립트로 계산했고, 종목별 숫자는 보도에서 옮긴 2차 자료다 · 정리 2026.11.18</footer>
+</main>
+
+<script>
+const DATA = {"Y":[[1996,8],[1997,17],[1998,0],[1999,49],[2000,3],[2001,7],[2002,4],[2003,53],[2004,12],[2005,6],[2006,10],[2007,29],[2008,12],[2009,17],[2010,14],[2011,29],[2012,13],[2013,7],[2014,34],[2015,47],[2016,7],[2017,2],[2018,24],[2019,10],[2020,10],[2021,4],[2022,5],[2023,25],[2024,32]],"AG":{"1998":"방콕(12월)","2002":"부산(9–10월)","2006":"도하(12월)","2010":"광저우(11월)","2014":"인천(9–10월)","2018":"자카르타·팔렘방(8–9월)","2023":"항저우(9–10월)","2026":"아이치·나고야(9–10월)"},"OG":{"1996":"애틀랜타","1998":"나가노(겨울)","2000":"시드니","2002":"솔트레이크(겨울)","2004":"아테네","2006":"토리노(겨울)","2008":"베이징","2010":"밴쿠버(겨울)","2012":"런던","2014":"소치(겨울)","2016":"리우","2018":"평창(겨울)","2021":"도쿄","2022":"베이징(겨울)","2024":"파리","2026":"밀라노·코르티나(겨울)"},"news":{"2018":{"tot":41,"축구":20,"야구":9},"2023":{"tot":57,"축구":20,"야구":19},"2026":{"tot":56,"축구":20,"야구":16,"농구":8,"3대3 농구":4},"team":{"2018":80.5,"2023":89.5}},"law":"제68조의11(예술ㆍ체육요원의 추천 등) ① 법 제33조의7제1항 전단에서 “대통령령으로 정하는 예술ㆍ체육 분야의 특기를 가진 사람”이란 다음 각 호의 어느 하나에 해당하는 사람을 말한다. <개정 2016. 3. 25., 2020. 6. 30., 2020. 12. 29., 2021. 10. 14., 2024. 5. 7.>\n\n1. 병무청장이 정하는 국제예술경연대회의 경쟁부문에서 입상한 사람으로서 다음 각 목의 요건을 모두 충족하는 사람. 다만, 한국인의 참가비율과 입상비율 등을 고려하여 병무청장이 정하는 국제예술경연대회의 경우에는 경쟁부문에서 1위로 입상한 사람으로서 입상성적이 가장 높은 사람으로 하며, 입상성적이 같거나 입상성적을 확인할 수 없는 경우에는 병무청장이 정하는 추천기준에 해당하는 사람으로 한다.\n\n가. 2위 이상으로 입상한 사람일 것\n\n나. 입상성적 순으로 2명 이내에 해당하는 사람일 것. 다만, 1위로 입상한 사람이 없는 경우에는 입상성적이 가장 높은 사람으로 한정하며, 입상성적이 같거나 입상성적을 확인할 수 없는 경우에는 병무청장이 정하는 추천기준에 해당하는 사람으로 한다.\n\n2. 병무청장이 정하는 국내예술경연대회(국악 등 국제대회가 없는 분야의 대회로 한정한다)의 경쟁부문에서 1위로 입상한 사람으로서 입상성적이 가장 높은 사람. 다만, 입상성적이 같거나 입상성적을 확인할 수 없는 경우에는 병무청장이 정하는 추천기준에 해당하는 사람으로 한다.\n\n3. 「무형유산의 보전 및 진흥에 관한 법률」 제12조에 따라 국가무형유산으로 지정된 분야에서 5년 이상 국가무형유산 전수교육을 받은 사람으로서 병무청장이 정하는 분야의 자격을 취득한 사람\n\n4. 올림픽대회에서 3위 이상으로 입상한 사람\n\n5. 아시아경기대회에서 1위로 입상한 사람\n\n② 제1항 각 호의 어느 하나에 해당하는 사람으로서 예술ㆍ체육요원으로 복무하기를 원하는 사람은 예술ㆍ체육요원 추천원서(전자문서로 된 원서를 포함한다)에 입상 확인서 등 필요한 서류를 첨부하여 문화체육관광부장관에게 제출하여야 한다. <개정 2016. 11. 29.>\n\n③ 제2항에 따른 예술ㆍ체육요원 추천원서를 받은 문화체육관광부장관은 원서를 받은 날부터 14일 이내에 추천자 명단을 병무청장에게 통보하여야 한다.\n\n④ 예술ㆍ체육요원은 병무청장이 정하는 분야에 복무하여야 한다. <개정 2016. 11. 29.>"};
+document.documentElement.lang = "ko";
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const s = (tag, a = {}, p) => { const e = document.createElementNS(NS, tag); for (const k in a) if (a[k] != null) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  const tx = (p, x, y, str, cls, size, anchor = "start", extra = {}) => { const t = s("text", { x, y, class: cls, "text-anchor": anchor, "font-size": size, ...extra }, p); t.textContent = str; return t; };
+  const fmt = (n) => Math.round(n).toLocaleString("ko-KR");
+  const f1 = (n) => n.toLocaleString("ko-KR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const pc = (n) => f1(n) + "%";
+  const man = (n) => n >= 1e5 ? f1(n / 1e4).replace(/\.0$/, "") + "만" : fmt(n);
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lerp = (arr, pos) => { const k = Math.floor(pos), f = pos - k; return k + 1 < arr.length ? arr[k] + (arr[k + 1] - arr[k]) * f : arr[k]; };
+  const bEl = (t) => Object.assign(document.createElement("b"), { textContent: t });
+
+  function table(id, head, rows) {
+    const t = document.createElement("table"), th = document.createElement("thead"), tr = document.createElement("tr");
+    head.forEach((h) => { const c = document.createElement("th"); c.textContent = h; tr.append(c); }); th.append(tr); t.append(th);
+    const tb = document.createElement("tbody");
+    rows.forEach((r) => { const row = document.createElement("tr"); r.forEach((v) => { const c = document.createElement("td"); c.textContent = v; row.append(c); }); tb.append(row); });
+    t.append(tb); document.getElementById(id).replaceChildren(t);
+  }
+  function tipFor(fig) {
+    const tip = fig.querySelector(".tip");
+    return {
+      show(ev, title, rows) {
+        tip.replaceChildren(); const h = document.createElement("div"); h.className = "tn"; h.textContent = title; tip.append(h);
+        rows.forEach(([v, k, col]) => { const d = document.createElement("div"); if (col) { const i = document.createElement("i"); i.className = "sw dot"; i.style.background = col; i.style.marginRight = "6px"; d.append(i); } const b = document.createElement("span"); b.className = "tv"; b.textContent = v + " "; const kk = document.createElement("span"); kk.textContent = k; d.append(b, kk); tip.append(d); });
+        tip.hidden = false;
+        const fr = fig.getBoundingClientRect(); let x, y;
+        if (ev.clientX != null) { x = ev.clientX - fr.left + 14; y = ev.clientY - fr.top + 14; } else { const r = (ev.rect || ev.target.getBoundingClientRect()); x = r.right - fr.left + 8; y = r.top - fr.top; }
+        const tw = tip.offsetWidth, th = tip.offsetHeight;
+        if (x + tw > fr.width - 8) x = Math.max(8, x - tw - 28);
+        if (y + th > fr.height - 8) y = Math.max(8, y - th - 28);
+        tip.style.left = x + "px"; tip.style.top = y + "px";
+      },
+      hide() { tip.hidden = true; },
+    };
+  }
+  /* Marks you can point at. One tab stop per chart; Left/Right step, Up/Down jump rows, Escape hides.
+     pts: {x, y, r, fn() -> [title, rows]} in viewBox units; u = viewBox units per CSS px. */
+  function pointLayer(v, tip, pts, label, u = 1) {
+    const ring = s("circle", { class: "ring", "stroke-width": 2 * u, opacity: 0 }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = i; const p = pts[i]; ring.setAttribute("cx", p.x); ring.setAttribute("cy", p.y); ring.setAttribute("r", p.r + 4 * u); ring.setAttribute("opacity", 1); const [t, rows] = p.fn(); tip.show(ev || { target: ring }, t, rows); };
+    const hide = () => { tip.hide(); ring.setAttribute("opacity", 0); };
+    const nearest = (e) => {
+      const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal, k = vb.width / r.width;
+      const x = vb.x + (e.clientX - r.left) * k, y = vb.y + (e.clientY - r.top) * k;
+      let best = -1, bd = Infinity;
+      pts.forEach((p, i) => { const d = Math.hypot(p.x - x, p.y - y) - p.r, reach = 18 * k; if (d < reach && d < bd) { bd = d; best = i; } });
+      return best;
+    };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerdown", (e) => { const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => { if (pts.length) show(idx < 0 ? 0 : idx); }); v.addEventListener("blur", hide);
+    const vert = (dir) => { const c = pts[Math.max(idx, 0)]; let best = -1, bd = Infinity; pts.forEach((p, i) => { const dy = (p.y - c.y) * dir; if (dy <= 0.5) return; const d = dy * 3 + Math.abs(p.x - c.x); if (d < bd) { bd = d; best = i; } }); return best < 0 ? Math.max(idx, 0) : best; };
+    v.addEventListener("keydown", (e) => {
+      if (!pts.length) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show((Math.max(idx, 0) + (e.key === "ArrowRight" ? 1 : -1) + pts.length) % pts.length); }
+      else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); show(vert(e.key === "ArrowDown" ? 1 : -1)); }
+      else if (e.key === "Escape") hide();
+    });
+  }
+  /* A time cursor over a chart: pointer or Left/Right picks a time index, a vertical rule follows it. */
+  function timeLayer(v, tip, n, xOf, y0, y1, fn, label, u = 1) {
+    const rule = s("line", { y1: y0, y2: y1, stroke: "var(--ink)", "stroke-width": u, opacity: 0, "pointer-events": "none" }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = Math.max(0, Math.min(n - 1, i)); const x = xOf(idx); rule.setAttribute("x1", x); rule.setAttribute("x2", x); rule.setAttribute("opacity", .5); const [t, rows] = fn(idx); const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; tip.show(ev || { rect: { right: r.left + (x - vb.x) / vb.width * r.width, top: r.top + 20 } }, t, rows); };
+    const hide = () => { tip.hide(); rule.setAttribute("opacity", 0); };
+    const at = (e) => { const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; const x = vb.x + (e.clientX - r.left) * vb.width / r.width; let best = 0, bd = Infinity; for (let i = 0; i < n; i++) { const d = Math.abs(xOf(i) - x); if (d < bd) { bd = d; best = i; } } return best; };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; show(at(e), e); });
+    v.addEventListener("pointerdown", (e) => show(at(e), e));
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => show(idx < 0 ? n - 1 : idx)); v.addEventListener("blur", hide);
+    v.addEventListener("keydown", (e) => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show(idx + (e.key === "ArrowRight" ? 1 : -1)); } else if (e.key === "Home") { e.preventDefault(); show(0); } else if (e.key === "End") { e.preventDefault(); show(n - 1); } else if (e.key === "Escape") hide(); });
+  }
+  /* A player: play/pause, scrubber and a large time readout. Frames 0..n-1; at rest it shows the last frame. */
+  function Player(id, label, draw, n, labelOf, seconds = 10) {
+    const box = document.getElementById(id);
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "play"; btn.setAttribute("aria-label", label + " 재생");
+    const icon = (playing) => { btn.replaceChildren(); const v = s("svg", { viewBox: "0 0 20 20", "aria-hidden": "true" }, btn); if (playing) { s("rect", { x: 4, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); s("rect", { x: 12, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); } else s("path", { d: "M5,3 L17,10 L5,17 Z", fill: "currentColor" }, v); };
+    const yr = document.createElement("div"); yr.className = "yr"; yr.setAttribute("aria-hidden", "true");
+    const sc = document.createElement("input"); sc.type = "range"; sc.className = "scrub"; sc.min = 0; sc.max = n - 1; sc.step = 1; sc.value = n - 1; sc.setAttribute("aria-label", label + " 시점");
+    box.append(btn, yr, sc);
+    let pos = n - 1, raf = 0, playing = false, t0 = 0, from = 0;
+    const render = () => { const k = Math.min(n - 1, Math.floor(pos + 1e-6)); yr.textContent = labelOf(k); sc.value = Math.round(pos); sc.setAttribute("aria-valuetext", labelOf(Math.round(pos))); draw(pos); };
+    const stop = () => { playing = false; cancelAnimationFrame(raf); icon(false); btn.setAttribute("aria-label", label + " 재생"); };
+    const tick = (now) => { pos = Math.min(n - 1, from + (now - t0) / (seconds * 1000) * (n - 1)); render(); if (pos < n - 1) raf = requestAnimationFrame(tick); else stop(); };
+    btn.addEventListener("click", () => {
+      if (playing) { stop(); return; }
+      if (reduce) { pos = n - 1; render(); return; }
+      from = pos >= n - 1 ? 0 : pos; pos = from; playing = true; icon(true); btn.setAttribute("aria-label", label + " 멈춤");
+      raf = requestAnimationFrame((t) => { t0 = t; tick(t); });
+    });
+    sc.addEventListener("input", () => { stop(); pos = +sc.value; render(); });
+    icon(false);
+    return { render, get pos() { return pos; } };
+  }
+  document.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".opt").forEach((o) => { o.setAttribute("aria-pressed", o === b); o.dataset.state = o.dataset.a === "1" ? "right" : "wrong"; });
+    document.getElementById("reveal").hidden = false;
+  }));
+  function chips(id, opts, cur, onPick) {
+    const box = document.getElementById(id);
+    opts.forEach(([k, name]) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = name; b.setAttribute("aria-pressed", k === cur); b.addEventListener("click", () => { box.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === b)); onPick(k); }); box.append(b); });
+  }
+  function onResize(fn) {
+    let lastW = 0, rt;
+    new ResizeObserver(() => { const w = document.querySelector(".page").clientWidth; if (Math.abs(w - lastW) < 2) return; lastW = w; clearTimeout(rt); rt = setTimeout(fn, 80); }).observe(document.querySelector(".page"));
+  }
+
+  const NEWS = DATA.news, SP = ["축구", "야구", "농구", "3대3 농구", "그 밖의 종목"], SPC = [0, 1, 2, 3, 4].map((k) => `var(--sp${k})`);
+  function medal(g, x, y, u, col, ribbon) {
+    s("path", { d: `M${x - u * .22},${y - u * 1.05} L${x - u * .08},${y - u * .42} M${x + u * .22},${y - u * 1.05} L${x + u * .08},${y - u * .42}`, stroke: ribbon || "var(--ribbon)", "stroke-width": u * .2, "stroke-linecap": "round" }, g);
+    s("circle", { cx: x, cy: y, r: u * .42, fill: col, stroke: "var(--gold-edge)", "stroke-width": u * .06 }, g);
+    s("circle", { cx: x, cy: y, r: u * .26, fill: "none", stroke: "var(--card)", "stroke-width": u * .05, opacity: .6 }, g);
+  }
+
+  /* ---------- 1. balance ---------- */
+  let nInd = 0, teamK = 0; const TEAM = [["축구", 20, "var(--sp0)"], ["야구", 19, "var(--sp1)"]];
+  function c1() {
+    const box = document.getElementById("c1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, H = narrow ? 300 : 340, cx = W / 2, top = 70, arm = Math.min(W * .38, 260), [tn, tv, tc] = TEAM[teamK];
+    const diff = tv - nInd, ang = Math.max(-18, Math.min(18, diff * 1.4));
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `저울. 왼쪽 ${tn} 금메달 1개(${tv}명), 오른쪽 개인종목 금메달 ${nInd}개(${nInd}명). ${diff === 0 ? "저울이 맞는다" : diff > 0 ? "왼쪽이 무겁다" : "오른쪽이 무겁다"}` }, box);
+    s("path", { d: `M${cx - 50},${H - 14} L${cx + 50},${H - 14} L${cx + 12},${H - 30} L${cx + 6},${top + 6} L${cx - 6},${top + 6} L${cx - 12},${H - 30} Z`, fill: "var(--beam)" }, v);
+    const beam = s("g", { class: "beam", style: `transform-origin:${cx}px ${top}px; transform: rotate(${-ang}deg)` }, v);
+    s("rect", { x: cx - arm, y: top - 4, width: arm * 2, height: 8, rx: 4, fill: "var(--beam)" }, beam); s("circle", { cx, cy: top, r: 9, fill: "var(--beam)" }, beam);
+    const pan = (px, items, col, lab, val) => {
+      const py = top + (narrow ? 70 : 80), pg = s("g", {}, beam);
+      s("line", { x1: px, x2: px - 46, y1: top, y2: py, stroke: "var(--axis)", "stroke-width": 1.4 }, pg); s("line", { x1: px, x2: px + 46, y1: top, y2: py, stroke: "var(--axis)", "stroke-width": 1.4 }, pg);
+      const counter = s("g", { transform: `rotate(${ang} ${px} ${py})` }, pg);
+      s("path", { d: `M${px - 62},${py} Q${px},${py + 26} ${px + 62},${py} Z`, fill: "var(--pan)" }, counter);
+      items(counter, px, py);
+      tx(counter, px, py + 44, lab, "lb", 13.5, "middle", { "font-weight": 700 }); tx(counter, px, py + 62, `${val}명`, "vl", 15, "middle");
+    };
+    pan(cx - arm, (g, px, py) => medal(g, px, py - 18, 34, tc, "var(--ribbon2)"), tc, `${tn} 금메달 1개`, tv);
+    pan(cx + arm, (g, px, py) => { const per = 7; for (let i = 0; i < nInd; i++) medal(g, px - 48 + (i % per) * 16, py - 8 - Math.floor(i / per) * 15, 13, "var(--gold)"); }, "var(--gold)", `개인종목 금메달 ${nInd}개`, nInd);
+    tx(v, cx, 24, diff === 0 ? "저울이 맞았다" : diff > 0 ? `${diff}개 더 올려야 맞는다` : `${-diff}개가 넘친다`, diff === 0 ? "vl i0" : "lb", diff === 0 ? 17 : 14.5, "middle", diff === 0 ? {} : { "font-weight": 700 });
+    document.getElementById("nout").textContent = `${nInd}개`;
+  }
+  document.getElementById("add").addEventListener("click", () => { nInd = Math.min(30, nInd + 1); c1(); });
+  document.getElementById("sub").addEventListener("click", () => { nInd = Math.max(0, nInd - 1); c1(); });
+  document.getElementById("team").addEventListener("click", (e) => { teamK = 1 - teamK; e.target.textContent = teamK ? "축구 금메달로 바꾸기" : "야구 금메달로 바꾸기"; c1(); });
+
+  /* ---------- 2. medal racks ---------- */
+  let ev = "2023";
+  const rackOf = (k) => { const n = NEWS[k], parts = [n["축구"] || 0, n["야구"] || 0, n["농구"] || 0, n["3대3 농구"] || 0]; parts.push(n.tot - parts.reduce((a, b) => a + b, 0)); return parts; };
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const parts = rackOf(ev), tot = NEWS[ev].tot, W = Math.max(300, box.clientWidth), narrow = W < 560, per = narrow ? 10 : 20, cw = Math.min(46, (W - 8) / per), u = cw * .62, rh = u * 2.1, rows = Math.ceil(tot / per), H = rows * rh + (narrow ? 64 : 40), x0 = (W - per * cw) / 2, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${ev}년 아시안게임 체육요원 ${tot}명. ` + SP.map((sp, k) => parts[k] ? `${sp} ${parts[k]}명` : "").filter(Boolean).join(", ") }, box);
+    let i = 0;
+    for (let r = 0; r < rows; r++) s("line", { x1: x0, x2: x0 + per * cw, y1: 8 + r * rh, y2: 8 + r * rh, stroke: "var(--beam)", "stroke-width": 3, "stroke-linecap": "round" }, v);
+    parts.forEach((n, k) => { for (let q = 0; q < n; q++, i++) { const x = x0 + (i % per) * cw + cw / 2, y = 8 + Math.floor(i / per) * rh + u * 1.25; medal(v, x, y, u, SPC[k]); } });
+    let lx = x0, ly = H - (narrow ? 38 : 14); SP.forEach((sp, k) => { if (!parts[k]) return; const t = `${sp} ${parts[k]}`, w = t.length * 12 + 30; if (lx + w > W) { lx = x0; ly += 24; } s("circle", { cx: lx + 6, cy: ly, r: 6, fill: SPC[k] }, v); tx(v, lx + 16, ly + 5, t, "lb", 13); lx += w; });
+    pts.push({ x: W / 2, y: H / 2, r: W / 2, fn: () => [`${ev}년 아시안게임`, [[`${tot}명`, ev === "2026" ? "편입 요건 충족" : "체육요원 편입"], ...SP.map((sp, k) => [`${parts[k]}명`, sp, SPC[k]]).filter((r_) => r_[0] !== "0명"), [pc((parts[0] + parts[1]) / tot * 100), "축구 + 야구"]]] });
+    pointLayer(v, tipFor(fig), pts, "Enter로 숫자를 볼 수 있다");
+  }
+  chips("k2", [["2018", "2018 자카르타·팔렘방"], ["2023", "2023 항저우"], ["2026", "2026 아이치·나고야"]], ev, (k) => { ev = k; c2(); });
+  table("t2", ["대회", "인원", ...SP, "축구 + 야구 비중"], ["2018", "2023", "2026"].map((k) => { const p = rackOf(k); return [`${k}년${k === "2026" ? "(요건 충족)" : ""}`, NEWS[k].tot, ...p, pc((p[0] + p[1]) / NEWS[k].tot * 100)]; }));
+
+  /* ---------- 3. medal stacks per year ---------- */
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const Y = DATA.Y, W = Math.max(300, box.clientWidth), narrow = W < 560, gw = (W - 8) / Y.length, u = Math.min(gw * .8, 12), per = 1, stepY = u * .52, maxN = Math.max(...Y.map((r) => r[1])), H = maxN * stepY + 84, base = H - 50, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "해마다 체육요원 편입 인원을 메달로 쌓은 그림. 2003년 53명, 1999년 49명, 2015년 47명이 많다" }, box);
+    Y.forEach(([yr, n], k) => {
+      const cx = 4 + gw * k + gw / 2, ag = DATA.AG[yr], og = DATA.OG[yr];
+      for (let q = 0; q < n; q++) s("circle", { cx, cy: base - q * stepY - u * .45, r: u * .45, fill: "var(--gold)", stroke: "var(--gold-edge)", "stroke-width": .7 }, v);
+      if (n >= 24) tx(v, cx, base - n * stepY - 6, n, "vl", 12, "middle");
+      if (ag) s("rect", { x: cx - gw * .4, y: base + 6, width: gw * .8, height: 6, rx: 2, fill: "var(--ag)" }, v);
+      if (og) s("rect", { x: cx - gw * .4, y: base + 14, width: gw * .8, height: 6, rx: 2, fill: "var(--og)" }, v);
+      if (yr % (narrow ? 8 : 4) === 0) tx(v, cx, base + 36, narrow ? `'${String(yr).slice(2)}` : yr, "tk", 11, "middle");
+      pts.push({ x: cx, y: base - Math.max(n, 2) * stepY / 2, r: Math.max(6, gw / 2), fn: () => [`${yr}년`, [[`${n}명`, "체육요원 편입"], ...(ag ? [[ag, "아시안게임", "var(--ag)"]] : []), ...(og ? [[og, "올림픽", "var(--og)"]] : [])]] });
+    });
+    s("line", { x1: 0, x2: W, y1: base + 2, y2: base + 2, class: "ax" }, v);
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표 키로 해를 옮겨 볼 수 있다");
+  }
+  table("t3", ["연도", "편입 인원", "그해 아시안게임", "그해 올림픽"], DATA.Y.map(([y, n]) => [y, n, DATA.AG[y] || "", DATA.OG[y] || ""]));
+
+  /* ---------- 4. law card ---------- */
+  (() => {
+    const box = document.getElementById("law"), t = DATA.law, a = t.indexOf("4. 올림픽"), b = t.indexOf("② ");
+    const p0 = document.createElement("p"); p0.textContent = t.slice(0, t.indexOf("<개정")).trim(); box.append(p0);
+    const p1 = document.createElement("p"); p1.textContent = "1.–3. (국제·국내 예술경연대회 입상자, 국가무형유산 전수교육 이수자 — 줄임)"; p1.style.color = "var(--muted)"; box.append(p1);
+    t.slice(a, b).trim().split(/\n+/).filter(Boolean).forEach((line) => { const p = document.createElement("p"), m = document.createElement("mark"); m.textContent = line.trim(); p.append(m); box.append(p); });
+    const src = document.createElement("p"); src.className = "src"; src.textContent = "국가법령정보센터 「병역법 시행령」 [시행 2026. 10. 2.] 제68조의11 제1항(개정 2016. 3. 25., 2020. 6. 30., 2020. 12. 29., 2021. 10. 14., 2024. 5. 7.)"; box.append(src);
+  })();
+
+  /* ---------- first view + resize ---------- */
+  c1(); c2(); c3();
+  onResize(() => { c1(); c2(); c3(); });
+})();
+</script>

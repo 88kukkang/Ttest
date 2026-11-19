@@ -1,0 +1,261 @@
+<title>안전모 탑</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: stacks of hard hats, one stack per industry, one hat per 1,000 injured workers — dropped onto the pile when the
+   chart comes into view and re-stacked when the year changes. Deaths are a wall of bricks, one brick per five deaths,
+   split into illness and the ways people were killed. */
+:root {
+  --paper: #f3f1ec; --card: #fdfcf9; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #dbe1dd; --grid: #e8e7e3; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --accent: #d56b41; --hat: #dc8c67; --hat2: #d56b41; --hat-hi: #ebcfa7; --brim: #8b4d3e;
+  --ill: #928a7f; --fall: #d56b41; --pinch: #9b3737; --hit: #b87b68; --road: #3e6f90; --other: #bcbbb6;
+  --up: #9b3737; --down: #416e59; --hat-ink: #a8451f;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #dc8c67; --brim: #cd9886; --ill: #928a7f; --pinch: #cd9886; --hit: #d8b29b; --road: #8eabc9; --other: #5f6062;
+  --up: #cd9886; --down: #91b0a1; --hat-ink: #dc8c67; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #dc8c67; --brim: #cd9886; --ill: #928a7f; --pinch: #cd9886; --hit: #d8b29b; --road: #8eabc9; --other: #5f6062;
+  --up: #cd9886; --down: #91b0a1; --hat-ink: #dc8c67; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+:focus-visible { outline-color: var(--accent) }
+</style>
+
+<main class="page">
+  <header>
+    <h1>산업재해는 공장의 일일까<span>아니다. 다친 사람은 서비스업 일터에서 가장 많고(37%), 공장(제조업)은 23%다. 목숨을 잃는 사고는 건설 현장에 몰리고, 사망자의 61%는 사고가 아니라 일하다 얻은 병으로 숨졌다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 22</dd>
+      <dt>한 줄</dt><dd>고용노동부 산업재해현황으로 2024년 재해자 14만 2,771명을 업종별로 보면 기타의 사업(도소매·음식숙박·시설관리·보건교육 등 서비스업) 5만 3,328명(37.4%), 건설업 3만 4,370명(24.1%), 제조업 3만 2,767명(23.0%), 운수·창고·통신업 1만 6,961명(11.9%)이다. 10년 전(2014년)보다 재해자는 57% 늘었고, 운수·창고·통신업은 4.0배, 서비스업은 1.8배가 됐다. 사망자 2,098명 가운데 1,271명(60.6%)은 업무상 질병이고, 사고 사망 827명 중 건설업이 328명(39.7%), 떨어짐이 278명(33.6%)이다.</dd>
+      <dt>분류</dt><dd>안전</dd>
+      <dt>본능</dt><dd>일반화 본능 · "산재 = 공장의 기계 사고"라는 한 장면으로 일터의 위험을 본다</dd>
+      <dt>그림 방식</dt><dd>안전모 탑 · 업종마다 재해자 1,000명당 안전모 하나를 쌓았다(2014·2019·2024년). 사망은 5명당 벽돌 하나로 담을 쌓아 병과 사고의 형태를 나눴다</dd>
+      <dt>기간</dt><dd>2014·2019·2024년</dd>
+      <dt>엮은 데이터</dt><dd>2개 · 고용노동부 산업재해현황(업종별·발생형태별, KOSIS) · 근로복지공단 업종별 산재신청 승인현황(2018–2024)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2024년 일하다 다치거나 병을 얻은 재해자 14만 2,771명. 가장 많은 업종은?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>제조업(공장)</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>건설업</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>서비스업(도소매·음식숙박·시설관리 등)</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. <span class="n">5만 3,328명</span>, 37.4%</span>
+      건설업(24.1%)과 제조업(23.0%)을 앞선다. 일하는 사람이 가장 많은 업종이라 재해율(0.42%)은 낮지만, 다치는 사람의 수로는 가장 많다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">업종마다 쌓인 안전모</h2>
+      <p>업종마다 재해자 1,000명당 안전모를 하나씩 쌓았다. 2024년 가장 높은 탑은 공장이 아니라 서비스업(53개)이다. 건설업(34개)과 제조업(33개)이 비슷하고, 운수·창고·통신업(17개)이 뒤를 잇는다. 탑 위의 숫자는 재해율(근로자 100명당 재해자)이다. 건설업 1.65, 운수업 1.21, 제조업 0.80, 서비스업 0.42다.</p>
+      <p>2014년을 누르면 탑이 다시 쌓인다. 10년 전에는 서비스업 30개, 제조업 29개로 비슷했고 운수업은 4개였다. 배달·물류 일이 늘면서 운수업 탑이 4배로 자랐다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">업종별 재해자</p>
+      <p class="fs">안전모 하나 = 재해자 1,000명(반올림). 탑 위 숫자 = 재해율(%)</p>
+      <div class="chips" id="chips1" role="group" aria-label="연도"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>고용노동부 「산업재해현황」 업종별(KOSIS 118 DT_11806_N000). 기타의 사업 = 도소매·음식숙박·시설관리·전문·보건·교육·여가 서비스 등. 광업 재해자의 대부분은 진폐 같은 업무상 질병이다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">2,098개 목숨의 벽</h2>
+      <p>2024년 산업재해 사망자 2,098명을 벽돌 하나에 5명씩 쌓았다. 벽의 절반 넘는 회색은 업무상 질병(1,271명)이다. 광업의 진폐, 오래 일한 사람의 암과 뇌·심장 질환이 여기에 들어간다. 나머지 827명이 사고다. 가장 큰 덩어리가 떨어짐(278명)이고, 끼임(97명), 사업장 밖 교통사고(87명)가 뒤를 잇는다. 떨어져 숨진 278명 중 182명이 건설 현장이다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">산업재해 사망자의 원인, 2024년</p>
+      <p class="fs">벽돌 하나 = 사망자 5명(반올림). 아래 막대 = 업종별 사고 사망</p>
+      <div class="legend" id="lg2"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>고용노동부 「산업재해현황」 사망재해 발생형태별(KOSIS 118 DT_11806_N022).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">인정받기 어려운 업종</h2>
+      <p>근로복지공단에 산재를 신청한 사람 가운데 인정받은 비율을 업종마다 봤다. 대부분의 업종은 90% 안팎이 인정받는다. 광업은 절반만 인정받는다. 광업 신청의 대부분이 진폐처럼 일과의 관계를 따져야 하는 병이기 때문이다. 산업재해의 숫자는 신청하고 인정받은 사람만의 숫자다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">업종별 산재 신청 대비 승인, 2018–2024년</p>
+      <p class="fs">%. 선 하나 = 업종 하나</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>근로복지공단 「업종별 산재신청 승인현황」(2018–2024). 업종 이름은 근로복지공단 분류를 따랐다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">그래서, 산업재해는 공장의 일일까</h2>
+      <p>아니다. 다치는 사람은 가게·식당·건물 관리·병원·학교 같은 서비스 일터에서 가장 많고, 배달·물류 일이 늘면서 운수업 재해가 10년 새 네 배가 됐다. 목숨을 잃는 사고는 높은 곳에서 떨어지는 건설 현장에 몰린다. 그리고 산재 사망의 다수는 사고가 아닌 병이다. 공장의 기계 앞만 보는 안전 대책으로는 일터의 위험 대부분을 놓친다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>재해자는 산재보험으로 인정받은 사람(요양 4일 이상)이다. 신청하지 않거나 인정받지 못한 재해는 들어 있지 않다.</li>
+      <li>2018년 이후 출퇴근 재해와 특수형태근로종사자(배달 등)의 산재 적용이 넓어져, 10년 전과의 비교에는 제도 변화가 섞여 있다.</li>
+      <li>사망자에는 업무상 질병 사망이 함께 들어 있다. 사고 사망만 말할 때는 827명이다.</li>
+      <li>"기타의 사업"은 고용노동부 업종 분류의 이름이고, 대부분 서비스업이다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=118&amp;tblId=DT_11806_N000" target="_blank" rel="noopener">산업재해현황 업종별</a> (KOSIS 118, 산업재해통계 15127634와 같은 출처)</td><td>고용노동부</td><td>업종별 근로자, 재해자, 사망자, 재해율</td><td>2014·2019·2024</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=118&amp;tblId=DT_11806_N022" target="_blank" rel="noopener">사망재해 발생형태별</a> (KOSIS 118)</td><td>고용노동부</td><td>업종별 사망 원인(떨어짐·끼임·질병 등)</td><td>2024</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15095104/fileData.do" target="_blank" rel="noopener">업종별 산재신청 승인현황</a> (15095104)</td><td>근로복지공단</td><td>업종별 신청·승인 건수</td><td>2018–2024</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>업종 대분류 10개 × 3개 연도 · 사망 형태 23가지 · 승인 7개 연도</dd>
+      <dt>도구</dt><dd>Python(집계) · SVG 안전모 탑, 벽돌 벽, 승인율 선(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>업종별 재해자 구성과 10년 변화 · 사망의 질병·사고 구분</dd>
+      <dt>검증</dt><dd>업종 소계의 합이 총계와 같은지 확인했다(2024년 재해자 14만 2,771명, 사망자 2,098명). 발생형태별 사망의 합도 2,098명이다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>작은 일터가 더 위험할까</h3><p>사업장 규모별 재해율로 5인 미만·50인 미만 사업장의 위험을 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=118&amp;tblId=DT_11806_N001" target="_blank" rel="noopener">산업재해현황 규모별</a> · 고용노동부</li></ul></div>
+      <div class="q"><h3>나이 든 노동자가 더 많이 다칠까</h3><p>연령별 재해자와 사망자로 60세 이상 노동자의 위험을 볼 수 있다.</p></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.6</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const IND = DATA.IND, N0 = DATA.n0;
+  const SN = { "제조업": "제조", "건설업": "건설", "기타의 사업": "서비스", "운수·창고 및 통신업": "운수·창고", "광업": "광업", "임업": "임업", "농업": "농업", "금융 및 보험업": "금융", "어업": "어업", "전기·가스·증기·수도사업": "전기·가스" };
+  const SHOW = ["기타의 사업", "건설업", "제조업", "운수·창고 및 통신업", "광업", "임업", "농업", "금융 및 보험업"];
+
+  /* ---------- 1. hard-hat towers ---------- */
+  let yr = "2024", hatsShown = false;
+  chips("chips1", [["2024", "2024년"], ["2019", "2019년"], ["2014", "2014년"]], yr, (k) => { yr = k; c1(true); });
+  function hat(g, x, y, w, col) {
+    const h = w * .55;
+    s("path", { d: `M${x - w * .42},${y} Q${x - w * .42},${y - h} ${x},${y - h} Q${x + w * .42},${y - h} ${x + w * .42},${y} Z`, fill: col }, g);
+    s("rect", { x: x - w * .5, y: y - 1.5, width: w, height: 3.2, rx: 1.6, fill: "var(--brim)" }, g);
+    s("path", { d: `M${x - w * .12},${y - h * .92} Q${x},${y - h * 1.02} ${x + w * .12},${y - h * .92}`, stroke: "var(--hat-hi)", "stroke-width": 1.4, fill: "none" }, g);
+  }
+  function c1(animate) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, n = SHOW.length, cw = W / n, hw = Math.min(narrow ? 22 : 34, cw * .7), step = hw * .42, H = 60 + 55 * step + 46, base = H - 40;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${yr}년 업종별 재해자를 안전모 탑으로 그린 그림` }, box), pts = [];
+    s("line", { x1: 0, x2: W, y1: base + 2, y2: base + 2, stroke: "var(--axis)", "stroke-width": 2 }, v);
+    const hats = [];
+    SHOW.forEach((ind, i) => {
+      const d = N0[yr][ind], k = Math.round(d.inj / 1000), cx = i * cw + cw / 2;
+      for (let j = 0; j < k; j++) { const g = s("g", {}, v); hat(g, cx + ((j % 2) ? 1.2 : -1.2), base - j * step, hw, j % 5 === 4 ? "var(--hat2)" : "var(--hat)"); hats.push({ g, j, i }); }
+      const topY = base - Math.max(1, k) * step - hw * .6;
+      tx(v, cx, topY - 4, d.rate.toFixed(2) + "%", "vl", narrow ? 11.5 : 13, "middle", { style: "fill:var(--hat-ink)" });
+      tx(v, cx, base + 18, SN[ind], "lb", narrow ? 11 : 12.5, "middle");
+      if (!narrow) tx(v, cx, base + 33, `${man(d.inj)}`, "tk", 11, "middle");
+      pts.push({ x: cx, y: (base + topY) / 2, r: cw / 2, fn: () => [`${ind} · ${yr}년`, [[fmt(d.inj) + "명", "재해자"], [fmt(d.dth) + "명", "사망자"], [d.rate.toFixed(2) + "%", "재해율"], [man(d.w) + "명", "근로자"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 업종을 옮겨 볼 수 있다");
+    if (reduce) return;
+    const drop = () => hats.forEach(({ g, j, i }) => { g.style.transform = "translateY(-260px)"; g.style.opacity = 0; requestAnimationFrame(() => requestAnimationFrame(() => { g.style.transition = `transform .55s cubic-bezier(.4,1.6,.6,1) ${j * 28 + i * 40}ms, opacity .2s ${j * 28 + i * 40}ms`; g.style.transform = "translateY(0)"; g.style.opacity = 1; })); });
+    if (animate || hatsShown) { if (animate) drop(); return; }
+    hats.forEach(({ g }) => { g.style.opacity = 0; });
+    const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); hatsShown = true; drop(); }, { threshold: .25 });
+    io.observe(box);
+  }
+  table("t1", ["업종", "재해자 2014", "재해자 2019", "재해자 2024", "사망자 2024", "재해율 2024", "근로자 2024"], IND.map((ind) => [ind, fmt(N0[2014][ind].inj), fmt(N0[2019][ind].inj), fmt(N0[2024][ind].inj), fmt(N0[2024][ind].dth), N0[2024][ind].rate.toFixed(2) + "%", fmt(N0[2024][ind].w)]));
+
+  /* ---------- 2. wall of bricks ---------- */
+  const T = DATA.n22["총계"];
+  const GRP = [["업무상질병", "업무상 질병", "ill"], ["떨어짐", "떨어짐", "fall"], ["끼임", "끼임", "pinch"], ["사업장외 교통사고", "교통사고(사업장 밖)", "road"], ["부딪힘", "부딪힘·맞음·무너짐", "hit", ["물체에 맞음", "무너짐"]], ["기타사고", "그 밖의 사고", "other"]];
+  const known = new Set(["계", "업무상질병", "떨어짐", "끼임", "사업장외 교통사고", "부딪힘", "물체에 맞음", "무너짐"]);
+  const val = (row, g) => g[0] === "기타사고" ? Object.entries(row).filter(([k]) => !known.has(k)).reduce((a, [, x]) => a + x, 0) : row[g[0]] + (g[3] ? g[3].reduce((a, k) => a + row[k], 0) : 0);
+  { const lg = document.getElementById("lg2"); GRP.forEach((g) => { const sp = document.createElement("span"); const i = document.createElement("i"); i.className = "sw"; i.style.background = `var(--${g[2]})`; sp.append(i, `${g[1]} ${fmt(val(T, g))}명`); lg.append(sp); }); }
+  let wallShown = false;
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, per = narrow ? 20 : 42, bw = W / per, bh = bw * .5, n = Math.round(T["계"] / 5), rows = Math.ceil(n / per);
+    const accInd = SHOW.filter((i) => i !== "광업").concat(["광업"]).map((ind) => ({ ind, a: DATA.n22[ind]["계"] - DATA.n22[ind]["업무상질병"] })).sort((a, b) => b.a - a.a).slice(0, 6);
+    const barTop = rows * bh + 30, H = barTop + accInd.length * 24 + 10;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "산업재해 사망자 2,098명을 벽돌 벽으로 그린 그림" }, box), pts = [], bricks = [];
+    let k = 0;
+    GRP.forEach((g) => {
+      const m = Math.round(val(T, g) / 5);
+      for (let j = 0; j < m && k < n; j++, k++) {
+        const r = Math.floor(k / per), c = k % per, off = r % 2 ? bw / 2 : 0, x = c * bw + off - (r % 2 && c === per - 1 ? bw / 2 : 0), y = (rows - 1 - r) * bh;
+        const b = s("rect", { x: x + .8, y: y + .8, width: (r % 2 && c === per - 1 ? bw / 2 : bw) - 1.6, height: bh - 1.6, rx: 1.5, fill: `var(--${g[2]})` }, v); bricks.push({ b, r });
+      }
+      pts.push({ x: 0, y: 0, r: 0, fn: () => [g[1], [[fmt(val(T, g)) + "명", "2024년 사망"], [pc(val(T, g) / T["계"] * 100), "전체 중"]]] });
+    });
+    // place a tooltip point at each group's first brick
+    let kk = 0; GRP.forEach((g, gi) => { const m = Math.round(val(T, g) / 5), mid = kk + Math.floor(m / 2), r = Math.floor(mid / per), c = mid % per; pts[gi].x = c * bw + bw / 2 + (r % 2 ? bw / 2 : 0); pts[gi].y = (rows - 1 - r) * bh + bh / 2; pts[gi].r = bw * 2; kk += m; });
+    tx(v, 0, barTop - 8, "업종별 사고 사망(질병 제외)", "lb", 12.5, "start", { style: "font-weight:600" });
+    const mx = Math.max(...accInd.map((a) => a.a)), l = narrow ? 64 : 90;
+    accInd.forEach((a, i) => { const y = barTop + i * 24; tx(v, l - 8, y + 13, SN[a.ind], "lb", 12, "end"); s("rect", { x: l, y: y + 2, width: (W - l - 50) * a.a / mx, height: 14, rx: 2, fill: "var(--fall)", opacity: i ? .65 : 1 }, v); tx(v, l + (W - l - 50) * a.a / mx + 6, y + 13, `${a.a}명`, "tk", 11.5, "start"); pts.push({ x: l + (W - l - 50) * a.a / mx, y: y + 9, r: 8, fn: () => [a.ind, [[`${a.a}명`, "사고 사망"], [`${DATA.n22[a.ind]["떨어짐"]}명`, "그중 떨어짐"], [`${DATA.n22[a.ind]["업무상질병"]}명`, "질병 사망"]]] }); });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 벽의 덩어리와 업종을 옮겨 볼 수 있다");
+    if (!wallShown && !reduce) {
+      bricks.forEach(({ b }) => { b.style.opacity = 0; });
+      const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); wallShown = true; bricks.forEach(({ b, r }, i) => { b.style.transition = `opacity .25s ${r * 70 + (i % per) * 6}ms`; b.style.opacity = 1; }); }, { threshold: .2 });
+      io.observe(box);
+    }
+  }
+  table("t2", ["업종", "사망", "업무상 질병", "사고", "떨어짐", "끼임"], ["총계", ...IND].map((ind) => { const r = DATA.n22[ind]; return [ind, fmt(r["계"]), fmt(r["업무상질병"]), fmt(r["계"] - r["업무상질병"]), fmt(r["떨어짐"]), fmt(r["끼임"])]; }));
+
+  /* ---------- 3. approval rates ---------- */
+  const AP = DATA.appr, AY = ["2018", "2019", "2020", "2021", "2022", "2023", "2024"];
+  const AN = Object.keys(AP).filter((k) => k !== "구분없음" && AY.every((y) => AP[k][y] && AP[k][y][0] >= 50));
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), H = Math.min(320, Math.max(250, W * .42)), l = 40, r = 112, top = 14, bot = 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "업종별 산재 신청 대비 승인 비율 2018–2024" }, box);
+    const nm = (k) => ({ "기타의사업": "서비스", "운수·창고및통신업": "운수·창고", "금융및보험업": "금융·보험", "전기·가스및상수도사업": "전기·가스" }[k] || k);
+    const sx = (y) => l + (y - 2018) / 6 * (W - l - r), sy = (p) => top + (1 - (p - 40) / 60) * (H - top - bot);
+    [40, 60, 80, 100].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: "gl" }, v); tx(v, l - 6, sy(t) + 4, `${t}%`, "tk", 11.5, "end"); });
+    [2018, 2020, 2022, 2024].forEach((y) => tx(v, sx(y), H - 6, String(y), "tk", 11.5, "middle"));
+    const lastY = [];
+    AN.forEach((k) => { const pr = AY.map((y) => AP[k][y][1] / AP[k][y][0] * 100), mine = k === "광업"; s("path", { d: "M" + pr.map((p, i) => `${sx(2018 + i)},${sy(p)}`).join("L"), fill: "none", stroke: mine ? "var(--pinch)" : "var(--axis)", "stroke-width": mine ? 3 : 1.5, opacity: mine ? 1 : .8 }, v); lastY.push({ k, p: pr[pr.length - 1], mine }); });
+    lastY.sort((a, b) => b.p - a.p); let prevY = -99;
+    lastY.forEach((o) => { let y = sy(o.p) + 4; if (y - prevY < 13) y = prevY + 13; prevY = y; tx(v, sx(2024) + 8, y, `${nm(o.k)} ${Math.round(o.p)}%`, o.mine ? "vl" : "tk", 11.5, "start", { style: o.mine ? "fill:var(--pinch)" : "" }); });
+    timeLayer(v, tipFor(fig), AY.length, (i) => sx(2018 + i), top, H - bot, (i) => [`${AY[i]}년`, AN.map((k) => [`${f1(AP[k][AY[i]][1] / AP[k][AY[i]][0] * 100)}%`, k]).sort((a, b) => parseFloat(b[0]) - parseFloat(a[0])).slice(0, 6)], "좌우 화살표로 해를 옮겨 볼 수 있다");
+  }
+  table("t3", ["업종", ...AY.map((y) => `${y} 신청/승인`)], AN.map((k) => [k, ...AY.map((y) => `${fmt(AP[k][y][0])}/${fmt(AP[k][y][1])}`)]));
+
+  const all = () => { c1(false); c2(); c3(); };
+  all(); onResize(all);
+})();
+</script>

@@ -1,0 +1,578 @@
+<title>수능 시험장</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: the reader draws the share of graduates among test applicants from 1994 to 2026 and then sees the real line.
+   Then an exam room of 100 desks coloured by who applied (played by year, with a "the year I sat the test" picker),
+   an OMR answer card where each bubble is 50,000 applicants, two chalk lines on a blackboard (current students vs
+   graduates), and four rooms of 100 desks with the empty seats of those who did not show up. */
+:root {
+  --paper: #f4f2ec; --card: #fcfbf7; --ink: #2c2c2a; --ink2: #494843; --muted: #5d5b55; --line: #e1ddd3; --grid: #eae7de; --axis: #a7a8a3;
+  --accent: #903a43; --intl: #903a43; --board: #2c2c2a; --board-ink: #f4f2ec; --sea: #fcfbf7;
+  --cur: #4e6aa9; --cur-ink: #3f5890; --grad: #903a43; --grad-ink: #862f39; --ged: #80a15a; --ged-ink: #4d6a2f; --mine: #d56b41; --mine-ink: #a8451f;
+  --desk: #e2ccb5; --desk-edge: #b6a392; --paper-w: #fcfbf7; --omr: #d6b0a7; --omr-bg: #fbf3ee; --omr-ink: #8b4d3e;
+  --bb: #35594a; --bb-edge: #8b4d3e; --chalk: #f4f2ec; --chalk2: #ebcfa7; --chalk3: #c6d6cc; --tray: #b6a392;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1c1b1a; --card: #262423; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3b3836; --grid: #302e2c; --axis: #62635d;
+  --accent: #d6b0a7; --intl: #d6b0a7; --board: #dcd9cf; --board-ink: #1c1b1a; --sea: #262423;
+  --cur: #8eabc9; --cur-ink: #abbdc9; --grad: #cf7f8a; --grad-ink: #e2a6ae; --ged: #abc07b; --ged-ink: #c4d39c; --mine: #dc8c67; --mine-ink: #e7a08a;
+  --desk: #67453c; --desk-edge: #8b4d3e; --paper-w: #dcd9cf; --omr: #8b4d3e; --omr-bg: #2c2725; --omr-ink: #d6b0a7;
+  --bb: #2b4a3d; --bb-edge: #67453c; --chalk: #eeede8; --chalk2: #ebcfa7; --chalk3: #a7c4c2; --tray: #67453c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1c1b1a; --card: #262423; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3b3836; --grid: #302e2c; --axis: #62635d;
+  --accent: #d6b0a7; --intl: #d6b0a7; --board: #dcd9cf; --board-ink: #1c1b1a; --sea: #262423;
+  --cur: #8eabc9; --cur-ink: #abbdc9; --grad: #cf7f8a; --grad-ink: #e2a6ae; --ged: #abc07b; --ged-ink: #c4d39c; --mine: #dc8c67; --mine-ink: #e7a08a;
+  --desk: #67453c; --desk-edge: #8b4d3e; --paper-w: #dcd9cf; --omr: #8b4d3e; --omr-bg: #2c2725; --omr-ink: #d6b0a7;
+  --bb: #2b4a3d; --bb-edge: #67453c; --chalk: #eeede8; --chalk2: #ebcfa7; --chalk3: #a7c4c2; --tray: #67453c; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 16.5px/1.78 var(--sans); word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 36px 80px }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--axis) }
+:focus-visible { outline: 2px solid var(--intl); outline-offset: 2px }
+.page { max-width: 1040px; margin: 0 auto; display: grid; gap: 64px }
+.prose { max-width: 660px; display: grid; gap: 14px; min-width: 0 }
+.prose p { margin: 0 }
+.n { font-weight: 700; font-variant-numeric: tabular-nums }
+.label { font: 500 12px/1.4 var(--mono); letter-spacing: .08em; color: var(--muted); margin: 0; text-transform: uppercase }
+
+header { display: grid; gap: 22px }
+h1 { font-weight: 700; font-size: clamp(32px, 5.6vw, 54px); line-height: 1.18; margin: 0; letter-spacing: -.03em; text-wrap: balance }
+h1 span { display: block; font-weight: 500; font-size: .46em; color: var(--ink2); margin-top: 12px; letter-spacing: -.01em; line-height: 1.45 }
+.sheet, .method { display: grid; grid-template-columns: 110px minmax(0, 1fr); border-top: 2px solid var(--ink); font-size: 14.5px; margin: 0 }
+.sheet dt, .sheet dd, .method dt, .method dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line) }
+.sheet dt, .method dt { font: 500 12px/2 var(--mono); color: var(--muted) }
+.sheet dd, .method dd { color: var(--ink2) }
+@media (max-width: 560px) { .sheet, .method { grid-template-columns: 84px minmax(0, 1fr) } }
+
+.quiz { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 14px }
+.quiz h2 { font-size: 20px; line-height: 1.5; margin: 0; font-weight: 700; text-wrap: balance }
+.opts { display: grid; gap: 8px }
+.opt { display: flex; gap: 12px; align-items: center; text-align: left; font: inherit; font-size: 15.5px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; cursor: pointer; min-height: 46px }
+.opt i { font: 500 12px var(--mono); color: var(--muted); font-style: normal; width: 14px }
+.opt[data-state="right"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink) }
+.opt[data-state="wrong"] { opacity: .5 }
+.reveal { font-size: 15px; color: var(--ink2); border-top: 1px solid var(--line); padding-top: 14px }
+.reveal .big { font-size: 28px; font-weight: 700; color: var(--ink); display: block; line-height: 1.3 }
+
+section.s { display: grid; gap: 22px }
+h2.h { font-size: clamp(23px, 3.3vw, 29px); line-height: 1.35; margin: 0; font-weight: 700; letter-spacing: -.02em; text-wrap: balance }
+figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 12px; position: relative; min-width: 0 }
+@media (max-width: 560px) { figure { padding: 14px } }
+.ft { font-weight: 700; font-size: 16px; margin: 0; line-height: 1.5 }
+.fs { font-size: 13.5px; color: var(--muted); margin: -8px 0 0; line-height: 1.6 }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y }
+figcaption { font-size: 12.5px; color: var(--muted); line-height: 1.65; border-top: 1px solid var(--grid); padding-top: 10px }
+details { font-size: 13px }
+summary { cursor: pointer; color: var(--ink2); width: max-content; font: 500 12px/2 var(--mono); padding: 6px 0 }
+.tw { overflow-x: auto; margin-top: 6px; max-height: 380px }
+table { border-collapse: collapse; font-size: 12.5px; min-width: 100% }
+th, td { padding: 5px 10px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums }
+th:first-child, td:first-child { text-align: left }
+th { font-weight: 700; color: var(--ink2); position: sticky; top: 0; background: var(--card) }
+
+/* player: play button, scrubber and a departures-board year */
+.player { display: flex; align-items: center; gap: 14px; flex-wrap: wrap }
+.play { width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; display: grid; place-items: center; flex: none }
+.play svg { width: 18px; height: 18px }
+.play:hover { background: var(--intl) }
+.yr { font: 600 30px/1 var(--mono); font-variant-numeric: tabular-nums; color: var(--board-ink); background: var(--board); border-radius: 6px; padding: 8px 10px; letter-spacing: .06em;
+  background-image: linear-gradient(transparent calc(50% - .5px), rgba(255,255,255,.14) calc(50% - .5px), rgba(255,255,255,.14) calc(50% + .5px), transparent calc(50% + .5px)) }
+.scrub { flex: 1 1 180px; min-width: 0; accent-color: var(--intl); height: 32px }
+.stat { font-size: 14px; color: var(--ink2); margin: 0; min-height: 1.6em }
+.stat b { font-variant-numeric: tabular-nums }
+.chips { display: flex; flex-wrap: wrap; gap: 8px }
+.chip { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; min-height: 40px; cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink) }
+.lb { fill: var(--ink); font-family: var(--sans) }
+.vl { fill: var(--ink); font-family: var(--sans); font-weight: 700; font-variant-numeric: tabular-nums }
+.tk { fill: var(--muted); font-family: var(--mono); font-variant-numeric: tabular-nums }
+.mt { fill: var(--muted); font-family: var(--sans) }
+.halo { paint-order: stroke; stroke: var(--card); stroke-linejoin: round }
+.halo-sea { paint-order: stroke; stroke: var(--sea); stroke-linejoin: round }
+.gl { stroke: var(--grid); stroke-width: 1 }
+.ax { stroke: var(--axis); stroke-width: 1 }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink2) }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block }
+.sw.line { height: 3px; width: 18px; border-radius: 2px }
+.sw.dot { border-radius: 50% }
+.tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--axis); border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.12); padding: 8px 10px; font-size: 12.5px; line-height: 1.5; min-width: 150px; max-width: 250px; z-index: 5 }
+.tip .tn { color: var(--muted) } .tip .tv { font-weight: 700; font-size: 14px }
+.ring { fill: none; stroke: var(--ink); }
+ul.care-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; color: var(--ink2) }
+.dt { overflow-x: auto; border-top: 2px solid var(--ink) }
+.dt td, .dt th { white-space: normal; text-align: left; vertical-align: top; padding: 8px 10px 8px 0; position: static }
+.next { display: grid; border-top: 2px solid var(--ink) }
+.q { padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px }
+.q h3 { font-size: 16px; margin: 0; font-weight: 700 }
+.q p { margin: 0; font-size: 14px; color: var(--ink2) }
+.q ul { margin: 0; padding-left: 18px; font-size: 13.5px }
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px }
+
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.gi { fill: var(--grad-ink) } .ci { fill: var(--cur-ink) } .ei { fill: var(--ged-ink) } .mi { fill: var(--mine-ink) } .oi { fill: var(--omr-ink) }
+.ck { fill: var(--chalk); font-family: var(--sans) } .ck2 { fill: var(--chalk2); font-family: var(--sans); font-weight: 700 } .ck3 { fill: var(--chalk3); font-family: var(--sans); font-weight: 700 } .ckt { fill: var(--chalk); font-family: var(--mono); opacity: .8 }
+::selection { background: var(--omr); color: #1c1b1a }
+.btn { font: inherit; font-size: 15px; font-weight: 600; color: var(--paper); background: var(--ink); border: 0; border-radius: 10px; padding: 10px 18px; min-height: 46px; cursor: pointer }
+.btn:hover { background: var(--intl) } .btn[disabled] { opacity: .45; cursor: default }
+.btn.ghost { color: var(--ink); background: var(--paper); border: 1px solid var(--axis) } .btn.ghost:hover { background: var(--grid) }
+.ydrow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center }
+.ydrow .hint { font-size: 13.5px; color: var(--muted); flex: 1 1 200px }
+#yd svg { touch-action: none; cursor: crosshair; border-radius: 8px }
+#yd.done svg { touch-action: pan-y; cursor: default }
+.pickyear { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; color: var(--ink2) }
+.pickyear select { font: inherit; font-size: 16px; color: var(--ink); background: var(--paper); border: 1px solid var(--axis); border-radius: 10px; padding: 8px 12px; min-height: 46px }
+.act { transition: stroke-dashoffset 1.6s ease-out }
+@media (prefers-reduced-motion: reduce) { .act { transition: none } }
+</style>
+
+<main class="page">
+  <header>
+    <h1>수능은 재수생이 많이 볼까<span>셋 중 하나꼴이다. 2026학년도 수능(2025년 11월)에 원서를 낸 55만 4,174명 가운데 졸업생이 15만 9,922명(28.9%), 검정고시 등이 2만 2,355명(4.0%)이다. 졸업생 비중은 2024학년도에 31.7%로 1997학년도 이후 가장 높았다. 하지만 졸업생 수는 1996학년도(30만 명)의 절반 남짓이다. 비중이 오른 것은 졸업생이 크게 늘어서가 아니라 재학생 지원자가 줄어서다.</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 40</dd>
+      <dt>한 줄</dt><dd>한국교육과정평가원 접수 현황으로 보면 졸업생 비중은 1996학년도 35.7%에서 2010학년도 19.3%까지 내려갔다가 2024학년도 31.7%로 올랐다. 2010–2024학년도에 졸업생은 2만 9천 명 늘었고 재학생은 20만 6천 명 줄었다. 원서를 내고 시험장에 오지 않은 사람은 2001학년도 2.5%에서 2026학년도 10.9%가 됐다.</dd>
+      <dt>분류</dt><dd>건강·복지·교육</dd>
+      <dt>본능</dt><dd>크기 본능 · "N수생 역대 최고" 같은 비중 하나만 보면, 전체가 줄어서 오른 것인지 그 사람들이 늘어서 오른 것인지 구분하지 못한다</dd>
+      <dt>그림 방식</dt><dd>수능 시험장 · 독자가 졸업생 비중 선을 먼저 그려 보고 실제 선과 맞춰 본다. 책상 100개의 시험장(1994–2026학년도 재생, 내가 수능 본 해 고르기), 5만 명이 한 칸인 OMR 카드, 칠판의 두 선, 빈 책상</dd>
+      <dt>기간</dt><dd>1994–2026학년도(1993년 11월–2025년 11월 시험)</dd>
+      <dt>엮은 데이터</dt><dd>2개 · 대학수학능력시험 연도별 접수현황 · 연도별 응시현황</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">수능 지원자 가운데 졸업생(재수생·N수생)의 비중은 어떻게 움직였을까? 1994학년도는 32.5%였다. 그다음부터 2026학년도까지 선을 직접 그려 보자.</h2>
+    <div class="chart" id="yd"></div>
+    <div class="ydrow">
+      <span class="hint" id="ydhint" aria-live="polite">그림 위를 왼쪽에서 오른쪽으로 긋는다. 키보드는 그림을 고른 뒤 좌우 화살표로 해를 옮기고 위아래 화살표로 값을 바꾼다.</span>
+      <button class="btn" type="button" id="ydbtn" disabled>실제 선 보기</button>
+      <button class="btn ghost" type="button" id="ydskip">그리지 않고 보기</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="ydreveal" hidden>
+      <span class="big">지금은 <span class="n">28.9%</span>, 가장 높았던 때는 <span class="n">35.7%</span></span>
+      <span id="ydmsg"></span> 실제 선은 U자 모양이다. 1996학년도 35.7%에서 2010학년도 19.3%까지 내려갔다가 2024학년도 31.7%까지 다시 올랐고, 2026학년도에는 28.9%로 내려왔다. 지금의 비중은 1998학년도(29.5%)와 비슷하다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">책상 100개의 시험장</h2>
+      <p>그해 지원자를 책상 100개에 앉혔다. 파란 자리가 고3 재학생, 붉은 자리가 졸업생, 초록 자리가 검정고시 등이다. 2026학년도에는 재학생 67자리, 졸업생 29자리, 검정고시 등 4자리다. 재생을 누르면 1994학년도부터 자리 색이 바뀐다.</p>
+      <p>붉은 자리가 가장 적었던 때는 2010학년도(19자리)다. 그 뒤 14년 동안 늘어 2024학년도에 32자리가 됐다. 초록 자리도 늘고 있다. 검정고시 등 지원자는 2018학년도 1만 1,121명에서 2026학년도 2만 2,355명으로 두 배가 됐고, 비중 4.0%는 1995학년도를 빼면 가장 높다. 아래에서 수능을 본 해를 고르면 그해의 시험장이 나온다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">수능 지원자 100명의 시험장</p>
+      <p class="fs">책상 하나 = 지원자 100명 중 1명. 파랑 = 재학생, 빨강 = 졸업생, 초록 = 검정고시 등</p>
+      <div class="player" id="p1"></div>
+      <div class="pickyear"><label for="myyear">내가 수능 본 해</label>
+        <select id="myyear"></select></div>
+      <p class="stat" id="st1" aria-live="polite"></p>
+      <div class="chart" id="c1"></div>
+      <figcaption>한국교육과정평가원 「대학수학능력시험 연도별 접수현황」(공공데이터포털 15098903). 원서를 낸 사람 기준이다. 학년도는 시험을 본 다음 해다(2026학년도 = 2025년 11월 13일 시험). 1994학년도는 시험을 두 번 봐서 2차(1993년 11월)를 썼다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">OMR 카드에 칠한 33년</h2>
+      <p>이번에는 비중이 아니라 사람 수다. 답안지 한 칸이 5만 명이고 한 줄이 한 해다. 지원자가 가장 많았던 2000학년도에는 89만 6,122명으로 18칸 가까이 칠해졌다. 2021학년도에는 49만 3,434명으로 10칸이 안 됐다. 2026학년도는 55만 4,174명이다.</p>
+      <p>붉은 칸(졸업생)을 따라가면 비중과 다른 이야기가 보인다. 졸업생이 가장 많았던 해는 1996학년도(30만 482명)다. 가장 적었던 해는 2008학년도(12만 6,729명)이고, 최근 3년은 16만 명 안팎이다. 졸업생 수는 30년 전의 절반 남짓이고 2000년대 중반과 비슷하다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">수능 지원자 수, 1994–2026학년도</p>
+      <p class="fs">한 칸 = 5만 명. 파랑 = 재학생, 빨강 = 졸업생, 초록 = 검정고시 등. 오른쪽 숫자 = 지원자 합계(만 명)</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>한국교육과정평가원 「대학수학능력시험 연도별 접수현황」(15098903). 1995학년도의 검정고시 등 4만 2,297명은 원자료에 적힌 값 그대로다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">칠판에 그린 두 선</h2>
+      <p>재학생 지원자와 졸업생 지원자를 칠판에 따로 그렸다. 졸업생 비중이 가장 낮았던 2010학년도부터 가장 높았던 2024학년도까지, 졸업생은 13만 658명에서 15만 9,742명으로 2만 9천 명(22%) 늘었다. 같은 기간 재학생은 53만 2,436명에서 32만 6,646명으로 20만 6천 명(39%) 줄었다.</p>
+      <p>비중이 19%에서 32%로 오른 것은 대부분 분모가 줄어서다. 재학생이 2010학년도 그대로였다면 2024학년도 졸업생 비중은 22.5%였을 것이다. 다만 졸업생이 늘어난 것도 사실이다. 2019학년도 13만 5,482명에서 2024학년도 15만 9,742명으로 5년 사이 2만 4천 명 늘었다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">재학생 지원자와 졸업생 지원자</p>
+      <p class="fs">만 명</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>한국교육과정평가원 「대학수학능력시험 연도별 접수현황」(15098903). "재학생이 그대로였다면"은 2024학년도의 졸업생·검정고시 등 지원자 수에 2010학년도 재학생 수를 넣어 계산한 값이다.</figcaption>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">원서는 냈지만 빈 책상</h2>
+      <p>원서를 낸 사람이 모두 시험장에 오지는 않는다. 2001학년도에는 100명 가운데 2.5명이 오지 않았다. 2010학년도 5.8명, 2021학년도 14.7명, 2026학년도 10.9명이다. 2026학년도에 비어 있던 책상은 6만 278개다.</p>
+      <p>빈 책상은 2004학년도부터 늘기 시작해 2018학년도에 10%를 넘었다. 수능 점수 없이 뽑는 전형으로 이미 합격한 사람은 시험을 보지 않아도 되기 때문이라는 설명이 흔하지만, 이 자료에는 누가 왜 오지 않았는지가 없다. 재학생과 졸업생 가운데 어느 쪽이 더 많이 빠졌는지도 이 파일로는 알 수 없다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">지원자 100명 가운데 시험장에 오지 않은 사람</p>
+      <p class="fs">책상 하나 = 지원자 100명 중 1명. 사람이 없는 책상 = 결시(반올림)</p>
+      <div class="chart" id="c4"></div>
+      <figcaption>한국교육과정평가원 「대학수학능력시험 연도별 응시현황」(15098904). 결시 = 지원 인원 − 응시 인원. 2021학년도(2020년 12월 3일 시험)는 코로나19로 시험이 2주 미뤄진 해다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 수능은 재수생이 많이 볼까</h2>
+      <p>많이 본다. 지원자 100명 가운데 29명이 졸업생이고 4명이 검정고시 등이다. 그리고 이 비중은 2010학년도 이후 꾸준히 올랐다. 하지만 "역대 최고"는 아니다. 1990년대 중반에는 졸업생이 지금의 두 배 가까이(30만 명) 됐고 비중도 더 높았다.</p>
+      <p>최근 비중이 오른 까닭의 큰 부분은 재학생 지원자가 줄어든 것이다. 졸업생 수는 2011학년도 이후 12만 8천–16만 2천 명 사이에서 움직였다. "재수생이 몰린다"보다 "고3은 줄었는데 다시 보는 사람은 줄지 않았다"가 숫자에 더 가깝다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>"졸업생"은 고등학교를 이미 졸업한 지원자 전부다. 재수생, 삼수 이상, 대학에 다니면서 다시 보는 사람이 섞여 있고 이 자료로는 나눌 수 없다.</li>
+      <li>비중은 원서를 낸 사람 기준이다. 실제로 시험을 본 사람 가운데 졸업생이 몇 %인지는 이 파일에 없다. 재학생의 결시가 더 많다면 시험장 안의 졸업생 비중은 이 숫자보다 높다.</li>
+      <li>"검정고시 등"에는 검정고시 합격자와 그 밖에 고졸 학력을 인정받은 사람이 들어 있다. 1995학년도 4만 2,297명은 앞뒤 해의 서너 배인데, 이유는 자료에 적혀 있지 않다.</li>
+      <li>학년도는 시험을 본 다음 해다. 1994학년도에는 시험을 두 번(1993년 8월·11월) 봤고, 이 장은 2차를 썼다.</li>
+      <li>재학생 지원자가 줄어든 것이 학생 수가 줄어서인지, 수능을 보지 않는 고3이 늘어서인지는 이 자료만으로는 가를 수 없다. 고3 학생 수는 이 장에서 쓰지 않았다.</li>
+      <li>책상 100개와 OMR 칸은 반올림한 그림이다. 정확한 값은 표에 있다.</li>
+      <li>지역별 지원자는 시도교육청이 따로 발표하고, 한데 모은 공개 파일은 찾지 못했다. 그래서 이 장에는 지도가 없다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15098903/fileData.do" target="_blank" rel="noopener">대학수학능력시험 연도별 접수현황</a> (15098903)</td><td>한국교육과정평가원</td><td>지원자 합계, 재학생·졸업생·검정고시 등</td><td>1994–2026학년도</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15098904/fileData.do" target="_blank" rel="noopener">대학수학능력시험 연도별 응시현황</a> (15098904)</td><td>한국교육과정평가원</td><td>지원 인원, 응시 인원, 응시율</td><td>1994–2026학년도</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>33개 학년도 × 지원 자격 3개 · 지원 인원과 응시 인원</dd>
+      <dt>도구</dt><dd>Python(집계) · SVG 직접 그리기 차트, 시험장 책상, OMR 카드, 칠판(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>자격별 비중 · 2010→2024학년도 변화 나누기(재학생이 그대로였다면) · 결시율 = 1 − 응시 ÷ 지원 · 100칸 반올림(최대 나머지 방식)</dd>
+      <dt>검증</dt><dd>재학생 + 졸업생 + 검정고시 등 = 총계(33개 학년도 모두). 접수현황의 총계 = 응시현황의 지원 인원. 응시율은 파일에 적힌 값과 계산 값이 같다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>수능 점수는 남녀가 다를까</h3><p>표준점수 도수분포에 남녀 인원이 따로 있어, 영역마다 분포가 어떻게 다른지 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15080195/fileData.do" target="_blank" rel="noopener">대학수학능력시험 표준점수 도수분포</a> · 한국교육과정평가원</li></ul></div>
+      <div class="q"><h3>어느 과목을 골라야 유리했을까</h3><p>선택 과목마다 등급을 가르는 표준점수가 다르다. 과목별 등급 구분 점수와 인원으로 견줄 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15080193/fileData.do" target="_blank" rel="noopener">대학수학능력시험 등급구분 표준점수</a> · 한국교육과정평가원</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.16</footer>
+</main>
+
+<script>
+const DATA = {"rows":[{"y":1994,"tot":750181,"m":444612,"f":305569,"cur":496617,"grad":243826,"ged":9738,"fee":"12000","per":"1993-10-02~10-11","app":750181,"took":726634,"rate":96.9,"date":"1993-11-16","gs":32.50228944748001,"ges":1.2980867284028788,"ns":33.80037617588288},{"y":1995,"tot":781749,"m":452360,"f":329389,"cur":477960,"grad":261492,"ged":42297,"fee":"12000","per":"1994-09-12~09-27","app":781749,"took":757488,"rate":96.9,"date":"1994-11-23","gs":33.44961106442093,"ges":5.410560167010128,"ns":38.86017123143106},{"y":1996,"tot":840661,"m":478707,"f":361954,"cur":526833,"grad":300482,"ged":13346,"fee":"12000","per":"1995-09-11~09-23","app":840661,"took":809867,"rate":96.3,"date":"1995-11-22","gs":35.74353990490816,"ges":1.5875602650771239,"ns":37.33110016998529},{"y":1997,"tot":824374,"m":472527,"f":351847,"cur":545023,"grad":268044,"ged":11307,"fee":"12000","per":"1996-09-02~09-14","app":824374,"took":795338,"rate":96.5,"date":"1996-11-13","gs":32.51485369504618,"ges":1.3715861975268506,"ns":33.88643989257304},{"y":1998,"tot":885321,"m":495179,"f":390142,"cur":613376,"grad":261424,"ged":10521,"fee":"12000","per":"1997-09-01~09-13","app":885321,"took":854272,"rate":96.5,"date":"1997-11-19","gs":29.528724609491924,"ges":1.1883825188829813,"ns":30.717107128374906},{"y":1999,"tot":868643,"m":475625,"f":393018,"cur":623130,"grad":233893,"ged":11620,"fee":"12000","per":"1998-09-01~09-15","app":868643,"took":839837,"rate":96.7,"date":"1998-11-18","gs":26.926251636172744,"ges":1.3377187175859357,"ns":28.263970353758676},{"y":2000,"tot":896122,"m":483602,"f":412520,"cur":631745,"grad":250064,"ged":14313,"fee":"15000","per":"1999-09-01~09-11","app":896122,"took":868366,"rate":96.9,"date":"1999-11-17","gs":27.905128989133175,"ges":1.5972155577030807,"ns":29.502344546836255},{"y":2001,"tot":872297,"m":465546,"f":406751,"cur":603238,"grad":254538,"ged":14521,"fee":"20000","per":"2000-09-01~09-16","app":872297,"took":850305,"rate":97.5,"date":"2000-11-15","gs":29.18019894600119,"ges":1.6646853078710575,"ns":30.844884253872245},{"y":2002,"tot":739129,"m":390473,"f":348656,"cur":541662,"grad":185946,"ged":11521,"fee":"20000","per":"2001-08-27~09-08","app":739129,"took":718441,"rate":97.2,"date":"2001-11-07","gs":25.15744883504774,"ges":1.5587265551750777,"ns":26.71617539022282},{"y":2003,"tot":675922,"m":356418,"f":319504,"cur":482089,"grad":179880,"ged":13953,"fee":"22000","per":"2002-08-28~09-10","app":675922,"took":655384,"rate":97.0,"date":"2002-11-06","gs":26.612538133098194,"ges":2.0642914419119367,"ns":28.67682957501013},{"y":2004,"tot":674154,"m":357421,"f":316733,"cur":476129,"grad":184317,"ged":13708,"fee":"22000","per":"2003-08-27~09-16","app":674154,"took":642583,"rate":95.3,"date":"2003-11-05","gs":27.340488968395942,"ges":2.033363296813488,"ns":29.373852265209432},{"y":2005,"tot":610257,"m":324700,"f":285557,"cur":435538,"grad":161524,"ged":13195,"fee":"41000","per":"2004-08-31~09-15","app":610257,"took":574218,"rate":94.1,"date":"2004-11-17","gs":26.468192908889204,"ges":2.1622037928282674,"ns":28.630396701717476},{"y":2006,"tot":593806,"m":314323,"f":279483,"cur":422310,"grad":159190,"ged":12306,"fee":"47000","per":"2005-08-30~09-14","app":593806,"took":554345,"rate":93.4,"date":"2005-11-23","gs":26.8084189112269,"ges":2.07239401420666,"ns":28.880812925433556},{"y":2007,"tot":588899,"m":313715,"f":275184,"cur":425396,"grad":151697,"ged":11806,"fee":"47000","per":"2006-08-29~09-13","app":588899,"took":551884,"rate":93.7,"date":"2006-11-16","gs":25.75942564005033,"ges":2.004758031513044,"ns":27.764183671563377},{"y":2008,"tot":584934,"m":312064,"f":272870,"cur":446597,"grad":126729,"ged":11608,"fee":"47000","per":"2007-08-28~09-12","app":584934,"took":550588,"rate":94.1,"date":"2007-11-15","gs":21.66552123829355,"ges":1.9844973962874446,"ns":23.650018634580995},{"y":2009,"tot":588839,"m":313002,"f":275837,"cur":448472,"grad":127586,"ged":12781,"fee":"47000","per":"2008-09-01~09-17","app":588839,"took":559475,"rate":95.0,"date":"2008-11-13","gs":21.66738276506821,"ges":2.1705423723632435,"ns":23.837925137431455},{"y":2010,"tot":677834,"m":358142,"f":319692,"cur":532436,"grad":130658,"ged":14740,"fee":"47000","per":"2009-08-26~09-10","app":677834,"took":638216,"rate":94.2,"date":"2009-11-12","gs":19.275810891752258,"ges":2.174573715688502,"ns":21.45038460744076},{"y":2011,"tot":712227,"m":379385,"f":332842,"cur":541880,"grad":154661,"ged":15686,"fee":"47000","per":"2010-08-25~09-09","app":712227,"took":668991,"rate":93.9,"date":"2010-11-18","gs":21.715127340019404,"ges":2.202387721892037,"ns":23.91751506191144},{"y":2012,"tot":693631,"m":371771,"f":321860,"cur":526418,"grad":151887,"ged":15326,"fee":"47000","per":"2011-08-24~09-08","app":693631,"took":648946,"rate":93.6,"date":"2011-11-10","gs":21.897377712357148,"ges":2.2095321575881126,"ns":24.10690986994526},{"y":2013,"tot":668522,"m":356924,"f":311598,"cur":510972,"grad":142561,"ged":14989,"fee":"47000","per":"2012-08-22~09-06","app":668522,"took":621336,"rate":92.9,"date":"2012-11-08","gs":21.324803073047708,"ges":2.2421102072931034,"ns":23.566913280340813},{"y":2014,"tot":650747,"m":342776,"f":307971,"cur":509081,"grad":127634,"ged":14032,"fee":"47000","per":"2013-08-22~09-06","app":650747,"took":606813,"rate":93.2,"date":"2013-11-07","gs":19.613459608726586,"ges":2.1562911546269135,"ns":21.7697507633535},{"y":2015,"tot":640621,"m":333204,"f":307417,"cur":495027,"grad":131539,"ged":14055,"fee":"47000","per":"2014-08-25~09-12","app":640621,"took":594835,"rate":92.9,"date":"2014-11-13","gs":20.533045279502232,"ges":2.1939649184151,"ns":22.727010197917334},{"y":2016,"tot":631187,"m":323783,"f":307404,"cur":482054,"grad":136090,"ged":13043,"fee":"47000","per":"2015-08-27~09-11","app":631187,"took":585332,"rate":92.7,"date":"2015-11-12","gs":21.560963708061163,"ges":2.0664240549947954,"ns":23.627387763055957},{"y":2017,"tot":605987,"m":310451,"f":295536,"cur":459342,"grad":135120,"ged":11525,"fee":"42000","per":"2016-08-25~09-09","app":605987,"took":552297,"rate":91.1,"date":"2016-11-17","gs":22.297508032350528,"ges":1.9018559804088206,"ns":24.19936401275935},{"y":2018,"tot":593527,"m":303620,"f":289907,"cur":444873,"grad":137533,"ged":11121,"fee":"42000","per":"2017-08-24~09-08","app":593527,"took":531327,"rate":89.5,"date":"2017-11-23","gs":23.172155605389477,"ges":1.8737142539429545,"ns":25.04586985933243},{"y":2019,"tot":594924,"m":306141,"f":288783,"cur":448111,"grad":135482,"ged":11331,"fee":"42000","per":"2018-08-23~09-07","app":594924,"took":530220,"rate":89.1,"date":"2018-11-15","gs":22.7729928528686,"ges":1.904613026201666,"ns":24.67760587907027},{"y":2020,"tot":548734,"m":282036,"f":266698,"cur":394024,"grad":142271,"ged":12439,"fee":"42000","per":"2019-08-22~09-06","app":548734,"took":484737,"rate":88.3,"date":"2019-11-14","gs":25.927134094114816,"ges":2.2668542499644637,"ns":28.19398834407928},{"y":2021,"tot":493434,"m":254027,"f":239407,"cur":346673,"grad":133070,"ged":13691,"fee":"42000","per":"2020-09-03~09-18","app":493434,"took":421034,"rate":85.3,"date":"2020-12-03","gs":26.968145689190447,"ges":2.7746365268708684,"ns":29.742782216061318},{"y":2022,"tot":509821,"m":261350,"f":248471,"cur":360710,"grad":134834,"ged":14277,"fee":"42000","per":"2021-08-19~09-03","app":509821,"took":448138,"rate":87.9,"date":"2021-11-18","gs":26.447321707030508,"ges":2.800394648317743,"ns":29.247716355348253},{"y":2023,"tot":508030,"m":260126,"f":247904,"cur":350239,"grad":142303,"ged":15488,"fee":"42000","per":"2022-08-18~09-02","app":508030,"took":447669,"rate":88.1,"date":"2022-11-17","gs":28.01074739680727,"ges":3.0486388599098477,"ns":31.059386256717126},{"y":2024,"tot":504588,"m":258692,"f":245896,"cur":326646,"grad":159742,"ged":18200,"fee":"42000","per":"2023-08-24~09-08","app":504588,"took":444870,"rate":88.2,"date":"2023-11-16","gs":31.65790704495549,"ges":3.6069030575439767,"ns":35.26481010249947},{"y":2025,"tot":522670,"m":268699,"f":253971,"cur":340777,"grad":161784,"ged":20109,"fee":"42000","per":"2024-08-22~09-06","app":522670,"took":463486,"rate":88.7,"date":"2024-11-14","gs":30.95337402184935,"ges":3.847360667342683,"ns":34.80073468919203},{"y":2026,"tot":554174,"m":283744,"f":270430,"cur":371897,"grad":159922,"ged":22355,"fee":"42000","per":"2025-08-21~09-05","app":554174,"took":493896,"rate":89.1,"date":"2025-11-13","gs":28.85772338651759,"ges":4.03393158105577,"ns":32.891654967573366}]};
+document.documentElement.lang = "ko";
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const s = (tag, a = {}, p) => { const e = document.createElementNS(NS, tag); for (const k in a) if (a[k] != null) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  const tx = (p, x, y, str, cls, size, anchor = "start", extra = {}) => { const t = s("text", { x, y, class: cls, "text-anchor": anchor, "font-size": size, ...extra }, p); t.textContent = str; return t; };
+  const fmt = (n) => Math.round(n).toLocaleString("ko-KR");
+  const f1 = (n) => n.toLocaleString("ko-KR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const pc = (n) => f1(n) + "%";
+  const man = (n) => n >= 1e5 ? f1(n / 1e4).replace(/\.0$/, "") + "만" : fmt(n);
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lerp = (arr, pos) => { const k = Math.floor(pos), f = pos - k; return k + 1 < arr.length ? arr[k] + (arr[k + 1] - arr[k]) * f : arr[k]; };
+  const bEl = (t) => Object.assign(document.createElement("b"), { textContent: t });
+
+  function table(id, head, rows) {
+    const t = document.createElement("table"), th = document.createElement("thead"), tr = document.createElement("tr");
+    head.forEach((h) => { const c = document.createElement("th"); c.textContent = h; tr.append(c); }); th.append(tr); t.append(th);
+    const tb = document.createElement("tbody");
+    rows.forEach((r) => { const row = document.createElement("tr"); r.forEach((v) => { const c = document.createElement("td"); c.textContent = v; row.append(c); }); tb.append(row); });
+    t.append(tb); document.getElementById(id).replaceChildren(t);
+  }
+  function tipFor(fig) {
+    const tip = fig.querySelector(".tip");
+    return {
+      show(ev, title, rows) {
+        tip.replaceChildren(); const h = document.createElement("div"); h.className = "tn"; h.textContent = title; tip.append(h);
+        rows.forEach(([v, k, col]) => { const d = document.createElement("div"); if (col) { const i = document.createElement("i"); i.className = "sw dot"; i.style.background = col; i.style.marginRight = "6px"; d.append(i); } const b = document.createElement("span"); b.className = "tv"; b.textContent = v + " "; const kk = document.createElement("span"); kk.textContent = k; d.append(b, kk); tip.append(d); });
+        tip.hidden = false;
+        const fr = fig.getBoundingClientRect(); let x, y;
+        if (ev.clientX != null) { x = ev.clientX - fr.left + 14; y = ev.clientY - fr.top + 14; } else { const r = (ev.rect || ev.target.getBoundingClientRect()); x = r.right - fr.left + 8; y = r.top - fr.top; }
+        const tw = tip.offsetWidth, th = tip.offsetHeight;
+        if (x + tw > fr.width - 8) x = Math.max(8, x - tw - 28);
+        if (y + th > fr.height - 8) y = Math.max(8, y - th - 28);
+        tip.style.left = x + "px"; tip.style.top = y + "px";
+      },
+      hide() { tip.hidden = true; },
+    };
+  }
+  /* Marks you can point at. One tab stop per chart; Left/Right step, Up/Down jump rows, Escape hides.
+     pts: {x, y, r, fn() -> [title, rows]} in viewBox units; u = viewBox units per CSS px. */
+  function pointLayer(v, tip, pts, label, u = 1) {
+    const ring = s("circle", { class: "ring", "stroke-width": 2 * u, opacity: 0 }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = i; const p = pts[i]; ring.setAttribute("cx", p.x); ring.setAttribute("cy", p.y); ring.setAttribute("r", p.r + 4 * u); ring.setAttribute("opacity", 1); const [t, rows] = p.fn(); tip.show(ev || { target: ring }, t, rows); };
+    const hide = () => { tip.hide(); ring.setAttribute("opacity", 0); };
+    const nearest = (e) => {
+      const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal, k = vb.width / r.width;
+      const x = vb.x + (e.clientX - r.left) * k, y = vb.y + (e.clientY - r.top) * k;
+      let best = -1, bd = Infinity;
+      pts.forEach((p, i) => { const d = Math.hypot(p.x - x, p.y - y) - p.r, reach = 18 * k; if (d < reach && d < bd) { bd = d; best = i; } });
+      return best;
+    };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerdown", (e) => { const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => { if (pts.length) show(idx < 0 ? 0 : idx); }); v.addEventListener("blur", hide);
+    const vert = (dir) => { const c = pts[Math.max(idx, 0)]; let best = -1, bd = Infinity; pts.forEach((p, i) => { const dy = (p.y - c.y) * dir; if (dy <= 0.5) return; const d = dy * 3 + Math.abs(p.x - c.x); if (d < bd) { bd = d; best = i; } }); return best < 0 ? Math.max(idx, 0) : best; };
+    v.addEventListener("keydown", (e) => {
+      if (!pts.length) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show((Math.max(idx, 0) + (e.key === "ArrowRight" ? 1 : -1) + pts.length) % pts.length); }
+      else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); show(vert(e.key === "ArrowDown" ? 1 : -1)); }
+      else if (e.key === "Escape") hide();
+    });
+  }
+  /* A time cursor over a chart: pointer or Left/Right picks a time index, a vertical rule follows it. */
+  function timeLayer(v, tip, n, xOf, y0, y1, fn, label, u = 1) {
+    const rule = s("line", { y1: y0, y2: y1, stroke: "var(--ink)", "stroke-width": u, opacity: 0, "pointer-events": "none" }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = Math.max(0, Math.min(n - 1, i)); const x = xOf(idx); rule.setAttribute("x1", x); rule.setAttribute("x2", x); rule.setAttribute("opacity", .5); const [t, rows] = fn(idx); const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; tip.show(ev || { rect: { right: r.left + (x - vb.x) / vb.width * r.width, top: r.top + 20 } }, t, rows); };
+    const hide = () => { tip.hide(); rule.setAttribute("opacity", 0); };
+    const at = (e) => { const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; const x = vb.x + (e.clientX - r.left) * vb.width / r.width; let best = 0, bd = Infinity; for (let i = 0; i < n; i++) { const d = Math.abs(xOf(i) - x); if (d < bd) { bd = d; best = i; } } return best; };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; show(at(e), e); });
+    v.addEventListener("pointerdown", (e) => show(at(e), e));
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => show(idx < 0 ? n - 1 : idx)); v.addEventListener("blur", hide);
+    v.addEventListener("keydown", (e) => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show(idx + (e.key === "ArrowRight" ? 1 : -1)); } else if (e.key === "Home") { e.preventDefault(); show(0); } else if (e.key === "End") { e.preventDefault(); show(n - 1); } else if (e.key === "Escape") hide(); });
+  }
+  /* A player: play/pause, scrubber and a large time readout. Frames 0..n-1; at rest it shows the last frame. */
+  function Player(id, label, draw, n, labelOf, seconds = 10) {
+    const box = document.getElementById(id);
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "play"; btn.setAttribute("aria-label", label + " 재생");
+    const icon = (playing) => { btn.replaceChildren(); const v = s("svg", { viewBox: "0 0 20 20", "aria-hidden": "true" }, btn); if (playing) { s("rect", { x: 4, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); s("rect", { x: 12, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); } else s("path", { d: "M5,3 L17,10 L5,17 Z", fill: "currentColor" }, v); };
+    const yr = document.createElement("div"); yr.className = "yr"; yr.setAttribute("aria-hidden", "true");
+    const sc = document.createElement("input"); sc.type = "range"; sc.className = "scrub"; sc.min = 0; sc.max = n - 1; sc.step = 1; sc.value = n - 1; sc.setAttribute("aria-label", label + " 시점");
+    box.append(btn, yr, sc);
+    let pos = n - 1, raf = 0, playing = false, t0 = 0, from = 0;
+    const render = () => { const k = Math.min(n - 1, Math.floor(pos + 1e-6)); yr.textContent = labelOf(k); sc.value = Math.round(pos); sc.setAttribute("aria-valuetext", labelOf(Math.round(pos))); draw(pos); };
+    const stop = () => { playing = false; cancelAnimationFrame(raf); icon(false); btn.setAttribute("aria-label", label + " 재생"); };
+    const tick = (now) => { pos = Math.min(n - 1, from + (now - t0) / (seconds * 1000) * (n - 1)); render(); if (pos < n - 1) raf = requestAnimationFrame(tick); else stop(); };
+    btn.addEventListener("click", () => {
+      if (playing) { stop(); return; }
+      if (reduce) { pos = n - 1; render(); return; }
+      from = pos >= n - 1 ? 0 : pos; pos = from; playing = true; icon(true); btn.setAttribute("aria-label", label + " 멈춤");
+      raf = requestAnimationFrame((t) => { t0 = t; tick(t); });
+    });
+    sc.addEventListener("input", () => { stop(); pos = +sc.value; render(); });
+    icon(false);
+    return { render, get pos() { return pos; } };
+  }
+  document.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".opt").forEach((o) => { o.setAttribute("aria-pressed", o === b); o.dataset.state = o.dataset.a === "1" ? "right" : "wrong"; });
+    document.getElementById("reveal").hidden = false;
+  }));
+  function chips(id, opts, cur, onPick) {
+    const box = document.getElementById(id);
+    opts.forEach(([k, name]) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = name; b.setAttribute("aria-pressed", k === cur); b.addEventListener("click", () => { box.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === b)); onPick(k); }); box.append(b); });
+  }
+  function onResize(fn) {
+    let lastW = 0, rt;
+    new ResizeObserver(() => { const w = document.querySelector(".page").clientWidth; if (Math.abs(w - lastW) < 2) return; lastW = w; clearTimeout(rt); rt = setTimeout(fn, 80); }).observe(document.querySelector(".page"));
+  }
+
+  const once = (el, fn, th = .25) => { if (reduce) return false; const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); fn(); }, { threshold: th }); io.observe(el); return true; };
+  const R = DATA.rows, N = R.length, CUR = "var(--cur)", GRAD = "var(--grad)", GED = "var(--ged)";
+  const man1 = (n) => f1(n / 1e4);
+  const split100 = (parts) => { const tot = parts.reduce((a, b) => a + b, 0), raw = parts.map((p) => p / tot * 100), fl = raw.map(Math.floor); let left = 100 - fl.reduce((a, b) => a + b, 0); raw.map((v, i) => [v - fl[i], i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (left > 0) { fl[i]++; left--; } }); return fl; };
+
+  /* ---------- 0. you draw it ---------- */
+  const guess = R.map(() => null); guess[0] = R[0].gs; let ydDone = false, kcur = 1; const yd = {};
+  function buildYD() {
+    const box = document.getElementById("yd"); box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), narrow = W < 560, H = narrow ? 280 : 340, l = 38, r = 16, top = 16, bot = 30, max = 50;
+    const x = (i) => l + (W - l - r) * i / (N - 1), y = (val) => top + (H - top - bot) * (1 - val / max);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "application", tabindex: 0, "aria-label": "졸업생 비중을 직접 그리는 그림. 좌우 화살표로 학년도를 옮기고 위아래 화살표로 값을 1%p씩 바꾼다" }, box);
+    s("rect", { x: x(.5), y: top, width: W - r - x(.5), height: H - top - bot, fill: "var(--grid)", opacity: .55, rx: 4 }, v);
+    [0, 10, 20, 30, 40, 50].forEach((t) => { s("line", { x1: l, x2: W - r, y1: y(t), y2: y(t), class: "gl" }, v); tx(v, l - 6, y(t) + 4, t + (t === 50 ? "%" : ""), "tk", 11, "end"); });
+    R.forEach((d, i) => { if ((d.y - 1994) % (narrow ? 8 : 4) === 0 || i === N - 1) tx(v, x(i), H - 10, d.y, "tk", 11, i === N - 1 ? "end" : i === 0 ? "start" : "middle"); });
+    yd.act = s("path", { fill: "none", stroke: "var(--grad)", "stroke-width": 3, "stroke-linejoin": "round", "stroke-linecap": "round", pathLength: 1, "stroke-dasharray": 1, "stroke-dashoffset": 1, class: "act" }, v);
+    yd.mine = s("path", { fill: "none", stroke: "var(--mine)", "stroke-width": 3, "stroke-linejoin": "round", "stroke-linecap": "round" }, v);
+    yd.cursor = s("circle", { r: 6, fill: "none", stroke: "var(--ink)", "stroke-width": 1.5, opacity: 0 }, v);
+    s("circle", { cx: x(0), cy: y(R[0].gs), r: 5, fill: "var(--grad)" }, v); tx(v, x(0) + 8, y(R[0].gs) + 20, "1994학년도 32.5%", "vl halo", 12.5, "start", { "stroke-width": 4 });
+    yd.note = tx(v, (x(.5) + W - r) / 2, y(max) + 22, "여기에 선을 그려 보세요", "mt", 13.5, "middle");
+    yd.labels = s("g", {}, v);
+    Object.assign(yd, { v, x, y, W, l, r, top, bot, H, max });
+    const at = (e) => { const rc = v.getBoundingClientRect(), k = W / rc.width; const px = (e.clientX - rc.left) * k, py = (e.clientY - rc.top) * k; return [Math.max(1, Math.min(N - 1, Math.round((px - l) / ((W - l - r) / (N - 1))))), Math.max(0, Math.min(max, (y(0) - py) / (y(0) - y(max)) * max))]; };
+    let drawing = false, last = null;
+    const put = (e) => { const [i, val] = at(e); if (last && last[0] !== i) { const [i0, v0] = last, st = i > i0 ? 1 : -1; for (let k = i0 + st; k !== i; k += st) guess[k] = v0 + (val - v0) * (k - i0) / (i - i0); } guess[i] = val; last = [i, val]; kcur = i; updYD(); };
+    v.addEventListener("pointerdown", (e) => { if (ydDone) return; drawing = true; last = null; v.setPointerCapture(e.pointerId); put(e); e.preventDefault(); });
+    v.addEventListener("pointermove", (e) => { if (drawing && !ydDone) put(e); });
+    const end = () => { drawing = false; last = null; }; v.addEventListener("pointerup", end); v.addEventListener("pointercancel", end);
+    v.addEventListener("keydown", (e) => {
+      if (ydDone) return; const prev = () => { for (let k = kcur; k >= 0; k--) if (guess[k] != null) return guess[k]; return 30; };
+      if (!["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(e.key)) return;
+      if (guess[kcur] == null) guess[kcur] = Math.round(prev());
+      if (e.key === "ArrowRight") { kcur = Math.min(N - 1, kcur + 1); if (guess[kcur] == null) guess[kcur] = prev(); } else if (e.key === "ArrowLeft") kcur = Math.max(1, kcur - 1);
+      else if (e.key === "ArrowUp" || e.key === "ArrowDown") { guess[kcur] = Math.max(0, Math.min(max, Math.round(guess[kcur] == null ? prev() : guess[kcur]) + (e.key === "ArrowUp" ? 1 : -1))); }
+      else return; e.preventDefault(); yd.cursor.setAttribute("opacity", 1); updYD(true);
+    });
+    v.addEventListener("blur", () => yd.cursor.setAttribute("opacity", 0));
+    updYD();
+  }
+  function updYD(kb) {
+    const { x, y } = yd; let d = "", pen = false;
+    // gaps between two drawn years are filled with a straight line, so starting a little to the right leaves nothing missing
+    for (let i = 1, p0 = 0; i < N; i++) { if (guess[i] == null) continue; for (let k = p0 + 1; k < i; k++) guess[k] = guess[p0] + (guess[i] - guess[p0]) * (k - p0) / (i - p0); p0 = i; }
+    guess.forEach((g, i) => { if (g == null) { pen = false; return; } d += `${pen ? "L" : "M"}${x(i).toFixed(1)},${y(g).toFixed(1)}`; pen = true; });
+    yd.mine.setAttribute("d", d); yd.mine.setAttribute("stroke-dasharray", ydDone ? "2 6" : "none");
+    const left = guess.filter((g) => g == null).length, any = guess.slice(1).some((g) => g != null);
+    yd.note.setAttribute("opacity", any || ydDone ? 0 : 1);
+    if (guess[kcur] != null) { yd.cursor.setAttribute("cx", x(kcur)); yd.cursor.setAttribute("cy", y(guess[kcur])); }
+    if (!ydDone) {
+      document.getElementById("ydbtn").disabled = left > 0;
+      const h = document.getElementById("ydhint");
+      h.textContent = !any ? "그림 위를 왼쪽에서 오른쪽으로 긋는다. 키보드는 그림을 고른 뒤 좌우 화살표로 해를 옮기고 위아래 화살표로 값을 바꾼다." : left > 0 ? `${left}개 학년도가 남았다. 2026학년도까지 이어서 그린다.${kb ? ` 지금 ${R[kcur].y}학년도 ${Math.round(guess[kcur])}%` : ""}` : `다 그렸다. 고치려면 다시 그으면 된다.${kb ? ` 지금 ${R[kcur].y}학년도 ${Math.round(guess[kcur])}%` : ""}`;
+    }
+  }
+  function revealYD(skipped) {
+    ydDone = true; document.getElementById("yd").classList.add("done"); const { x, y, v } = yd;
+    yd.act.setAttribute("d", R.map((d, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(d.gs).toFixed(1)}`).join(""));
+    requestAnimationFrame(() => requestAnimationFrame(() => yd.act.setAttribute("stroke-dashoffset", 0)));
+    const lab = (yr, dy, anchor = "middle") => { const i = R.findIndex((d) => d.y === yr), d = R[i]; s("circle", { cx: x(i), cy: y(d.gs), r: 4, fill: "var(--grad)" }, yd.labels); tx(yd.labels, x(i), y(d.gs) + dy, `${yr} ${pc(d.gs)}`, "vl halo gi", 12.5, anchor, { "stroke-width": 4 }); };
+    lab(1996, -10, "start"); lab(2010, 20); lab(2024, -10, "end"); lab(2026, 20, "end");
+    v.removeAttribute("tabindex"); v.setAttribute("role", "img"); v.setAttribute("aria-label", "수능 지원자 중 졸업생 비중. 1994학년도 32.5%, 1996학년도 35.7%, 2010학년도 19.3%, 2024학년도 31.7%, 2026학년도 28.9%" + (skipped ? "" : ". 점선은 내가 그린 선"));
+    updYD(); document.getElementById("ydbtn").disabled = true; document.getElementById("ydskip").disabled = true;
+    const filled = guess.map((g, i) => [g, i]).filter(([g, i]) => i > 0 && g != null), msg = document.getElementById("ydmsg");
+    if (!skipped && filled.length) {
+      const err = filled.reduce((a, [g, i]) => a + Math.abs(g - R[i].gs), 0) / filled.length, low = guess.reduce((b, g, i) => (i > 0 && g != null && (b < 0 || g < guess[b]) ? i : b), -1);
+      msg.textContent = `내 선(주황 점선)은 실제와 평균 ${f1(err)}%p 차이가 났다. 내가 가장 낮게 그린 해는 ${R[low].y}학년도(${Math.round(guess[low])}%)다.`;
+    } else msg.textContent = "";
+    document.getElementById("ydhint").textContent = skipped ? "붉은 선이 실제 값이다." : "붉은 선이 실제 값, 주황 점선이 내가 그린 선이다.";
+    document.getElementById("ydreveal").hidden = false;
+  }
+  document.getElementById("ydbtn").addEventListener("click", () => revealYD(false));
+  document.getElementById("ydskip").addEventListener("click", () => { for (let i = 1; i < N; i++) guess[i] = null; revealYD(true); });
+
+  /* ---------- desks ---------- */
+  function desk(g, x, y, u, col, empty) {
+    // seen from above: desk with an answer sheet, and the test-taker's head and shoulders below it
+    s("rect", { x: x - u * .42, y: y - u * .46, width: u * .84, height: u * .46, rx: u * .06, fill: empty ? "none" : "var(--desk)", stroke: "var(--desk-edge)", "stroke-width": 1, "stroke-dasharray": empty ? "3 2.5" : null }, g);
+    if (empty) return;
+    s("rect", { x: x - u * .2, y: y - u * .38, width: u * .4, height: u * .28, fill: "var(--paper-w)" }, g);
+    s("path", { d: `M${x - u * .34},${y + u * .42} Q${x - u * .34},${y + u * .12} ${x},${y + u * .12} Q${x + u * .34},${y + u * .12} ${x + u * .34},${y + u * .42} Z`, fill: col }, g);
+    s("circle", { cx: x, cy: y + u * .14, r: u * .17, fill: col, stroke: "var(--card)", "stroke-width": 1 }, g);
+  }
+  /* ---------- 1. exam room ---------- */
+  const S100 = R.map((d) => split100([d.cur, d.grad, d.ged]));
+  function draw1(pos) {
+    const box = document.getElementById("c1"), k = Math.min(N - 1, Math.floor(pos + 1e-6)), d = R[k], [a, b, c] = S100[k];
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, per = narrow ? 10 : 20, rows = 100 / per, cw = Math.min(48, W / per), u = cw * .92, rh = cw * 1.08, H = rows * rh + 8, x0 = (W - per * cw) / 2;
+    box.replaceChildren();
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${d.y}학년도 수능 지원자 100명의 시험장. 재학생 ${a}자리, 졸업생 ${b}자리, 검정고시 등 ${c}자리` }, box);
+    for (let i = 0; i < 100; i++) desk(v, x0 + (i % per) * cw + cw / 2, 4 + Math.floor(i / per) * rh + rh * .5, u, i < a ? CUR : i < a + b ? GRAD : GED);
+    const st = document.getElementById("st1"); st.replaceChildren(`${d.y}학년도 · 지원자 `, bEl(`${fmt(d.tot)}명`), ` · 재학생 ${pc(d.cur / d.tot * 100)} · 졸업생 `, bEl(pc(d.gs)), ` (${fmt(d.grad)}명) · 검정고시 등 ${pc(d.ges)}`);
+    const sel = document.getElementById("myyear"); if (+sel.value !== d.y) sel.value = String(d.y);
+  }
+  const pl1 = Player("p1", "수능 지원자 구성", draw1, N, (k) => String(R[k].y), 12);
+  const my = document.getElementById("myyear");
+  R.forEach((d) => { const o = document.createElement("option"); o.value = d.y; o.textContent = `${d.y}학년도 (${d.date.slice(0, 4)}년 ${+d.date.slice(5, 7)}월 시험)`; my.append(o); });
+  my.value = String(R[N - 1].y);
+  my.addEventListener("change", () => { const sc = document.querySelector("#p1 .scrub"); sc.value = R.findIndex((d) => d.y === +my.value); sc.dispatchEvent(new Event("input", { bubbles: true })); });
+  table("t1", ["학년도", "지원자", "재학생", "졸업생", "검정고시 등", "졸업생 비중", "검정고시 등 비중"], R.map((d) => [d.y, fmt(d.tot), fmt(d.cur), fmt(d.grad), fmt(d.ged), pc(d.gs), pc(d.ges)]));
+
+  /* ---------- 2. OMR card ---------- */
+  let grow2 = 1;
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, NB = 18, UNIT = 5e4, l = narrow ? 38 : 60, rr = narrow ? 40 : 54, rh = narrow ? 15 : 17, top = 30, H = top + N * rh + 14;
+    const bw = (W - l - rr) / NB, oh = rh * .62, ow = Math.min(bw * .78, oh * 2.4), pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "1994–2026학년도 수능 지원자 수를 OMR 카드 칸으로 칠한 그림. 한 칸 5만 명. 2000학년도 89만 6천 명이 가장 많고 2021학년도 49만 3천 명이 가장 적다" }, box);
+    s("rect", { x: 1, y: 1, width: W - 2, height: H - 2, rx: 8, fill: "var(--omr-bg)", stroke: "var(--omr)", "stroke-width": 1.2 }, v);
+    for (let b = 0; b < NB; b++) if ((b + 1) % (narrow ? 4 : 2) === 0) tx(v, l + (b + 1) * bw, 14, `${(b + 1) * 5}만`, "tk oi", narrow ? 11 : 11.5, "end");
+    for (let i = 0; i < N; i += 1) { if (i % 5 === 4) s("line", { x1: 6, x2: W - 6, y1: top + (i + 1) * rh - .5, y2: top + (i + 1) * rh - .5, stroke: "var(--omr)", "stroke-width": .7, opacity: .7 }, v); }
+    R.forEach((d, i) => {
+      const cy = top + i * rh + rh / 2, segs = [[0, d.cur, CUR], [d.cur, d.cur + d.grad, GRAD], [d.cur + d.grad, d.tot, GED]], lim = d.tot * grow2;
+      tx(v, l - 8, cy + 4, narrow ? String(d.y).slice(2) : d.y, "tk oi", narrow ? 11 : 11.5, "end");
+      for (let b = 0; b < NB; b++) {
+        const bx = l + b * bw + (bw - ow) / 2, lo = b * UNIT, hi = lo + UNIT;
+        s("rect", { x: bx, y: cy - oh / 2, width: ow, height: oh, rx: oh / 2, fill: "none", stroke: "var(--omr)", "stroke-width": 1 }, v);
+        segs.forEach(([a, z, col]) => { const s0 = Math.max(lo, a), s1 = Math.min(hi, z, lim); if (s1 > s0) s("rect", { x: bx + ow * (s0 - lo) / UNIT, y: cy - oh / 2, width: Math.max(.6, ow * (s1 - s0) / UNIT), height: oh, rx: (s1 - s0) / UNIT > .7 ? oh / 2 : Math.min(oh / 2, 2), fill: col }, v); });
+      }
+      tx(v, W - 8, cy + 4, man1(d.tot), "vl", narrow ? 11 : 12, "end");
+      pts.push({ x: l + Math.min(NB, d.tot / UNIT) * bw / 2, y: cy, r: rh / 2, fn: () => [`${d.y}학년도`, [[`${fmt(d.tot)}명`, "지원자"], [`${fmt(d.cur)}명`, "재학생", CUR], [`${fmt(d.grad)}명`, "졸업생", GRAD], [`${fmt(d.ged)}명`, "검정고시 등", GED]]] });
+    });
+    tx(v, l - 8, 14, narrow ? "학년도" : "학년도", "tk oi", narrow ? 11 : 11.5, "end");
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표 키로 학년도를 옮겨 볼 수 있다");
+  }
+  table("t2", ["학년도", "지원자", "재학생", "졸업생", "검정고시 등", "남", "여"], R.map((d) => [d.y, fmt(d.tot), fmt(d.cur), fmt(d.grad), fmt(d.ged), fmt(d.m), fmt(d.f)]));
+
+  /* ---------- 3. blackboard ---------- */
+  let grow3 = 1;
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, H = narrow ? 320 : 400, fr = narrow ? 8 : 12, l = fr + 38, r = fr + (narrow ? 14 : 20), top = fr + 26, bot = fr + 44, max = 70;
+    const x = (i) => l + (W - l - r) * i / (N - 1), y = (val) => top + (H - top - bot) * (1 - val / max);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "칠판에 그린 재학생 지원자와 졸업생 지원자. 재학생은 2000학년도 63만 명에서 2024학년도 33만 명으로 줄었고, 졸업생은 13만–16만 명 사이다" }, box);
+    s("rect", { x: 1, y: 1, width: W - 2, height: H - 14, rx: 6, fill: "var(--bb-edge)" }, v); s("rect", { x: fr, y: fr, width: W - fr * 2, height: H - 12 - fr * 2, rx: 3, fill: "var(--bb)" }, v);
+    s("rect", { x: W * .12, y: H - 14, width: W * .76, height: 8, rx: 2, fill: "var(--tray)" }, v); s("rect", { x: W * .2, y: H - 18, width: 26, height: 5, rx: 2, fill: "var(--chalk)" }, v); s("rect", { x: W * .2 + 34, y: H - 18, width: 18, height: 5, rx: 2, fill: "var(--chalk2)" }, v);
+    [0, 20, 40, 60].forEach((t) => { s("line", { x1: l, x2: W - r, y1: y(t), y2: y(t), stroke: "var(--chalk)", "stroke-width": 1, opacity: .18, "stroke-dasharray": "2 5" }, v); tx(v, l - 6, y(t) + 4, t, "ckt", 11, "end"); });
+    R.forEach((d, i) => { if ((d.y - 1994) % (narrow ? 8 : 4) === 0 || i === N - 1) tx(v, x(i), y(0) + 18, d.y, "ckt", 11, i === N - 1 ? "end" : "middle"); });
+    const i10 = R.findIndex((d) => d.y === 2010), i24 = R.findIndex((d) => d.y === 2024);
+    s("rect", { x: x(i10), y: y(max), width: x(i24) - x(i10), height: y(0) - y(max), fill: "var(--chalk)", opacity: .07 }, v);
+    const nn = Math.max(2, Math.round((N - 1) * grow3) + 1), line = (key, col, w) => s("path", { d: R.slice(0, nn).map((d, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(d[key] / 1e4).toFixed(1)}`).join(""), fill: "none", stroke: col, "stroke-width": w, "stroke-linejoin": "round", "stroke-linecap": "round", "stroke-dasharray": "1 0" }, v);
+    line("cur", "var(--chalk3)", 3.2); line("grad", "var(--chalk2)", 3.2);
+    if (grow3 === 1) {
+      const dot = (i, key, cls, dy, anchor, label) => { const d = R[i]; s("circle", { cx: x(i), cy: y(d[key] / 1e4), r: 4, fill: cls === "ck3" ? "var(--chalk3)" : "var(--chalk2)" }, v); tx(v, x(i), y(d[key] / 1e4) + dy, label || `${man1(d[key])}만`, cls, narrow ? 12 : 13, anchor); };
+      dot(i10, "cur", "ck3", -10, "middle"); dot(i24, "cur", "ck3", -10, "middle"); dot(N - 1, "cur", "ck3", -10, "end");
+      dot(i10, "grad", "ck2", 20, "middle"); dot(i24, "grad", "ck2", 20, "middle"); dot(R.findIndex((d) => d.y === 1996), "grad", "ck2", -10, "middle");
+      tx(v, x(narrow ? 5 : 6), y(R[6].cur / 1e4) - 14, "재학생", "ck3", 14, "middle"); tx(v, x(narrow ? 4 : 5), y(R[5].grad / 1e4) + 26, "졸업생", "ck2", 14, "middle");
+      tx(v, (x(i10) + x(i24)) / 2, y(max) + 16, narrow ? "2010 → 2024" : "2010 → 2024학년도", "ck", 12, "middle");
+      tx(v, (x(i10) + x(i24)) / 2, y(max) + 32, "재학생 −20.6만 · 졸업생 +2.9만", "ck", narrow ? 11 : 12.5, "middle");
+    }
+    timeLayer(v, tipFor(fig), N, x, top, y(0), (i) => { const d = R[i]; return [`${d.y}학년도`, [[`${fmt(d.cur)}명`, "재학생", "var(--chalk3)"], [`${fmt(d.grad)}명`, "졸업생", "var(--chalk2)"], [pc(d.gs), "졸업생 비중"]]]; }, "좌우 화살표 키로 학년도를 옮겨 볼 수 있다");
+  }
+
+  /* ---------- 4. empty desks ---------- */
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const YS = [2001, 2010, 2021, 2026], W = Math.max(300, box.clientWidth), narrow = W < 560, cols = narrow ? 2 : 4, gap = narrow ? 14 : 22, bw = (W - gap * (cols - 1)) / cols, cw = bw / 10, u = cw * .92, rh = cw * 1.08, bh = 10 * rh + 44, rowsB = Math.ceil(YS.length / cols), H = rowsB * bh + (rowsB - 1) * 8, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "지원자 100명 가운데 결시자를 빈 책상으로 그린 그림. 2001학년도 3자리, 2010학년도 6자리, 2021학년도 15자리, 2026학년도 11자리" }, box);
+    YS.forEach((yr, k) => {
+      const d = R.find((q) => q.y === yr), ab = 100 - d.rate, n = Math.round(ab), bx = (k % cols) * (bw + gap), by = Math.floor(k / cols) * (bh + 8);
+      tx(v, bx, by + 16, `${yr}학년도`, "lb", 13.5); tx(v, bx + bw, by + 16, `결시 ${f1(ab)}%`, "vl gi", 13.5, "end");
+      for (let i = 0; i < 100; i++) desk(v, bx + (i % 10) * cw + cw / 2, by + 28 + Math.floor(i / 10) * rh + rh * .5, u, "var(--muted)", i >= 100 - n);
+      tx(v, bx, by + bh - 2, `${fmt(d.app - d.took)}명`, "tk", 11.5);
+      pts.push({ x: bx + bw / 2, y: by + bh / 2, r: bw / 2 - 6, fn: () => [`${yr}학년도`, [[`${fmt(d.app)}명`, "지원"], [`${fmt(d.took)}명`, "응시"], [`${fmt(d.app - d.took)}명`, "결시"], [pc(100 - d.rate), "결시율"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 학년도를 옮겨 볼 수 있다");
+  }
+  table("t4", ["학년도", "시험일", "지원", "응시", "결시", "결시율"], R.map((d) => [d.y, d.date, fmt(d.app), fmt(d.took), fmt(d.app - d.took), pc(100 - d.rate)]));
+
+  /* ---------- first view + resize ---------- */
+  const growOn = (el, set, draw) => { if (!once(el, () => { const t0 = performance.now(); const tick = (now) => { const k = Math.min(1, (now - t0) / 1100); set(1 - Math.pow(1 - k, 3)); draw(); if (k < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); })) return; set(0); };
+  buildYD(); pl1.render();
+  growOn(document.getElementById("c2"), (g) => { grow2 = g; }, c2); c2();
+  growOn(document.getElementById("c3"), (g) => { grow3 = g; }, c3); c3();
+  c4();
+  onResize(() => { grow2 = 1; grow3 = 1; buildYD(); if (ydDone) revealYD(!guess.slice(1).some((g) => g != null)); pl1.render(); c2(); c3(); c4(); });
+})();
+</script>

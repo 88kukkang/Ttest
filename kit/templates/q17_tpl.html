@@ -1,0 +1,331 @@
+<title>폭염 지도책</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: an atlas of hot places. Each place where heat illness struck is a small drawn scene (scaffold, paddy, road, greenhouse...)
+   with the people who collapsed there piled beneath it, one figure per ten patients; the atlas replays 2012–2025.
+   Ages are thermometers whose mercury can show either patients or the rate per 100,000 people; the day is a sundial. */
+:root {
+  --paper: #f6f1e7; --card: #fffcf6; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #e2ccb5; --grid: #efe5d6; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --accent: #9b3737; --sun: #d56b41; --sun2: #ebcfa7; --hot: #9b3737; --hot2: #d56b41; --out-bg: #fbeee0; --in-bg: #e9f0f0;
+  --ic-a: #67453c; --ic-b: #80a15a; --ic-c: #689daf; --ic-d: #b6a392; --glass: #dbe1dd; --merc: #9b3737; --hot-ink: #9b3737;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #dc8c67; --sun: #dc8c67; --sun2: #67453c; --hot: #dc8c67; --hot2: #cd9886; --out-bg: #332a25; --in-bg: #263133;
+  --ic-a: #d8b29b; --ic-b: #abc07b; --ic-c: #8ab5bb; --ic-d: #928a7f; --glass: #4c4d50; --merc: #dc8c67; --hot-ink: #dc8c67; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #dc8c67; --sun: #dc8c67; --sun2: #67453c; --hot: #dc8c67; --hot2: #cd9886; --out-bg: #332a25; --in-bg: #263133;
+  --ic-a: #d8b29b; --ic-b: #abc07b; --ic-c: #8ab5bb; --ic-d: #928a7f; --glass: #4c4d50; --merc: #dc8c67; --hot-ink: #dc8c67; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.yr { background-image: none; font-family: var(--serif); font-size: 26px }
+@keyframes spin { to { transform: rotate(360deg) } }
+.rays { transform-box: fill-box; transform-origin: center; animation: spin 40s linear infinite }
+@media (prefers-reduced-motion: reduce) { .rays { animation: none } }
+</style>
+
+<main class="page">
+  <header>
+    <h1>온열질환은 노인에게만 생길까<span>아니다. 2025년 환자 4,460명 가운데 65세 이상은 30%다. 열에 넷은 작업장에서, 열에 하나는 논밭에서 쓰러졌다. 다만 인구 대비로는 80세 이상이 가장 위험하다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 17</dd>
+      <dt>한 줄</dt><dd>질병관리청 온열질환 응급실 감시(2025년 5월 15일–9월 30일)에 신고된 환자 4,460명 가운데 65세 이상은 1,341명(30.1%), 남성이 79.7%다. 환자 수는 50대(865명)가 가장 많고, 쓰러진 곳은 실외 작업장 32.1%, 실내 작업장 8.0%, 논밭 12.2%, 길가 11.7%다. 직업은 단순노무 종사자가 26.0%다. 그러나 주민등록 인구로 나누면 80세 이상이 10만 명당 19.1명으로 전체 평균(8.7명)의 2.2배다. 환자는 2012년 984명에서 2025년 4,460명으로 늘었고 2023년부터 세 해 연속 늘었다.</dd>
+      <dt>분류</dt><dd>건강·복지·교육</dd>
+      <dt>본능</dt><dd>일반화 본능 · "더위에 약한 노인"이라는 한 가지 얼굴로 온열질환을 본다</dd>
+      <dt>그림 방식</dt><dd>폭염 지도책 · 쓰러진 곳마다 작은 풍경을 그리고 그 아래에 환자 10명마다 한 사람씩 눕혔다. 2012–2025년을 재생한다. 나이는 수은 온도계, 하루는 해시계로 그렸다</dd>
+      <dt>기간</dt><dd>2012–2025년 여름(감시 기간)</dd>
+      <dt>엮은 데이터</dt><dd>2개 · 질병관리청 온열질환 응급실 감시체계 연도별 결과(2012–2025) · 행정안전부 연령별 주민등록 인구(같은 해 7월)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2025년 여름 응급실에 온 온열질환자 4,460명. 이 가운데 65세 이상은?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>열에 일곱</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>절반쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>열에 셋</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. <span class="n">30.1%</span>, 1,341명</span>
+      나머지 70%는 65세 아래다. 환자 수가 가장 많은 나이는 50대(865명), 그다음이 60대(834명)와 30대(608명)다. 열 명 중 여덟이 남성이다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">어디서 쓰러졌나</h2>
+      <p>쓰러진 곳마다 작은 풍경을 그리고, 그 아래에 그곳에서 쓰러진 사람을 10명마다 하나씩 눕혔다. 2025년 가장 많은 사람이 쓰러진 곳은 실외 작업장(1,431명)이다. 공사장·물류창고 같은 실내 작업장(359명)까지 더하면 열에 넷이 일하다 쓰러졌다. 그다음이 논밭(542명)과 길가(522명)다. 집 안에서 쓰러진 사람은 237명(5.3%)이다.</p>
+      <p>재생하면 해마다 사람이 쌓인다. 2018년 폭염 때 4,526명으로 크게 늘었고, 2023년부터 세 해 연속 늘어 2025년에는 2018년과 비슷해졌다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">온열질환자가 쓰러진 곳</p>
+      <p class="fs">누운 사람 하나 = 환자 10명(반올림). 위쪽 = 실외, 아래쪽 = 실내. 해마다 감시 기간(대체로 5월 중순–9월)</p>
+      <div class="player" id="p1"></div>
+      <p class="stat" id="st1" aria-live="polite"></p>
+      <div class="chart" id="c1"></div>
+      <figcaption>질병관리청 「온열질환 응급실 감시체계」 연도별 결과(전국 약 500개 응급실 신고). 2012년은 감시 기간이 짧다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">나이마다의 온도계</h2>
+      <p>나이대마다 온도계를 세웠다. 처음에는 수은이 환자 수만큼 올라가 있다. 50대·60대가 가장 높다. "인구 10만 명당"을 누르면 수은이 그 나이 인구로 나눈 값으로 바뀐다. 80세 이상 온도계가 홀로 솟는다. 10만 명당 19.1명으로, 50대(10.0명)의 두 배 가까이다.</p>
+      <p>그러니까 "노인에게만"은 틀렸지만 "노인이 더 위험하다"는 맞다. 일하는 50대는 수가 많아서, 80세 이상은 몸이 약해서 많이 쓰러진다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">나이대별 온열질환자, 2025년</p>
+      <p class="fs">수은 높이 = 환자 수 또는 인구 10만 명당 환자 수</p>
+      <div class="chips" id="chips2" role="group" aria-label="기준"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>온열질환 응급실 감시(2025년), 행정안전부 연령별 주민등록 인구(2025년 7월). 80세 이상에는 90세 이상을 넣었다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">하루의 해시계</h2>
+      <p>쓰러진 시각을 해시계로 그렸다. 부채꼴의 길이가 그 시간대 한 시간에 쓰러진 사람의 몫이다. 한낮의 오후 3–4시가 가장 길지만, 오전 10–12시도 한 시간에 7.9%로 그만큼 길다. 해가 뜨거워지기 전에 서둘러 일하는 오전과 해가 진 저녁 7시 넘어서도 쓰러지는 사람이 있다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">쓰러진 시각, 2016–2025년 합계</p>
+      <p class="fs">부채꼴 길이 = 그 시간대 한 시간에 쓰러진 사람의 몫(%), 부채꼴 폭 = 시간대의 길이</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>온열질환 응급실 감시(2016–2025년). 2025년의 10–11시·11–12시는 10–12시로 합쳤다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">무슨 일을 하던 사람인가</h2>
+      <p>2025년 환자의 직업을 봤다. 단순노무 종사자(건설·운반·청소 등)가 26.0%로 가장 많고, 무직 13.2%, 농림어업 7.8%가 뒤를 잇는다. 사무직은 2.4%다. 더위에 몸을 쓰는 일을 하는 사람이 쓰러진다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">온열질환자의 직업, 2025년</p>
+      <p class="fs">% (미상·기타 25.8%는 그림에서 뺐다)</p>
+      <div class="chart" id="c4"></div>
+      <figcaption>온열질환 응급실 감시(2025년). 직업 분류는 2019년부터 같은 틀이다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 온열질환은 노인에게만 생길까</h2>
+      <p>아니다. 환자의 70%는 65세 아래이고, 열에 넷은 일하다 쓰러졌다. 공사장·논밭·길 위에서 몸을 쓰는 50대 남성이 가장 흔한 얼굴이다. 동시에 80세 이상은 인구 대비로 가장 위험하다. 폭염 대책은 "어르신 무더위 쉼터"만이 아니라, 한낮에 일을 멈출 수 있게 하는 일터의 규칙이기도 해야 한다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>응급실 감시체계는 전국 응급실에 온 환자만 센다. 동네 의원에 가거나 병원에 가지 않은 사람, 응급실에 오기 전에 숨진 사람은 빠진다.</li>
+      <li>감시 기간이 해마다 조금씩 다르다(대체로 5월 하순–9월). 해마다의 환자 수는 그해 여름의 더위에 크게 좌우된다.</li>
+      <li>인구 10만 명당 환자 수는 주민등록 인구(그해 7월)로 나눈 값이다. 나이대별로 바깥 활동 시간이 달라, 같은 더위에 노출된 사람당 위험과는 다르다.</li>
+      <li>나이와 장소를 엮은 표는 없어서 "논밭의 노인", "작업장의 50대"처럼 나이와 장소를 함께 말할 수는 없다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15122866/fileData.do" target="_blank" rel="noopener">온열질환 감시체계</a> (15122866, 기후보건 통합정보 연도별 xlsx)</td><td>질병관리청</td><td>성별, 연령, 직업, 발생 시간, 발생 장소별 환자 수</td><td>2012–2025</td></tr>
+        <tr><td><a href="https://jumin.mois.go.kr/ageStatMonth.do" target="_blank" rel="noopener">연령별 인구현황</a> (주민등록 인구통계)</td><td>행정안전부</td><td>10세 단위 연령별 전국 인구</td><td>2014·2018·2025년 7월</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>14개 연도 결과표 · 환자 2만 8,846명(2012–2025년 합계)</dd>
+      <dt>도구</dt><dd>Python(엑셀 결과표 읽기) · SVG로 그린 장소 풍경, 온도계, 해시계와 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>장소·직업·시간대 구성비 · 연령별 인구 10만 명당 환자 수</dd>
+      <dt>검증</dt><dd>연도마다 성별·연령·장소·시간대 표의 합계가 같은지 확인했다(예: 2025년 4,460명).</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>폭염일수가 하루 늘면 환자는 몇 명 늘까</h3><p>기상청 일별 최고기온과 감시체계의 일별 환자를 견주면 더위와 환자의 관계를 볼 수 있다.</p></div>
+      <div class="q"><h3>한파에는 누가 쓰러질까</h3><p>같은 시스템의 한랭질환 감시 결과로 겨울의 얼굴을 볼 수 있다.</p>
+        <ul><li><a href="https://health.kdca.go.kr/healthhazard/clmtInfo/coldstats" target="_blank" rel="noopener">한랭질환 감시</a> · 질병관리청</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.6</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const Y = DATA.Y, NY = Y.length, PL = DATA.PL;
+  const PN = { "실외:작업장": "작업장(실외)", "실외:논밭": "논밭", "실외:길가": "길가", "실외:운동장(공원)": "운동장·공원", "실외:주거지주변": "집 주변", "실외:산": "산", "실외:강가/해변": "강가·해변", "실외:기타": "그 밖의 실외", "실내:집": "집 안", "실내:작업장": "작업장(실내)", "실내:건물": "건물 안", "실내:비닐하우스": "비닐하우스", "실내:기타": "그 밖의 실내" };
+
+  /* small vector scenes, drawn in a 64×40 box */
+  const SCENE = {
+    "실외:작업장": (g) => { [8, 24, 40].forEach((x) => s("rect", { x, y: 6, width: 14, height: 30, fill: "none", stroke: "var(--ic-a)", "stroke-width": 1.6 }, g)); s("line", { x1: 8, y1: 21, x2: 54, y2: 21, stroke: "var(--ic-a)", "stroke-width": 1.6 }, g); s("path", { d: "M58,36 L58,2 L30,2 M58,8 L52,2", fill: "none", stroke: "var(--sun)", "stroke-width": 2 }, g); s("line", { x1: 34, y1: 2, x2: 34, y2: 12, stroke: "var(--sun)", "stroke-width": 1.2 }, g); },
+    "실외:논밭": (g) => { s("path", { d: "M2,36 L62,36 L56,22 L8,22 Z", fill: "var(--ic-b)", opacity: .25 }, g); for (let r = 0; r < 3; r++) for (let c = 0; c < 7; c++) { const x = 10 + c * 7 + r * 1.5, y = 33 - r * 5; s("path", { d: `M${x},${y} l-2,-4 M${x},${y} l0,-5 M${x},${y} l2,-4`, stroke: "var(--ic-b)", "stroke-width": 1.2, fill: "none" }, g); } },
+    "실외:길가": (g) => { s("rect", { x: 0, y: 24, width: 64, height: 12, fill: "var(--ic-d)", opacity: .5 }, g); s("line", { x1: 2, y1: 30, x2: 62, y2: 30, stroke: "var(--card)", "stroke-width": 1.6, "stroke-dasharray": "6 5" }, g); s("path", { d: "M50,24 L50,4 L42,4", fill: "none", stroke: "var(--ic-a)", "stroke-width": 1.6 }, g); s("circle", { cx: 41, cy: 6, r: 2.4, fill: "var(--sun)" }, g); },
+    "실외:운동장(공원)": (g) => { s("rect", { x: 0, y: 26, width: 64, height: 10, fill: "var(--ic-b)", opacity: .35 }, g); s("path", { d: "M6,26 L6,12 L24,12 L24,26", fill: "none", stroke: "var(--ic-a)", "stroke-width": 1.6 }, g); s("circle", { cx: 48, cy: 13, r: 9, fill: "var(--ic-b)", opacity: .8 }, g); s("line", { x1: 48, y1: 20, x2: 48, y2: 30, stroke: "var(--ic-a)", "stroke-width": 2 }, g); },
+    "실외:주거지주변": (g) => { [[6, 14], [32, 18]].forEach(([x, w]) => { s("path", { d: `M${x},34 L${x},20 L${x + w / 2 + 5},11 L${x + w + 10},20 L${x + w + 10},34 Z`, fill: "none", stroke: "var(--ic-a)", "stroke-width": 1.6, "stroke-linejoin": "round" }, g); }); s("line", { x1: 0, y1: 35, x2: 64, y2: 35, stroke: "var(--ic-b)", "stroke-width": 2 }, g); },
+    "실외:산": (g) => { s("path", { d: "M0,36 L20,10 L32,24 L44,6 L64,36 Z", fill: "var(--ic-b)", opacity: .45 }, g); s("path", { d: "M40,11 L44,6 L48,11", fill: "none", stroke: "var(--card)", "stroke-width": 1.6 }, g); },
+    "실외:강가/해변": (g) => { for (let k = 0; k < 3; k++) s("path", { d: `M0,${22 + k * 6} q8,-4 16,0 t16,0 t16,0 t16,0`, fill: "none", stroke: "var(--ic-c)", "stroke-width": 1.8 }, g); s("path", { d: "M44,18 L50,4 L56,18 Z", fill: "var(--sun)", opacity: .8 }, g); },
+    "실외:기타": (g) => { s("path", { d: "M26,36 L32,8 L38,36 Z", fill: "var(--sun)", opacity: .85 }, g); s("rect", { x: 22, y: 34, width: 20, height: 3, fill: "var(--ic-a)" }, g); s("line", { x1: 28.5, y1: 22, x2: 35.5, y2: 22, stroke: "var(--card)", "stroke-width": 2 }, g); },
+    "실내:집": (g) => { s("path", { d: "M10,36 L10,16 L32,4 L54,16 L54,36 Z", fill: "none", stroke: "var(--ic-a)", "stroke-width": 1.6, "stroke-linejoin": "round" }, g); s("circle", { cx: 32, cy: 24, r: 6, fill: "none", stroke: "var(--ic-c)", "stroke-width": 1.4 }, g); s("path", { d: "M32,24 l4,-3 M32,24 l-1,5 M32,24 l-4,-2", stroke: "var(--ic-c)", "stroke-width": 1.4 }, g); },
+    "실내:작업장": (g) => { s("path", { d: "M4,36 L4,18 L16,10 L16,18 L28,10 L28,18 L40,10 L40,18 L52,18 L52,4 L58,4 L58,36 Z", fill: "none", stroke: "var(--ic-a)", "stroke-width": 1.6, "stroke-linejoin": "round" }, g); },
+    "실내:건물": (g) => { s("rect", { x: 20, y: 2, width: 24, height: 34, fill: "none", stroke: "var(--ic-a)", "stroke-width": 1.6 }, g); for (let r = 0; r < 5; r++) for (let c = 0; c < 3; c++) s("rect", { x: 24 + c * 6.5, y: 6 + r * 6, width: 3.6, height: 3, fill: "var(--ic-c)" }, g); },
+    "실내:비닐하우스": (g) => { s("path", { d: "M4,36 L4,24 Q32,-2 60,24 L60,36 Z", fill: "var(--ic-c)", opacity: .2, stroke: "var(--ic-c)", "stroke-width": 1.6 }, g); [16, 26, 38, 48].forEach((x) => s("line", { x1: x, y1: 36, x2: x, y2: x < 32 ? 12 + (32 - x) * .5 : 12 + (x - 32) * .5, stroke: "var(--ic-c)", "stroke-width": 1 }, g)); },
+    "실내:기타": (g) => { s("rect", { x: 22, y: 6, width: 20, height: 30, rx: 1, fill: "none", stroke: "var(--ic-a)", "stroke-width": 1.6 }, g); s("circle", { cx: 37, cy: 22, r: 1.6, fill: "var(--ic-a)" }, g); },
+  };
+  // a person lying down: head + body, about 10×5
+  const lying = (g, x, y, col, k = 1) => { s("circle", { cx: x + 2.4 * k, cy: y, r: 2.4 * k, fill: col }, g); s("rect", { x: x + 5.4 * k, y: y - 2 * k, width: 8.6 * k, height: 4 * k, rx: 2 * k, fill: col }, g); };
+
+  /* ---------- 1. atlas ---------- */
+  function c1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, cols = W >= 900 ? 4 : W >= 560 ? 3 : 2, gap = 10, tw = (W - gap * (cols - 1)) / cols;
+    const k = Math.min(NY - 1, Math.round(pos)), fk = narrow ? .8 : 1, gw = narrow ? 13 : 16, gh = narrow ? 9 : 11, per = Math.max(4, Math.floor((tw - 16) / gw));
+    const order = PL.map((p, i) => i).sort((a, b) => (PL[a].startsWith("실내") - PL[b].startsWith("실내")) || DATA.place[NY - 1][b] - DATA.place[NY - 1][a]);
+    const maxN = PL.map((_, i) => Math.max(...DATA.place.map((r) => Math.round(r[i] / 10))));
+    const outN = order.filter((i) => PL[i].startsWith("실외")), inN = order.filter((i) => PL[i].startsWith("실내"));
+    const head = narrow ? 64 : 72, pad = 8;
+    const blockH = (list) => { const rows = []; for (let a = 0; a < list.length; a += cols) rows.push(Math.max(...list.slice(a, a + cols).map((i) => head + Math.ceil(maxN[i] / per) * gh + pad * 2))); return rows; };
+    const rOut = blockH(outN), rIn = blockH(inN), secH = 26;
+    const H = secH + rOut.reduce((a, b) => a + b + gap, 0) + secH + rIn.reduce((a, b) => a + b + gap, 0);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${Y[k]}년 온열질환자가 쓰러진 곳` }, box), pts = [];
+    let y0 = 0;
+    [["실외", outN, rOut, "var(--out-bg)"], ["실내", inN, rIn, "var(--in-bg)"]].forEach(([nm, list, rows, bg]) => {
+      const tot = list.reduce((a, i) => a + DATA.place[k][i], 0);
+      tx(v, 0, y0 + 17, `${nm} ${fmt(tot)}명 (${pc(tot / DATA.tot[k] * 100)})`, "vl", 14, "start"); y0 += secH;
+      list.forEach((i, j) => {
+        const c = j % cols, r = Math.floor(j / cols); const x = c * (tw + gap), y = y0 + rows.slice(0, r).reduce((a, b) => a + b + gap, 0), h = rows[r];
+        s("rect", { x, y, width: tw, height: h, rx: 10, fill: bg }, v);
+        const sc = s("g", { transform: `translate(${x + 8},${y + 8}) scale(${narrow ? .85 : 1.15})` }, v); SCENE[PL[i]](sc);
+        const n = DATA.place[k][i];
+        tx(v, x + (narrow ? 64 : 86), y + 24, PN[PL[i]], "lb", narrow ? 12 : 13, "start", { style: "font-weight:600" });
+        tx(v, x + (narrow ? 64 : 86), y + 42, `${fmt(n)}명`, "vl", narrow ? 13 : 15, "start", { style: "fill:var(--hot-ink)" });
+        const g = s("g", {}, v), m = Math.round(n / 10);
+        for (let q = 0; q < m; q++) lying(g, x + 8 + (q % per) * gw, y + head + Math.floor(q / per) * gh + 4, "var(--hot2)", fk);
+        pts.push({ x: x + tw / 2, y: y + 24, r: tw / 2, fn: () => [`${PN[PL[i]]} · ${Y[k]}년`, [[fmt(n) + "명", "환자"], [pc(n / DATA.tot[k] * 100), "전체 중"]]] });
+      });
+      y0 += rows.reduce((a, b) => a + b + gap, 0);
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 장소를 옮겨 볼 수 있다");
+    const st = document.getElementById("st1"); st.replaceChildren();
+    st.append(`${Y[k]}년 여름 환자 `, bEl(`${fmt(DATA.tot[k])}명`), ` · 65세 이상 `, bEl(pc(DATA.a65[k] / DATA.tot[k] * 100)), ` · 남성 `, bEl(pc(DATA.male[k] / DATA.tot[k] * 100)));
+  }
+  const p1 = Player("p1", "폭염 지도책", c1, NY, (i) => String(Y[i]), 12);
+  table("t1", ["장소", ...Y.slice(-6).map(String)], PL.map((p, i) => [PN[p], ...DATA.place.slice(-6).map((r) => fmt(r[i]))]));
+
+  /* ---------- 2. thermometers ---------- */
+  const AGN = ["0–9세", "10대", "20대", "30대", "40대", "50대", "60대", "70대", "80세 이상"];
+  const A25 = DATA.age[NY - 1], P25 = DATA.pop["2025"], RATE = A25.map((n, i) => n / P25[i] * 1e5);
+  let mode2 = "n", th = null, raf2 = 0;
+  chips("chips2", [["n", "환자 수"], ["r", "인구 10만 명당"]], mode2, (k) => { mode2 = k; anim2(); });
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, H = narrow ? 300 : 340, n = AGN.length, cw = W / n, tube = narrow ? 9 : 13, bulb = narrow ? 10 : 14, top = 30, bot = H - 54;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "나이대별 온열질환자 온도계" }, box), pts = [];
+    const items = AGN.map((a, i) => {
+      const cx = i * cw + cw / 2;
+      s("rect", { x: cx - tube / 2 - 2, y: top - 4, width: tube + 4, height: bot - top + 8, rx: tube / 2 + 2, fill: "var(--card)", stroke: "var(--glass)", "stroke-width": 1.5 }, v);
+      for (let t = 0; t <= 4; t++) { const yy = top + (bot - top) * t / 4; s("line", { x1: cx + tube / 2 + 2, x2: cx + tube / 2 + 6, y1: yy, y2: yy, stroke: "var(--axis)" }, v); }
+      s("circle", { cx, cy: bot + bulb - 2, r: bulb, fill: "var(--merc)" }, v);
+      const merc = s("rect", { x: cx - tube / 2 + 2, width: tube - 4, rx: (tube - 4) / 2, fill: "var(--merc)" }, v);
+      const lab = tx(v, cx, 0, "", "vl", narrow ? 11 : 12.5, "middle", { style: "fill:var(--hot-ink)" });
+      tx(v, cx, H - 6, narrow ? ["0–9", "10대", "20대", "30대", "40대", "50대", "60대", "70대", "80+"][i] : AGN[i], "lb", narrow ? 11.5 : 12, "middle");
+      pts.push({ x: cx, y: (top + bot) / 2, r: cw / 2, fn: () => [AGN[i] + " · 2025년", [[fmt(A25[i]) + "명", "환자"], [f1(RATE[i]) + "명", "인구 10만 명당"], [man(P25[i]) + "명", "인구"]]] });
+      return { merc, lab };
+    });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 나이대를 옮겨 볼 수 있다");
+    th = { items, top, bot, cur: th ? th.cur : null };
+    draw2(target2());
+  }
+  const target2 = () => mode2 === "n" ? A25.map((x) => x / 1000) : RATE.map((x) => x / 22);
+  function draw2(fr) {
+    th.items.forEach((it, i) => {
+      const h = Math.max(4, (th.bot - th.top) * fr[i]), y = th.bot + 4 - h;
+      it.merc.setAttribute("y", y); it.merc.setAttribute("height", h + 8);
+      it.lab.setAttribute("y", y - 6); it.lab.textContent = mode2 === "n" ? fmt(A25[i]) : f1(RATE[i]);
+    });
+    th.cur = fr;
+  }
+  function anim2() {
+    cancelAnimationFrame(raf2); const from = th.cur, to = target2();
+    if (reduce) return draw2(to);
+    const t0 = performance.now(); const step = (now) => { const t = Math.min(1, (now - t0) / 900), e = 1 - Math.pow(1 - t, 3); draw2(from.map((f, i) => f + (to[i] - f) * e)); if (t < 1) raf2 = requestAnimationFrame(step); }; raf2 = requestAnimationFrame(step);
+  }
+  table("t2", ["나이", "환자 2025", "인구 2025.7", "10만 명당"], AGN.map((a, i) => [a, fmt(A25[i]), fmt(P25[i]), f1(RATE[i])]));
+
+  /* ---------- 3. sundial ---------- */
+  const TB = DATA.TB, HRS = [6, 4, 2, 1, 1, 1, 1, 1, 1, 1, 5], START = [0, 6, 10, 12, 13, 14, 15, 16, 17, 18, 19];
+  const TS = TB.map((_, j) => DATA.time.slice(4).reduce((a, r) => a + r[j], 0)), TT = TS.reduce((a, b) => a + b, 0), PERH = TS.map((x, j) => x / TT * 100 / HRS[j]);
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), S = Math.min(W, 520), H = S * .56 + 46, cx = W / 2, cy = S * .5 + 20, R0 = S * .09, R1 = S * .4;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "온열질환자가 쓰러진 시각 해시계" }, box), pts = [];
+    // the dial spans 5 a.m. (left) to 9 p.m. (right) across the upper half; night hours fold underneath the horizon
+    const ang = (h) => Math.PI + (h - 5) / 16 * Math.PI;
+    s("line", { x1: cx - R1 - 10, x2: cx + R1 + 10, y1: cy, y2: cy, stroke: "var(--axis)" }, v);
+    const sun = s("g", {}, v); s("circle", { cx: 0, cy: 0, r: 9, fill: "var(--sun)" }, sun);
+    const rays = s("g", { class: "rays" }, sun); for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2; s("line", { x1: Math.cos(a) * 12, y1: Math.sin(a) * 12, x2: Math.cos(a) * 16, y2: Math.sin(a) * 16, stroke: "var(--sun)", "stroke-width": 2, "stroke-linecap": "round" }, rays); }
+    const mx = Math.max(...PERH);
+    TB.forEach((b, j) => {
+      const h0 = Math.max(5, START[j]), h1 = Math.min(21, START[j] + HRS[j]); if (h1 <= h0) return;
+      const a0 = ang(h0), a1 = ang(h1), r = R0 + (R1 - R0) * PERH[j] / mx;
+      const d = `M${cx + Math.cos(a0) * R0},${cy + Math.sin(a0) * R0} L${cx + Math.cos(a0) * r},${cy + Math.sin(a0) * r} A${r},${r} 0 0 1 ${cx + Math.cos(a1) * r},${cy + Math.sin(a1) * r} L${cx + Math.cos(a1) * R0},${cy + Math.sin(a1) * R0} A${R0},${R0} 0 0 0 ${cx + Math.cos(a0) * R0},${cy + Math.sin(a0) * R0}Z`;
+      s("path", { d, fill: PERH[j] > 7 ? "var(--hot)" : "var(--hot2)", opacity: .85, stroke: "var(--card)", "stroke-width": 1.5 }, v);
+      const am = (a0 + a1) / 2; pts.push({ x: cx + Math.cos(am) * (r - 8), y: cy + Math.sin(am) * (r - 8), r: 10, fn: () => [`${b}시`, [[f1(PERH[j]) + "%", "한 시간에"], [pc(TS[j] / TT * 100), "그 시간대 전체"], [fmt(TS[j]) + "명", "2016–2025년"]]] });
+    });
+    [6, 9, 12, 15, 18, 21].forEach((h) => { const a = ang(h); tx(v, cx + Math.cos(a) * (R1 + 14), cy + Math.sin(a) * (R1 + 14) + 4, `${h}시`, "tk", 11.5, "middle"); });
+    tx(v, cx, cy + 22, `밤(19–6시) ${pc((TS[0] + TS[10]) / TT * 100)}`, "mt", 12, "middle");
+    const place = (h) => { const a = ang(h); sun.setAttribute("transform", `translate(${cx + Math.cos(a) * (R1 + 34)},${cy + Math.sin(a) * (R1 + 34) * .9})`); };
+    place(15.5);
+    if (!reduce) { let t0 = null; const step = (now) => { t0 = t0 || now; const t = ((now - t0) / 9000) % 1; place(5 + 16 * t); if (document.body.contains(v)) requestAnimationFrame(step); }; requestAnimationFrame(step); }
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 시간대를 옮겨 볼 수 있다");
+  }
+  table("t3", ["시간대", "환자(2016–2025)", "그 시간대 몫", "한 시간에"], TB.map((b, j) => [b + "시", fmt(TS[j]), pc(TS[j] / TT * 100), pc(PERH[j])]));
+
+  /* ---------- 4. occupations ---------- */
+  const O = DATA.occ["2025"], OT = O["합계"];
+  const ON = [["단순노무종사자", "단순노무"], ["무직(노숙인제외)", "무직"], ["농림어업숙련종사자", "농림어업"], ["전문가 및관련종사자", "전문가"], ["장치기계조작및 조립종사자", "기계조작·조립"], ["학생", "학생"], ["주부", "주부"], ["서비스종사자", "서비스"], ["기능원및관련기능종사자", "기능원"], ["사무종사자", "사무"], ["군인", "군인"], ["관리자", "관리자"], ["판매종사자", "판매"], ["노숙인", "노숙인"]];
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), l = 92, r = 52, rowH = 22, top = 16, H = top + ON.length * rowH;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "온열질환자 직업 2025" }, box), pts = [];
+    const sx = (p) => l + p / 30 * (W - l - r);
+    [0, 10, 20, 30].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top - 4, y2: H, class: t ? "gl" : "ax" }, v); tx(v, sx(t), top - 6, `${t}%`, "tk", 11.5, "middle"); });
+    ON.forEach(([k, nm], i) => { const p = O[k] / OT * 100, y = top + i * rowH + 4; tx(v, l - 8, y + 11, nm, "lb", 12.5, "end"); s("rect", { x: l, y, width: Math.max(1, sx(p) - l), height: 14, rx: 2, fill: i < 3 ? "var(--hot)" : "var(--hot2)", opacity: i < 3 ? 1 : .7 }, v); tx(v, sx(p) + 5, y + 11, pc(p), "tk", 11.5, "start"); pts.push({ x: sx(p), y: y + 7, r: 7, fn: () => [nm, [[fmt(O[k]) + "명", "환자"], [pc(p), "전체 중"]]] }); });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 직업을 옮겨 볼 수 있다");
+  }
+  table("t4", ["직업", "2025년 환자", "몫"], Object.entries(O).filter(([k]) => k !== "합계").map(([k, n]) => [k, fmt(n), pc(n / OT * 100)]));
+
+  const all = () => { p1.render(); c2(); c3(); c4(); };
+  all(); onResize(all);
+})();
+</script>

@@ -1,0 +1,330 @@
+<title>믿음의 기둥</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: the reader answers "trust / don't trust" for 17 institutions and sees how many people answered the same.
+   Then 17 stone pillars whose height is the share who trust each institution (played 2013-2025), a fever chart of
+   four institutions over 13 years, a grid of who trusts what (age, income, education, sex, town or country),
+   and a row of 100 people per institution with those who "do not trust at all". */
+:root {
+  --paper: #f4f2ec; --card: #fcfbf7; --ink: #2c2c2a; --ink2: #494843; --muted: #5d5b55; --line: #e1ddd3; --grid: #eae7de; --axis: #a7a8a3;
+  --accent: #3e6f90; --intl: #3e6f90; --board: #2c2c2a; --board-ink: #f4f2ec; --sea: #fcfbf7;
+  --yes: #3e6f90; --yes-ink: #2f5a77; --no: #9b3737; --no-ink: #8a2f2f; --me: #d56b41; --me-ink: #a8451f;
+  --stone: #d8d2c4; --stone2: #b8ac9c; --stone3: #928a7f; --roof: #5a5551; --q0: #f1ede3; --q4: #3e6f90;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1a1b1c; --card: #242527; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #393a3c; --grid: #2e2f31; --axis: #62635d;
+  --accent: #8eabc9; --intl: #8eabc9; --board: #dcd9cf; --board-ink: #1a1b1c; --sea: #242527;
+  --yes: #8eabc9; --yes-ink: #abbdc9; --no: #d0605c; --no-ink: #eaa6a0; --me: #dc8c67; --me-ink: #e7a08a;
+  --stone: #5a5551; --stone2: #4c433e; --stone3: #928a7f; --roof: #b8ac9c; --q0: #2e2f31; --q4: #8eabc9; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1a1b1c; --card: #242527; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #393a3c; --grid: #2e2f31; --axis: #62635d;
+  --accent: #8eabc9; --intl: #8eabc9; --board: #dcd9cf; --board-ink: #1a1b1c; --sea: #242527;
+  --yes: #8eabc9; --yes-ink: #abbdc9; --no: #d0605c; --no-ink: #eaa6a0; --me: #dc8c67; --me-ink: #e7a08a;
+  --stone: #5a5551; --stone2: #4c433e; --stone3: #928a7f; --roof: #b8ac9c; --q0: #2e2f31; --q4: #8eabc9; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.yi { fill: var(--yes-ink) } .ni { fill: var(--no-ink) } .mi { fill: var(--me-ink) }
+::selection { background: var(--stone2); color: #1a1b1c }
+.btn { font: inherit; font-size: 15px; font-weight: 600; color: var(--paper); background: var(--ink); border: 0; border-radius: 10px; padding: 10px 18px; min-height: 46px; cursor: pointer }
+.btn:hover { background: var(--intl) } .btn[disabled] { opacity: .45; cursor: default }
+.vote { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 18px; margin: 0; padding: 0; list-style: none }
+@media (max-width: 640px) { .vote { grid-template-columns: minmax(0, 1fr) } }
+.vote li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; border-bottom: 1px solid var(--grid); padding: 4px 0; min-height: 50px }
+.vote .nm { font-size: 15px } .vote .nm small { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.4 }
+.seg { display: inline-flex; border: 1px solid var(--axis); border-radius: 999px; overflow: hidden }
+.seg button { font: inherit; font-size: 13.5px; color: var(--ink); background: var(--paper); border: 0; padding: 6px 12px; min-height: 40px; min-width: 64px; cursor: pointer }
+.seg button + button { border-left: 1px solid var(--axis) }
+.seg button[aria-pressed="true"][data-v="1"] { background: var(--yes); color: var(--card) } .seg button[aria-pressed="true"][data-v="0"] { background: var(--no); color: var(--card) }
+.vrow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center } .vrow .hint { font-size: 13.5px; color: var(--muted); flex: 1 1 200px }
+.res .bar { height: 8px; border-radius: 4px; background: var(--grid); position: relative; overflow: hidden; margin-top: 4px }
+.res .bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--me) }
+</style>
+
+<main class="page">
+  <header>
+    <h1>사람들은 어떤 기관을 가장 믿지 않을까<span>국회다. 2025년 사회통합실태조사에서 국회를 믿는다는 사람은 37.5%로 17개 기관 가운데 가장 적었고, 2013년부터 13년 동안 한 해도 빠지지 않고 꼴찌였다. "전혀 믿지 않는다"도 넷 중 하나(26.3%)다. 그다음이 검찰(39.2%)과 법원(43.7%)이다. 가장 믿는 곳은 의료기관(72.0%)이다. 그리고 이 순서는 나이, 소득, 학력, 남녀를 가려도 거의 그대로다.</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 47</dd>
+      <dt>한 줄</dt><dd>한국행정연구원 사회통합실태조사(19세 이상 8,000명 안팎)로 보면 2025년 기관을 "약간" 또는 "매우" 믿는다는 비율은 국회 37.5%, 검찰 39.2%, 법원 43.7%, 노동조합단체 45.1%, 신문사 46.3% … 금융기관 67.6%, 교육기관 67.6%, 의료기관 72.0%다. 국회는 2016년 12.6%에서 올라왔지만 여전히 꼴찌다. 나이대별 차이는 기관마다 9%p를 넘지 않는다.</dd>
+      <dt>분류</dt><dd>환경·교통·정치</dd>
+      <dt>본능</dt><dd>간극 본능 · "젊은 층은 이 기관을, 노년층은 저 기관을 믿지 않는다"처럼 나눠 생각하지만, 실제 숫자는 집단 사이보다 기관 사이의 차이가 훨씬 크다</dd>
+      <dt>그림 방식</dt><dd>믿음의 기둥 · 독자가 17개 기관을 먼저 믿는지 답하고 국민과 견준다. 신뢰만큼 선 돌기둥(2013–2025년 재생), 네 기관의 13년 그래프, 누가 무엇을 믿는지 격자, "전혀 믿지 않는다" 100명 줄</dd>
+      <dt>기간</dt><dd>2013–2025년(공기업은 2016년부터)</dd>
+      <dt>엮은 데이터</dt><dd>1개 · 사회통합실태조사 기관별 신뢰 정도(전체·성·나이·직업·소득·학력·지역)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 내 답부터</p>
+    <h2 id="qz">당신은 이 기관들을 믿는가? 17개 모두 답하면 같은 질문에 국민이 어떻게 답했는지 보여 준다.</h2>
+    <ul class="vote" id="vote"></ul>
+    <div class="vrow"><span class="hint" id="vhint" aria-live="polite">17개 남았다.</span><button class="btn" type="button" id="vgo" disabled>국민과 견줘 보기</button></div>
+    <div aria-live="polite"><div class="reveal" id="vreveal" hidden>
+      <span class="big" id="vbig"></span>
+      <span id="vmsg"></span>
+      <div class="chart" id="vres" style="margin-top:12px"></div>
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">믿음만큼 선 기둥</h2>
+      <p>기관마다 돌기둥을 세우고, 그 기관을 믿는다는 사람의 비율만큼 높였다. 2025년에 가장 낮은 기둥은 국회(37.5%)이고, 검찰(39.2%)과 법원(43.7%)이 그 옆에 있다. 가장 높은 기둥은 의료기관(72.0%), 교육기관과 금융기관(각 67.6%), 대기업(65.3%)이다.</p>
+      <p>재생을 누르면 2013년부터 기둥이 오르내린다. 2016년에는 거의 모든 기둥이 낮아졌다. 그해 국회는 12.6%, 중앙정부 부처는 24.6%였다. 2021년에는 대부분의 기둥이 가장 높았다. 국회 기둥은 13년 내내 가장 낮았지만 2025년에는 37.5%로 이 조사에서 가장 높다. 대기업 기둥은 33.6%에서 65.3%로 거의 두 배가 됐다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">기관을 믿는다는 사람의 비율</p>
+      <p class="fs">%. 기둥 높이 = "약간 믿는다" + "매우 믿는다". 가로선 = 50%</p>
+      <div class="player" id="p1"></div>
+      <p class="stat" id="st1" aria-live="polite"></p>
+      <div class="chart" id="c1"></div>
+      <figcaption>한국행정연구원 「사회통합실태조사」 기관별 신뢰 정도(KOSIS 417 DT_417001_0038). 19세 이상에게 "다음 기관을 얼마나 믿는가"를 네 단계로 묻는다. 공기업은 2016년부터 물었다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">국회·검찰·법원의 13년</h2>
+      <p>세 기관을 같이 그리면 비슷하게 움직인다. 2016년에 함께 바닥을 쳤다가 2021년에 함께 가장 높았다(국회 34.4%, 검찰 50.1%, 법원 51.2%). 그 뒤 검찰과 법원은 내려가고 있다. 검찰은 2021년 50.1%에서 2025년 39.2%로 11%p 내려갔고, 법원은 51.2%에서 43.7%가 됐다. 국회만 2025년에 크게 올라 검찰과의 거리가 1.7%p로 좁혀졌다.</p>
+      <p>위의 의료기관 선은 따로 움직인다. 2022년 76.4%까지 올랐다가 2024년 61.5%로 15%p 떨어졌고, 2025년에 72.0%로 돌아왔다. 기관을 골라 다른 선도 볼 수 있다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">기관을 믿는다는 사람의 비율, 2013–2025년</p>
+      <p class="fs">%. 굵은 선 = 고른 기관, 옅은 선 = 나머지 기관</p>
+      <div class="chips" id="k2" role="group" aria-label="강조할 기관"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>한국행정연구원 「사회통합실태조사」. 해마다 표본이 다른 조사라 1–2%p의 오르내림에는 뜻을 두기 어렵다.</figcaption>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">누가 무엇을 믿나</h2>
+      <p>나이대별로 기관마다 믿는다는 비율을 칸에 칠했다. 줄은 거의 같은 색이다. 국회는 20대 37.3%, 60세 이상 38.7%다. 기관 사이의 차이(37–72%)가 나이 사이의 차이보다 몇 배 크다. 나이대별 차이가 가장 큰 곳도 지방자치단체와 TV방송사의 8.6%p다. 대체로 60세 이상이 모든 기관을 조금씩 더 믿는다.</p>
+      <p>소득으로 나누면 차이가 더 벌어진다. 가구 소득이 월 100만 원 미만인 사람은 경찰을 73.3% 믿고, 600만 원 이상은 46.6% 믿는다. 검찰은 51.0%와 37.0%, 법원은 56.7%와 42.4%다. 다만 소득이 가장 낮은 집단은 나이가 많은 사람이 많아, 소득 때문인지 나이 때문인지는 이 표로 가를 수 없다. 그리고 어느 집단에서도 국회는 아래쪽 줄에 있다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">집단별 기관 신뢰, 2025년</p>
+      <p class="fs">%. 칸이 진할수록 믿는다는 사람이 많다</p>
+      <div class="chips" id="k3" role="group" aria-label="나누는 기준"></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>한국행정연구원 「사회통합실태조사」 특성별 기관 신뢰 정도(2025년). 이 표에는 정치 성향(진보·보수)별 값이 없다. 원자료(마이크로데이터)는 한국행정연구원에서 따로 제공하고, 이 장은 쓰지 않았다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">"전혀 믿지 않는다"</h2>
+      <p>"별로 믿지 않는다"와 "전혀 믿지 않는다"는 다르다. 기관마다 100명을 세우고 "전혀 믿지 않는다"는 사람을 붉게 칠했다. 국회는 100명 가운데 26명이다. 검찰 19명, 노동조합단체 16명, 법원 15명이고, 의료기관과 금융기관은 5명이다.</p>
+      <p>국회를 전혀 믿지 않는 사람은 2016년 43.9%였다. 그 뒤 줄었지만 2025년에도 넷 중 하나다. 같은 해 "매우 믿는다"는 2.2%다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">기관을 "전혀 믿지 않는다"는 사람, 2025년</p>
+      <p class="fs">사람 하나 = 1%. 붉은색 = 전혀 믿지 않는다, 옅은 붉은색 = 별로 믿지 않는다</p>
+      <div class="chart" id="c4"></div>
+      <figcaption>한국행정연구원 「사회통합실태조사」 기관별 신뢰 정도(2025년). 네 단계 비율의 합이 100%가 되도록 반올림했다.</figcaption>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 사람들은 어떤 기관을 가장 믿지 않을까</h2>
+      <p>국회다. 13년 동안 한 번도 꼴찌를 벗어나지 않았다. 그 위에 검찰과 법원이 있다. 법을 만들고 집행하고 판단하는 세 기관이 아래 세 자리를 차지한다. 가장 믿는 곳은 의료기관, 교육기관, 금융기관이다.</p>
+      <p>"어느 세대가 무엇을 믿지 않는다"는 이야기는 숫자에서 잘 보이지 않는다. 나이, 성별, 지역, 학력을 나눠도 순서는 거의 같고 차이는 몇 %p다. 사람들이 갈라져 있는 것보다 기관에 대한 생각이 한쪽으로 모여 있는 쪽에 가깝다. 다만 정치 성향별로 나눈 표는 이 자료에 없어서 확인하지 못했다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>"믿는다"는 네 단계 가운데 "약간 믿는다"와 "매우 믿는다"를 더한 비율이다. "약간"이 대부분이라, 믿는다는 비율이 높아도 굳게 믿는다는 뜻은 아니다.</li>
+      <li>표본조사다. 한 해 8,000명 안팎에게 묻기 때문에 1–2%p의 차이에는 뜻을 두기 어렵다. 집단별 값은 표본이 더 작아 더 흔들린다.</li>
+      <li>정치 성향별 신뢰는 이 장에서 확인하지 못했다. KOSIS 표에는 성·나이·직업·소득·학력·지역별 값만 있다.</li>
+      <li>"국회", "검찰"처럼 기관 이름만 묻는다. 응답자가 떠올리는 것이 기관인지, 그때의 사건이나 사람인지는 알 수 없다. 조사한 해의 큰 사건이 숫자를 움직였을 수 있다.</li>
+      <li>위의 "내 답"은 이 페이지 안에서만 쓰이고 어디에도 저장하거나 보내지 않는다. 국민 답과의 비교는 네 단계를 "믿는다/믿지 않는다" 둘로 줄여서 했다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=417&amp;tblId=DT_417001_0038" target="_blank" rel="noopener">사회통합실태조사: 기관별 신뢰 정도</a> (KOSIS 417 DT_417001_0038, 공공데이터포털 <a href="https://www.data.go.kr/data/15145315/fileData.do" target="_blank" rel="noopener">15145315</a>)</td><td>한국행정연구원</td><td>17개 기관 × 신뢰 네 단계와 평균, 성·나이·직업·소득·학력·지역별</td><td>2013–2025</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>17개 기관 × 13개 연도 × 신뢰 네 단계 · 28개 집단 × 4개 연도</dd>
+      <dt>도구</dt><dd>Python(수집·집계) · SVG 돌기둥, 선 그래프, 격자, 사람 줄(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>믿는다 = ③ 약간 + ④ 매우 · 해마다 순위 · 집단 사이 차이(최댓값 − 최솟값) · 내 답과 같은 답을 한 국민의 비율</dd>
+      <dt>검증</dt><dd>네 단계의 합이 기관·연도마다 100%(반올림 차이 0.6%p 안). 국회가 13개 연도 모두 가장 낮음을 확인했다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>사람들은 서로를 얼마나 믿을까</h3><p>같은 조사에 "대부분의 사람을 믿을 수 있다"는 질문과 가족·이웃·처음 만난 사람에 대한 신뢰가 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=417&amp;tblId=DT_417001_0038" target="_blank" rel="noopener">사회통합실태조사</a> · 한국행정연구원</li></ul></div>
+      <div class="q"><h3>어느 갈등이 가장 심하다고 볼까</h3><p>진보와 보수, 빈부, 세대, 남녀 갈등을 얼마나 심하게 느끼는지 해마다 묻는다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15145315/fileData.do" target="_blank" rel="noopener">사회통합실태조사</a> · 한국행정연구원</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.18</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const once = (el, fn, th = .25) => { if (reduce) return false; const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); fn(); }, { threshold: th }); io.observe(el); return true; };
+  const Y = DATA.years, NY = Y.length, IN = DATA.inst, A = DATA.all, L = NY - 1;
+  const tr = (v, j) => v[2][j] == null ? null : v[2][j] + v[3][j];
+  const SHORT = { "중앙정부 부처": "중앙정부", "지방자치단체": "지자체", "노동조합단체": "노동조합", "TV방송사": "TV방송" };
+  const sn = (i) => SHORT[i] || i;
+  const josa = (w, a, b) => { const c = w.charCodeAt(w.length - 1) - 0xac00; return w + (c >= 0 && c < 11172 && c % 28 ? a : b); };
+  const DESC = { "중앙정부 부처": "부, 처, 청", "지방자치단체": "시·도청, 시·군·구청", "노동조합단체": "노조와 노동단체", "시민단체": "", "교육기관": "학교", "의료기관": "병원" };
+
+  /* ---------- 0. my answers ---------- */
+  const mine = {}; const vote = document.getElementById("vote");
+  IN.forEach((inst) => {
+    const li = document.createElement("li"), nm = document.createElement("span"); nm.className = "nm"; nm.append(inst); if (DESC[inst]) { const s2 = document.createElement("small"); s2.textContent = DESC[inst]; nm.append(s2); }
+    const seg = document.createElement("span"); seg.className = "seg"; seg.setAttribute("role", "group"); seg.setAttribute("aria-label", inst);
+    [["1", "믿는다"], ["0", "안 믿는다"]].forEach(([v, t]) => { const b = document.createElement("button"); b.type = "button"; b.dataset.v = v; b.textContent = t; b.setAttribute("aria-pressed", "false"); b.addEventListener("click", () => { if (vdone) return; mine[inst] = +v; seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b)); updV(); }); seg.append(b); });
+    li.append(nm, seg); vote.append(li);
+  });
+  let vdone = false;
+  const updV = () => { const left = IN.length - Object.keys(mine).length; document.getElementById("vhint").textContent = left ? `${left}개 남았다.` : "다 답했다."; document.getElementById("vgo").disabled = left > 0; };
+  const showRes = () => {
+    vdone = true; document.getElementById("vgo").disabled = true; vote.querySelectorAll("button").forEach((b) => { b.style.cursor = "default"; });
+    const same = IN.map((i) => { const t = tr(A[i], L); return mine[i] ? t : 100 - t; }), avg = same.reduce((a, b) => a + b, 0) / same.length;
+    const lonely = IN.map((i, k) => [same[k], i]).sort((a, b) => a[0] - b[0])[0], yes = IN.filter((i) => mine[i]).length;
+    document.getElementById("vbig").textContent = `내 답과 같은 국민, 평균 ${f1(avg)}%`;
+    document.getElementById("vmsg").textContent = `17개 가운데 ${yes}개를 믿는다고 답했다. 국민 답과 가장 다른 것은 ${josa(lonely[1], "이다", "다")}. ${josa(lonely[1], "을", "를")} ${mine[lonely[1]] ? "믿는다" : "믿지 않는다"}는 국민은 ${f1(lonely[0])}%뿐이다. 국민의 답은 2025년 조사의 "믿는다"(약간 + 매우) 비율이다.`;
+    document.getElementById("vreveal").hidden = false;   // 폭을 재기 전에 먼저 보이게 한다
+    const box = document.getElementById("vres"); box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), narrow = W < 560, rh = 26, l = narrow ? 76 : 110, rr = 58, H = IN.length * rh + 6;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "기관마다 내 답과 같은 답을 한 국민의 비율. " + IN.map((i, k) => `${i} ${f1(same[k])}%`).join(", ") }, box);
+    IN.map((i, k) => [i, same[k]]).sort((a, b) => b[1] - a[1]).forEach(([i, val], k) => {
+      const y = 3 + k * rh, w = (W - l - rr) * val / 100;
+      tx(v, l - 8, y + 16, sn(i), "lb", 13, "end");
+      s("rect", { x: l, y: y + 5, width: W - l - rr, height: rh - 11, rx: 3, fill: "var(--grid)" }, v);
+      s("rect", { x: l, y: y + 5, width: w, height: rh - 11, rx: 3, fill: mine[i] ? "var(--yes)" : "var(--no)" }, v);
+      tx(v, W - 2, y + 16, `${f1(val)}%`, "vl", 12.5, "end");
+    });
+    document.getElementById("vreveal").hidden = false;
+  };
+  document.getElementById("vgo").addEventListener("click", showRes);
+
+  /* ---------- 1. pillars ---------- */
+  function pillar(g, x, w, top, base, tint) {
+    const h = base - top; if (h <= 0) return;
+    s("rect", { x: x - w * .62, y: base - 4, width: w * 1.24, height: 6, rx: 1.5, fill: "var(--stone3)" }, g);
+    s("rect", { x: x - w / 2, y: top + 6, width: w, height: Math.max(0, h - 10), fill: tint }, g);
+    for (let k = 1; k < 4; k++) s("line", { x1: x - w / 2 + w * k / 4, x2: x - w / 2 + w * k / 4, y1: top + 8, y2: base - 6, stroke: "var(--stone3)", "stroke-width": .8, opacity: .55 }, g);
+    s("rect", { x: x - w * .64, y: top, width: w * 1.28, height: 7, rx: 1.5, fill: "var(--roof)" }, g);
+  }
+  function draw1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"), k = Math.min(L, Math.floor(pos + 1e-6)), f = pos - k;
+    const val = (i) => { const a = tr(A[i], k), b = k < L ? tr(A[i], k + 1) : a; return a == null ? null : a + ((b ?? a) - a) * f; };
+    const W = Math.max(300, box.clientWidth), narrow = W < 640, H = narrow ? 420 : 380, l = 30, top = 18, bot = narrow ? 84 : 50, base = H - bot, y = (v) => base - (base - top) * v / 80;
+    const order = [...IN].sort((a, b) => (tr(A[a], L) ?? 0) - (tr(A[b], L) ?? 0)), gw = (W - l) / order.length, pw = Math.min(30, gw * .56), pts = [];
+    box.replaceChildren();
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${Y[k]}년 기관을 믿는다는 비율을 기둥 높이로 그린 그림. ` + order.map((i) => `${i} ${val(i) == null ? "조사 없음" : f1(val(i)) + "%"}`).join(", ") }, box);
+    [0, 20, 40, 60, 80].forEach((t) => { s("line", { x1: l, x2: W, y1: y(t), y2: y(t), class: "gl" }, v); tx(v, l - 6, y(t) + 4, t, "tk", 11, "end"); });
+    s("line", { x1: l, x2: W, y1: y(50), y2: y(50), stroke: "var(--ink)", "stroke-width": 1, "stroke-dasharray": "4 3" }, v);
+    order.forEach((i, n) => {
+      const cx = l + gw * n + gw / 2, vv = val(i);
+      if (vv != null) { const low = i === order[0]; pillar(v, cx, pw, y(vv), base, low ? "var(--no)" : "var(--stone)"); tx(v, cx, y(vv) - 6, narrow ? String(Math.round(vv)) : f1(vv), "vl" + (low ? " ni" : ""), narrow ? 11 : 12, "middle"); }
+      const t = tx(v, cx + 4, base + 12, sn(i), "lb", narrow ? 11 : 12, "end"); t.setAttribute("transform", `rotate(${narrow ? -70 : -38} ${cx + 4} ${base + 12})`);
+      pts.push({ x: cx, y: vv == null ? base - 10 : (y(vv) + base) / 2, r: Math.max(10, gw / 2), fn: () => [`${i} · ${Y[k]}년`, vv == null ? [["조사 없음", ""]] : [[`${f1(tr(A[i], k))}%`, "믿는다(약간 + 매우)"], [`${f1(A[i][0][k])}%`, "전혀 믿지 않는다", "var(--no)"], [`${A[i][4][k]}점`, "평균(4점 만점)"]]] });
+    });
+    const lowest = IN.filter((i) => tr(A[i], k) != null).sort((a, b) => tr(A[a], k) - tr(A[b], k));
+    document.getElementById("st1").replaceChildren(`${Y[k]}년 · 가장 낮은 기둥 `, bEl(`${lowest[0]} ${f1(tr(A[lowest[0]], k))}%`), ` · 가장 높은 기둥 `, bEl(`${lowest.at(-1)} ${f1(tr(A[lowest.at(-1)], k))}%`), " · 50%를 넘는 기관 ", bEl(`${lowest.filter((i) => tr(A[i], k) >= 50).length}개`));
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 기관을 옮겨 볼 수 있다");
+  }
+  const pl1 = Player("p1", "기관 신뢰", draw1, NY, (k) => String(Y[k]), 10);
+  table("t1", ["기관", ...Y.map(String)], [...IN].sort((a, b) => tr(A[a], L) - tr(A[b], L)).map((i) => [i, ...Y.map((_, j) => tr(A[i], j) == null ? "–" : f1(tr(A[i], j)))]));
+
+  /* ---------- 2. fever chart ---------- */
+  let hl2 = ["국회", "검찰", "법원", "의료기관"];
+  const LC = { "국회": "var(--no)", "검찰": "var(--me)", "법원": "var(--yes)", "의료기관": "var(--stone3)" };
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, H = narrow ? 300 : 360, l = 30, r = narrow ? 64 : 90, top = 14, bot = 26, x = (j) => l + (W - l - r) * j / L, y = (v) => top + (H - top - bot) * (1 - v / 80);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "기관 신뢰 비율의 13년 변화. " + hl2.map((i) => `${i} ${f1(tr(A[i], 0) ?? 0)}%에서 ${f1(tr(A[i], L))}%`).join(", ") }, box);
+    [0, 20, 40, 60, 80].forEach((t) => { s("line", { x1: l, x2: W - r, y1: y(t), y2: y(t), class: "gl" }, v); tx(v, l - 6, y(t) + 4, t, "tk", 11, "end"); });
+    Y.forEach((yy, j) => { if (j % (narrow ? 3 : 2) === 0 || j === L) tx(v, x(j), H - 8, yy, "tk", 11, "middle"); });
+    const line = (i, col, w, op) => { const d = Y.map((_, j) => tr(A[i], j) == null ? null : `${x(j).toFixed(1)},${y(tr(A[i], j)).toFixed(1)}`).filter(Boolean); s("path", { d: "M" + d.join("L"), fill: "none", stroke: col, "stroke-width": w, opacity: op, "stroke-linejoin": "round" }, v); };
+    IN.filter((i) => !hl2.includes(i)).forEach((i) => line(i, "var(--axis)", 1, .55));
+    const ends = [];
+    hl2.forEach((i, n) => { const col = LC[i] || ["var(--no)", "var(--me)", "var(--yes)", "var(--stone3)"][n % 4]; line(i, col, 3, 1); Y.forEach((_, j) => { if (tr(A[i], j) != null) s("circle", { cx: x(j), cy: y(tr(A[i], j)), r: 2.6, fill: col }, v); }); ends.push([y(tr(A[i], L)), i, col]); });
+    ends.sort((a, b) => a[0] - b[0]); let prev = -99; ends.forEach((e) => { e[0] = Math.max(e[0], prev + 15); prev = e[0]; tx(v, W - r + 6, e[0] + 4, `${sn(e[1])} ${f1(tr(A[e[1]], L))}`, "lb", 12, "start", { fill: e[2] === "var(--stone3)" ? "var(--ink2)" : e[2] }); });
+    timeLayer(v, tipFor(fig), NY, x, top, y(0), (j) => [`${Y[j]}년`, hl2.map((i) => [tr(A[i], j) == null ? "–" : `${f1(tr(A[i], j))}%`, i, LC[i]])], "좌우 화살표 키로 해를 옮겨 볼 수 있다");
+  }
+  chips("k2", [["법", "국회·검찰·법원"], ["정부", "정부·지자체·경찰·군대"], ["말", "TV·신문·시민단체·노조"], ["삶", "의료·교육·금융·대기업"]], "법", (k) => {
+    hl2 = { 법: ["국회", "검찰", "법원", "의료기관"], 정부: ["중앙정부 부처", "지방자치단체", "경찰", "군대"], 말: ["TV방송사", "신문사", "시민단체", "노동조합단체"], 삶: ["의료기관", "교육기관", "금융기관", "대기업"] }[k];
+    hl2.forEach((i, n) => { LC[i] = ["var(--no)", "var(--me)", "var(--yes)", "var(--stone3)"][n]; }); c2();
+  });
+
+  /* ---------- 3. grid by group ---------- */
+  const GS = { 나이: ["19~29세", "30~39세", "40~49세", "50~59세", "60세 이상"], 소득: ["100만원 미만", "100~200만원 미만", "200~300만원 미만", "300~400만원 미만", "400~500만원 미만", "500~600만원 미만", "600만원 이상"], 학력: ["초졸 이하", "중졸", "고졸", "대졸 이상"], 성별: ["남자", "여자"], 지역: ["도시(동부)", "농어촌(읍면부)"] };
+  const GL = { "100만원 미만": "~100만", "100~200만원 미만": "100–200", "200~300만원 미만": "200–300", "300~400만원 미만": "300–400", "400~500만원 미만": "400–500", "500~600만원 미만": "500–600", "600만원 이상": "600만~", "도시(동부)": "도시", "농어촌(읍면부)": "농어촌", "19~29세": "19–29세", "30~39세": "30대", "40~49세": "40대", "50~59세": "50대" };
+  let g3 = "나이"; const jg = DATA.gy.indexOf(2025), GR = DATA.groups;
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const cols = GS[g3], order = [...IN].sort((a, b) => tr(A[a], L) - tr(A[b], L)), W = Math.max(300, box.clientWidth), narrow = W < 560, l = narrow ? 70 : 104, r = narrow ? 34 : 56, top = narrow ? 58 : 40, rh = 25, cw = (W - l - r) / cols.length, H = top + order.length * rh + 4, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${g3}별 2025년 기관 신뢰 격자. 국회는 ` + cols.map((c) => `${c} ${f1(tr(GR[c]["국회"], jg))}%`).join(", ") }, box);
+    cols.forEach((c, n) => { const cx = l + n * cw + cw / 2; if (narrow && cols.length > 4) { const t = tx(v, cx + 3, top - 6, GL[c] || c, "lb", 11, "start"); t.setAttribute("transform", `rotate(-50 ${cx + 3} ${top - 6})`); } else tx(v, cx, top - 10, GL[c] || c, "lb", 12, "middle"); });
+    tx(v, W, top - 10, "차이", "tk", 11, "end");
+    order.forEach((i, k) => {
+      const y0 = top + k * rh, vals = cols.map((c) => tr(GR[c][i], jg)); tx(v, l - 8, y0 + 16, sn(i), "lb", 12.5, "end");
+      vals.forEach((val, n) => { const t = Math.max(0, Math.min(1, (val - 30) / 50)); s("rect", { x: l + n * cw + 1, y: y0 + 1, width: cw - 2, height: rh - 2, rx: 2, fill: `color-mix(in oklab, var(--q4) ${Math.round(t * 100)}%, var(--q0))` }, v); if (cw > 30) tx(v, l + n * cw + cw / 2, y0 + 16, Math.round(val), t > .55 ? "vl" : "vl", 11.5, "middle", { fill: t > .55 ? "var(--card)" : "var(--ink)" }); pts.push({ x: l + n * cw + cw / 2, y: y0 + rh / 2, r: Math.min(cw, rh) / 2, fn: () => [`${i} · ${cols[n]}`, [[`${f1(val)}%`, "믿는다"], [`${f1(tr(A[i], L))}%`, "전체"]]] }); });
+      tx(v, W, y0 + 16, `${f1(Math.max(...vals) - Math.min(...vals))}`, "tk", 11.5, "end");
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 칸을 옮겨 볼 수 있다");
+  }
+  chips("k3", Object.keys(GS).map((k) => [k, k]), g3, (k) => { g3 = k; c3(); });
+  const allG = Object.values(GS).flat();
+  table("t3", ["기관", "전체", ...allG.map((g) => GL[g] || g)], [...IN].sort((a, b) => tr(A[a], L) - tr(A[b], L)).map((i) => [i, f1(tr(A[i], L)), ...allG.map((g) => f1(tr(GR[g][i], jg)))]));
+
+  /* ---------- 4. 100 people, not at all ---------- */
+  const split100 = (parts) => { const tot = parts.reduce((a, b) => a + b, 0), raw = parts.map((p) => p / tot * 100), fl = raw.map(Math.floor); let left = 100 - fl.reduce((a, b) => a + b, 0); raw.map((v, i) => [v - fl[i], i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (left > 0) { fl[i]++; left--; } }); return fl; };
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const order = [...IN].sort((a, b) => A[b][0][L] - A[a][0][L]), W = Math.max(300, box.clientWidth), narrow = W < 560, per = narrow ? 25 : 50, l = narrow ? 0 : 104, lh = narrow ? 18 : 0, cw = (W - l - 40) / per, u = cw * .9, rowsI = 100 / per, rh = u * 1.25, bh = lh + rowsI * rh + 8, H = order.length * bh, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "기관마다 100명 가운데 전혀 믿지 않는다는 사람. " + order.map((i) => `${i} ${Math.round(A[i][0][L])}명`).join(", ") }, box);
+    order.forEach((i, k) => {
+      const y0 = k * bh, c = split100([A[i][0][L], A[i][1][L], A[i][2][L], A[i][3][L]]);
+      if (narrow) tx(v, 0, y0 + 13, sn(i), "lb", 13); else tx(v, l - 8, y0 + rh * rowsI / 2 + 5, sn(i), "lb", 13, "end");
+      tx(v, W, y0 + (narrow ? 13 : rh * rowsI / 2 + 5), `${c[0]}명`, "vl ni", 13, "end");
+      for (let n = 0; n < 100; n++) { const x = l + (n % per) * cw + cw / 2, yy = y0 + lh + Math.floor(n / per) * rh + rh / 2, col = n < c[0] ? "var(--no)" : n < c[0] + c[1] ? "color-mix(in oklab, var(--no) 30%, var(--card))" : "var(--grid)"; s("circle", { cx: x, cy: yy - u * .22, r: u * .2, fill: col }, v); s("path", { d: `M${x - u * .3},${yy + u * .42} Q${x - u * .3},${yy + .02 * u} ${x},${yy + .02 * u} Q${x + u * .3},${yy + .02 * u} ${x + u * .3},${yy + u * .42} Z`, fill: col }, v); }
+      pts.push({ x: l + (W - l - 40) / 2, y: y0 + lh + rowsI * rh / 2, r: rowsI * rh / 2 + 2, fn: () => [i, [[`${f1(A[i][0][L])}%`, "전혀 믿지 않는다", "var(--no)"], [`${f1(A[i][1][L])}%`, "별로 믿지 않는다"], [`${f1(A[i][2][L])}%`, "약간 믿는다"], [`${f1(A[i][3][L])}%`, "매우 믿는다"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표 키로 기관을 옮겨 볼 수 있다");
+  }
+
+  /* ---------- first view + resize ---------- */
+  updV(); pl1.render(); c2(); c3(); c4();
+  onResize(() => { pl1.render(); c2(); c3(); c4(); if (vdone) showRes(); });
+})();
+</script>

@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>씨앗 화분</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: 1) 6 seed pots by age sprouting leaves for male/female (2010-2023 playback),
+   2) 17-sido fertility garden & IVF/IUI regional concentration,
+   3) dual paths of assisted reproduction (IVF vs IUI) and procedure concentration.
+   All data/accent colors taken strictly from design/palette.json. */
+:root {
+  --paper: #f3f1ec; --card: #fdfcf9; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f;
+  --line: #dbe1dd; --grid: #ebdac0; --axis: #a7a8a3;
+  --accent: #416e59;
+  --pot: #8b4d3e; --pot-rim: #67453c; --soil: #4c433e;
+  --sprout: #416e59; --sprout-hi: #abc07b;
+  --male: #3e6f90; --male-ink: #3e6f90;
+  --female: #953a4c; --female-ink: #953a4c;
+  --a20: #abc07b; --a20-ink: #3e6f42;
+  --a25: #80a15a; --a25-ink: #416e59;
+  --a30: #416e59; --a30-ink: #416e59;
+  --a35: #d56b41; --a35-ink: #8b4d3e;
+  --a40: #953a4c; --a40-ink: #953a4c;
+  --a45: #67453c; --a45-ink: #67453c;
+  --ivf: #953a4c; --iui: #3e6f90;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --serif: "Gowun Batang", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3;
+  --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --accent: #91b0a1;
+  --pot: #cd9886; --pot-rim: #ebcfa7; --soil: #4c433e;
+  --sprout: #91b0a1; --sprout-hi: #c4d39c;
+  --male: #689daf; --male-ink: #8ab5bb;
+  --female: #d6b0a7; --female-ink: #d6b0a7;
+  --a20: #c4d39c; --a20-ink: #c4d39c;
+  --a25: #abc07b; --a25-ink: #abc07b;
+  --a30: #91b0a1; --a30-ink: #91b0a1;
+  --a35: #dc8c67; --a35-ink: #dc8c67;
+  --a40: #d6b0a7; --a40-ink: #d6b0a7;
+  --a45: #b87b68; --a45-ink: #b87b68;
+  --ivf: #d6b0a7; --iui: #8ab5bb;
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3;
+  --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --accent: #91b0a1;
+  --pot: #cd9886; --pot-rim: #ebcfa7; --soil: #4c433e;
+  --sprout: #91b0a1; --sprout-hi: #c4d39c;
+  --male: #689daf; --male-ink: #8ab5bb;
+  --female: #d6b0a7; --female-ink: #d6b0a7;
+  --a20: #c4d39c; --a20-ink: #c4d39c;
+  --a25: #abc07b; --a25-ink: #abc07b;
+  --a30: #91b0a1; --a30-ink: #91b0a1;
+  --a35: #dc8c67; --a35-ink: #dc8c67;
+  --a40: #d6b0a7; --a40-ink: #d6b0a7;
+  --a45: #b87b68; --a45-ink: #b87b68;
+  --ivf: #d6b0a7; --iui: #8ab5bb;
+  color-scheme: dark;
+}
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 16.5px/1.78 var(--sans); word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 36px 80px }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--axis) }
+:focus-visible { outline: 2px solid var(--intl); outline-offset: 2px }
+.page { max-width: 1040px; margin: 0 auto; display: grid; gap: 64px }
+.prose { max-width: 660px; display: grid; gap: 14px; min-width: 0 }
+.prose p { margin: 0 }
+.n { font-weight: 700; font-variant-numeric: tabular-nums }
+.label { font: 500 12px/1.4 var(--mono); letter-spacing: .08em; color: var(--muted); margin: 0; text-transform: uppercase }
+
+header { display: grid; gap: 22px }
+h1 { font-weight: 700; font-size: clamp(32px, 5.6vw, 54px); line-height: 1.18; margin: 0; letter-spacing: -.03em; text-wrap: balance }
+h1 span { display: block; font-weight: 500; font-size: .46em; color: var(--ink2); margin-top: 12px; letter-spacing: -.01em; line-height: 1.45 }
+.sheet, .method { display: grid; grid-template-columns: 110px minmax(0, 1fr); border-top: 2px solid var(--ink); font-size: 14.5px; margin: 0 }
+.sheet dt, .sheet dd, .method dt, .method dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line) }
+.sheet dt, .method dt { font: 500 12px/2 var(--mono); color: var(--muted) }
+.sheet dd, .method dd { color: var(--ink2) }
+@media (max-width: 560px) { .sheet, .method { grid-template-columns: 84px minmax(0, 1fr) } }
+
+.quiz { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 14px }
+.quiz h2 { font-size: 20px; line-height: 1.5; margin: 0; font-weight: 700; text-wrap: balance }
+.opts { display: grid; gap: 8px }
+.opt { display: flex; gap: 12px; align-items: center; text-align: left; font: inherit; font-size: 15.5px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; cursor: pointer; min-height: 46px }
+.opt i { font: 500 12px var(--mono); color: var(--muted); font-style: normal; width: 14px }
+.opt[data-state="right"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink) }
+.opt[data-state="wrong"] { opacity: .5 }
+.reveal { font-size: 15px; color: var(--ink2); border-top: 1px solid var(--line); padding-top: 14px }
+.reveal .big { font-size: 28px; font-weight: 700; color: var(--ink); display: block; line-height: 1.3 }
+
+section.s { display: grid; gap: 22px }
+h2.h { font-size: clamp(23px, 3.3vw, 29px); line-height: 1.35; margin: 0; font-weight: 700; letter-spacing: -.02em; text-wrap: balance }
+figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 12px; position: relative; min-width: 0 }
+@media (max-width: 560px) { figure { padding: 14px } }
+.ft { font-weight: 700; font-size: 16px; margin: 0; line-height: 1.5 }
+.fs { font-size: 13.5px; color: var(--muted); margin: -8px 0 0; line-height: 1.6 }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y }
+figcaption { font-size: 12.5px; color: var(--muted); line-height: 1.65; border-top: 1px solid var(--grid); padding-top: 10px }
+details { font-size: 13px }
+summary { cursor: pointer; color: var(--ink2); width: max-content; font: 500 12px/2 var(--mono); padding: 6px 0 }
+.tw { overflow-x: auto; margin-top: 6px; max-height: 380px }
+table { border-collapse: collapse; font-size: 12.5px; min-width: 100% }
+th, td { padding: 5px 10px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums }
+th:first-child, td:first-child { text-align: left }
+th { font-weight: 700; color: var(--ink2); position: sticky; top: 0; background: var(--card) }
+
+/* player: play button, scrubber and a departures-board year */
+.player { display: flex; align-items: center; gap: 14px; flex-wrap: wrap }
+.play { width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; display: grid; place-items: center; flex: none }
+.play svg { width: 18px; height: 18px }
+.play:hover { background: var(--intl) }
+.yr { font: 600 30px/1 var(--mono); font-variant-numeric: tabular-nums; color: var(--board-ink); background: var(--board); border-radius: 6px; padding: 8px 10px; letter-spacing: .06em;
+  background-image: linear-gradient(transparent calc(50% - .5px), rgba(255,255,255,.14) calc(50% - .5px), rgba(255,255,255,.14) calc(50% + .5px), transparent calc(50% + .5px)) }
+.scrub { flex: 1 1 180px; min-width: 0; accent-color: var(--intl); height: 32px }
+.stat { font-size: 14px; color: var(--ink2); margin: 0; min-height: 1.6em }
+.stat b { font-variant-numeric: tabular-nums }
+.chips { display: flex; flex-wrap: wrap; gap: 8px }
+.chip { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; min-height: 40px; cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink) }
+.lb { fill: var(--ink); font-family: var(--sans) }
+.vl { fill: var(--ink); font-family: var(--sans); font-weight: 700; font-variant-numeric: tabular-nums }
+.tk { fill: var(--muted); font-family: var(--mono); font-variant-numeric: tabular-nums }
+.mt { fill: var(--muted); font-family: var(--sans) }
+.halo { paint-order: stroke; stroke: var(--card); stroke-linejoin: round }
+.halo-sea { paint-order: stroke; stroke: var(--sea); stroke-linejoin: round }
+.gl { stroke: var(--grid); stroke-width: 1 }
+.ax { stroke: var(--axis); stroke-width: 1 }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink2) }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block }
+.sw.line { height: 3px; width: 18px; border-radius: 2px }
+.sw.dot { border-radius: 50% }
+.tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--axis); border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.12); padding: 8px 10px; font-size: 12.5px; line-height: 1.5; min-width: 150px; max-width: 250px; z-index: 5 }
+.tip .tn { color: var(--muted) } .tip .tv { font-weight: 700; font-size: 14px }
+.ring { fill: none; stroke: var(--ink); }
+ul.care-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; color: var(--ink2) }
+.dt { overflow-x: auto; border-top: 2px solid var(--ink) }
+.dt td, .dt th { white-space: normal; text-align: left; vertical-align: top; padding: 8px 10px 8px 0; position: static }
+.next { display: grid; border-top: 2px solid var(--ink) }
+.q { padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px }
+.q h3 { font-size: 16px; margin: 0; font-weight: 700 }
+.q p { margin: 0; font-size: 14px; color: var(--ink2) }
+.q ul { margin: 0; padding-left: 18px; font-size: 13.5px }
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px }
+
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans); font-weight: 500; font-size: clamp(17px, 2.4vw, 23px) }
+.ft { font-weight: 700; font-size: 16.5px }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+
+.potgrid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; align-items: start }
+@media (max-width: 820px) { .potgrid { grid-template-columns: minmax(0, 1fr) } }
+
+.sidogrid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(260px, 1fr); gap: 20px; align-items: start }
+@media (max-width: 820px) { .sidogrid { grid-template-columns: minmax(0, 1fr) } }
+
+.sidebox { display: grid; gap: 16px }
+.kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; margin: 0 }
+.kpis div { border-top: 1px solid var(--line); padding-top: 10px }
+.kpis dt { font: 12px/1.4 var(--mono); color: var(--muted) }
+.kpis dd { margin: 2px 0 0; font-family: var(--serif); font-weight: 700; font-size: clamp(20px, 3.2vw, 27px); line-height: 1.15; color: var(--ink); font-variant-numeric: tabular-nums }
+.kpis dd small { font-family: var(--sans); font-size: 12.5px; color: var(--muted); margin-left: 3px; font-weight: normal }
+
+.ranks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px }
+.rk { margin: 0 0 4px; font: 12px/1.4 var(--mono); color: var(--muted); font-weight: 600 }
+.ranks ol { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; color: var(--ink) }
+.ranks ol li::marker { color: var(--muted); font-family: var(--mono); font-size: 12px }
+.ranks ol span { color: var(--muted); font-family: var(--mono); font-size: 12px; margin-left: 4px }
+
+.duogrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start }
+@media (max-width: 780px) { .duogrid { grid-template-columns: minmax(0, 1fr) } }
+.dt { padding-top: 10px }
+</style>
+
+<main class="page">
+  <header>
+    <h1>아이를 갖기 어려운 부부는 늘었을까<span>진료인원은 25% 늘어 출생아 수를 넘어섰다. 그러나 여성이 늘어난 것이 아니라 남성 진료가 2.5배 폭증했고, 환자의 60%는 35세 이상이다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 33</dd>
+      <dt>한 줄</dt><dd>국민건강보험공단 진료 통계로 2010년 21만 6,313명이던 난임(불임) 진료인원은 2023년 27만 1,741명으로 25.6% 늘어나 한 해 출생아 수(23만 명)를 앞질렀다. 그러나 여성 환자는 17만 9,206명에서 17만 9,334명으로 13년째 제자리(+128명)인 반면, 남성 환자가 3만 7,107명에서 9만 2,407명으로 2.5배(+149.0%) 급증해 전체 증가분을 이끌었다. 환자의 중심 연령은 30대 초반에서 30대 후반·40대로 옮겨가 35세 이상이 60.8%(40대 이상 25.6%)를 차지한다. 2017년 건강보험이 적용된 난임시술(F021) 진료건수는 2018년 66.0만 건에서 2022년 91.1만 건으로 38.0% 늘었고, 시술 환자의 33.2%가 40대 이상이다.</dd>
+      <dt>분류</dt><dd>인구·가족</dd>
+      <dt>본능</dt><dd>단일 관점 본능 · 난임은 여성의 문제라는 한쪽 시선으로 보거나 단순히 아기를 못 낳는 사람이 많아졌다고만 여긴다</dd>
+      <dt>그림 방식</dt><dd>나이별로 싹이 트는 씨앗 화분(2010–2023년 재생) · 17개 시도 난임 화원 · 체외수정과 인공수정 두 갈래</dd>
+      <dt>기간</dt><dd>2010–2023년 (난임시술 2018–2022년)</dd>
+      <dt>엮은 데이터</dt><dd>4개 · 국민건강보험공단 불임 및 유산 관련 상병별 진료현황(15143044) · 특정기호 F021 난임진료 시도별 연령별(15127567) · 연령별 요양기관종별 난임시술(15127541) · 통계청 인구동향조사 출생아수(DT_1B8000F)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <h2 id="qz">먼저, 문제 하나 · 2010년에서 2023년 사이 난임 진료인원이 5만 5천 명 늘어나는 동안, 여성 환자는 얼마나 늘었을까?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>4만 5천 명 늘었다</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>B</i>거의 그대로다 (단 128명 증가)</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>2만 명 줄었다</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">B. 거의 그대로다, 단 <span class="n">128명</span> 증가(+0.1%)</span>
+      여성 난임 진료인원은 2010년 17만 9,206명에서 2023년 17만 9,334명으로 13년 동안 사실상 변함이 없었다. 같은 기간 5만 5,428명 늘어난 전체 난임 환자 증가분의 99.8%는 남성 환자(3만 7,107명 → 9만 2,407명, +5만 5,300명)에서 나왔다. 난임은 부부가 함께 병원을 찾는 문화가 정착하면서 통계상 환자 수가 늘어난 것이다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">여성은 제자리인데 남성이 2.5배로 늘었고, 화분의 중심은 35세 위로 옮겨갔다</h2>
+      <p>난임(불임, 상병코드 N46·N97)으로 병원을 찾은 진료인원은 2010년 <span class="n">21만 6,313명</span>에서 2015년 25.0만 명, 2021년 28.0만 명을 거쳐 2023년 <span class="n">27만 1,741명</span>으로 13년 새 <span class="n">25.6%</span> 늘었다. 같은 기간 한 해 태어난 아기가 47.0만 명에서 23.0만 명으로 반토막 나는 사이, 출생아 100명당 난임 진료 환자는 <span class="n">46.0명</span>에서 <span class="n">118.1명</span>으로 2.6배가 됐다. 이제 한 해 새로 태어나는 아이 수보다 난임 진료를 받는 부부 인원이 더 많다.</p>
+      <p>그러나 화분을 나이와 성별로 쪼개어 보면 뜻밖의 반전이 드러난다. 여성 난임 환자는 2010년 17만 9,206명에서 2023년 17만 9,334명으로 단 <span class="n">128명</span>(+0.1%) 늘어나는 데 그쳤다. 반면 남성 환자는 3만 7,107명에서 9만 2,407명으로 <span class="n">2.5배</span>(+149.0%) 폭증했다. 2010년 환자 10명 중 1.7명(17.2%)에 불과하던 남성 비중이 2023년에는 <span class="n">34.0%</span>로 세 명 중 한 명이 됐다. 화분의 나이대도 급격히 늙었다. 2010년에는 30–34세 화분(9만 8,612명, 45.6%)이 가장 무성했지만, 2023년에는 <span class="n">35–39세</span>(9만 5,659명, 35.2%)가 1위로 올라섰고, 40세 이상(6만 9,607명, 25.6%)은 2010년(2만 1,515명)의 <span class="n">3.2배</span>로 자라났다. 35세 이상이 전체의 <span class="n">60.8%</span>를 차지한다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">나이대별 씨앗 화분과 난임 환자 추이, 2010–2023년</p>
+      <p class="fs">왼쪽: 6개 연령대별 씨앗 화분에서 자라나는 싹(파란 잎=남성, 붉은 잎=여성). 점선 윤곽은 2010년 형태. 오른쪽: 남녀 환자 추이와 출생아 100명당 난임 환자</p>
+      <div class="player" id="p1"></div>
+      <div class="legend" aria-hidden="true">
+        <span><i class="sw" style="background:var(--male)"></i>남성 환자(2.5배 폭증)</span>
+        <span><i class="sw" style="background:var(--female)"></i>여성 환자(13년 제자리)</span>
+        <span><i class="sw dot" style="background:var(--soil)"></i>테라코타 화분(연령대 크기)</span>
+      </div>
+      <div class="potgrid">
+        <div class="chart" id="c1a"></div>
+        <div class="chart" id="c1b"></div>
+      </div>
+      <figcaption>국민건강보험공단 「불임 및 유산 관련 상병별 진료현황」(15143044) 및 통계청 「인구동향조사」(DT_1B8000F). 주상병코드 N46(남성불임)과 N97(여성불임) 합계 기준이다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">난임시술 열에 다섯은 수도권에 몰렸고, 광주·세종이 가장 빠르게 늘었다</h2>
+      <p>2017년 10월부터 건강보험 급여(산정특례 특정기호 F021)가 적용된 난임시술(체외수정·인공수정) 수급자는 2018년 <span class="n">9만 7,471명</span>(66.0만 건)에서 2022년 <span class="n">10만 9,283명</span>(91.1만 건)으로 늘었다. 진료인원은 12.1% 늘어난 반면 진료건수는 <span class="n">38.0%</span> 증가해, 환자 한 명당 연간 진료건수도 6.78건에서 <span class="n">8.34건</span>으로 늘었다. 더 많은 횟수와 주기로 집중적인 시술을 받는 부부가 많아졌다는 뜻이다.</p>
+      <p>시도별로 보면 시술의 절반 이상이 수도권에 쏠려 있다. 2022년 기준 경기도가 <span class="n">3만 4,459명</span>(31.5%, 28.6만 건)으로 전국에서 가장 많고, 서울이 <span class="n">2만 2,417명</span>(20.5%, 20.9만 건)으로 뒤를 이어 두 곳이 전체의 <span class="n">52.0%</span>를 차지했다. 2018년 대비 증가율은 광주광역시가 <span class="n">+43.5%</span>(2,570 → 3,688명)로 1위였고, 경기도(+32.8%), 세종특별자치시(+29.6%), 전북(+26.0%), 강원(+22.6%) 순이었다. 반면 울산(-17.3%), 제주(-14.5%), 충남(-9.6%), 경남(-8.8%) 등 5개 시도는 같은 기간 시술 환자가 줄었다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">17개 시도 난임 화원: 시도별 난임시술(F021) 환자와 건수, 2018–2022년</p>
+      <p class="fs">화분 막대 = 2022년 시술 환자 수(명). 색 = 2018년 대비 증감률(%). 오른쪽은 권역 요약과 시도별 순위</p>
+      <div class="chips" role="group" aria-label="정렬 기준 선택" id="chips2"></div>
+      <div class="sidogrid">
+        <div class="chart" id="c2"></div>
+        <div class="sidebox">
+          <dl class="kpis" id="kpi2"></dl>
+          <div class="ranks">
+            <div><p class="rk" id="rkt1">시술 환자 많은 시도</p><ol id="rk2a"></ol></div>
+            <div><p class="rk" id="rkt2">2018 대비 증가율 높은 시도</p><ol id="rk2b"></ol></div>
+          </div>
+        </div>
+      </div>
+      <figcaption>국민건강보험공단 「특정기호 F021 난임진료의 시도별 연령별 진료인원 및 건수」(15127567). 요양기관 주소지 기준 건강보험 급여 실적인원이다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">인공수정은 80%를 넘겼고, 시술 환자 세 명 중 한 명은 40대다</h2>
+      <p>난임시술의 두 갈래인 체외수정(시험관아기, IVF)과 정자주입술(인공수정, IUI)의 진료건수를 비교하면 인공수정의 팽창이 두드러진다. 건강보험 청구 기준 인공수정 건수는 2018년 <span class="n">4만 257건</span>(69.3%)에서 2022년 <span class="n">7만 76건</span>(<span class="n">81.0%</span>)으로 74.1% 늘어난 반면, 체외수정은 1만 7,794건에서 1만 6,455건(19.0%)으로 비슷한 수준을 지켰다. 시술의 <span class="n">61.0%</span>(5만 2,752건)는 전문 의원급 의료기관에서 이루어졌다.</p>
+      <p>시술을 받는 사람의 나이는 더욱 가파르게 올라갔다. 난임시술(F021) 환자 중 40세 이상(40–44세 및 45세 이상) 비중은 2018년 <span class="n">24.2%</span>(2만 3,536명)에서 2022년 <span class="n">33.2%</span>(<span class="n">3만 6,256명</span>)로 껑충 뛰어, 시술 부부 셋 중 한 명이 40대다. 특히 45세 이상 시술 환자는 3,499명에서 <span class="n">7,544명</span>으로 2.2배가 됐다. 자연유산(O03-O06) 진료인원은 전체 임신 건수가 줄면서 2010년 2만 1,410명에서 2023년 <span class="n">1만 2,342명</span>으로 줄었지만, 출생아 1천 명당 유산 환자는 45.5명에서 <span class="n">53.7명</span>으로 오히려 높아졌다. 늦어진 결혼과 늦어진 첫 임신 시도가 난임 시술과 유산 위험의 문턱을 함께 높이고 있는 셈이다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">난임시술 두 갈래(시험관 vs 인공수정)와 40대 시술 비중 상승</p>
+      <p class="fs">왼쪽: 2018–2022년 체외수정(시험관)과 정자주입술(인공수정) 건수 추이. 오른쪽: 시술 환자 중 40세 이상 비중과 1인당 연간 진료건수</p>
+      <div class="legend" aria-hidden="true">
+        <span><i class="sw line" style="background:var(--iui)"></i>인공수정 (정자주입술)</span>
+        <span><i class="sw line" style="background:var(--ivf)"></i>체외수정 (시험관)</span>
+        <span><i class="sw dot" style="background:var(--a40)"></i>40세 이상 비중(%)</span>
+      </div>
+      <div class="duogrid">
+        <div class="chart" id="c3a"></div>
+        <div class="chart" id="c3b"></div>
+      </div>
+      <figcaption>국민건강보험공단 「연령별 요양기관종별 난임시술 진료건수」(15127541) 및 「특정기호 F021 난임진료」(15127567).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">그래서, 아이를 갖기 어려운 부부는 늘었을까</h2>
+      <p>진료와 시술 통계만 보면 "그렇다". 병원을 찾은 난임 환자는 2010년 21.6만 명에서 2023년 27.2만 명으로 25.6% 늘었고, 출생아 수를 훌쩍 뛰어넘었다. 그러나 이것을 '한국 여성의 생물학적 생식 능력이 갑자기 떨어졌다'고 읽는 것은 오해다. 여성 난임 환자는 13년간 단 128명 늘어 제자리였고, 늘어난 환자의 전부가 남성의 적극적인 진료 참여(3.7만 → 9.2만 명)에서 나왔기 때문이다. 여기에 초혼과 첫 출산 연령이 30대 중후반으로 늦춰지면서 35세 이상 난임 진료 비중이 60%를 넘고 40대 시술이 3명 중 1명으로 불어났다. 부부가 함께 원인을 찾고, 늦은 나이에도 의학의 도움을 받아 아이를 만나려는 간절한 시도가 난임 통계를 키운 진짜 동력이다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:20px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>난임(불임) 통계는 질병코드 N46(남성불임) 또는 N97(여성불임)로 건강보험 급여를 청구한 사람의 수다. 병원을 방문하지 않았거나 전액 비급여로 진료받은 인원은 포함되지 않는다.</li>
+      <li>2017년 10월부터 난임시술(체외수정·인공수정)에 건강보험 급여가 새로 적용(특정기호 F021)되면서, 과거 비급여로 이루어지던 시술이 제도권 통계로 편입된 효과가 2018년 이후 수치에 섞여 있다.</li>
+      <li>연도별 진료인원은 해당 연도 동안 1회 이상 진료를 받은 실인원(연인원과 다름)이다. 한 사람이 여러 병원을 다녀도 연간 1명으로 집계된다.</li>
+      <li>시도별 난임시술 실적은 시술을 받은 '환자의 주소지' 기준이다. 지방 거주 환자가 서울·경기의 대형 난임 전문병원에서 시술을 받았더라도 환자의 주민등록 주소지 시도로 분류된다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:20px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15143044/fileData.do" target="_blank" rel="noopener">불임 및 유산 관련 상병별 진료현황</a> (15143044)</td><td>국민건강보험공단</td><td>연도별·성별·연령별 난임(N46, N97) 및 유산(O03-O06) 진료인원</td><td>2010–2023</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15127567/fileData.do" target="_blank" rel="noopener">특정기호 F021 난임진료 시도별 연령별 진료인원 및 건수</a> (15127567)</td><td>국민건강보험공단</td><td>17개 시도별·연령별 난임시술 수급인원 및 진료건수</td><td>2018–2022</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15127541/fileData.do" target="_blank" rel="noopener">연령별 요양기관종별 난임시술 진료건수</a> (15127541)</td><td>국민건강보험공단</td><td>시술구분별(체외수정, 정자주입술) 연령별·종별 진료건수</td><td>2018–2022</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&tblId=DT_1B8000F&conn_path=I2" target="_blank" rel="noopener">인구동태건수 및 동태율 추이</a> (DT_1B8000F)</td><td>통계청</td><td>전국 연간 출생아수 (난임 진료인원 대비 출생 규모 비교 분모)</td><td>2010–2023</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:20px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>국민건강보험공단 공공데이터 3개 파일(15143044, 15127567, 15127541) 및 통계청 출생 통계(14개년)</dd>
+      <dt>도구</dt><dd>Python(원자료 파싱·연령대 범주화·시도별 집계) · SVG 씨앗 화분과 새싹 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>난임 진료인원 남녀 분해 · 연령대별 씨앗 화분 비중 이동 · 17개 시도별 시술 집중도와 1인당 시술 횟수 시계열</dd>
+      <dt>검증</dt><dd>15143044 시트 1의 14개년 성별 진료인원 합계(2023년 27만 1,741명 = 남 9만 2,407명 + 여 17만 9,334명)와 연령대별 합계가 정확히 일치함을 확인했다. F021 시도별 인원 합계도 전국 합계(2022년 10만 9,283명)와 일치한다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Gemini가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:20px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>육아휴직은 엄마만 쓸까</h3><p>늘어난 30대 난임 극복 부부가 출산 뒤 육아휴직을 어떻게 나누어 쓰는지 성별·지역별 데이터로 검증할 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15100479/fileData.do" target="_blank" rel="noopener">성별 지역별 육아휴직급여 수급자수</a> (15100479) · 고용노동부</li></ul></div>
+      <div class="q"><h3>코스피는 몇 종목이 움직일까</h3><p>주식시장의 하루 등락 분포와 대형주 쏠림을 전 종목 시세로 검증할 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15094808/fileData.do" target="_blank" rel="noopener">주식시세정보</a> (15094808) · 금융위원회</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.6</footer>
+</main>
+
+<script>
+const DATA = {"pots":{"yrs":[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023],"tiers":["24세 이하","25–29세","30–34세","35–39세","40–44세","45세 이상"],"tot":[216313,224195,220984,219184,242010,249875,250611,241224,263033,258737,256561,280410,269393,271741],"male":[37107,41895,43200,44423,50478,55787,65366,67930,82501,83202,82740,93149,89673,92407],"female":[179206,182300,177784,174761,191532,194088,185245,173294,180532,175535,173821,187261,179720,179334],"male_pct":[17.2,18.7,19.5,20.3,20.9,22.3,26.1,28.2,31.4,32.2,32.2,33.2,33.3,34.0],"by_tier":{"24세 이하":{"tot":[2929,2746,2524,2407,2615,2391,2157,1868,1797,1629,1575,1401,1154,1074],"m":[146,121,190,177,166,189,199,164,167,171,178,121,147,126],"w":[2783,2625,2334,2230,2449,2202,1958,1704,1630,1458,1397,1280,1007,948]},"25–29세":{"tot":[36898,34398,27963,24394,25910,24754,22209,20118,18900,17819,18186,17810,15297,14424],"m":[2439,2742,2370,1989,2285,2488,2493,2576,2848,2809,2945,3241,2927,2799],"w":[34459,31656,25593,22405,23625,22266,19716,17542,16052,15010,15241,14569,12370,11625]},"30–34세":{"tot":[98612,104230,103551,103080,108718,106406,98415,86530,86880,83745,85184,92194,88666,90977],"m":[14262,16296,16639,17343,19060,19912,21314,19730,21825,21620,22222,24896,24353,25222],"w":[84350,87934,86912,85737,89658,86494,77101,66800,65055,62125,62962,67298,64313,65755]},"35–39세":{"tot":[56359,59035,61107,62028,72004,80067,86712,88151,101281,98769,94249,100660,95100,95659],"m":[13351,14932,15311,15687,17976,20874,25654,27653,34416,34135,33169,36377,33927,34985],"w":[43008,44103,45796,46341,54028,59193,61058,60498,66865,64634,61080,64283,61173,60674]},"40–44세":{"tot":[17317,19444,21214,22574,27007,29716,32902,35242,41814,43821,44585,53636,54297,54548],"m":[4939,5688,6470,7015,8305,9218,11564,12784,16236,16987,17009,20343,20307,21083],"w":[12378,13756,14744,15559,18702,20498,21338,22458,25578,26834,27576,33293,33990,33465]},"45세 이상":{"tot":[4198,4342,4625,4701,5756,6541,8216,9315,12361,12954,12782,14709,14879,15059],"m":[1970,2116,2220,2212,2686,3106,4142,5023,7009,7480,7217,8171,8012,8192],"w":[2228,2226,2405,2489,3070,3435,4074,4292,5352,5474,5565,6538,6867,6867]}},"births":[470171,471265,484550,436455,435435,438420,406243,357771,326822,302676,272337,260562,249186,230028],"ratio_to_birth":[46.0,47.6,45.6,50.2,55.6,57.0,61.7,67.4,80.5,85.5,94.2,107.6,108.1,118.1],"ratio_female_to_birth":[38.1,38.7,36.7,40.0,44.0,44.3,45.6,48.4,55.2,58.0,63.8,71.9,72.1,78.0],"miscarriages":[21410,20818,22403,21467,22077,21235,19912,18432,17304,16463,14983,13818,13365,12342]},"f021":{"yrs":[2018,2019,2020,2021,2022],"tiers":["29세 이하","30–34세","35–39세","40–44세","45세 이상"],"patients":[97471,92920,97182,110634,109283],"cases":[660465,694353,791074,890920,911232],"per_person":[6.78,7.47,8.14,8.05,8.34],"by_tier":{"29세 이하":{"patients":[4124,3719,3985,4052,3403],"cases":[29136,27487,31525,32057,26993]},"30–34세":{"patients":[27407,25473,26786,30238,28848],"cases":[188160,189385,211376,233670,224721]},"35–39세":{"patients":[42404,39542,39187,42666,40776],"cases":[280416,289264,305653,329933,322945]},"40–44세":{"patients":[20037,19763,21651,27121,28712],"cases":[146196,159007,195596,243035,270358]},"45세 이상":{"patients":[3499,4423,5573,6557,7544],"cases":[16557,29210,46924,52225,66215]}},"over40_pct":[24.1,26.0,28.0,30.4,33.2]},"sido":{"names":["강원도","경기도","경상남도","경상북도","광주광역시","대구광역시","대전광역시","부산광역시","서울특별시","세종특별자치시","울산광역시","인천광역시","전라남도","전라북도","제주특별자치도","충청남도","충청북도"],"data22":{"서울특별시":{"p18":22239,"c18":160342,"p22":22417,"c22":209188,"chg_pct":0.8},"부산광역시":{"p18":6498,"c18":40946,"p22":6809,"c22":57518,"chg_pct":4.8},"대구광역시":{"p18":3803,"c18":27495,"p22":4309,"c22":37718,"chg_pct":13.3},"인천광역시":{"p18":5930,"c18":38582,"p22":6529,"c22":51423,"chg_pct":10.1},"광주광역시":{"p18":2570,"c18":15675,"p22":3688,"c22":25144,"chg_pct":43.5},"대전광역시":{"p18":2519,"c18":16774,"p22":2329,"c22":18214,"chg_pct":-7.5},"울산광역시":{"p18":2614,"c18":15972,"p22":2163,"c22":17942,"chg_pct":-17.3},"세종특별자치시":{"p18":903,"c18":5650,"p22":1170,"c22":9964,"chg_pct":29.6},"경기도":{"p18":25947,"c18":188136,"p22":34459,"c22":285839,"chg_pct":32.8},"강원도":{"p18":2292,"c18":13397,"p22":2810,"c22":19202,"chg_pct":22.6},"충청북도":{"p18":2453,"c18":13399,"p22":2530,"c22":16712,"chg_pct":3.1},"충청남도":{"p18":3951,"c18":23531,"p22":3572,"c22":25508,"chg_pct":-9.6},"전라북도":{"p18":2400,"c18":14156,"p22":3024,"c22":20846,"chg_pct":26.0},"전라남도":{"p18":2604,"c18":15305,"p22":3095,"c22":20879,"chg_pct":18.9},"경상북도":{"p18":4021,"c18":27265,"p22":4321,"c22":34699,"chg_pct":7.5},"경상남도":{"p18":5424,"c18":34470,"p22":4944,"c22":50043,"chg_pct":-8.8},"제주특별자치도":{"p18":1303,"c18":9370,"p22":1114,"c22":10393,"chg_pct":-14.5}}},"procedures":{"yrs":[2018,2019,2020,2021,2022],"ivf":[17794,17288,18021,18881,16455],"iui":[40257,45079,55270,63779,70076],"ivf_pct":[30.7,27.7,24.6,22.8,19.0],"iui_pct":[69.3,72.3,75.4,77.2,81.0],"age22":{"ivf":{"29세 이하":617,"30–34세":4696,"35–39세":6560,"40–44세":4050,"45세 이상":532},"iui":{"29세 이하":1341,"30–34세":12509,"35–39세":23362,"40–44세":26494,"45세 이상":6370}},"hosp22":{"의원":54036,"병원":16647,"종합병원":14582,"상급종합병원":1266}}};
+document.documentElement.lang = "ko";
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const s = (tag, a = {}, p) => { const e = document.createElementNS(NS, tag); for (const k in a) if (a[k] != null) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  const tx = (p, x, y, str, cls, size, anchor = "start", extra = {}) => { const t = s("text", { x, y, class: cls, "text-anchor": anchor, "font-size": size, ...extra }, p); t.textContent = str; return t; };
+  const fmt = (n) => Math.round(n).toLocaleString("ko-KR");
+  const f1 = (n) => n.toLocaleString("ko-KR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const pc = (n) => f1(n) + "%";
+  const man = (n) => n >= 1e5 ? f1(n / 1e4).replace(/\.0$/, "") + "만" : fmt(n);
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lerp = (arr, pos) => { const k = Math.floor(pos), f = pos - k; return k + 1 < arr.length ? arr[k] + (arr[k + 1] - arr[k]) * f : arr[k]; };
+  const bEl = (t) => Object.assign(document.createElement("b"), { textContent: t });
+
+  function table(id, head, rows) {
+    const t = document.createElement("table"), th = document.createElement("thead"), tr = document.createElement("tr");
+    head.forEach((h) => { const c = document.createElement("th"); c.textContent = h; tr.append(c); }); th.append(tr); t.append(th);
+    const tb = document.createElement("tbody");
+    rows.forEach((r) => { const row = document.createElement("tr"); r.forEach((v) => { const c = document.createElement("td"); c.textContent = v; row.append(c); }); tb.append(row); });
+    t.append(tb); document.getElementById(id).replaceChildren(t);
+  }
+  function tipFor(fig) {
+    const tip = fig.querySelector(".tip");
+    return {
+      show(ev, title, rows) {
+        tip.replaceChildren(); const h = document.createElement("div"); h.className = "tn"; h.textContent = title; tip.append(h);
+        rows.forEach(([v, k, col]) => { const d = document.createElement("div"); if (col) { const i = document.createElement("i"); i.className = "sw dot"; i.style.background = col; i.style.marginRight = "6px"; d.append(i); } const b = document.createElement("span"); b.className = "tv"; b.textContent = v + " "; const kk = document.createElement("span"); kk.textContent = k; d.append(b, kk); tip.append(d); });
+        tip.hidden = false;
+        const fr = fig.getBoundingClientRect(); let x, y;
+        if (ev.clientX != null) { x = ev.clientX - fr.left + 14; y = ev.clientY - fr.top + 14; } else { const r = (ev.rect || ev.target.getBoundingClientRect()); x = r.right - fr.left + 8; y = r.top - fr.top; }
+        const tw = tip.offsetWidth, th = tip.offsetHeight;
+        if (x + tw > fr.width - 8) x = Math.max(8, x - tw - 28);
+        if (y + th > fr.height - 8) y = Math.max(8, y - th - 28);
+        tip.style.left = x + "px"; tip.style.top = y + "px";
+      },
+      hide() { tip.hidden = true; },
+    };
+  }
+  /* Marks you can point at. One tab stop per chart; Left/Right step, Up/Down jump rows, Escape hides.
+     pts: {x, y, r, fn() -> [title, rows]} in viewBox units; u = viewBox units per CSS px. */
+  function pointLayer(v, tip, pts, label, u = 1) {
+    const ring = s("circle", { class: "ring", "stroke-width": 2 * u, opacity: 0 }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = i; const p = pts[i]; ring.setAttribute("cx", p.x); ring.setAttribute("cy", p.y); ring.setAttribute("r", p.r + 4 * u); ring.setAttribute("opacity", 1); const [t, rows] = p.fn(); tip.show(ev || { target: ring }, t, rows); };
+    const hide = () => { tip.hide(); ring.setAttribute("opacity", 0); };
+    const nearest = (e) => {
+      const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal, k = vb.width / r.width;
+      const x = vb.x + (e.clientX - r.left) * k, y = vb.y + (e.clientY - r.top) * k;
+      let best = -1, bd = Infinity;
+      pts.forEach((p, i) => { const d = Math.hypot(p.x - x, p.y - y) - p.r, reach = 18 * k; if (d < reach && d < bd) { bd = d; best = i; } });
+      return best;
+    };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerdown", (e) => { const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => { if (pts.length) show(idx < 0 ? 0 : idx); }); v.addEventListener("blur", hide);
+    const vert = (dir) => { const c = pts[Math.max(idx, 0)]; let best = -1, bd = Infinity; pts.forEach((p, i) => { const dy = (p.y - c.y) * dir; if (dy <= 0.5) return; const d = dy * 3 + Math.abs(p.x - c.x); if (d < bd) { bd = d; best = i; } }); return best < 0 ? Math.max(idx, 0) : best; };
+    v.addEventListener("keydown", (e) => {
+      if (!pts.length) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show((Math.max(idx, 0) + (e.key === "ArrowRight" ? 1 : -1) + pts.length) % pts.length); }
+      else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); show(vert(e.key === "ArrowDown" ? 1 : -1)); }
+      else if (e.key === "Escape") hide();
+    });
+  }
+  /* A time cursor over a chart: pointer or Left/Right picks a time index, a vertical rule follows it. */
+  function timeLayer(v, tip, n, xOf, y0, y1, fn, label, u = 1) {
+    const rule = s("line", { y1: y0, y2: y1, stroke: "var(--ink)", "stroke-width": u, opacity: 0, "pointer-events": "none" }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = Math.max(0, Math.min(n - 1, i)); const x = xOf(idx); rule.setAttribute("x1", x); rule.setAttribute("x2", x); rule.setAttribute("opacity", .5); const [t, rows] = fn(idx); const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; tip.show(ev || { rect: { right: r.left + (x - vb.x) / vb.width * r.width, top: r.top + 20 } }, t, rows); };
+    const hide = () => { tip.hide(); rule.setAttribute("opacity", 0); };
+    const at = (e) => { const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; const x = vb.x + (e.clientX - r.left) * vb.width / r.width; let best = 0, bd = Infinity; for (let i = 0; i < n; i++) { const d = Math.abs(xOf(i) - x); if (d < bd) { bd = d; best = i; } } return best; };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; show(at(e), e); });
+    v.addEventListener("pointerdown", (e) => show(at(e), e));
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => show(idx < 0 ? n - 1 : idx)); v.addEventListener("blur", hide);
+    v.addEventListener("keydown", (e) => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show(idx + (e.key === "ArrowRight" ? 1 : -1)); } else if (e.key === "Home") { e.preventDefault(); show(0); } else if (e.key === "End") { e.preventDefault(); show(n - 1); } else if (e.key === "Escape") hide(); });
+  }
+  /* A player: play/pause, scrubber and a large time readout. Frames 0..n-1; at rest it shows the last frame. */
+  function Player(id, label, draw, n, labelOf, seconds = 10) {
+    const box = document.getElementById(id);
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "play"; btn.setAttribute("aria-label", label + " 재생");
+    const icon = (playing) => { btn.replaceChildren(); const v = s("svg", { viewBox: "0 0 20 20", "aria-hidden": "true" }, btn); if (playing) { s("rect", { x: 4, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); s("rect", { x: 12, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); } else s("path", { d: "M5,3 L17,10 L5,17 Z", fill: "currentColor" }, v); };
+    const yr = document.createElement("div"); yr.className = "yr"; yr.setAttribute("aria-hidden", "true");
+    const sc = document.createElement("input"); sc.type = "range"; sc.className = "scrub"; sc.min = 0; sc.max = n - 1; sc.step = 1; sc.value = n - 1; sc.setAttribute("aria-label", label + " 시점");
+    box.append(btn, yr, sc);
+    let pos = n - 1, raf = 0, playing = false, t0 = 0, from = 0;
+    const render = () => { const k = Math.min(n - 1, Math.floor(pos + 1e-6)); yr.textContent = labelOf(k); sc.value = Math.round(pos); sc.setAttribute("aria-valuetext", labelOf(Math.round(pos))); draw(pos); };
+    const stop = () => { playing = false; cancelAnimationFrame(raf); icon(false); btn.setAttribute("aria-label", label + " 재생"); };
+    const tick = (now) => { pos = Math.min(n - 1, from + (now - t0) / (seconds * 1000) * (n - 1)); render(); if (pos < n - 1) raf = requestAnimationFrame(tick); else stop(); };
+    btn.addEventListener("click", () => {
+      if (playing) { stop(); return; }
+      if (reduce) { pos = n - 1; render(); return; }
+      from = pos >= n - 1 ? 0 : pos; pos = from; playing = true; icon(true); btn.setAttribute("aria-label", label + " 멈춤");
+      raf = requestAnimationFrame((t) => { t0 = t; tick(t); });
+    });
+    sc.addEventListener("input", () => { stop(); pos = +sc.value; render(); });
+    icon(false);
+    return { render, get pos() { return pos; } };
+  }
+  document.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".opt").forEach((o) => { o.setAttribute("aria-pressed", o === b); o.dataset.state = o.dataset.a === "1" ? "right" : "wrong"; });
+    document.getElementById("reveal").hidden = false;
+  }));
+  function chips(id, opts, cur, onPick) {
+    const box = document.getElementById(id);
+    opts.forEach(([k, name]) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = name; b.setAttribute("aria-pressed", k === cur); b.addEventListener("click", () => { box.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === b)); onPick(k); }); box.append(b); });
+  }
+  function onResize(fn) {
+    let lastW = 0, rt;
+    new ResizeObserver(() => { const w = document.querySelector(".page").clientWidth; if (Math.abs(w - lastW) < 2) return; lastW = w; clearTimeout(rt); rt = setTimeout(fn, 80); }).observe(document.querySelector(".page"));
+  }
+
+  const P = DATA.pots, PY = P.yrs, NPY = PY.length, TIERS = P.tiers;
+
+  /* ---------- Figure 1: Seed Pots Sprouting by Age (2010-2023) ---------- */
+  function drawF1(pos) {
+    const boxA = document.getElementById("c1a"), boxB = document.getElementById("c1b"), fig = document.getElementById("f1");
+    boxA.replaceChildren(); boxB.replaceChildren();
+    const yr = PY[Math.round(pos)];
+    const tot = lerp(P.tot, pos), mVal = lerp(P.male, pos), wVal = lerp(P.female, pos);
+    const bth = lerp(P.births, pos);
+    const i10 = 0; // 2010 base index
+
+    // Panel A: 6 Seed Pots by Age Group
+    const WA = Math.max(300, boxA.clientWidth), HA = 384, narrowA = WA < 390;
+    const vA = s("svg", { viewBox: `0 0 ${WA} ${HA}`, role: "img", "aria-label": `${yr}년 연령대별 씨앗 화분과 난임 환자 새싹 그림` }, boxA);
+
+    // Header badge inside SVG
+    tx(vA, 8, 20, `${yr}년 난임 환자 ${man(tot)}명 (출생아 ${man(bth)}명)`, "vl", 14.5, "start");
+    tx(vA, 8, 38, `남성 ${man(mVal)}명 (${f1(mVal/tot*100)}%) · 여성 ${man(wVal)}명 · 점선=2010년`, "mt", 12, "start");
+
+    const nPots = TIERS.length;
+    const padL = 12, padR = 12;
+    const availW = WA - padL - padR;
+    const potSlot = availW / nPots;
+    const potBaseY = 328;
+    const maxStemH = 180;
+    const maxTierVal = 110000;
+
+    // Shelf beneath pots
+    s("rect", { x: 4, y: potBaseY + 12, width: WA - 8, height: 7, rx: 3, fill: "var(--line)", stroke: "var(--axis)", "stroke-width": 1 }, vA);
+
+    const ptsA = [];
+
+    TIERS.forEach((t, i) => {
+      const cx = padL + i * potSlot + potSlot / 2;
+      const tTot = lerp(P.by_tier[t].tot, pos);
+      const tM = lerp(P.by_tier[t].m, pos);
+      const tW = lerp(P.by_tier[t].w, pos);
+      const tTot10 = P.by_tier[t].tot[i10];
+
+      const potW = Math.min(potSlot * 0.74, 46);
+      const potTopW = potW;
+      const potBotW = potW * 0.74;
+      const potH = 26;
+
+      // Sprout height based on patient count
+      const stemH = Math.max(12, (tTot / maxTierVal) * maxStemH);
+      const stemH10 = Math.max(12, (tTot10 / maxTierVal) * maxStemH);
+      const stemTopY = potBaseY - stemH;
+      const stemTopY10 = potBaseY - stemH10;
+
+      // 2010 ghost sprout outline
+      s("line", { x1: cx, x2: cx, y1: potBaseY, y2: stemTopY10, stroke: "var(--axis)", "stroke-width": 1.2, "stroke-dasharray": "2 2", opacity: 0.6 }, vA);
+      s("circle", { cx, cy: stemTopY10, r: 3, fill: "none", stroke: "var(--axis)", "stroke-width": 1, opacity: 0.6 }, vA);
+
+      // Main plant stem
+      const is35 = t === "35–39세", is40 = t === "40–44세";
+      s("line", { x1: cx, x2: cx, y1: potBaseY, y2: stemTopY, stroke: "var(--sprout)", "stroke-width": is35 ? 3.2 : 2.4, "stroke-linecap": "round" }, vA);
+
+      // Leaves sprouting along the stem
+      // Female leaves (right side, coral/rose), Male leaves (left side, blue/teal)
+      const nPairs = Math.min(5, Math.max(1, Math.round(tTot / 20000)));
+      const mRatio = tM / (tTot || 1);
+      for (let pIdx = 1; pIdx <= nPairs; pIdx++) {
+        const leafY = potBaseY - (stemH / (nPairs + 1)) * pIdx;
+        const leafLen = Math.min(18, 8 + (tTot / maxTierVal) * 14);
+
+        // Female leaf on right (curving up-right)
+        s("path", {
+          d: `M${cx},${leafY} Q${cx + leafLen * 0.6},${leafY - 6} ${cx + leafLen},${leafY - 2} Q${cx + leafLen * 0.6},${leafY + 4} ${cx},${leafY}Z`,
+          fill: "var(--female)", stroke: "var(--card)", "stroke-width": 0.8
+        }, vA);
+
+        // Male leaf on left (curving up-left)
+        const hasMaleLeaf = (pIdx / nPairs) <= (mRatio * 2.2);
+        if (hasMaleLeaf) {
+          s("path", {
+            d: `M${cx},${leafY + 2} Q${cx - leafLen * 0.6},${leafY - 4} ${cx - leafLen},${leafY} Q${cx - leafLen * 0.6},${leafY + 6} ${cx},${leafY + 2}Z`,
+            fill: "var(--male)", stroke: "var(--card)", "stroke-width": 0.8
+          }, vA);
+        }
+      }
+
+      // Sprout blossom at top
+      s("circle", { cx, cy: stemTopY - 2, r: is35 ? 5.5 : 4.5, fill: "var(--sprout-hi)", stroke: "var(--card)", "stroke-width": 1.2 }, vA);
+      s("circle", { cx, cy: stemTopY - 2, r: 2.2, fill: "var(--female)" }, vA);
+
+      // Terra-cotta Pot body
+      const pPath = `M${cx - potTopW / 2},${potBaseY} L${cx - potBotW / 2},${potBaseY + potH} L${cx + potBotW / 2},${potBaseY + potH} L${cx + potTopW / 2},${potBaseY} Z`;
+      s("path", { d: pPath, fill: "var(--pot)", stroke: "var(--pot-rim)", "stroke-width": 1.2 }, vA);
+      // Pot rim
+      s("rect", { x: cx - potTopW / 2 - 2, y: potBaseY - 3, width: potTopW + 4, height: 6, rx: 2, fill: "var(--pot-rim)" }, vA);
+      // Soil surface
+      s("ellipse", { cx, cy: potBaseY, rx: potTopW / 2 - 2, ry: 2.5, fill: "var(--soil)" }, vA);
+
+      // Value label above sprout
+      tx(vA, cx, stemTopY - 12, `${man(tTot)}`, is35 ? "vl halo" : "lb halo", narrowA ? 11 : 12, "middle", { style: is35 ? "fill:var(--a35-ink)" : (is40 ? "fill:var(--a40-ink)" : "") });
+      // Age group label below shelf
+      const shortAge = t.replace("세 이하", "↓").replace("세 이상", "↑").replace("세", "");
+      tx(vA, cx, potBaseY + 30, narrowA ? shortAge : t, "vl", narrowA ? 11.5 : 12, "middle");
+      tx(vA, cx, potBaseY + 45, `${f1(tTot / tot * 100)}%`, "tk", 11, "middle");
+
+      ptsA.push({
+        x: cx, y: stemTopY, r: 16,
+        fn: () => [
+          `${yr}년 · ${t}`,
+          [
+            [fmt(tTot) + "명", `전체 난임 진료인원 (${pc(tTot / tot * 100)})`],
+            [fmt(tM) + "명", `남성 환자 (${pc(tM / tTot * 100)})`],
+            [fmt(tW) + "명", `여성 환자 (${pc(tW / tTot * 100)})`],
+            [fmt(tTot10) + "명", `2010년 건수 (${tTot >= tTot10 ? "+" : ""}${f1((tTot / tTot10 - 1) * 100)}%)`]
+          ]
+        ]
+      });
+    });
+
+    pointLayer(vA, tipFor(fig), ptsA, "화살표 키로 나이대별 화분을 살펴볼 수 있다");
+
+    // Panel B: Top = Male vs Female Infertility, Bottom = Births vs Infertility Patients
+    const WB = Math.max(300, boxB.clientWidth), HB = 384, l = 46, r = 84, narrowB = WB < 380;
+    const vB = s("svg", { viewBox: `0 0 ${WB} ${HB}`, role: "img", "aria-label": `2010–2023년 성별 난임 진료인원 및 출생아 대비 난임 비율 추이` }, boxB);
+
+    // Top subchart: Male vs Female (y: 34..156)
+    const tTop = 34, tBot = 156;
+    const sx = (i) => l + i / (NPY - 1) * (WB - l - r);
+    const syG = (v) => tTop + (1 - v / 220000) * (tBot - tTop);
+
+    tx(vB, 6, 16, "성별 난임 진료인원 (2010–2023년)", "vl", 12.5, "start");
+    [0, 100000, 200000].forEach((tk) => {
+      s("line", { x1: l, x2: WB - r, y1: syG(tk), y2: syG(tk), class: tk === 0 ? "ax" : "gl" }, vB);
+      tx(vB, l - 6, syG(tk) + 4, tk === 0 ? "0" : tk / 1e4 + "만", "tk", 12, "end");
+    });
+
+    // Female line
+    const dFem = PY.map((_, i) => `${sx(i).toFixed(1)},${syG(P.female[i]).toFixed(1)}`).join("L");
+    s("path", { d: "M" + dFem, fill: "none", stroke: "var(--female)", "stroke-width": 2.4 }, vB);
+    // Male line
+    const dMale = PY.map((_, i) => `${sx(i).toFixed(1)},${syG(P.male[i]).toFixed(1)}`).join("L");
+    s("path", { d: "M" + dMale, fill: "none", stroke: "var(--male)", "stroke-width": 2.4 }, vB);
+
+    // End points and callouts
+    const lastM = P.male[NPY - 1], lastW = P.female[NPY - 1];
+    s("circle", { cx: sx(NPY - 1), cy: syG(lastW), r: 3.5, fill: "var(--female)" }, vB);
+    tx(vB, sx(NPY - 1) + 6, syG(lastW) + 4, `여 ${man(lastW)}`, "vl halo", 12, "start", { style: "fill:var(--female-ink)" });
+    s("circle", { cx: sx(NPY - 1), cy: syG(lastM), r: 3.5, fill: "var(--male)" }, vB);
+    tx(vB, sx(NPY - 1) + 6, syG(lastM) + 4, `남 ${man(lastM)}`, "vl halo", 12, "start", { style: "fill:var(--male-ink)" });
+
+    // Scrubber vertical line synced with player
+    const curX = sx(pos);
+    s("line", { x1: curX, x2: curX, y1: tTop, y2: tBot, stroke: "var(--ink)", "stroke-width": 1.2, "stroke-dasharray": "3 3" }, vB);
+    s("circle", { cx: curX, cy: syG(wVal), r: 3.5, fill: "var(--female)", stroke: "var(--card)", "stroke-width": 1.5 }, vB);
+    s("circle", { cx: curX, cy: syG(mVal), r: 3.5, fill: "var(--male)", stroke: "var(--card)", "stroke-width": 1.5 }, vB);
+
+    // Bottom subchart: Births vs Infertility Patients Ratio (y: 206..348)
+    const bTop = 206, bBot = 348;
+    const syR = (v) => bTop + (1 - v / 140) * (bBot - bTop);
+    tx(vB, 6, 192, "출생아 100명당 난임 진료 환자수 (2010–2023년)", "vl", 12.5, "start");
+    [0, 50, 100].forEach((tk) => {
+      s("line", { x1: l, x2: WB - r, y1: syR(tk), y2: syR(tk), class: tk === 0 ? "ax" : "gl" }, vB);
+      tx(vB, l - 6, syR(tk) + 4, String(tk), "tk", 12, "end");
+    });
+    // 100 parity line (crossover)
+    s("line", { x1: l, x2: WB - r, y1: syR(100), y2: syR(100), stroke: "var(--axis)", "stroke-width": 1.2, "stroke-dasharray": "2 2" }, vB);
+    tx(vB, WB - r + 4, syR(100) - 4, "출생아수 1:1 역전선", "tk", 11, "start");
+
+    (narrowB ? [2010, 2015, 2020, 2023] : [2010, 2012, 2015, 2018, 2021, 2023]).forEach((y) => {
+      const idx = PY.indexOf(y);
+      tx(vB, sx(idx), HB - 8, String(y), "tk", 12, "middle");
+    });
+
+    const dRatio = PY.map((_, i) => `${sx(i).toFixed(1)},${syR(P.ratio_to_birth[i]).toFixed(1)}`).join("L");
+    s("path", { d: `M${sx(0).toFixed(1)},${bBot}L${dRatio}L${sx(NPY - 1).toFixed(1)},${bBot}Z`, fill: "var(--accent)", "fill-opacity": 0.12 }, vB);
+    s("path", { d: "M" + dRatio, fill: "none", stroke: "var(--accent)", "stroke-width": 2.2 }, vB);
+
+    const lastR = P.ratio_to_birth[NPY - 1];
+    s("circle", { cx: sx(NPY - 1), cy: syR(lastR), r: 3.5, fill: "var(--accent)" }, vB);
+    tx(vB, sx(NPY - 1) + 6, syR(lastR) + 4, `${lastR}명`, "vl halo", 12, "start", { style: "fill:var(--accent)" });
+
+    if (pos >= 0 && pos < NPY) {
+      s("line", { x1: curX, x2: curX, y1: bTop, y2: bBot, stroke: "var(--ink)", "stroke-width": 1.1, "stroke-dasharray": "3 3" }, vB);
+      const curRatio = lerp(P.ratio_to_birth, pos);
+      s("circle", { cx: curX, cy: syR(curRatio), r: 4, fill: "var(--accent)", stroke: "var(--card)", "stroke-width": 1.5 }, vB);
+    }
+
+    timeLayer(vB, tipFor(fig), NPY, sx, tTop, bBot, (i) => {
+      const y = PY[i];
+      return [
+        `${y}년 · 난임 진료인원`,
+        [
+          [fmt(P.tot[i]) + "명", "전체 난임 환자"],
+          [fmt(P.male[i]) + "명 (" + P.male_pct[i] + "%)", "남성 난임 환자 (N46)"],
+          [fmt(P.female[i]) + "명", "여성 난임 환자 (N97)"],
+          [fmt(P.births[i]) + "명", "해당 연도 출생아수"],
+          [f1(P.ratio_to_birth[i]) + "명", "출생아 100명당 난임 환자수"]
+        ]
+      ];
+    }, "좌우 화살표로 연도별 성별 난임 인원을 볼 수 있다");
+  }
+
+  table(
+    "t1",
+    ["연도", "전체 난임환자(명)", "남성 환자", "여성 환자", "남성 비중", "35세 이상 비중", "40세 이상 비중", "출생아수", "출생 100명당 난임환자"],
+    PY.map((y, i) => {
+      const tot = P.tot[i], m = P.male[i], w = P.female[i];
+      const over35 = P.by_tier["35–39세"].tot[i] + P.by_tier["40–44세"].tot[i] + P.by_tier["45세 이상"].tot[i];
+      const over40 = P.by_tier["40–44세"].tot[i] + P.by_tier["45세 이상"].tot[i];
+      return [
+        String(y),
+        fmt(tot),
+        fmt(m),
+        fmt(w),
+        P.male_pct[i] + "%",
+        f1(over35 / tot * 100) + "%",
+        f1(over40 / tot * 100) + "%",
+        fmt(P.births[i]),
+        f1(P.ratio_to_birth[i]) + "명"
+      ];
+    })
+  );
+
+  /* ---------- Figure 2: 17-Sido Infertility Garden & Procedures (2018-2022) ---------- */
+  let sort2 = "p22";
+  chips("chips2", [
+    ["p22", "2022년 환자수 순"],
+    ["chg", "2018 대비 증가율 순"],
+    ["c22", "2022년 건수 순"]
+  ], sort2, (k) => { sort2 = k; drawF2(); });
+
+  function drawF2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2");
+    box.replaceChildren();
+    const S = DATA.sido, names = S.names;
+    const list = names.map((name) => {
+      const d = S.data22[name];
+      return { name, p18: d.p18, p22: d.p22, c18: d.c18, c22: d.c22, chg: d.chg_pct };
+    });
+
+    if (sort2 === "p22") list.sort((a, b) => b.p22 - a.p22);
+    else if (sort2 === "chg") list.sort((a, b) => b.chg - a.chg);
+    else list.sort((a, b) => b.c22 - a.c22);
+
+    const W = Math.max(300, box.clientWidth), H = 450, narrow = W < 420;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "17개 시도별 난임시술 환자수와 증감률 가든 차트" }, box);
+
+    const l = narrow ? 76 : 94, r = 70;
+    const rowH = (H - 30) / list.length;
+    const maxP = Math.max(...list.map((x) => x.p22));
+
+    tx(v, l, 16, "시도별 2022년 시술인원 (막대) 및 2018 대비 증감률", "mt", 12, "start");
+
+    const pts = [];
+    list.forEach((item, idx) => {
+      const y = 26 + idx * rowH;
+      const bW = (W - l - r) * (item.p22 / maxP);
+      const isUp = item.chg >= 0;
+      const col = isUp ? (item.chg >= 30 ? "var(--female)" : "var(--a35)") : "var(--male)";
+      const colInk = isUp ? (item.chg >= 30 ? "var(--female-ink)" : "var(--a35-ink)") : "var(--male-ink)";
+
+      tx(v, l - 8, y + rowH * 0.72, item.name, "lb", narrow ? 11.5 : 12.5, "end");
+
+      // Sprout pot marker at start of bar
+      s("rect", { x: l, y: y + 2, width: Math.max(4, bW), height: rowH - 4, rx: 3, fill: col }, v);
+
+      // Value label
+      tx(v, l + bW + 6, y + rowH * 0.72, `${item.chg >= 0 ? "+" : ""}${f1(item.chg)}%`, "tk", 12, "start", { style: `fill:${colInk}` });
+
+      pts.push({
+        x: l + bW / 2, y: y + rowH / 2, r: rowH / 2 + 2,
+        fn: () => [
+          item.name + " · 난임시술(F021)",
+          [
+            [fmt(item.p22) + "명", "2022년 시술 환자"],
+            [fmt(item.c22) + "건", "2022년 시술 진료건수"],
+            [(item.chg >= 0 ? "+" : "") + f1(item.chg) + "%", "2018 대비 환자수 증감"],
+            [fmt(item.p18) + "명", "2018년 시술 환자"]
+          ]
+        ]
+      });
+    });
+
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 17개 시도를 살펴볼 수 있다");
+
+    // KPI Summary
+    const kpi = document.getElementById("kpi2"); kpi.replaceChildren();
+    const tot22 = DATA.f021.patients[4], tot18 = DATA.f021.patients[0];
+    const cases22 = DATA.f021.cases[4];
+    const capitalP = S.data22["경기도"].p22 + S.data22["서울특별시"].p22 + S.data22["인천광역시"].p22;
+    [
+      ["전국 시술 환자 (2022)", fmt(tot22), "명 (+12.1%)"],
+      ["연간 시술 건수 (2022)", man(cases22), "건 (+38.0%)"],
+      ["수도권 3개 시도 몫", f1(capitalP / tot22 * 100) + "%", fmt(capitalP) + "명"],
+      ["시술 1인당 건수", f1(DATA.f021.per_person[4]) + "건", "2018년 6.8건"]
+    ].forEach(([dtT, ddT, smT]) => {
+      const d = document.createElement("div"), dt = document.createElement("dt"), dd = document.createElement("dd");
+      dt.textContent = dtT; dd.textContent = ddT;
+      const sm = document.createElement("small"); sm.textContent = smT; dd.append(sm);
+      d.append(dt, dd); kpi.append(d);
+    });
+
+    const fillOl = (id, arr, fn) => {
+      const ol = document.getElementById(id); ol.replaceChildren();
+      arr.forEach((x) => {
+        const li = document.createElement("li"); li.textContent = x.name;
+        const sp = document.createElement("span"); sp.textContent = fn(x);
+        li.append(sp); ol.append(li);
+      });
+    };
+    const byP = [...list].sort((a, b) => b.p22 - a.p22);
+    const byChg = [...list].sort((a, b) => b.chg - a.chg);
+    fillOl("rk2a", byP.slice(0, 6), (x) => `${fmt(x.p22)}명`);
+    fillOl("rk2b", byChg.slice(0, 6), (x) => `${x.chg >= 0 ? "+" : ""}${f1(x.chg)}%`);
+  }
+  drawF2();
+
+  table(
+    "t2",
+    ["시도명", "2018년 환자(명)", "2022년 환자(명)", "환자수 증감률", "2018년 건수", "2022년 건수", "1인당 건수(2022)"],
+    DATA.sido.names.map((name) => {
+      const d = DATA.sido.data22[name];
+      return [
+        name,
+        fmt(d.p18),
+        fmt(d.p22),
+        (d.chg_pct >= 0 ? "+" : "") + f1(d.chg_pct) + "%",
+        fmt(d.c18),
+        fmt(d.c22),
+        f1(d.c22 / d.p22) + "건"
+      ];
+    })
+  );
+
+  /* ---------- Figure 3: IVF vs IUI & Over-40 Procedures ---------- */
+  function drawF3() {
+    const boxA = document.getElementById("c3a"), boxB = document.getElementById("c3b"), fig = document.getElementById("f3");
+    boxA.replaceChildren(); boxB.replaceChildren();
+    const PR = DATA.procedures, FY = PR.yrs, NFY = FY.length;
+
+    // Panel A: IVF vs IUI Cases (2018-2022)
+    const WA = Math.max(290, boxA.clientWidth), HA = 304, l = 46, r = 86, top = 28, bot = 30;
+    const vA = s("svg", { viewBox: `0 0 ${WA} ${HA}`, role: "img", "aria-label": "2018–2022년 체외수정과 정자주입술 진료건수 추이" }, boxA);
+    const sxA = (i) => l + i / (NFY - 1) * (WA - l - r);
+    const syA = (v) => top + (1 - v / 80000) * (HA - top - bot);
+
+    tx(vA, 6, 16, "시술종류별 진료건수 (2018–2022년)", "vl", 12.5, "start");
+    [0, 20000, 40000, 60000, 80000].forEach((tk) => {
+      s("line", { x1: l, x2: WA - r, y1: syA(tk), y2: syA(tk), class: tk === 0 ? "ax" : "gl" }, vA);
+      tx(vA, l - 6, syA(tk) + 4, tk === 0 ? "0" : tk / 1e4 + "만", "tk", 12, "end");
+    });
+    FY.forEach((y, i) => tx(vA, sxA(i), HA - 8, String(y), "tk", 12, "middle"));
+
+    // IUI line
+    const dIUI = FY.map((_, i) => `${sxA(i).toFixed(1)},${syA(PR.iui[i]).toFixed(1)}`).join("L");
+    s("path", { d: "M" + dIUI, fill: "none", stroke: "var(--iui)", "stroke-width": 2.5 }, vA);
+    const lastIUI = PR.iui[NFY - 1];
+    s("circle", { cx: sxA(NFY - 1), cy: syA(lastIUI), r: 3.5, fill: "var(--iui)" }, vA);
+    tx(vA, sxA(NFY - 1) + 6, syA(lastIUI) + 4, `인공 ${man(lastIUI)}`, "vl halo", 12, "start", { style: "fill:var(--iui)" });
+
+    // IVF line
+    const dIVF = FY.map((_, i) => `${sxA(i).toFixed(1)},${syA(PR.ivf[i]).toFixed(1)}`).join("L");
+    s("path", { d: "M" + dIVF, fill: "none", stroke: "var(--ivf)", "stroke-width": 2.5 }, vA);
+    const lastIVF = PR.ivf[NFY - 1];
+    s("circle", { cx: sxA(NFY - 1), cy: syA(lastIVF), r: 3.5, fill: "var(--ivf)" }, vA);
+    tx(vA, sxA(NFY - 1) + 6, syA(lastIVF) + 4, `시험관 ${man(lastIVF)}`, "vl halo", 12, "start", { style: "fill:var(--ivf)" });
+
+    timeLayer(vA, tipFor(fig), NFY, sxA, top, HA - bot, (i) => {
+      const y = FY[i], tot = PR.iui[i] + PR.ivf[i];
+      return [
+        `${y}년 · 난임시술 구분`,
+        [
+          [fmt(tot) + "건", "총 난임시술 진료건수"],
+          [fmt(PR.iui[i]) + "건 (" + PR.iui_pct[i] + "%)", "인공수정 (정자주입술)"],
+          [fmt(PR.ivf[i]) + "건 (" + PR.ivf_pct[i] + "%)", "체외수정 (시험관아기)"]
+        ]
+      ];
+    }, "좌우 화살표로 시술 종류별 건수를 볼 수 있다");
+
+    // Panel B: Over 40 Pct & Procedures Per Person (2018-2022)
+    const F21 = DATA.f021;
+    const WB = Math.max(290, boxB.clientWidth), HB = 304;
+    const vB = s("svg", { viewBox: `0 0 ${WB} ${HB}`, role: "img", "aria-label": "2018–2022년 난임시술 40세 이상 비중과 1인당 건수 추이" }, boxB);
+    const sxB = (i) => l + i / (NFY - 1) * (WB - l - r);
+    const syB = (v) => top + (1 - (v - 20) / 20) * (HB - top - bot); // 20% to 40%
+
+    tx(vB, 6, 16, "시술 환자 중 40세 이상 비중 (%)", "vl", 12.5, "start");
+    [20, 25, 30, 35, 40].forEach((tk) => {
+      s("line", { x1: l, x2: WB - r, y1: syB(tk), y2: syB(tk), class: tk === 20 ? "ax" : "gl" }, vB);
+      tx(vB, l - 6, syB(tk) + 4, tk + "%", "tk", 12, "end");
+    });
+    FY.forEach((y, i) => tx(vB, sxB(i), HB - 8, String(y), "tk", 12, "middle"));
+
+    const d40 = FY.map((_, i) => `${sxB(i).toFixed(1)},${syB(F21.over40_pct[i]).toFixed(1)}`).join("L");
+    s("path", { d: `M${sxB(0).toFixed(1)},${HB - bot}L${d40}L${sxB(NFY - 1).toFixed(1)},${HB - bot}Z`, fill: "var(--a40)", "fill-opacity": 0.14 }, vB);
+    s("path", { d: "M" + d40, fill: "none", stroke: "var(--a40)", "stroke-width": 2.4 }, vB);
+
+    const last40 = F21.over40_pct[NFY - 1];
+    s("circle", { cx: sxB(NFY - 1), cy: syB(last40), r: 3.5, fill: "var(--a40)" }, vB);
+    tx(vB, sxB(NFY - 1) + 6, syB(last40) + 4, `${f1(last40)}%`, "vl halo", 12, "start", { style: "fill:var(--a40-ink)" });
+
+    timeLayer(vB, tipFor(fig), NFY, sxB, top, HB - bot, (i) => {
+      const y = FY[i];
+      return [
+        `${y}년 · 시술 고령화`,
+        [
+          [f1(F21.over40_pct[i]) + "%", "40세 이상 시술 환자 비중"],
+          [f1(F21.per_person[i]) + "건", "환자 1인당 연간 시술건수"],
+          [fmt(F21.patients[i]) + "명", "전체 난임시술 수급인원"],
+          [fmt(F21.cases[i]) + "건", "전체 난임시술 진료건수"]
+        ]
+      ];
+    }, "좌우 화살표로 40세 이상 비중을 볼 수 있다");
+  }
+  drawF3();
+
+  table(
+    "t3",
+    ["연도", "난임시술 환자수", "총 시술건수", "1인당 건수", "체외수정 건수", "정자주입술 건수", "40세 이상 환자수", "40세 이상 비중"],
+    DATA.f021.yrs.map((y, i) => {
+      const p = DATA.f021.patients[i], c = DATA.f021.cases[i];
+      const ivf = DATA.procedures.ivf[i], iui = DATA.procedures.iui[i];
+      const p40 = DATA.f021.by_tier["40–44세"].patients[i] + DATA.f021.by_tier["45세 이상"].patients[i];
+      return [
+        String(y),
+        fmt(p),
+        fmt(c),
+        f1(c / p) + "건",
+        fmt(ivf) + ` (${DATA.procedures.ivf_pct[i]}%)`,
+        fmt(iui) + ` (${DATA.procedures.iui_pct[i]}%)`,
+        fmt(p40) + "명",
+        DATA.f021.over40_pct[i] + "%"
+      ];
+    })
+  );
+
+  const p1 = Player("p1", "씨앗 화분 재생", drawF1, NPY, (i) => String(PY[i]), 8);
+  const renderAll = () => { p1.render(); drawF2(); drawF3(); };
+  renderAll();
+  onResize(renderAll);
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+// East Asia frame for typhoon tracks: land from world-atlas 50m, conic conformal centred on Korea.
+import fs from 'fs';
+import * as topo from 'topojson-client';
+import { geoConicConformal, geoPath, geoCircle } from 'd3-geo';
+import * as simp from 'topojson-simplify';
+const W = 560, H = 640;
+const T0 = JSON.parse(fs.readFileSync('node_modules/world-atlas/land-50m.json')); const T1 = simp.presimplify(T0); const land = topo.feature(simp.simplify(T1, simp.quantile(T1, +(process.argv[4] || 0.5))), 'land');
+const proj = geoConicConformal().parallels([25, 40]).rotate([-127, 0]).center([0, 31.5]).fitExtent([[0, 0], [W, H]], { type: 'MultiPoint', coordinates: [[108, 15], [148, 15], [108, 47], [148, 47]] }).clipExtent([[-4, -4], [W + 4, H + 4]]);
+const clip = { type: 'Polygon', coordinates: [[[100, 8], [100, 55], [158, 55], [158, 8], [100, 8]]] };
+const path = geoPath(proj);
+const r1 = (n) => Math.round(n * 10) / 10, r0 = (n) => Math.round(n);
+const shrink = (d) => d.replace(/-?\d+\.\d+/g, (m) => String(r1(+m)));
+const d = path(land).replace(/-?\d+\.\d+/g, (m) => String(r0(+m)));
+const D = JSON.parse(fs.readFileSync(process.argv[2]));
+const P = (lat, lon) => proj([lon, lat]).map(r1);
+D.ty.forEach((o) => { if (o.trk) { o.xy = o.trk.map(([la, lo, p]) => [...P(la, lo), p]); delete o.trk; } if (o.near) { const [x, y] = P(o.near.lat, o.near.lon); o.near.x = x; o.near.y = y; } });
+const grat = [];
+for (let lat = 20; lat <= 45; lat += 5) grat.push({ lat, d: shrink(path({ type: 'LineString', coordinates: Array.from({ length: 61 }, (_, i) => [100 + i, lat]) })) });
+for (let lon = 110; lon <= 145; lon += 5) grat.push({ lon, d: shrink(path({ type: 'LineString', coordinates: Array.from({ length: 51 }, (_, i) => [lon, 8 + i]) })) });
+D.map = { W, H, land: d, grat, r400: shrink(path(geoCircle().center([D.ref[1], D.ref[0]]).radius(400 / 111.195).precision(2)())), ref: P(D.ref[0], D.ref[1]), labels: [['한국', ...P(36.4, 127.9)], ['일본', ...P(36.2, 138.6)], ['중국', ...P(33, 113)], ['타이완', ...P(23.7, 121)], ['필리핀', ...P(16.5, 121)]] };
+fs.writeFileSync(process.argv[3], JSON.stringify(D));
+console.log(d.length, JSON.stringify(D).length);

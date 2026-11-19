@@ -1,0 +1,325 @@
+<title>키재기 벽</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a door frame at home where children's heights are pencilled in. The wall is drawn at real scale
+   (1 cm on the wall = 1 CSS cm), so the 2016 and 2025 marks sit as far apart as they would on a real door. */
+:root {
+  --paper: #f5efe6; --card: #fcf9f4; --ink: #4c433e; --ink2: #5a5551; --muted: #5f6062; --line: #e2ccb5; --grid: #efe3d2; --axis: #b8ac9c;
+  --ghost: #bcbbb6; --board: #4c433e; --board-ink: #ebdac0; --accent: #3e6f90;
+  --wall: #ebdac0; --wall2: #e2ccb5; --frame: #b87b68; --frame2: #8b4d3e; --tape: #ebcfa7; --pencil: #928a7f;
+  --boy: #3e6f90; --boy2: #8eabc9; --girl: #953a4c; --girl2: #d6b0a7; --old: #928a7f;
+  --sans: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #23201d; --card: #2d2925; --ink: #ebdac0; --ink2: #e2ccb5; --muted: #b8ac9c; --line: #4c433e; --grid: #38322d; --axis: #5a5551;
+  --ghost: #5a5551; --board: #171513; --board-ink: #ebdac0; --accent: #8eabc9;
+  --wall: #4c433e; --wall2: #5a5551; --frame: #8b4d3e; --frame2: #67453c; --tape: #b6a392; --pencil: #bcbbb6;
+  --boy: #8eabc9; --boy2: #3e6f90; --girl: #d6b0a7; --girl2: #953a4c; --old: #b8ac9c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #23201d; --card: #2d2925; --ink: #ebdac0; --ink2: #e2ccb5; --muted: #b8ac9c; --line: #4c433e; --grid: #38322d; --axis: #5a5551;
+  --ghost: #5a5551; --board: #171513; --board-ink: #ebdac0; --accent: #8eabc9;
+  --wall: #4c433e; --wall2: #5a5551; --frame: #8b4d3e; --frame2: #67453c; --tape: #b6a392; --pencil: #bcbbb6;
+  --boy: #8eabc9; --boy2: #3e6f90; --girl: #d6b0a7; --girl2: #953a4c; --old: #b8ac9c; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h, .ft { font-family: var(--serif); font-weight: 700 }
+h1 { font-size: clamp(34px, 6vw, 56px); letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-size: 19px }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.yr { background-image: none; font-family: var(--serif); font-size: 26px }
+.wallbox { overflow: hidden; border-radius: 10px }
+.grades { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; max-width: 34rem }
+.grades .chip { padding: 6px 4px; font-variant-numeric: tabular-nums }
+.mk { font-family: var(--mono); font-weight: 600 }
+</style>
+
+<main class="page">
+  <header>
+    <h1>아이들 키는 계속 커질까<span>커진다. 다만 아주 천천히, 9년에 1cm 남짓. 사는 곳에 따른 차이는 1cm도 안 된다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 15</dd>
+      <dt>한 줄</dt><dd>학생건강검사 원자료로 2016년과 2025년의 같은 학년을 견주면 12개 학년 모두 2025년이 0.2–1.6cm 크다. 고3 남학생은 173.4cm에서 174.4cm, 여학생은 160.8cm에서 161.8cm가 됐다. 키가 한창 크는 중1–중2 남학생이 가장 많이(1.6cm) 커졌다. 시도별 평균 차이는 가장 큰 서울과 가장 작은 제주 사이에도 0.8cm다.</dd>
+      <dt>분류</dt><dd>건강·복지·교육</dd>
+      <dt>본능</dt><dd>직선 본능 · 부모 세대보다 훨씬 커진 경험을 앞으로도 같은 속도로 이어질 것처럼 여긴다</dd>
+      <dt>그림 방식</dt><dd>실제 크기의 키재기 벽 · 화면의 1cm가 벽의 1cm가 되도록 그린 문틀에 2016년과 2025년 평균 키를 긋고, 초1부터 고3까지 학년을 골라 본다</dd>
+      <dt>기간</dt><dd>원자료 2016·2025년 · 참고 계열 2010–2023년</dd>
+      <dt>엮은 데이터</dt><dd>3개 · 교육부 학생건강검사 키 원자료(2016) · 학생건강검사 표본조사 원시자료(2025) · e-나라지표 학생 평균 키(교육부, 2차 자료)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">고3 남학생 평균 키는 2016년 173.4cm였다. 9년 뒤 2025년에는?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>173cm 아래로 줄었다</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>B</i>1cm쯤 컸다</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>3cm 넘게 컸다</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">B. <span class="n">174.4cm</span>, 1.0cm 컸다</span>
+      여학생도 160.8cm에서 161.8cm로 1.0cm 컸다. 커지는 속도는 1년에 0.1cm꼴로, 부모 세대 때보다 훨씬 느리다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">문틀에 그은 두 개의 선</h2>
+      <p>집 문틀에 아이 키를 연필로 긋듯, 학년마다 2016년(회색)과 2025년(색) 평균 키를 그었다. 이 벽은 실제 크기다. 화면의 1cm가 벽의 1cm다(기기 설정에 따라 조금 다를 수 있다). 학년을 고르면 그 학년의 2016년 선은 늘 같은 자리에 두고, 2025년 선이 그 위로 얼마나 올라오는지만 보여 준다. 두 선 사이 간격이 9년 동안 커진 키다. 어느 학년에서도 손가락 한 마디를 넘지 않는다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">실제 크기 키재기 벽, 학년별 평균 키</p>
+      <p class="fs">학년을 고르면 그 학년의 문틀을 실제 크기로 확대한다. 회색 점선 = 2016년, 색 선 = 2025년. 왼쪽은 문틀 전체를 줄여 그린 것으로, 네모 친 곳이 확대한 자리다</p>
+      <div class="grades" id="g1" role="group" aria-label="학년 고르기"></div>
+      <div class="chart wallbox" id="c1"></div>
+      <figcaption>교육부 「학생건강검사 키 원자료」(2016, 8만 2,883명), 「학생건강검사 표본조사 원시자료」(2025, 9만 2,620명, 최종가중치 적용).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">12개 학년 모두 조금씩 컸다</h2>
+      <p>학년마다 9년 동안 커진 키를 이었다. 남학생은 중1–중2에서 1.6cm로 가장 많이 컸고, 초2는 0.2cm로 거의 그대로다. 여학생은 초4(1.2cm)에서 가장 많이 컸다. 고3 무렵 다 자란 키는 남녀 모두 1.0cm 커졌다. 사춘기가 조금 일찍 오는 경향과 다 자란 키가 조금 커진 것이 함께 보인다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">학년별 평균 키, 2016년과 2025년</p>
+      <p class="fs">가로 막대와 오른쪽 숫자 = 2016년보다 2025년에 커진 키(cm). 평균 키는 표에 있다</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>교육부 학생건강검사 원자료. 2016년 자료에는 가중치가 없어 단순 평균, 2025년은 가중 평균이다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">사는 곳에 따른 차이는 1cm도 안 된다</h2>
+      <p>2025년 시도마다 같은 학년·성별의 전국 평균보다 얼마나 큰지(작은지)를 평균했다. 서울(+0.34cm)과 대구(+0.33cm)가 가장 크고 제주(−0.47cm)가 가장 작지만, 두 끝의 차이도 0.8cm다. 대도시·중소도시(+0.05cm)와 면·도서벽지(−0.29cm)의 차이도 3mm 남짓이다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">시도별 키, 전국 평균과의 차이(2025년)</p>
+      <p class="fs">mm. 학년·성별마다 전국 평균을 뺀 값을 학생 수로 가중 평균</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>교육부 「학생건강검사 표본조사 원시자료」(2025). 표본조사라 시도별 값에는 몇 mm의 표본오차가 있다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">참고: 고등학생 평균 키 14년</h2>
+      <p>e-나라지표에 실린 교육부 표본통계의 고등학생 평균 키는 2010년 남 171.8cm·여 160.6cm에서 2023년 남 174.3cm·여 161.7cm다. 남학생은 2.5cm, 여학생은 1.1cm 커졌다. 다만 이 계열은 학교급 평균이고 해마다 표본 구성이 달라, 해와 해 사이의 작은 오르내림은 크게 의미 두지 않는 것이 좋다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">고등학생 평균 키, 2010–2023년 (2차 자료)</p>
+      <p class="fs">cm. 2020년은 코로나로 조사하지 않았다</p>
+      <div class="player" id="p4"></div>
+      <div class="chart" id="c4"></div>
+      <figcaption>e-나라지표 「학생 평균 키」(교육부 학생건강검사 표본통계). 초등·중등 계열은 2013·2017·2023년에 집계 방식이 바뀐 듯 크게 뛰어 싣지 않았다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 아이들 키는 계속 커질까</h2>
+      <p>아직은 커지고 있다. 그러나 부모 세대가 겪은 것처럼 10년에 몇 cm씩 크는 시대는 지났다. 2016년부터 2025년까지 9년 동안 고3의 키는 1cm 컸다. 지역에 따른 차이는 그보다 더 작다. 키의 시대적 성장은 끝을 향해 가는 곡선 위에 있다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>2016년 원자료(공공데이터포털 15051016)는 학년·성별·키만 있고 가중치가 없다. 2025년 표본조사 원시자료는 최종가중치를 적용했다. 조사 설계가 다른 두 자료라 학년별 0.1–0.3cm 차이는 설계 차이일 수 있다.</li>
+      <li>공공데이터포털에는 해마다 이전 연도 원자료가 남지 않아, 2016년과 2025년 두 시점만 원자료로 견줬다. 그 사이의 흐름은 e-나라지표(2차 자료)로 보였다.</li>
+      <li>"실제 크기"는 CSS 1cm(약 38픽셀) 기준이다. 휴대폰·모니터의 화면 배율에 따라 실제 자로 잰 길이와 다를 수 있다.</li>
+      <li>평균 키 비교라 개인의 키 분포(작은 아이·큰 아이의 비율)는 보여 주지 않는다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15051016/fileData.do" target="_blank" rel="noopener">학생건강검사 키 rawdata</a> (15051016)</td><td>교육부</td><td>학년·성별 키 8만 2,883명</td><td>2016</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15100360/fileData.do" target="_blank" rel="noopener">학생건강검사 표본조사 rawdata</a> (15100360)</td><td>교육부</td><td>학년·성별·시도·도시규모별 키와 최종가중치 9만 2,620명</td><td>2025</td></tr>
+        <tr><td><a href="https://www.index.go.kr/unify/idx-info.do?idxCd=1540" target="_blank" rel="noopener">학생 평균 키</a> (e-나라지표, 2차 자료)</td><td>교육부</td><td>고등학생 평균 키</td><td>2010–2023</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>원자료 2개(17만 5천 명) · 참고 계열 1개</dd>
+      <dt>도구</dt><dd>Python(집계) · 실제 크기 SVG(CSS cm 단위)와 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>학년·성별 평균(2025년 가중) · 학년·성별을 맞춘 시도 차이</dd>
+      <dt>검증</dt><dd>2025년 원자료의 학년·성별 가중 평균(예: 중3 남 170.9cm)을 e-나라지표 계열의 최근 값과 견줘 같은 범위인지 확인했다. 키 80cm 미만·220cm 초과 입력값은 오류로 보고 뺐다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>아이들은 더 무거워졌을까</h3><p>같은 원자료의 몸무게와 체질량지수로 비만 학생 비율의 변화를 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15100360/fileData.do" target="_blank" rel="noopener">학생건강검사 표본조사 rawdata</a> · 교육부</li></ul></div>
+      <div class="q"><h3>안경 쓰는 아이는 몇 학년부터 늘까</h3><p>같은 자료의 나안 시력으로 학년별 시력 저하를 볼 수 있다.</p></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다(2차 자료는 표시) · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const GL = ["초1", "초2", "초3", "초4", "초5", "초6", "중1", "중2", "중3", "고1", "고2", "고3"];
+  const H = (y, g, s) => DATA[y === 16 ? "m16" : "m25"][`${g}|${s}`];
+  const PX = 96 / 2.54; // CSS px per cm
+
+  /* ---------- 1. the real-scale wall ---------- */
+  // One grade at a time, picked by the reader. The window never moves: the 2016 mark always sits at the same
+  // height, so the only thing that changes between grades is the gap to the 2025 mark.
+  const LO = 2.5, HI = 4, HEAD = 34;
+  let grade = 11, anim = 0;
+  function c1(t = 1) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 520, g = grade + 1;
+    const Hw = (LO + HI) * PX, Ht = HEAD + Hw;
+    const v = s("svg", { viewBox: `0 0 ${W} ${Ht}`, width: W, height: Ht, role: "img", "aria-label": `${GL[grade]} 평균 키 실제 크기 벽. 남학생 2016년 ${f1(H(16, g, "남"))}cm, 2025년 ${f1(H(25, g, "남"))}cm, 여학생 2016년 ${f1(H(16, g, "여"))}cm, 2025년 ${f1(H(25, g, "여"))}cm` }, box);
+    s("rect", { x: 0, y: 0, width: W, height: Ht, fill: "var(--wall)" }, v);
+    for (let i = 0; i < W; i += 46) s("rect", { x: i, y: HEAD, width: 23, height: Hw, fill: "var(--wall2)", opacity: .35 }, v);
+    const lab = (x, y_, str, size, anchor, col, cls = "mk") => tx(v, x, y_, str, cls + " halo", size, anchor, { style: `fill:${col};stroke:var(--wall)`, "stroke-width": 4 });
+
+    // whole door (not to scale): where on the door this grade sits
+    const ow = narrow ? 66 : 118, g0 = 108, g1 = 182, oy = (cm) => HEAD + (g1 - cm) / (g1 - g0) * Hw, ox = narrow ? 32 : 50, odw = ow - ox - 8;
+    lab(6, 22, narrow ? "문틀 전체" : "문틀 전체 (축소)", 11.5, "start", "var(--ink2)", "vl");
+    s("rect", { x: ox, y: HEAD, width: odw, height: Hw, fill: "var(--tape)", opacity: .55 }, v);
+    s("rect", { x: ox - 6, y: HEAD, width: 6, height: Hw, fill: "var(--frame)" }, v);
+    for (let cm = 110; cm <= 180; cm += 10) { s("line", { x1: ox, x2: ox + 5, y1: oy(cm), y2: oy(cm), stroke: "var(--ink)", "stroke-width": .8 }, v); lab(ox - 9, oy(cm) + 4, String(cm), 11.5, "end", "var(--ink2)"); }
+    ["남", "여"].forEach((sx_, k) => {
+      const col = sx_ === "남" ? "var(--boy)" : "var(--girl)", xa = ox + 3 + k * odw / 2, xb = xa + odw / 2 - 6;
+      for (let i = 1; i <= 12; i++) s("line", { x1: xa, x2: xb, y1: oy(H(25, i, sx_)), y2: oy(H(25, i, sx_)), stroke: col, "stroke-width": 1, opacity: .45 }, v);
+      const b = H(16, g, sx_); s("rect", { x: xa - 2, y: oy(b + HI), width: xb - xa + 4, height: oy(b - LO) - oy(b + HI), fill: "none", stroke: col, "stroke-width": 2, rx: 2 }, v);
+    });
+
+    // two magnified panels at real scale: boys, girls
+    const gap = narrow ? 10 : 18, px0 = ow + gap, pw = (W - px0 - 4 - gap) / 2, tw = narrow ? 26 : 34, pts = [];
+    ["남", "여"].forEach((sx_, k) => {
+      const x0 = px0 + k * (pw + gap), col = sx_ === "남" ? "var(--boy)" : "var(--girl)", base = H(16, g, sx_), now = H(25, g, sx_), d = now - base;
+      const y = (cm) => HEAD + (base + HI - cm) * PX;
+      s("rect", { x: x0, y: HEAD, width: pw, height: Hw, fill: "var(--wall)", stroke: col, "stroke-width": 2, rx: 3 }, v);
+      lab(x0, 22, `${sx_ === "남" ? "남학생" : "여학생"} +${f1(d)}cm`, narrow ? 13 : 15, "start", col, "vl");
+      s("rect", { x: x0 + 1, y: HEAD + 1, width: tw, height: Hw - 2, fill: "var(--tape)" }, v);
+      for (let mm = Math.ceil((base - LO) * 10); mm <= Math.floor((base + HI) * 10); mm++) {
+        const yy = y(mm / 10), m = ((mm % 10) + 10) % 10, len = m === 0 ? tw * .8 : m === 5 ? tw * .5 : tw * .28;
+        s("line", { x1: x0 + 1, x2: x0 + 1 + len, y1: yy, y2: yy, stroke: "var(--ink)", "stroke-width": m === 0 ? 1.3 : .6 }, v);
+        if (m === 0 && yy > HEAD + 14 && yy < Ht - 4) tx(v, x0 + tw - 1, yy + 12, String(mm / 10), "mk", 11.5, "end", { style: "fill:var(--ink)" });
+      }
+      const lx0 = x0 + tw - 4, lx1 = x0 + pw - 6, yNow = y(base + d * t);
+      s("line", { x1: lx0, x2: lx1, y1: y(base), y2: y(base), stroke: "var(--old)", "stroke-width": 2, "stroke-linecap": "round", "stroke-dasharray": "6 4" }, v);
+      lab(x0 + tw + 6, y(base) + 16, `2016 ${f1(base)}`, 11.5, "start", "var(--ink2)");
+      s("line", { x1: lx0, x2: lx1, y1: yNow, y2: yNow, stroke: col, "stroke-width": 3, "stroke-linecap": "round" }, v);
+      lab(x0 + tw + 6, yNow - 6, `2025 ${f1(now)}`, narrow ? 11.5 : 13, "start", col);
+      // bracket that measures the gap, with a small face sticker on the 2025 mark
+      const bx = lx1 - 4; if (d * t * PX > 4) s("path", { d: `M${bx - 5},${yNow} h5 V${y(base)} h-5`, fill: "none", stroke: col, "stroke-width": 1.4 }, v);
+      const fx_ = lx1 - 20, rr = 9;
+      if (!narrow) {
+      s("circle", { cx: fx_, cy: yNow, r: rr, fill: sx_ === "남" ? "var(--boy2)" : "var(--girl2)", stroke: col, "stroke-width": 2 }, v);
+      s("circle", { cx: fx_ - 3.2, cy: yNow - 1, r: 1.4, fill: "var(--ink)" }, v); s("circle", { cx: fx_ + 3.2, cy: yNow - 1, r: 1.4, fill: "var(--ink)" }, v);
+      s("path", { d: `M${fx_ - 3},${yNow + 3.2} q3,2.6 6,0`, fill: "none", stroke: "var(--ink)", "stroke-width": 1.2, "stroke-linecap": "round" }, v);
+      }
+      pts.push({ x: (lx0 + lx1) / 2, y: y(base), r: 4, fn: () => [`${GL[grade]} · 2016 ${sx_}학생`, [[f1(base) + "cm", "평균 키"]]] });
+      pts.push({ x: (lx0 + lx1) / 2, y: y(now), r: 4, fn: () => [`${GL[grade]} · 2025 ${sx_}학생`, [[f1(now) + "cm", "평균 키"], ["+" + f1(d) + "cm", "2016년보다"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 선을 하나씩 볼 수 있다");
+  }
+  function pickGrade(i) {
+    grade = i; cancelAnimationFrame(anim);
+    if (reduce) return c1(1);
+    const t0 = performance.now(), step = (now) => { const t = Math.min(1, (now - t0) / 700); c1(1 - Math.pow(1 - t, 3)); if (t < 1) anim = requestAnimationFrame(step); };
+    anim = requestAnimationFrame(step);
+  }
+  (() => {
+    const box = document.getElementById("g1");
+    GL.forEach((name, i) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = name; b.setAttribute("aria-pressed", i === grade); b.addEventListener("click", () => { box.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === b)); pickGrade(i); }); box.append(b); });
+  })();
+  table("t1", ["학년", "남 2016", "남 2025", "차이", "여 2016", "여 2025", "차이"], GL.map((g, i) => [g, f1(H(16, i + 1, "남")), f1(H(25, i + 1, "남")), f1(H(25, i + 1, "남") - H(16, i + 1, "남")), f1(H(16, i + 1, "여")), f1(H(25, i + 1, "여")), f1(H(25, i + 1, "여") - H(16, i + 1, "여"))]));
+
+  /* ---------- 2. dumbbells by grade ---------- */
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, cols = narrow ? 1 : 2, cw = W / cols, rowH = 24, top = 42, Hh = top + 12 * rowH + 8, Ht = Hh * (narrow ? 2 : 1);
+    const v = s("svg", { viewBox: `0 0 ${W} ${Ht}`, role: "img", "aria-label": "학년별 평균 키 2016년과 2025년" }, box), pts = [];
+    ["남", "여"].forEach((sx_, k) => {
+      const ox = narrow ? 0 : k * cw, oy = narrow ? k * Hh : 0, l = ox + 40, r = ox + cw - 54, col = sx_ === "남" ? "var(--boy)" : "var(--girl)";
+      tx(v, ox, oy + 16, sx_ === "남" ? "남학생" : "여학생", "vl", 14, "start", { style: `fill:${col}` });
+      const sxx = (d) => l + d / 2 * (r - l);
+      [0, 1, 2].forEach((t) => { s("line", { x1: sxx(t), x2: sxx(t), y1: oy + top - 4, y2: oy + Hh - 6, class: t ? "gl" : "ax" }, v); tx(v, sxx(t), oy + top - 6, `+${t}cm`, "tk", 11, "middle"); });
+      GL.forEach((g, i) => {
+        const yy = oy + top + i * rowH + rowH / 2, a = H(16, i + 1, sx_), b = H(25, i + 1, sx_), d = b - a;
+        s("rect", { x: l, y: yy - 6, width: Math.max(1, sxx(d) - l), height: 12, rx: 3, fill: col, opacity: .75 }, v);
+        tx(v, l - 6, yy + 4, g, "lb", 12, "end");
+        tx(v, r + 6, yy + 4, `+${f1(d)}`, d >= 1.2 ? "vl" : "tk", 11.5, "start");
+        pts.push({ x: sxx(d), y: yy, r: 6, fn: () => [`${g} ${sx_}학생`, [[f1(a) + "cm", "2016년"], [f1(b) + "cm", "2025년"], ["+" + f1(d) + "cm", "차이"]]] });
+      });
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 학년을 옮겨 볼 수 있다");
+  }
+  table("t2", ["학년", "남 차이(cm)", "여 차이(cm)", "남 표본 2016/2025", "여 표본 2016/2025"], GL.map((g, i) => [g, f1(H(25, i + 1, "남") - H(16, i + 1, "남")), f1(H(25, i + 1, "여") - H(16, i + 1, "여")), `${fmt(DATA.n16[`${i + 1}|남`])}/${fmt(DATA.n25[`${i + 1}|남`])}`, `${fmt(DATA.n16[`${i + 1}|여`])}/${fmt(DATA.n25[`${i + 1}|여`])}`]));
+
+  /* ---------- 3. regions ---------- */
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const S = Object.entries(DATA.sido).sort((a, b) => b[1] - a[1]), Z = Object.entries(DATA.size);
+    const W = Math.max(300, box.clientWidth), l = 90, r = 50, rowH = 22, top = 20, H_ = top + (S.length + Z.length + 1) * rowH + 24;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H_}`, role: "img", "aria-label": "시도별 키 전국 평균과의 차이 2025" }, box), pts = [];
+    const sx = (mm) => l + (mm + 6) / 12 * (W - l - r);
+    [-5, 0, 5].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top - 6, y2: H_ - 22, class: t ? "gl" : "ax" }, v); tx(v, sx(t), H_ - 6, `${t > 0 ? "+" : ""}${t}mm`, "tk", 11.5, "middle"); });
+    [...S, ["", null], ...Z].forEach(([k, val], j) => {
+      if (val == null) return; const yy = top + j * rowH + rowH / 2, mm = val * 10;
+      s("rect", { x: Math.min(sx(0), sx(mm)), y: yy - 6, width: Math.abs(sx(mm) - sx(0)), height: 12, rx: 3, fill: mm >= 0 ? "var(--boy)" : "var(--frame)", opacity: .8 }, v);
+      tx(v, l - 8, yy + 4, k, "lb", 12, "end"); tx(v, W - 4, yy + 4, `${mm >= 0 ? "+" : ""}${f1(mm)}mm`, "tk", 11.5, "end");
+      pts.push({ x: sx(mm), y: yy, r: 6, fn: () => [k, [[`${mm >= 0 ? "+" : ""}${f1(mm)}mm`, "같은 학년·성별 전국 평균 대비"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 지역을 옮겨 볼 수 있다");
+    table("t3", ["지역", "전국 평균과의 차이(mm)"], [...S, ...Z].map(([k, val]) => [k, f1(val * 10)]));
+  }
+
+  /* ---------- 4. secondary series ---------- */
+  const EY = Object.keys(DATA.enara["고등-남"]).sort(), NE = EY.length;
+  function c4(pos) {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), Hh = Math.min(300, Math.max(220, W * .38)), l = 40, r = 70, top = 14, bot = 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${Hh}`, role: "img", "aria-label": "고등학생 평균 키 2010–2023" }, box);
+    const y0 = 2010, y1 = 2023, sx = (y) => l + (y - y0) / (y1 - y0) * (W - l - r), sy = (cm) => top + (1 - (cm - 158) / 18) * (Hh - top - bot);
+    [160, 165, 170, 175].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: "gl" }, v); tx(v, l - 6, sy(t) + 4, t, "tk", 11.5, "end"); });
+    [2010, 2014, 2018, 2023].forEach((yy) => tx(v, sx(yy), Hh - 6, String(yy), "tk", 11.5, "middle"));
+    const k = Math.min(NE - 1, Math.round(pos)), pts = [];
+    [["고등-남", "var(--boy)", "남"], ["고등-여", "var(--girl)", "여"]].forEach(([key, col, nm]) => {
+      const ys = EY.slice(0, k + 1), d = DATA.enara[key];
+      s("path", { d: "M" + ys.map((yy) => `${sx(+yy).toFixed(1)},${sy(d[yy]).toFixed(1)}`).join("L"), fill: "none", stroke: col, "stroke-width": 2.6, "stroke-linejoin": "round" }, v);
+      ys.forEach((yy) => { s("circle", { cx: sx(+yy), cy: sy(d[yy]), r: 3, fill: col }, v); pts.push({ x: sx(+yy), y: sy(d[yy]), r: 3, fn: () => [`${yy}년 고등학생 ${nm}`, [[f1(d[yy]) + "cm", "평균 키"]]] }); });
+      const ly = ys[ys.length - 1]; tx(v, sx(+ly) + 8, sy(d[ly]) + 4, `${nm} ${f1(d[ly])}`, "vl halo", 12.5, "start", { style: `fill:${col}`, "stroke-width": 4 });
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 해를 옮겨 볼 수 있다");
+  }
+  table("t4", ["연도", "고등 남", "고등 여"], EY.map((yy) => [yy, f1(DATA.enara["고등-남"][yy]), f1(DATA.enara["고등-여"][yy])]));
+
+  const p4 = Player("p4", "고등학생 키", c4, NE, (i) => EY[i], 6);
+  const all = () => { c1(); c2(); c3(); p4.render(); };
+  all(); onResize(all);
+})();
+</script>

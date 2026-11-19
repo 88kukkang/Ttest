@@ -1,0 +1,303 @@
+<title>한글 별자리</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a night-sky world map where every country with a King Sejong Institute is a Hangul letter whose size is the
+   number of students (played 2021-2025), linked to Korea like a constellation. Then stacked bars by region with the
+   share outside Asia, a slope of the top countries from 2021 to 2025, a "pick a country" card, and the monthly
+   downloads of the learning apps in 2025. */
+:root {
+  --paper: #f4f2ec; --card: #fcfbf7; --ink: #2c2c2a; --ink2: #494843; --muted: #5d5b55; --line: #e1ddd3; --grid: #eae7de; --axis: #a7a8a3;
+  --accent: #4e6aa9; --intl: #4e6aa9; --board: #2c2c2a; --board-ink: #f4f2ec; --sea: #fcfbf7;
+  --sky: #1f2a44; --sky-land: #2e3b58; --sky-line: #3e4d6e; --star: #ebcfa7; --star2: #f4f2ec; --kor: #d56b41; --sky-ink: #dcd9cf;
+  --r0: #3e6f90; --r1: #689daf; --r2: #8ab5bb; --r3: #4e6aa9; --r4: #80a15a; --r5: #d56b41; --r6: #b87b68; --r7: #9b3737; --r8: #939594;
+  --hi: #d56b41; --hi-ink: #a8451f;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #191a1d; --card: #232428; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #383a3e; --grid: #2d2f33; --axis: #62635d;
+  --accent: #8eabc9; --intl: #8eabc9; --board: #dcd9cf; --board-ink: #191a1d; --sea: #232428;
+  --sky: #12182a; --sky-land: #232c44; --sky-line: #34405e;
+  --r0: #689daf; --r1: #8ab5bb; --r2: #a7c4c2; --r3: #8eabc9; --r4: #abc07b; --r5: #dc8c67; --r6: #cd9886; --r7: #e0908a; --r8: #a7a8a3;
+  --hi: #dc8c67; --hi-ink: #e7a08a; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #191a1d; --card: #232428; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #383a3e; --grid: #2d2f33; --axis: #62635d;
+  --accent: #8eabc9; --intl: #8eabc9; --board: #dcd9cf; --board-ink: #191a1d; --sea: #232428;
+  --sky: #12182a; --sky-land: #232c44; --sky-line: #34405e;
+  --r0: #689daf; --r1: #8ab5bb; --r2: #a7c4c2; --r3: #8eabc9; --r4: #abc07b; --r5: #dc8c67; --r6: #cd9886; --r7: #e0908a; --r8: #a7a8a3;
+  --hi: #dc8c67; --hi-ink: #e7a08a; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.hi-ink { fill: var(--hi-ink) } .skyl { fill: var(--sky-ink); font-family: var(--sans) } .skyv { fill: var(--star2); font-family: var(--sans); font-weight: 700 }
+::selection { background: var(--star); color: #191a1d }
+.pickc { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; color: var(--ink2) }
+.pickc select { font: inherit; font-size: 16px; color: var(--ink); background: var(--paper); border: 1px solid var(--axis); border-radius: 10px; padding: 8px 12px; min-height: 46px }
+.ccard { border: 1px solid var(--line); border-left: 4px solid var(--hi); border-radius: 10px; padding: 12px 16px; background: var(--paper); display: grid; gap: 4px; font-size: 14px; color: var(--ink2) }
+.ccard .nm { font-weight: 700; font-size: 17px; color: var(--ink) } .ccard .bigv { font: 600 28px/1.2 var(--mono); color: var(--ink); font-variant-numeric: tabular-nums } .ccard p { margin: 0 }
+.twinkle { animation: tw 2.6s ease-in-out infinite }
+@keyframes tw { 0%, 100% { opacity: 1 } 50% { opacity: .55 } }
+@media (prefers-reduced-motion: reduce) { .twinkle { animation: none } }
+</style>
+
+<main class="page">
+  <header>
+    <h1>한국어는 어느 나라에서 배울까<span>러시아와 베트남이다. 2025년 세종학당 수강생 12만 3,427명 가운데 러시아가 2만 2,410명(18.2%), 베트남이 1만 7,821명(14.4%)으로 둘이 셋 중 하나다. 아시아 밖의 수강생도 늘었다. 미국은 4년 사이 두 배(3,820명→7,974명)가 됐다. 하지만 러시아와 중앙아시아가 더 빨리 늘어, 아시아 밖의 몫은 2021년 38.7%에서 2025년 34.1%로 오히려 줄었다.</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 49</dd>
+      <dt>한 줄</dt><dd>세종학당재단의 국가별 수강생 수로 보면 전체는 2021년 8만 1,476명에서 2025년 12만 3,427명으로 51% 늘었다. 러시아·중앙아시아가 1만 5,096명에서 3만 5,722명(+137%)으로 가장 많이 늘었고, 북미는 두 배(+113%), 유럽은 29% 늘었다. 러시아는 2024년 6,032명에서 2025년 2만 2,410명으로 한 해에 세 배가 넘었다.</dd>
+      <dt>분류</dt><dd>생활·문화</dd>
+      <dt>본능</dt><dd>직선 본능 · 케이팝을 따라 한국어 배우기가 서쪽 나라들로 퍼져 나간다고 그리지만, 숫자는 가까운 아시아와 러시아에서 더 크게 자란다</dd>
+      <dt>그림 방식</dt><dd>한글 별자리 · 밤하늘 세계지도에 나라마다 한글 자모 별을 띄운다(별 크기 = 수강생, 2021–2025년 재생). 지역별 쌓인 막대와 아시아 밖의 몫, 상위 나라의 순위 기울기, 나라 고르기 카드, 학습 앱 달마다 내려받기</dd>
+      <dt>기간</dt><dd>2021–2025년</dd>
+      <dt>엮은 데이터</dt><dd>4개 · 국가별 세종학당 수강생 수 현황 · 세종학당 학습 앱 월별 다운로드 · 손안의 세종학당 신규 가입자 · 해외대학 한국학 현황</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2025년 세종학당 수강생이 가장 많은 나라는?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>베트남</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>미국</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>러시아</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. 러시아 <span class="n">2만 2,410명</span></span>
+      2024년까지는 베트남이 4년 내리 1위였다. 러시아는 2024년 6,032명에서 2025년 2만 2,410명으로 한 해에 3.7배가 되며 1위가 됐다. 베트남(1만 7,821명), 중국(8,357명), 미국(7,974명)이 뒤를 잇는다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">한글 별자리</h2>
+      <p>세종학당이 있는 나라마다 한글 자모를 하나씩 별로 띄웠다. 별이 클수록 그해 수강생이 많다. 한국에서 각 나라로 가는 가는 선이 별자리를 잇는다. 2025년에 가장 밝은 별은 러시아, 베트남, 중국, 미국, 우즈베키스탄이다.</p>
+      <p>재생을 누르면 2021년부터 별이 커지고 작아진다. 동남아시아와 중앙아시아의 별이 해마다 굵고, 미국과 캐나다의 별은 꾸준히 자란다. 인도와 콜롬비아처럼 한 해에 크게 부풀었다 줄어드는 별도 있다. 별을 가리키면 그 나라의 숫자가 나온다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">나라별 세종학당 수강생</p>
+      <p class="fs">별(한글 자모) 하나 = 나라 하나, 넓이 = 그해 수강생 수. 색 = 지역</p>
+      <div class="player" id="p1"></div>
+      <p class="stat" id="st1" aria-live="polite"></p>
+      <div class="chart" id="c1"></div>
+      <div class="legend" id="lg1"></div>
+      <figcaption>세종학당재단 「국가별 세종학당 수강생 수 현황(2021–2025년)」(공공데이터포털 15127358). 90개 나라. 지역 묶음은 이 장이 정했다. 지도는 Natural Earth 110m 경계, 별의 자리는 나라의 가운데쯤이다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">아시아 밖은 늘었을까</h2>
+      <p>지역별로 쌓으면 아시아 밖(유럽·북미·중남미·중동과 아프리카·오세아니아)의 수강생은 2021년 3만 1,528명에서 2025년 4만 2,067명으로 33% 늘었다. 북미는 두 배가 넘었고 오세아니아(호주)는 143명에서 1,085명이 됐다. 중남미만 13% 줄었다.</p>
+      <p>그런데 <b>몫으로 보기</b>를 누르면 아시아 밖의 몫은 38.7%에서 34.1%로 줄어든다. 같은 기간 러시아·중앙아시아가 2.4배, 동남아시아가 43% 늘었기 때문이다. 한국어를 배우는 사람은 서쪽으로도 늘지만, 가까운 쪽에서 더 많이 는다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">지역별 세종학당 수강생</p>
+      <p class="fs" id="fs2"></p>
+      <div class="chips" id="k2" role="group" aria-label="보는 방법"></div>
+      <div class="chart" id="c2"></div>
+      <div class="legend" id="lg2"></div>
+      <figcaption>세종학당재단 「국가별 세종학당 수강생 수 현황」. 아시아 = 동북아시아·동남아시아·남아시아·러시아와 중앙아시아(이 장의 묶음). 러시아를 아시아에서 빼면 아시아 밖의 몫은 2025년 52%가 된다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">순위의 기울기</h2>
+      <p>2021년과 2025년의 상위 열다섯 나라를 선으로 이었다. 위로 올라간 선이 많이 늘어난 나라다. 우즈베키스탄은 3.4배, 러시아 3.0배, 헝가리 2.6배, 일본·캐나다·영국은 2배 넘게 늘었다. 인도네시아와 몽골은 줄었다. 아래에서 나라를 고르면 그 나라의 5년이 나온다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">2021년과 2025년의 순위</p>
+      <p class="fs">두 해 가운데 한 번이라도 15위 안에 든 나라. 굵은 선 = 고른 나라</p>
+      <div class="pickc"><label for="cpick">나라 고르기</label><select id="cpick"></select></div>
+      <div class="ccard" id="ccard" aria-live="polite"></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>세종학당재단 「국가별 세종학당 수강생 수 현황」. 한국학 과정이 있는 대학 수는 한국국제교류재단 「해외대학 한국학 현황」(15041591, 2025년 말).</figcaption>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">손안의 세종학당</h2>
+      <p>교실 밖에서도 배운다. 세종학당 학습 앱 세 가지는 2025년 한 해 동안 9만 4천 번 내려받아졌다. "손안의 세종학당"이 6만 2,308번, "세종학당 AI 선생님"이 2만 8,123번이다. 5월에 손안의 세종학당이 한 달 1만 3,101번으로 크게 튀었다. 그달에 무슨 일이 있었는지는 자료에 적혀 있지 않다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">세종학당 학습 앱 달마다 내려받기, 2025년</p>
+      <p class="fs">번</p>
+      <div class="chart" id="c4"></div>
+      <figcaption>세종학당재단 「세종학당 학습 앱 월별 다운로드」(15159571). "세종학당 농어업 한국어"는 4월에 나왔다. 손안의 세종학당 신규 가입은 2025년 1만 8,883건(15159589).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 한국어는 어느 나라에서 배울까</h2>
+      <p>세종학당 수강생으로는 러시아, 베트남, 중국, 미국, 우즈베키스탄이다. 다섯 나라가 절반(51%)이다. 한국어를 배우는 사람이 가장 많은 곳은 여전히 한국과 가까운 아시아이고, 지난 4년 동안 가장 크게 자란 곳은 러시아와 중앙아시아다.</p>
+      <p>아시아 밖도 늘었다. 미국과 캐나다는 두 배가 됐고 유럽은 30% 늘었다. 다만 아시아가 더 빨리 늘어 몫은 줄었다. "한국어가 세계로 퍼진다"는 말은 맞지만, 퍼지는 속도는 가까운 곳이 더 빠르다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>세종학당 수강생만 센다. 대학, 사설 학원, 혼자 배우는 사람은 들어 있지 않다. 일본과 중국처럼 대학과 학원에서 한국어를 많이 배우는 나라는 이 숫자로는 작게 보인다. 한국학 과정이 있는 대학은 일본 377곳, 중국 270곳, 미국 141곳이다.</li>
+      <li>수강생 수는 세종학당이 몇 곳 있는지에 크게 좌우된다. 한 나라에 세종학당이 새로 열리거나 닫히면 숫자가 크게 오르내린다. 나라별 세종학당 수는 이 파일에 없다.</li>
+      <li>한 해 숫자가 크게 튀는 나라(러시아 2025년, 인도 2022년, 영국 2022년, 콜롬비아 2023년)는 왜 튀었는지 자료에 설명이 없다. 온라인 과정이나 행사성 강좌가 들어갔을 수 있다.</li>
+      <li>한 사람이 여러 학기를 들으면 여러 번 셀 수 있다. 사람 수인지 수강 건수인지 파일에 설명이 없다.</li>
+      <li>지역 묶음(러시아를 중앙아시아와 함께 아시아로 묶은 것 등)은 이 장이 정했다. 묶음을 바꾸면 "아시아 밖의 몫"이 달라진다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15127358/fileData.do" target="_blank" rel="noopener">국가별 세종학당 수강생 수 현황</a> (15127358)</td><td>세종학당재단</td><td>90개 나라 해마다 수강생</td><td>2021–2025</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15159571/fileData.do" target="_blank" rel="noopener">세종학당 학습 앱 월별 다운로드</a> (15159571)</td><td>세종학당재단</td><td>앱 세 가지의 달마다 내려받기</td><td>2025</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15159589/fileData.do" target="_blank" rel="noopener">손안의 세종학당 신규 가입자 수</a> (15159589)</td><td>세종학당재단</td><td>달마다 신규 가입</td><td>2025</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15041591/fileData.do" target="_blank" rel="noopener">해외대학 한국학 현황</a> (15041591)</td><td>한국국제교류재단</td><td>나라별 한국학 과정이 있는 대학 수</td><td>2025년 말</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>90개 나라 × 5개 연도 수강생 · 앱 3가지 × 12개월 · 대학 1,421곳</dd>
+      <dt>도구</dt><dd>Python(집계) · Node(d3-geo, 세계지도와 나라 가운데 점) · SVG 별자리 지도, 쌓인 막대, 기울기, 막대(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>지역 묶음 합 · 아시아 밖의 몫 · 2021→2025 배수 · 순위</dd>
+      <dt>검증</dt><dd>나라별 합이 해마다의 합계(2025년 12만 3,427명)와 같다. 90개 나라 모두 세계지도의 나라와 맞췄다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>한국학은 어느 대학에서 가르칠까</h3><p>나라마다 한국학 학사·석사·박사 과정이 있는 대학을 셀 수 있다. 일본·중국·미국이 앞서고, 동남아가 따라온다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15041591/fileData.do" target="_blank" rel="noopener">해외대학 한국학 현황</a> · 한국국제교류재단</li></ul></div>
+      <div class="q"><h3>앱으로 배우는 사람은 무엇을 가장 많이 볼까</h3><p>손안의 세종학당 콘텐츠 이용 현황으로 가장 많이 본 단원을 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15159590/fileData.do" target="_blank" rel="noopener">손안의 세종학당 콘텐츠 이용현황</a> · 세종학당재단</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.18</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const YS = DATA.YS, NY = YS.length, C = DATA.C, T = DATA.T, REGS = DATA.regs, ASIA = DATA.asia, GEO = DATA.geo;
+  const RC = REGS.map((_, k) => `var(--r${k})`), rcol = (g) => RC[REGS.indexOf(g)];
+  const JAMO = "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ".split("");
+  C.forEach((c, i) => { c.j = JAMO[i % JAMO.length]; });
+  const legend = (id, items) => { const lg = document.getElementById(id); lg.replaceChildren(); items.forEach(([n, col]) => { const sp = document.createElement("span"), i = document.createElement("i"); i.className = "sw"; i.style.background = col; sp.append(i, n); lg.append(sp); }); };
+  const josa = (w, a, b) => { const c = w.charCodeAt(w.length - 1) - 0xac00; return w + (c >= 0 && c < 11172 && c % 28 ? a : b); };
+
+  /* ---------- 1. constellation map ---------- */
+  function draw1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"), k = Math.min(NY - 1, Math.floor(pos + 1e-6)), f = pos - k;
+    const val = (c) => { const a = c.v[k], b = k < NY - 1 ? c.v[k + 1] : a; return a + (b - a) * f; };
+    const W = Math.max(300, box.clientWidth), sc = W / GEO.W, H = GEO.H * sc, pts = [];
+    box.replaceChildren();
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${YS[k]}년 나라별 세종학당 수강생 별자리 지도. ` + [...C].sort((a, b) => b.v[k] - a.v[k]).slice(0, 5).map((c) => `${c.n} ${fmt(c.v[k])}명`).join(", ") }, box);
+    s("rect", { width: W, height: H, rx: 8, fill: "var(--sky)" }, v);
+    for (let i = 0; i < 90; i++) s("circle", { cx: (i * 137.5 * 7.3) % W, cy: (i * 61.8 * 3.1) % H, r: .7, fill: "var(--star2)", opacity: .35 }, v);
+    const g = s("g", { transform: `scale(${sc})` }, v);
+    GEO.world.forEach((w) => s("path", { d: w.d, fill: "var(--sky-land)", stroke: "var(--sky-line)", "stroke-width": .5 / sc }, g));
+    const [kx, ky] = GEO.kor, mx = Math.max(...C.map((c) => Math.max(...c.v))), R = (W < 560 ? 20 : 46) / sc;
+    const order = [...C].filter((c) => c.n !== "대한민국").sort((a, b) => val(a) - val(b));
+    order.forEach((c) => { const vv = val(c); if (vv <= 0) return; const [x, y] = c.xy; s("path", { d: `M${kx},${ky} Q${(kx + x) / 2},${Math.min(ky, y) - Math.abs(x - kx) * .18} ${x},${y}`, fill: "none", stroke: "var(--star)", "stroke-width": .5 / sc, opacity: .28 }, g); });
+    order.forEach((c, n) => { const vv = val(c), [x, y] = c.xy; if (vv <= 0) { s("circle", { cx: x, cy: y, r: 1.3 / sc, fill: "var(--sky-line)" }, g); return; } const size = Math.max(11 / sc, Math.sqrt(vv / mx) * R * 1.6); s("circle", { cx: x, cy: y, r: size * .55, fill: rcol(c.g), opacity: .35 }, g); const t = tx(g, x, y + size * .36, c.j, n % 4 === 0 ? "skyv twinkle" : "skyv", size, "middle"); t.setAttribute("fill", "var(--star)"); pts.push({ x: x * sc, y: y * sc, r: Math.max(6, size * sc * .5), fn: () => [c.n, [[`${fmt(c.v[k])}명`, `${YS[k]}년 수강생`], [`${fmt(c.v[0])}명 → ${fmt(c.v[NY - 1])}명`, "2021 → 2025"], [c.g, "지역", rcol(c.g)]]] }); });
+    s("circle", { cx: kx, cy: ky, r: 5 / sc, fill: "var(--kor)" }, g); tx(g, kx, ky - 9 / sc, "한국", "skyl", 12 / sc, "middle");
+    [...C].sort((a, b) => val(b) - val(a)).slice(0, W < 560 ? 0 : 6).forEach((c) => { const [x, y] = c.xy; tx(g, x + 10 / sc, y + 16 / sc, `${c.n} ${fmt(c.v[k])}`, "skyl", 11.5 / sc, "start"); });
+    document.getElementById("st1").replaceChildren(`${YS[k]}년 · 수강생 `, bEl(`${fmt(T[k])}명`), ` · 1위 `, bEl([...C].sort((a, b) => b.v[k] - a.v[k])[0].n), ` · 수강생이 있는 나라 ${C.filter((c) => c.v[k] > 0).length}곳`);
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 나라를 옮겨 볼 수 있다");
+  }
+  const pl1 = Player("p1", "세종학당 수강생", draw1, NY, (k) => String(YS[k]), 7);
+  legend("lg1", REGS.map((g) => [g, rcol(g)]));
+  table("t1", ["나라", "지역", ...YS.map(String), "2021→2025"], [...C].sort((a, b) => b.v[NY - 1] - a.v[NY - 1]).map((c) => [c.n, c.g, ...c.v.map(fmt), c.v[0] ? `${f1(c.v[NY - 1] / c.v[0])}배` : "–"]));
+
+  /* ---------- 2. stacked bars ---------- */
+  let mode2 = "n";
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, H = narrow ? 320 : 360, l = 46, r = narrow ? 50 : 110, top = 16, bot = 28, gw = (W - l - r) / NY, bw = gw * .62, sh = mode2 === "s", max = sh ? 100 : 140000, y = (v_) => top + (H - top - bot) * (1 - v_ / max), pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": sh ? "지역별 수강생의 몫. 아시아 밖 2021년 38.7%, 2025년 34.1%" : "지역별 수강생 수. 2021년 8만 1,476명, 2025년 12만 3,427명" }, box);
+    (sh ? [0, 25, 50, 75, 100] : [0, 40000, 80000, 120000]).forEach((t) => { s("line", { x1: l, x2: W - r, y1: y(t), y2: y(t), class: "gl" }, v); tx(v, l - 6, y(t) + 4, sh ? t + "%" : t / 1e4 + "만", "tk", 11, "end"); });
+    const order = [...REGS.filter((g) => !ASIA.includes(g)), ...ASIA];
+    YS.forEach((yr, j) => {
+      const cx = l + gw * j + gw / 2; let acc = 0, asiaTop = null;
+      order.forEach((g, n) => { const raw = DATA.G[g][j], val = sh ? raw / T[j] * 100 : raw; s("rect", { x: cx - bw / 2, y: y(acc + val), width: bw, height: y(acc) - y(acc + val), fill: rcol(g) }, v); acc += val; if (n === order.length - ASIA.length - 1) asiaTop = acc; });
+      s("line", { x1: cx - bw / 2 - 4, x2: cx + bw / 2 + 4, y1: y(asiaTop), y2: y(asiaTop), stroke: "var(--ink)", "stroke-width": 2 }, v);
+      const outv = REGS.filter((g) => !ASIA.includes(g)).reduce((a, g) => a + DATA.G[g][j], 0);
+      tx(v, cx, y(asiaTop) + 16, sh ? pc(outv / T[j] * 100) : `${f1(outv / 1e4)}만`, "vl halo", 12.5, "middle", { "stroke-width": 4 });
+      tx(v, cx, H - 8, yr, "tk", 11, "middle");
+      pts.push({ x: cx, y: (top + H - bot) / 2, r: bw / 2, fn: () => [`${yr}년`, [[`${fmt(T[j])}명`, "전체"], [`${fmt(outv)}명 (${pc(outv / T[j] * 100)})`, "아시아 밖"], ...REGS.map((g) => [`${fmt(DATA.G[g][j])}명`, g, rcol(g)])]] });
+    });
+    if (!narrow) { let acc = 0; order.forEach((g) => { const raw = DATA.G[g][NY - 1], val = sh ? raw / T[NY - 1] * 100 : raw; const mid = y(acc + val / 2); if (y(acc) - y(acc + val) > 11) tx(v, W - r + 8, mid + 4, g, "lb", 11.5); acc += val; }); }
+    tx(v, l, top - 4, "굵은 가로선 아래 = 아시아 밖", "mt", 11.5);
+    document.getElementById("fs2").textContent = sh ? "%. 굵은 가로선 아래가 아시아 밖, 위가 아시아(이 장의 묶음)" : "명. 굵은 가로선 아래가 아시아 밖, 위가 아시아(이 장의 묶음)";
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표 키로 해를 옮겨 볼 수 있다");
+  }
+  chips("k2", [["n", "수강생 수"], ["s", "몫으로 보기"]], "n", (k) => { mode2 = k; c2(); });
+  legend("lg2", REGS.map((g) => [g, rcol(g)]));
+  table("t2", ["지역", ...YS.map(String), "2025 몫", "2021→2025"], REGS.map((g) => [g, ...DATA.G[g].map(fmt), pc(DATA.G[g][NY - 1] / T[NY - 1] * 100), DATA.G[g][0] ? `${(DATA.G[g][NY - 1] / DATA.G[g][0] * 100 - 100).toFixed(0)}%` : "–"]));
+
+  /* ---------- 3. slope + country card ---------- */
+  const rank = (j) => [...C].sort((a, b) => b.v[j] - a.v[j]).map((c) => c.n);
+  const R0 = rank(0), R1 = rank(NY - 1), SET = [...new Set([...R0.slice(0, 15), ...R1.slice(0, 15)])];
+  let selC = "우즈베키스탄";
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, n = 17, rh = 22, top = 30, H = top + n * rh + 6, cap = (r_) => Math.min(r_, 16), xl = narrow ? 112 : 190, xr = W - (narrow ? 112 : 190), pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "2021년과 2025년 세종학당 수강생 순위를 이은 기울기 그림" }, box);
+    tx(v, xl, 16, "2021", "lb", 13, "end", { "font-weight": 700 }); tx(v, xr, 16, "2025", "lb", 13, "start", { "font-weight": 700 });
+    SET.forEach((nm) => { const c = C.find((q) => q.n === nm), a = R0.indexOf(nm), b = R1.indexOf(nm), y0 = top + cap(a) * rh + rh / 2, y1 = top + cap(b) * rh + rh / 2, me = nm === selC, up = b < a; s("line", { x1: xl + 6, x2: xr - 6, y1: y0, y2: y1, stroke: me ? "var(--hi)" : up ? "var(--r3)" : "var(--axis)", "stroke-width": me ? 3.5 : 1.4, opacity: me ? 1 : .75 }, v); if (a < 15 || me) tx(v, xl, y0 + 4, `${nm} ${fmt(c.v[0])}`, me ? "vl hi-ink" : "lb", 12, "end"); if (b < 15 || me) tx(v, xr, y1 + 4, `${b + 1}. ${nm} ${fmt(c.v[NY - 1])}`, me ? "vl hi-ink" : "lb", 12, "start"); pts.push({ x: (xl + xr) / 2, y: (y0 + y1) / 2, r: 8, fn: () => [nm, [[`${a + 1}위 → ${b + 1}위`, "순위"], [`${fmt(c.v[0])} → ${fmt(c.v[NY - 1])}명`, "수강생"]]] }); });
+    tx(v, xl, top + 16 * rh + rh / 2 + 4, "16위 밖", "tk", 11.5, "end"); tx(v, xr, top + 16 * rh + rh / 2 + 4, "16위 밖", "tk", 11.5, "start");
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 나라를 옮겨 볼 수 있다");
+  }
+  function card3() {
+    const c = C.find((q) => q.n === selC), box = document.getElementById("ccard"); box.replaceChildren();
+    const nm = document.createElement("div"); nm.className = "nm"; nm.textContent = `${c.n} · ${c.g}`;
+    const bv = document.createElement("div"); bv.className = "bigv"; bv.textContent = `${fmt(c.v[NY - 1])}명`;
+    const mini = s("svg", { viewBox: "0 0 260 50", width: 260, height: 50, role: "img", "aria-label": `${c.n} 2021–2025년 수강생 ` + c.v.map(fmt).join(", ") }), mxv = Math.max(...c.v, 1);
+    c.v.forEach((val, j) => { const h = val / mxv * 34; s("rect", { x: 6 + j * 50, y: 40 - h, width: 34, height: h, rx: 2, fill: j === NY - 1 ? "var(--hi)" : "var(--r3)" }, mini); tx(mini, 23 + j * 50, 50, `'${String(YS[j]).slice(2)}`, "tk", 11, "middle"); });
+    const p1 = document.createElement("p"), r1 = R1.indexOf(c.n) + 1; p1.append(bEl(`2025년 ${r1}위`), ` · 2021년 ${R0.indexOf(c.n) + 1}위 · ${c.v[0] ? `4년 사이 ${f1(c.v[NY - 1] / c.v[0])}배` : "2021년 0명"}`);
+    const p2 = document.createElement("p"), un = DATA.univ[c.n] || 0; p2.textContent = `한국학 과정이 있는 대학 ${un}곳${DATA.univSejong[c.n] ? ` (그중 세종학당이 함께 있는 대학 ${DATA.univSejong[c.n]}곳)` : ""}`;
+    box.append(nm, bv, mini, p1, p2);
+  }
+  const cp = document.getElementById("cpick"); [...C].filter((c) => c.n !== "대한민국").sort((a, b) => b.v[NY - 1] - a.v[NY - 1]).forEach((c) => { const o = document.createElement("option"); o.value = c.n; o.textContent = `${c.n} (${fmt(c.v[NY - 1])}명)`; cp.append(o); });
+  cp.value = selC; cp.addEventListener("change", () => { selC = cp.value; card3(); c3(); });
+
+  /* ---------- 4. app downloads ---------- */
+  const APPN = ["손안의 세종학당", "세종학당 AI 선생님", "세종학당 농어업 한국어"], APPC = ["var(--r3)", "var(--r5)", "var(--r4)"];
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const A = DATA.app, W = Math.max(300, box.clientWidth), narrow = W < 560, H = narrow ? 260 : 300, l = 40, r = 8, top = 20, bot = 44, gw = (W - l - r) / A.length, bw = gw * .7, max = 18000, y = (v_) => top + (H - top - bot) * (1 - v_ / max), pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "2025년 세종학당 학습 앱 달마다 내려받기. 5월에 손안의 세종학당이 1만 3,101번으로 가장 많다" }, box);
+    [0, 5000, 10000, 15000].forEach((t) => { s("line", { x1: l, x2: W - r, y1: y(t), y2: y(t), class: "gl" }, v); tx(v, l - 6, y(t) + 4, t / 1e3 + "천", "tk", 11, "end"); });
+    A.forEach((row, j) => { const cx = l + gw * j + gw / 2; let acc = 0; [1, 2, 3].forEach((q) => { const val = row[q]; s("rect", { x: cx - bw / 2, y: y(acc + val), width: bw, height: y(acc) - y(acc + val), fill: APPC[q - 1] }, v); acc += val; }); tx(v, cx, H - bot + 16, `${+row[0].slice(5)}월`, "tk", 11, "middle"); if (row[0].endsWith("05")) tx(v, cx, y(acc) - 6, fmt(acc), "vl", 12, "middle"); pts.push({ x: cx, y: y(acc / 2), r: bw / 2, fn: () => [row[0], APPN.map((n, q) => [`${fmt(row[q + 1])}번`, n, APPC[q]])] }); });
+    APPN.forEach((n, q) => { const x = l + (narrow ? 0 : q * 170), yy = H - 8 - (narrow ? (2 - q) * 0 : 0); if (!narrow) { s("rect", { x, y: yy - 9, width: 10, height: 10, fill: APPC[q] }, v); tx(v, x + 14, yy, n, "lb", 12); } });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표 키로 달을 옮겨 볼 수 있다");
+  }
+  table("t4", ["달", ...APPN, "합"], DATA.app.map((r_) => [r_[0], fmt(r_[1]), fmt(r_[2]), fmt(r_[3]), fmt(r_[1] + r_[2] + r_[3])]));
+
+  /* ---------- first view + resize ---------- */
+  pl1.render(); c2(); card3(); c3(); c4();
+  onResize(() => { pl1.render(); c2(); c3(); c4(); });
+})();
+</script>

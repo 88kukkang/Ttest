@@ -1,0 +1,254 @@
+<title>여권 도장</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: one passport page per nationality, filled with entry stamps. One stamp = 5,000 people staying over 90 days,
+   coloured by the purpose of their visa. Pages keep a fixed size across years so the replay only adds or removes stamps. */
+:root {
+  --paper: #f5f1ea; --card: #fdfbf7; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #e2ccb5; --grid: #ece6dc; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --board: #3e4a52; --board-ink: #ebdac0; --accent: #3e6f90;
+  --page: #f2ead9; --page2: #e8dcc4; --cover: #416e59;
+  --g-work: #3e6f90; --g-kin: #d56b41; --g-study: #80a15a; --g-perm: #67453c; --g-fam: #8ab5bb; --g-marr: #953a4c; --g-etc: #bcbbb6;
+  --kin-ink: #a8451f; --study-ink: #4f6e33;
+  --t-work: #fff; --t-kin: #2f3133; --t-study: #2f3133; --t-perm: #fff; --t-fam: #2f3133; --t-marr: #fff; --t-etc: #2f3133;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Nanum Myeongjo", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --board: #131415; --board-ink: #ebdac0; --accent: #8eabc9;
+  --page: #2f2c28; --page2: #3a3631; --cover: #91b0a1;
+  --g-work: #8eabc9; --g-kin: #d56b41; --g-study: #abc07b; --g-perm: #b6a392; --g-fam: #689daf; --g-marr: #d6b0a7; --g-etc: #5f6062;
+  --kin-ink: #dc8c67; --study-ink: #abc07b;
+  --t-work: #1d1e1f; --t-kin: #1d1e1f; --t-study: #1d1e1f; --t-perm: #1d1e1f; --t-fam: #1d1e1f; --t-marr: #1d1e1f; --t-etc: #ebeeec;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --board: #131415; --board-ink: #ebdac0; --accent: #8eabc9;
+  --page: #2f2c28; --page2: #3a3631; --cover: #91b0a1;
+  --g-work: #8eabc9; --g-kin: #d56b41; --g-study: #abc07b; --g-perm: #b6a392; --g-fam: #689daf; --g-marr: #d6b0a7; --g-etc: #5f6062;
+  --kin-ink: #dc8c67; --study-ink: #abc07b;
+  --t-work: #1d1e1f; --t-kin: #1d1e1f; --t-study: #1d1e1f; --t-perm: #1d1e1f; --t-fam: #1d1e1f; --t-marr: #1d1e1f; --t-etc: #ebeeec;
+  color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 800; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.yr { background-image: none; font-family: var(--serif); font-size: 26px }
+.chip .sw { margin-right: 6px; vertical-align: -1px }
+</style>
+
+<main class="page">
+  <header>
+    <h1>외국인 주민은 대부분 일하러 온 사람일까<span>비자로 보면 아니다. 90일 넘게 머무는 외국인 212만 명 가운데 취업 비자는 넷 중 하나(23%)다. 가장 큰 무리는 재외동포(31%)이고, 유학생·영주권자·가족·결혼이민자가 나머지를 나눈다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 2</dd>
+      <dt>한 줄</dt><dd>법무부 체류외국인 통계로 2024년 말 90일 넘게 머무는 외국인 212만 4,360명을 체류자격(비자)으로 나누면 취업 비자 22.8%, 재외동포(F-4·H-2) 30.6%, 유학·어학연수 12.5%, 가족(방문동거·거주·동반) 10.0%, 영주 9.6%, 결혼이민 7.0%다. 나라마다 모양이 전혀 달라서 인도네시아·캄보디아는 열에 아홉이 취업 비자이고, 한국계 중국인은 74%가 동포 비자, 베트남·몽골은 유학이 가장 많다. 유학의 몫은 2014년 6.1%에서 2024년 12.5%로 두 배가 됐다.</dd>
+      <dt>분류</dt><dd>인구·가족</dd>
+      <dt>본능</dt><dd>일반화 본능 · 공장·농장에서 일하는 외국인 노동자의 모습을 외국인 주민 전체로 넓혀 본다</dd>
+      <dt>그림 방식</dt><dd>여권 도장 · 나라마다 여권 한 면을 펴고 5,000명마다 도장 하나를 찍었다. 도장 색은 비자의 목적. 2011년부터 2024년까지 재생한다</dd>
+      <dt>기간</dt><dd>2011·2014–2017·2019·2021–2024년, 해마다 12월 말</dd>
+      <dt>엮은 데이터</dt><dd>1개(10개 연도판) · 법무부 국적(지역) 및 체류자격별 체류외국인 현황</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2024년 말 한국에 90일 넘게 머무는 외국인은 212만 명이다. 이 가운데 취업 비자(전문인력·비전문취업·계절근로·선원 등)를 가진 사람의 비율은?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>셋 중 둘쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>절반쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>넷 중 하나쯤</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. <span class="n">22.8%</span>, 48만 4천 명</span>
+      가장 많은 비자는 재외동포(F-4) 55만 6천 명이다. 방문취업(H-2) 동포 9만 3천 명을 더하면 동포 비자가 30.6%로 취업 비자보다 많다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">나라마다 다른 여권 한 면</h2>
+      <p>나라마다 여권 한 면을 펴고, 그 나라 사람 5,000명마다 도장을 하나씩 찍었다. 도장 색은 체류자격이 말하는 목적이다. 인원이 많은 12개 나라를 따로 펴고 나머지는 한 면에 모았다.</p>
+      <p>파란 도장(취업)은 인도네시아·캄보디아·네팔·타이·미얀마의 여권을 채운다. 한국계 중국인의 여권은 주황(동포)과 갈색(영주)이다. 베트남·중국·몽골은 초록(유학)이 가장 크고, 베트남·필리핀·타이에는 자주색(결혼이민)이 적지 않다. 아래 단추로 한 가지 목적만 진하게 볼 수 있다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">나라별 체류외국인과 체류 목적</p>
+      <p class="fs">도장 하나 = 90일 넘게 머무는 외국인 5,000명(반올림). 해마다 12월 말</p>
+      <div class="chips" id="chips1" role="group" aria-label="목적 강조"></div>
+      <div class="player" id="p1"></div>
+      <p class="stat" id="st1" aria-live="polite"></p>
+      <div class="chart" id="c1"></div>
+      <figcaption>법무부 「국적(지역) 및 체류자격별 체류외국인 현황」. 단기 체류(사증면제·관광통과·단기방문·단기취업 등, 2024년 52만 6천 명)는 뺐다. 2012·2013·2020년은 공공데이터포털에 판이 없고, 2018년 판은 숫자가 다른 해와 맞지 않아 쓰지 않았다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">유학은 두 배, 동포는 조금씩 줄었다</h2>
+      <p>해마다 90일 넘게 머무는 외국인 전체를 목적별로 나눴다. 동포 비자의 몫은 2015년 39.9%에서 2024년 30.6%로 줄었고, 유학·어학연수는 2014년 6.1%에서 2024년 12.5%로 늘었다. 취업 비자의 몫은 2011년 26.1%에서 코로나 시기인 2021년 17.6%까지 내려갔다가 2024년 22.8%로 돌아왔다. 어느 해에도 취업 비자가 30%를 넘은 적은 없다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">90일 넘게 머무는 외국인의 체류 목적, 2011–2024년</p>
+      <p class="fs">%. 줄 하나가 한 해의 100%</p>
+      <div class="legend" id="lg2"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>법무부 체류외국인 현황. 결혼이민(F-6) 자격은 2011년 12월에 생겨, 2011년에는 결혼이민자 대부분이 거주(F-2)로 잡혀 있다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">그래서, 외국인 주민은 대부분 일하러 온 사람일까</h2>
+      <p>비자의 목적으로 보면 아니다. 취업 비자는 넷 중 하나이고, 가장 큰 무리는 재외동포다. 공장과 농장의 이주노동자는 인도네시아·캄보디아·네팔 같은 몇몇 나라에 몰려 있다. 다만 비자의 목적과 실제로 일하는지는 다르다. 동포·영주·결혼이민 자격으로도 일할 수 있고, 유학생도 정해진 시간 안에서 일한다. "외국인 = 노동자"라는 그림은 외국인 주민의 한 부분만 보여 준다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <h2 class="h" id="s4" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>체류자격은 "들어온 목적"이지 "지금 하는 일"이 아니다. 재외동포(F-4)·영주(F-5)·결혼이민(F-6) 자격자 상당수가 일을 하고, 방문취업(H-2)은 동포에게 주는 취업 자격이다. 이 페이지의 "취업 비자"는 E 계열(교수·회화·전문인력·비전문취업·계절근로·선원)과 기술연수·주재·기업투자·무역경영(D-3·D-7·D-8·D-9)이다.</li>
+      <li>"90일 넘게 머무는 외국인"은 체류외국인에서 사증면제·관광통과·일시취재·단기방문·단기취업·관광상륙을 뺀 수다. 행정안전부의 "외국인주민"은 귀화자와 그 자녀를 더하므로 이보다 크다.</li>
+      <li>미국의 "그 밖"은 대부분 협정(A-3, 주한미군 관련)과 기타 자격이다. 미국의 "동포"는 재외동포(F-4) 자격의 한국계 미국인이다.</li>
+      <li>불법체류자는 마지막으로 받은 체류자격으로 들어 있다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/3045188/fileData.do" target="_blank" rel="noopener">국적(지역) 및 체류자격별 체류외국인 현황</a> (3045188, 과거 판 포함)</td><td>법무부</td><td>국적·체류자격별 인원</td><td>2011·2014–2017·2019·2021–2024</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>10개 연도판 · 나라 약 200개 × 체류자격 37–38개</dd>
+      <dt>도구</dt><dd>Python(연도마다 다른 열 이름 맞추기·집계) · SVG 도장과 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>체류자격을 일곱 가지 목적으로 묶은 구성비</dd>
+      <dt>검증</dt><dd>해마다 모든 나라·자격을 더한 체류외국인 합계가 법무부 발표치와 같은지 확인했다(예: 2024년 265만 783명, 2019년 252만 4,656명).</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>외국인 주민은 어디에 모여 살까</h3><p>시군구별 외국인 주민 수와 체류자격을 엮으면 공단 도시와 대학 도시의 차이를 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/3045188/fileData.do" target="_blank" rel="noopener">체류외국인 현황</a> · 법무부</li></ul></div>
+      <div class="q"><h3>유학생은 졸업 뒤 한국에 남을까</h3><p>유학(D-2)에서 구직(D-10)·특정활동(E-7)으로 바뀐 인원을 해마다 볼 수 있다.</p></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const Y = DATA.years, NY = Y.length, GK = DATA.groups.slice(0, 7), NAT = DATA.nat, PER = 5000;
+  const GN = { work: "취업", kin: "재외동포", study: "유학·연수", perm: "영주", fam: "가족", marr: "결혼이민", etc: "그 밖" };
+  const GL = { work: "취업 비자", kin: "동포(F-4·H-2)", study: "유학·어학연수", perm: "영주(F-5)", fam: "가족(F-1·2·3)", marr: "결혼이민(F-6)", etc: "그 밖" };
+  const col = (g) => `var(--g-${g})`;
+  const V = (yi, ni, gi) => DATA.v[Y[yi]][ni][gi];
+  const at = (pos, ni, gi) => { const k = Math.floor(pos), f = pos - k, a = V(k, ni, gi), b = V(Math.min(NY - 1, k + 1), ni, gi); return a + (b - a) * f; };
+  const longT = (yi) => NAT.reduce((s, _, ni) => s + GK.reduce((t, __, gi) => t + V(yi, ni, gi), 0), 0);
+
+  /* ---------- 1. passports ---------- */
+  let focus = "all";
+  {
+    const box = document.getElementById("chips1");
+    const opts = [["all", "모든 목적"], ...GK.map((g) => [g, GN[g]])];
+    opts.forEach(([k, name]) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; if (k !== "all") { const i = document.createElement("i"); i.className = "sw"; i.style.background = col(k); b.append(i); } b.append(name); b.setAttribute("aria-pressed", k === focus); b.addEventListener("click", () => { box.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === b)); focus = k; p1.render(); }); box.append(b); });
+  }
+  // a little pseudo-random tilt per stamp, fixed so stamps don't wobble between frames
+  const tilt = (i, j) => (((i * 73 + j * 37) % 17) - 8) * 1.4;
+  function c1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), cols = W >= 860 ? 4 : W >= 560 ? 3 : 2, gap = W < 560 ? 10 : 14, cw = (W - gap * (cols - 1)) / cols;
+    const st = W < 560 ? 11 : 13, sg = 3, pad = 10, per = Math.max(1, Math.floor((cw - pad * 2 + sg) / (st + sg))), headH = 44;
+    const maxStamps = NAT.map((_, ni) => Math.max(...Y.map((__, yi) => GK.reduce((t, ___, gi) => t + Math.round(V(yi, ni, gi) / PER), 0))));
+    const cardH = maxStamps.map((m) => headH + Math.ceil(m / per) * (st + sg) + pad);
+    const rowsH = []; for (let i = 0; i < NAT.length; i += cols) rowsH.push(Math.max(...cardH.slice(i, i + cols)));
+    const Ht = rowsH.reduce((a, b) => a + b + gap, 0);
+    const v = s("svg", { viewBox: `0 0 ${W} ${Ht}`, role: "img", "aria-label": `${Y[Math.round(pos)]}년 나라별 체류외국인 여권 도장` }, box), pts = [];
+    let yy = 0;
+    NAT.forEach((nm, ni) => {
+      const c = ni % cols, r = Math.floor(ni / cols); if (c === 0 && r > 0) yy += rowsH[r - 1] + gap;
+      const x0 = c * (cw + gap), y0 = yy, h = rowsH[r];
+      s("rect", { x: x0, y: y0, width: cw, height: h, rx: 6, fill: "var(--page)" }, v);
+      s("rect", { x: x0, y: y0, width: 5, height: h, rx: 2, fill: "var(--cover)" }, v);
+      for (let k = y0 + 22; k < y0 + h; k += 22) s("line", { x1: x0 + 10, x2: x0 + cw - 8, y1: k, y2: k, stroke: "var(--page2)", "stroke-width": 1 }, v);
+      const vals = GK.map((_, gi) => at(pos, ni, gi)), tot = vals.reduce((a, b) => a + b, 0);
+      tx(v, x0 + pad + 4, y0 + 19, nm, "vl", W < 560 ? 13 : 14, "start");
+      tx(v, x0 + pad + 4, y0 + 36, `${man(tot)}명`, "mt", 12, "start");
+      let k = 0; const ox = x0 + pad + 2, oy = y0 + headH;
+      GK.forEach((g, gi) => {
+        const n = Math.round(vals[gi] / PER), dim = focus !== "all" && focus !== g;
+        for (let j = 0; j < n; j++, k++) {
+          const cx = ox + (k % per) * (st + sg) + st / 2, cy = oy + Math.floor(k / per) * (st + sg) + st / 2;
+          const gEl = s("g", { transform: `translate(${cx.toFixed(1)},${cy.toFixed(1)}) rotate(${tilt(ni + k, j)})`, opacity: dim ? .14 : .92 }, v);
+          // stamp shape doubles the colour: square = work, diamond = family, round = the rest
+          const sq = g === "work" || g === "fam", e = g === "fam" ? st * .84 : st;
+          if (g === "fam") gEl.setAttribute("transform", gEl.getAttribute("transform").replace(/rotate\([^)]*\)/, "rotate(45)"));
+          s("rect", { x: -e / 2, y: -e / 2, width: e, height: e, rx: sq ? 1.5 : e / 2, fill: "none", stroke: col(g), "stroke-width": 1.6 }, gEl);
+          s("rect", { x: -e / 2 + 2.6, y: -e / 2 + 2.6, width: e - 5.2, height: e - 5.2, rx: sq ? 1 : e / 2, fill: col(g) }, gEl);
+        }
+      });
+      const share = (g) => tot ? vals[GK.indexOf(g)] / tot * 100 : 0;
+      pts.push({ x: x0 + cw / 2, y: y0 + 20, r: 18, fn: () => [`${nm} · ${Y[Math.round(pos)]}년`, [[fmt(tot) + "명", "90일 넘게 머무는 사람"], ...GK.filter((g) => share(g) >= 1).sort((a, b) => share(b) - share(a)).slice(0, 4).map((g) => [pc(share(g)), GL[g], col(g)])]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 나라를 옮겨 볼 수 있다");
+    const yi = Math.round(pos), T = longT(yi), stp = document.getElementById("st1"); stp.replaceChildren();
+    const gsum = (g) => NAT.reduce((s_, _, ni) => s_ + V(yi, ni, GK.indexOf(g)), 0);
+    if (focus === "all") stp.append(`${Y[yi]}년 말, 90일 넘게 머무는 외국인 `, bEl(`${fmt(T)}명`), ` · 취업 비자 `, bEl(pc(gsum("work") / T * 100)), ` · 동포 비자 `, bEl(pc(gsum("kin") / T * 100)));
+    else stp.append(`${Y[yi]}년 말, ${GL[focus]} `, bEl(`${fmt(gsum(focus))}명`), ` · 전체의 `, bEl(pc(gsum(focus) / T * 100)));
+  }
+  const p1 = Player("p1", "여권 도장", c1, NY, (i) => String(Y[i]), 10);
+  table("t1", ["나라", ...GK.map((g) => GL[g]), "합계"], NAT.map((nm, ni) => { const r = GK.map((_, gi) => V(NY - 1, ni, gi)); return [nm, ...r.map(fmt), fmt(r.reduce((a, b) => a + b, 0))]; }));
+
+  /* ---------- 2. shares over time ---------- */
+  {
+    const lg = document.getElementById("lg2");
+    GK.forEach((g) => { const sp = document.createElement("span"); const i = document.createElement("i"); i.className = "sw"; i.style.background = col(g); sp.append(i, GL[g]); lg.append(sp); });
+  }
+  const SH = Y.map((_, yi) => { const T = longT(yi); return GK.map((g, gi) => NAT.reduce((s_, __, ni) => s_ + V(yi, ni, gi), 0) / T * 100); });
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), l = 44, r = 4, rowH = 32, top = 18, H_ = top + NY * rowH + 4;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H_}`, role: "img", "aria-label": "체류 목적별 구성비 2011–2024" }, box), pts = [];
+    const sx = (p) => l + p / 100 * (W - l - r);
+    [0, 25, 50, 75, 100].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top - 4, y2: H_ - 2, class: "gl" }, v); tx(v, sx(t), top - 6, `${t}%`, "tk", 11.5, t === 100 ? "end" : t ? "middle" : "start"); });
+    Y.forEach((yy, yi) => {
+      const y = top + yi * rowH + 3; let acc = 0;
+      tx(v, l - 6, y + 16, String(yy), "tk", 11.5, "end");
+      GK.forEach((g, gi) => {
+        const w = SH[yi][gi], x = sx(acc);
+        s("rect", { x, y, width: Math.max(0, sx(acc + w) - x - 1), height: rowH - 7, fill: col(g) }, v);
+        if (sx(acc + w) - x > 30) tx(v, x + (sx(acc + w) - x) / 2, y + 17, Math.round(w) + "", "lb", 14, "middle", { style: `fill:var(--t-${g});font-weight:600` });
+        acc += w;
+      });
+      pts.push({ x: sx(50), y: y + 11, r: (W - l) / 2, fn: () => [`${yy}년 말`, GK.map((g, gi) => [pc(SH[yi][gi]), GL[g], col(g)])] });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 해를 옮겨 볼 수 있다");
+  }
+  table("t2", ["연도", ...GK.map((g) => GL[g]), "90일 넘게 머무는 외국인"], Y.map((yy, yi) => [yy, ...SH[yi].map(pc), fmt(longT(yi))]));
+
+  const all = () => { p1.render(); c2(); };
+  all(); onResize(all);
+})();
+</script>

@@ -1,0 +1,380 @@
+<title>K-뷰티 립스틱</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a row of 26 lipsticks (2000–2025) whose bullets twist up to that year's cosmetics exports; a ranking of destinations
+   with a crown that passes from China to the US in 2025; a world map where bottles land on 145–175 countries (2018–2022,
+   played); an eyeshadow palette whose pans are the destinations' shares; and duty-free shopping bags filled by nationality. */
+:root {
+  --paper: #f6f1ee; --card: #fdfaf8; --ink: #2f2829; --ink2: #4c4041; --muted: #5f5556; --line: #e7dcd7; --grid: #eee6e2; --axis: #b6a392;
+  --accent: #903a43; --intl: #903a43; --hi-ink: #903a43; --board: #4c4041; --board-ink: #f6f1ee; --sea: #f0ebe8; --land: #e2d6cf; --land-edge: #fdfaf8;
+  --tube: #4c433e; --ring: #b6a392; --bullet: #903a43; --bullet-hi: #d6b0a7; --imp: #a7a8a3;
+  --cn: #9b3737; --us: #3e6f90; --jp: #d6b0a7; --hk: #d56b41; --vn: #80a15a; --ru: #8eabc9; --tw: #b87b68; --th: #abc07b; --sg: #689daf; --my: #dabea9; --etc: #c9c2bd;
+  --pal-case: #2f2829; --pal-edge: #67605a; --bag: #ead0b9; --bag-edge: #b87b68; --bag-cn: #9b3737; --bag-kr: #3e6f90;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1e1a1b; --card: #282324; --ink: #f1eae7; --ink2: #e7cdc0; --muted: #b6a392; --line: #3e3637; --grid: #332c2d; --axis: #67605a;
+  --accent: #e7a3ab; --intl: #e7a3ab; --hi-ink: #efb4ba; --board: #e7cdc0; --board-ink: #1e1a1b; --sea: #231f20; --land: #3a3334; --land-edge: #282324;
+  --tube: #928a7f; --ring: #d8b29b; --bullet: #e7a3ab; --bullet-hi: #903a43; --imp: #6e6862;
+  --cn: #e59a7e; --us: #8eabc9; --jp: #e7cdc0; --hk: #dc8c67; --vn: #abc07b; --ru: #b5c6ce; --tw: #cd9886; --th: #c4d39c; --sg: #689daf; --my: #b6a392; --etc: #5f5853;
+  --pal-case: #111011; --pal-edge: #67605a; --bag: #4c433e; --bag-edge: #b87b68; --bag-cn: #e59a7e; --bag-kr: #8eabc9; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1e1a1b; --card: #282324; --ink: #f1eae7; --ink2: #e7cdc0; --muted: #b6a392; --line: #3e3637; --grid: #332c2d; --axis: #67605a;
+  --accent: #e7a3ab; --intl: #e7a3ab; --hi-ink: #efb4ba; --board: #e7cdc0; --board-ink: #1e1a1b; --sea: #231f20; --land: #3a3334; --land-edge: #282324;
+  --tube: #928a7f; --ring: #d8b29b; --bullet: #e7a3ab; --bullet-hi: #903a43; --imp: #6e6862;
+  --cn: #e59a7e; --us: #8eabc9; --jp: #e7cdc0; --hk: #dc8c67; --vn: #abc07b; --ru: #b5c6ce; --tw: #cd9886; --th: #c4d39c; --sg: #689daf; --my: #b6a392; --etc: #5f5853;
+  --pal-case: #111011; --pal-edge: #67605a; --bag: #4c433e; --bag-edge: #b87b68; --bag-cn: #e59a7e; --bag-kr: #8eabc9; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.hi { fill: var(--hi-ink) }
+::selection { background: var(--bullet-hi); color: var(--ink) }
+.pop { transform-box: fill-box; transform-origin: 50% 100% }
+</style>
+
+<main class="page">
+  <header>
+    <h1>K-뷰티 화장품은 중국에만 팔릴까<span>이제는 아니다. 2021년 화장품 수출의 53.2%가 중국으로 갔지만 2025년에는 17.7%로 줄었고, 처음으로 미국(19.1%)이 1위가 됐다. 상위 10개국 몫도 92.7%(2016년)에서 70.7%로 줄어 더 많은 나라로 흩어졌다. 수출은 2025년 114억 달러로 2000년의 149배다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 35</dd>
+      <dt>한 줄</dt><dd>식품의약품안전처 화장품산업 통계로 보면 화장품 수출은 2000년 7,649만 달러에서 2025년 114억 1,757만 달러가 됐다. 2022년 한 해 13.4% 줄었다가 2024년 20.3%, 2025년 12.2% 늘었다. 중국 몫은 2021년 53.2%가 꼭대기였고 2025년 17.7%, 홍콩은 2016년 29.8%에서 6.1%다. 미국은 8.3%에서 19.1%, 일본은 4.4%에서 9.5%가 됐다. 화장품을 사 간 나라는 2018년 145곳에서 2022년 175곳이 됐다. 면세점 매출에서 중국 국적 몫은 2021년 93.9%에서 2024년 71.8%, 화장품 몫은 2020년 81.5%에서 55.6%로 내려왔다.</dd>
+      <dt>분류</dt><dd>주거·일·경제</dd>
+      <dt>본능</dt><dd>운명 본능 · "K-뷰티 = 중국 특수"라는 한때의 모습이 그대로 이어진다고 본다</dd>
+      <dt>그림 방식</dt><dd>립스틱 26개 · 한 해가 립스틱 하나, 올라온 길이가 그해 수출액(2000–2025년). 왕관이 넘어가는 순위표, 세계 지도에 떨어지는 화장품 병(2018–2022년 재생), 나라별 아이섀도 팔레트, 면세점 쇼핑백</dd>
+      <dt>기간</dt><dd>2000–2025년 · 나라별 전체는 2018–2022년</dd>
+      <dt>엮은 데이터</dt><dd>4개 · 화장품 수입 및 수출액 · 화장품 수출액 상위 10개국 · 4대 소비재 국가별 수출금액(화장품) · 면세점 국적별 매출과 화장품 매출 비율</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2021년 한국 화장품 수출의 53%가 중국으로 갔다. 2025년 중국의 몫은?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>여전히 절반 안팎</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>3분의 1쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>5분의 1이 안 된다</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. <span class="n">17.7%</span>, 20억 1,831만 달러</span>
+      2021년 48억 8,171만 달러에서 절반 아래로 줄었다. 그사이 미국은 8억 4,104만 달러에서 21억 8,420만 달러로 늘어 중국을 앞질렀다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">올라오는 립스틱</h2>
+      <p>2000년부터 2025년까지 한 해를 립스틱 하나로 세우고, 그해 수출액만큼 립스틱을 올렸다. 2000년 7,649만 달러였던 립스틱은 2012년 10억 달러를 넘고, 2016년 한 해에만 61% 길어져 41억 달러가 된다. 2021년 91억 8,357만 달러에서 2022년 13.4% 짧아졌다가 2025년 114억 1,757만 달러로 가장 길다.</p>
+      <p>점선은 그해 화장품 수입액이다. 수입은 2014년 이후 10억–13억 달러 사이에 머물렀다. 2025년 수출은 수입의 8.9배다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">화장품 수출액, 2000–2025년</p>
+      <p class="fs">억 달러. 립스틱 하나 = 한 해, 올라온 길이 = 수출액. 점선 = 수입액</p>
+      <div class="chart" id="c1"></div>
+      <figcaption>식품의약품안전처 「화장품산업현황」 화장품 수입 및 수출액 현황(KOSIS 145 DT_145011_A006).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">왕관이 넘어간 해</h2>
+      <p>2016년부터 2025년까지 해마다 수출 상위 나라의 순위를 이었다. 왕관은 1위다. 중국은 2024년까지 9년 동안 1위였다. 다만 몫은 2021년 53.2%가 꼭대기였고 2022년 45.4%, 2023년 32.8%, 2024년 24.5%로 해마다 줄었다. 2016년 2위였던 홍콩(29.8%)도 6.1%로 내려왔다.</p>
+      <p>미국은 2016년 3위(8.3%)에서 2021년 2위, 2025년 1위(19.1%)가 됐다. 일본도 4.4%에서 9.5%로 올라 2021년부터 3위다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">화장품 수출 순위, 2016–2025년</p>
+      <p class="fs">순위. 원 크기 = 그해 수출액, 원 안 숫자 = 전체 수출에서의 몫(%)</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>식품의약품안전처 「화장품산업현황」 화장품 수출액 상위 10개국 현황(KOSIS 145 DT_145011_A008). 상위 10개국 밖으로 나간 해는 선을 끊었다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">세계로 떨어지는 병</h2>
+      <p>한국 화장품이 팔려 간 나라마다 화장품 병을 떨어뜨렸다. 병 크기가 그 나라로 간 수출액이다. 2018년에는 145개 나라, 2022년에는 175개 나라다. 재생을 누르면 중국 병이 2021년까지 커졌다가 2022년 줄어드는 사이, 미국·일본·동남아·중동·동유럽의 병이 함께 커진다.</p>
+      <p>2022년에 수출이 1천만 달러를 넘은 나라는 35곳이다. 키르기즈스탄(5,270만 달러)·카자흐스탄(4,951만 달러) 같은 중앙아시아와 폴란드·리투아니아 같은 동유럽도 들어 있다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">나라별 화장품 수출</p>
+      <p class="fs">병 넓이 = 그 나라로 간 수출액. 선 = 한국에서 그 나라로</p>
+      <div class="player" id="p3"></div>
+      <p class="stat" id="st3" aria-live="polite"></p>
+      <div class="chart" id="c3"></div>
+      <figcaption>「4대 소비재 국가별 수출금액(화장품)」(15119569, 2018–2022년). 지도는 Natural Earth 110m 경계를 등면적 도법으로 그렸다. 홍콩·싱가포르·마카오는 점으로 놓았다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">나라별 아이섀도 팔레트</h2>
+      <p>그해 수출을 아이섀도 팔레트 한 판으로 놓고, 칸 넓이를 나라별 몫으로 나눴다. 2016년 팔레트는 중국과 홍콩 두 칸이 67%를 채운다. 2025년에는 미국·중국·일본이 비슷한 크기로 나란히 있고, 상위 10개국 밖의 "그 밖의 나라" 칸이 29.3%로 가장 넓다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">화장품 수출의 나라별 몫</p>
+      <p class="fs">칸 넓이 = 그해 수출에서의 몫. 그 밖의 나라 = 상위 10개국을 뺀 나머지</p>
+      <div class="chips" id="chips4" role="group" aria-label="해 고르기"></div>
+      <div class="chart" id="c4"></div>
+      <figcaption>식품의약품안전처 「화장품산업현황」(KOSIS 145 DT_145011_A008, A006).</figcaption>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">면세점 쇼핑백</h2>
+      <p>수출 통계 밖에서도 중국으로 가는 화장품이 있다. 면세점에서 사 가는 화장품이다. 면세점 매출을 해마다 쇼핑백 하나로 그리고 사 간 사람의 국적으로 채웠다. 중국 국적 몫은 2015년 57.1%에서 2021년 93.9%까지 올랐다가 2024년 71.8%로 내려왔다. 면세점 매출에서 화장품이 차지하는 몫(쇼핑백 손잡이의 숫자)도 2020년 81.5%에서 2024년 55.6%로 내려왔다.</p>
+    </div>
+    <figure id="f5">
+      <p class="ft">면세점 매출의 국적별 몫과 화장품 몫</p>
+      <p class="fs">쇼핑백 하나 = 한 해 면세점 매출 100%, 색 = 사 간 사람의 국적. 가운데 숫자 = 중국 국적 몫, 손잡이 위 숫자 = 매출 중 화장품 몫</p>
+      <div class="legend" id="lg5"></div>
+      <div class="chart" id="c5"></div>
+      <figcaption>「면세점 이용객 국적별 및 화장품 매출 비중」(15142237, 2015–2024년).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t5"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <div class="prose">
+      <h2 class="h" id="s6">그래서, K-뷰티 화장품은 중국에만 팔릴까</h2>
+      <p>이제는 아니다. 2021년까지 화장품 수출은 중국과 홍콩에 크게 기대었지만, 그 뒤 중국 몫이 해마다 줄고 미국·일본과 여러 나라의 몫이 커져 2025년 미국이 처음 1위가 됐다. 수출액은 오히려 가장 많다. 중국에서 줄어든 만큼을 다른 나라가 채우고도 남은 셈이다. 다만 면세점처럼 수출 통계에 잡히지 않는 경로에서는 지금도 중국 손님의 몫이 70%를 넘는다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>목록에 적은 "10월 화장품 수출 약 60% 증가"는 기사(2차 자료)에서 옮긴 것이다. 월별 수출을 주는 관세청 「품목별 국가별 수출입실적」(15100475)은 인증키가 필요하고, 관세청 무역통계 누리집은 이 환경에서 접속이 끊겨 2026년 월별 숫자는 확인하지 못했다.</li>
+      <li>화장품의 범위는 식품의약품안전처 통계 기준이다. 관세청 품목 분류(HS 3303–3307 등)로 센 숫자와 다를 수 있다.</li>
+      <li>나라별 전체 자료(15119569)는 2018–2022년뿐이다. 2023–2025년은 상위 10개국만 있다.</li>
+      <li>홍콩으로 간 화장품의 상당 부분은 중국 본토로 다시 팔린다는 분석이 많지만, 이 자료로는 확인할 수 없다.</li>
+      <li>면세점 국적별 몫은 매출 기준이고, 화장품만의 국적별 몫은 아니다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=145&amp;tblId=DT_145011_A006" target="_blank" rel="noopener">화장품 수입 및 수출액 현황</a> (KOSIS 145)</td><td>식품의약품안전처</td><td>연도별 수출·수입액</td><td>2000–2025</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=145&amp;tblId=DT_145011_A008" target="_blank" rel="noopener">화장품 수출액 상위 10개국 현황</a> (KOSIS 145)</td><td>식품의약품안전처</td><td>나라별 순위·수출액</td><td>2016–2025</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15119569/fileData.do" target="_blank" rel="noopener">4대 소비재 국가별 수출금액(화장품)</a> (15119569)</td><td>공공데이터포털</td><td>모든 나라의 수출액</td><td>2018–2022</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15142237/fileData.do" target="_blank" rel="noopener">면세점 이용객 국적별 및 화장품 매출 비중</a> (15142237)</td><td>공공데이터포털</td><td>국적별 매출 몫, 화장품 매출 몫</td><td>2015–2024</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>26개 연도 수출·수입 · 10개 연도 상위 10개국 · 2018–2022년 195개 나라 · 면세점 10개 연도</dd>
+      <dt>도구</dt><dd>Python(집계) · Node(d3-geo, 세계 지도) · SVG 립스틱, 순위 왕관, 지도 위 병, 팔레트, 쇼핑백(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>나라별 몫과 순위의 변화 · 상위 10개국 몫(쏠림) · 수출국 수</dd>
+      <dt>검증</dt><dd>나라별 수출의 합(2022년 79억 4,705만 달러)이 연도별 총수출(79억 5,320만 달러)과 0.1% 안으로 같다. 상위 10개국 수출액도 나라별 자료(2018–2022)와 1% 안으로 같다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s10">
+    <h2 class="h" id="s10" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>화장품은 어디서 만들까</h3><p>화장품 제조업체와 생산실적을 시도별로 보면 수출을 만드는 지역을 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15091220/fileData.do" target="_blank" rel="noopener">화장품업체정보</a> · 식품의약품안전처</li></ul></div>
+      <div class="q"><h3>K-푸드도 같은 길을 갈까</h3><p>같은 「4대 소비재」 자료의 농식품 국가별 수출로 중국 의존이 줄었는지 견줄 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15100475/openapi.do" target="_blank" rel="noopener">품목별 국가별 수출입실적</a> · 관세청</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.8</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const once = (el, fn, th = .25) => { if (reduce) return false; const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); fn(); }, { threshold: th }); io.observe(el); return true; };
+  const usd = (k) => { const v = k * 1000; if (v >= 1e8) { const e = Math.floor(v / 1e8), m = Math.round((v % 1e8) / 1e4); return `${fmt(e)}억${m ? " " + fmt(m) + "만" : ""} 달러`; } return `${fmt(Math.round(v / 1e4))}만 달러`; };
+  const eok = (k) => (k / 1e5).toLocaleString("ko-KR", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+  const CC = { 중국: "var(--cn)", 미국: "var(--us)", 일본: "var(--jp)", 홍콩: "var(--hk)", 베트남: "var(--vn)", 러시아: "var(--ru)", 러시아연방: "var(--ru)", 대만: "var(--tw)", 타이완: "var(--tw)", 태국: "var(--th)", 싱가포르: "var(--sg)", 싱가폴: "var(--sg)", 말레이시아: "var(--my)", 말레이지아: "var(--my)" };
+  const colC = (c) => CC[c] || "var(--etc)";
+
+  /* ---------- 1. lipsticks ---------- */
+  const T = DATA.tot, NY = T.y.length, MX = Math.max(...T.exp);
+  let seen1 = false;
+  function lipstick(g, x, base, w, ext, hi) {
+    const caseH = w * 1.5, ringH = w * .22;
+    s("rect", { x: x - w / 2, y: base - caseH, width: w, height: caseH, rx: w * .12, fill: "var(--tube)" }, g);
+    s("rect", { x: x - w / 2, y: base - caseH - ringH, width: w, height: ringH, fill: "var(--ring)" }, g);
+    const bw = w * .72, top = base - caseH - ringH - ext, b = s("g", {}, g);
+    s("path", { d: `M${x - bw / 2},${base - caseH - ringH} L${x - bw / 2},${top + bw * .6} L${x + bw / 2},${top} L${x + bw / 2},${base - caseH - ringH} Z`, fill: hi ? "var(--bullet)" : "var(--bullet)", opacity: hi ? 1 : .82 }, b);
+    s("rect", { x: x - bw / 2, y: base - caseH - ringH - Math.min(ext, w * .5), width: bw, height: Math.min(ext, w * .5), fill: "var(--bullet)" }, b);
+    return { b, top };
+  }
+  function c1() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, left = narrow ? 26 : 36, H = narrow ? 300 : 380, top = 20, cw = (W - left) / NY, w = Math.min(22, cw * .64), base = H - 26, caseH = w * 1.5 + w * .22, chH = base - caseH - top;
+    const sy = (k) => k / MX * chH;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "2000년부터 2025년까지 해마다 화장품 수출액만큼 올라온 립스틱 26개. 2025년이 114억 달러로 가장 길다" }, box), pts = [], bs = [];
+    for (let t = 0; t <= 120; t += 20) { const y = base - caseH - sy(t * 1e5); s("line", { x1: left, x2: W, y1: y, y2: y, class: "gl" }, v); tx(v, left - 5, y + 4, String(t), "tk", 11, "end"); }
+    T.y.forEach((y, i) => {
+      const x = left + i * cw + cw / 2, g = s("g", {}, v), L = lipstick(g, x, base, w, sy(T.exp[i]), y >= 2024); bs.push({ b: L.b, i, ext: sy(T.exp[i]) });
+      const iy = base - caseH - sy(T.imp[i]); s("line", { x1: x - cw / 2 + 1, x2: x + cw / 2 - 1, y1: iy, y2: iy, stroke: "var(--imp)", "stroke-width": 2, "stroke-dasharray": "3 2" }, v);
+      if (!narrow || i % 5 === 0 || i === NY - 1) tx(v, x, H - 8, narrow ? `'${String(y).slice(2)}` : String(y).slice(2), "tk", 11, "middle");
+      if ([0, 12, 16, 21, 22, NY - 1].includes(i) && !(narrow && [12, 22].includes(i))) tx(v, x, L.top - 6, eok(T.exp[i]), i === NY - 1 ? "vl hi" : "vl", 11.5, "middle");
+      pts.push({ x, y: base - caseH - sy(T.exp[i]) / 2, r: cw / 2, fn: () => [`${y}년`, [[usd(T.exp[i]), "수출"], [usd(T.imp[i]), "수입"], ...(i ? [[(T.exp[i] / T.exp[i - 1] * 100 - 100).toFixed(1) + "%", "수출, 전년보다"]] : [])]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 해를 옮겨 볼 수 있다");
+    if (seen1 || reduce) return;
+    bs.forEach(({ b, ext }) => { b.style.transform = `translateY(${ext}px)`; });
+    once(box, () => { seen1 = true; bs.forEach(({ b, i }) => { b.style.transition = `transform .9s cubic-bezier(.2,.8,.3,1) ${i * 45}ms`; requestAnimationFrame(() => { b.style.transform = "none"; }); }); });
+  }
+  c1(); onResize(() => { seen1 = true; c1(); });
+  table("t1", ["연도", "수출(천 달러)", "수입(천 달러)", "수출 증감"], T.y.map((y, i) => [String(y), fmt(T.exp[i]), fmt(T.imp[i]), i ? (T.exp[i] / T.exp[i - 1] * 100 - 100).toFixed(1) + "%" : "–"]).reverse());
+
+  /* ---------- 2. crown ranking ---------- */
+  const TP = DATA.top, NT = TP.y.length, TOTY = (y) => T.exp[T.y.indexOf(y)];
+  const SHOW = ["중국", "미국", "일본", "홍콩", "베트남", "러시아", "대만", "태국"];
+  const rankOf = (c, i) => { const k = TP.rows[i].findIndex((r) => r[0] === c || (c === "러시아" && r[0].startsWith("러시아")) || (c === "대만" && r[0] === "타이완")); return k < 0 ? null : k; };
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, left = narrow ? 18 : 30, right = narrow ? 66 : 74, top = 34, rh = narrow ? 36 : 40, H = top + 10 * rh + 24;
+    const sx = (i) => left + i / (NT - 1) * (W - left - right), sy = (k) => top + k * rh + rh / 2;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "2016년부터 2025년까지 화장품 수출 상위 나라의 순위. 중국이 9년 동안 1위였고 2025년 미국이 1위가 됐다" }, box), pts = [];
+    for (let k = 0; k < 10; k++) tx(v, 4, sy(k) + 4, String(k + 1), "tk", 11, "start");
+    TP.y.forEach((y, i) => { if (!narrow || i % 3 === 0 || i === NT - 1) tx(v, sx(i), H - 6, String(y), "tk", 11, "middle"); });
+    const mx = Math.max(...TP.rows.flat().map((r) => r[1]));
+    SHOW.forEach((c) => {
+      const col = colC(c); let d = "", prev = false;
+      TP.y.forEach((_, i) => { const k = rankOf(c, i); if (k == null) { prev = false; return; } d += `${prev ? "L" : "M"}${sx(i)},${sy(k)}`; prev = true; });
+      s("path", { d, fill: "none", stroke: col, "stroke-width": narrow ? 3 : 4, "stroke-linejoin": "round", "stroke-linecap": "round", opacity: .85 }, v);
+      TP.y.forEach((y, i) => { const k = rankOf(c, i); if (k == null) return; const val = TP.rows[i][k][1], r = Math.max(6, Math.sqrt(val / mx) * (narrow ? 15 : 19)), sh = val / TOTY(y) * 100;
+        s("circle", { cx: sx(i), cy: sy(k), r, fill: col, stroke: "var(--card)", "stroke-width": 1.5 }, v);
+        if (r > 12) tx(v, sx(i), sy(k) + 4, Math.round(sh), "vl", r > 15 ? 12.5 : 11.5, "middle", { style: "fill:var(--card)" });
+        pts.push({ x: sx(i), y: sy(k), r, fn: () => [`${c} · ${y}년 ${k + 1}위`, [[usd(val), "수출"], [pc(sh), "전체에서의 몫"]]] }); });
+      const kl = rankOf(c, NT - 1); if (kl != null) tx(v, sx(NT - 1) + (narrow ? 18 : 22), sy(kl) + 4, c, "lb", narrow ? 11.5 : 12.5, "start");
+    });
+    // crowns on rank 1
+    TP.y.forEach((y, i) => { const x = sx(i), yy = sy(0) - (narrow ? 22 : 27); s("path", { d: `M${x - 8},${yy + 7} L${x - 9},${yy - 3} L${x - 4},${yy + 2} L${x},${yy - 6} L${x + 4},${yy + 2} L${x + 9},${yy - 3} L${x + 8},${yy + 7} Z`, fill: "var(--ring)", stroke: "var(--ink2)", "stroke-width": .8 }, v); });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 나라와 해를 옮겨 볼 수 있다");
+  }
+  c2(); onResize(c2);
+  table("t2", ["연도", ...Array.from({ length: 10 }, (_, k) => `${k + 1}위`)], TP.y.map((y, i) => [String(y), ...TP.rows[i].map((r) => `${r[0]} ${pc(r[1] / TOTY(y) * 100)}`)]).reverse());
+
+  /* ---------- 3. world map ---------- */
+  const CT = DATA.cty, NC = CT.y.length, GEO = DATA.geo, CMX = Math.max(...CT.rows.flatMap((r) => r[1]));
+  let lay3 = null;
+  function bottle(g, x, y, sz, col) {
+    const b = s("g", {}, g);
+    s("rect", { x: x - sz * .5, y: y - sz * 1.2, width: sz, height: sz * 1.2, rx: sz * .22, fill: col, stroke: "var(--card)", "stroke-width": .8 }, b);
+    s("rect", { x: x - sz * .22, y: y - sz * 1.55, width: sz * .44, height: sz * .38, rx: sz * .08, fill: "var(--ink2)" }, b);
+    return b;
+  }
+  function build3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), k = W / GEO.W, H = GEO.H * k;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "한국 화장품이 팔려 간 나라를 화장품 병으로 표시한 세계 지도. 2018년 145개국에서 2022년 175개국으로 늘었다" }, box), pts = [];
+    s("rect", { x: 0, y: 0, width: W, height: H, fill: "var(--sea)", rx: 8 }, v);
+    const g = s("g", { transform: `scale(${k})` }, v);
+    GEO.world.forEach((c) => s("path", { d: c.d, fill: "var(--land)", stroke: "var(--land-edge)", "stroke-width": .6, "vector-effect": "non-scaling-stroke" }, g));
+    const arcs = s("g", {}, v), bots = s("g", {}, v), [kx, ky] = GEO.kor.map((z) => z * k);
+    s("circle", { cx: kx, cy: ky, r: 4, fill: "var(--accent)" }, v);
+    const items = CT.rows.filter((r) => r[2]).map((r) => { const [x, y] = r[2].map((z) => z * k); const arc = s("path", { fill: "none", stroke: colC(r[0]), "stroke-width": 1, opacity: .35 }, arcs); const holder = s("g", {}, bots); return { r, x, y, arc, holder }; });
+    items.forEach((it) => pts.push({ x: it.x, y: it.y, r: 6, fn: () => { const kk = lay3.k; return [it.r[0], [[usd(it.r[1][kk]), `${CT.y[kk]}년 수출`], ...CT.y.map((yy, j) => [usd(it.r[1][j]), `${yy}년`]).filter((_, j) => j !== kk)]]; } }));
+    lay3 = { W, k, items, kx, ky, narrow: W < 560 };
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 나라를 옮겨 볼 수 있다");
+  }
+  function draw3(pos) {
+    if (!lay3 || Math.abs(lay3.W - Math.max(300, document.getElementById("c3").clientWidth)) > 1) build3();
+    const i = Math.min(NC - 1, Math.floor(pos + 1e-6)), f = Math.max(0, pos - i), j = Math.min(NC - 1, i + 1), { items, kx, ky, narrow } = lay3; lay3.k = i;
+    const Smax = narrow ? 22 : 34;
+    items.forEach((it) => { const val = it.r[1][i] + (it.r[1][j] - it.r[1][i]) * f; it.holder.replaceChildren();
+      if (val <= 0) { it.arc.setAttribute("d", ""); return; }
+      const sz = Math.max(2.2, Math.sqrt(val / CMX) * Smax), mx = (kx + it.x) / 2, my = Math.min(ky, it.y) - Math.abs(it.x - kx) * .18 - 10;
+      it.arc.setAttribute("d", `M${kx},${ky} Q${mx},${my} ${it.x},${it.y}`); it.arc.setAttribute("stroke-width", Math.max(.6, sz / 7));
+      bottle(it.holder, it.x, it.y + sz * .5, sz, colC(it.r[0])); });
+    const st = document.getElementById("st3"); st.replaceChildren();
+    const tot = CT.rows.reduce((a, r) => a + r[1][i], 0), cn = CT.rows.find((r) => r[0] === "중국")[1][i];
+    st.append(`${CT.y[i]}년 수출한 나라 `, bEl(`${CT.n[i]}곳`), " · 1천만 달러 넘은 나라 ", bEl(`${CT.rows.filter((r) => r[1][i] > 1e4).length}곳`), " · 중국 몫 ", bEl(pc(cn / tot * 100)));
+  }
+  const p3 = Player("p3", "세계 지도의 화장품 병", (p) => draw3(p), NC, (i) => String(CT.y[i]), 6);
+  p3.render(); onResize(() => draw3(p3.pos));
+  table("t3", ["나라", ...CT.y.map(String)], CT.rows.slice(0, 50).map((r) => [r[0], ...r[1].map((x) => fmt(x))]));
+
+  /* ---------- 4. eyeshadow palette ---------- */
+  let year4 = "2025", seen4 = false;
+  chips("chips4", [["2016", "2016년"], ["2021", "2021년"], ["2025", "2025년"]], year4, (k) => { year4 = k; seen4 = true; c4(); });
+  function squarify(items, x, y, w, h) {
+    const out = [], tot = items.reduce((a, b) => a + b.v, 0), area = w * h; let rest = items.map((it) => ({ it, a: it.v / tot * area })), X = x, Y = y, Wd = w, Hd = h;
+    const worst = (row, side) => { const s0 = row.reduce((a, b) => a + b.a, 0); return Math.max(...row.map((r) => Math.max(side * side * r.a / (s0 * s0), (s0 * s0) / (side * side * r.a)))); };
+    while (rest.length) { const side = Math.min(Wd, Hd); let row = [rest[0]], i = 1; while (i < rest.length && worst(row.concat(rest[i]), side) <= worst(row, side)) { row.push(rest[i]); i++; }
+      const s0 = row.reduce((a, b) => a + b.a, 0);
+      if (Wd >= Hd) { const cw = s0 / Hd; let yy = Y; row.forEach((r) => { const hh = r.a / cw; out.push({ ...r.it, x: X, y: yy, w: cw, h: hh }); yy += hh; }); X += cw; Wd -= cw; }
+      else { const ch = s0 / Wd; let xx = X; row.forEach((r) => { const ww = r.a / ch; out.push({ ...r.it, x: xx, y: Y, w: ww, h: ch }); xx += ww; }); Y += ch; Hd -= ch; }
+      rest = rest.slice(i); }
+    return out;
+  }
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, PW = Math.min(W, 760), H = narrow ? PW * .9 : PW * .58, ox = (W - PW) / 2, pad = narrow ? 12 : 18;
+    const i = TP.y.indexOf(+year4), tot = TOTY(+year4), rows = TP.rows[i], other = tot - rows.reduce((a, r) => a + r[1], 0);
+    const items = [...rows.map((r) => ({ c: r[0], v: r[1] })), { c: "그 밖의 나라", v: other }].sort((a, b) => b.v - a.v);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": `${year4}년 화장품 수출의 나라별 몫을 아이섀도 팔레트 칸으로 그린 그림` }, box), pts = [], pans = [];
+    s("rect", { x: ox, y: 0, width: PW, height: H, rx: 18, fill: "var(--pal-case)" }, v);
+    s("rect", { x: ox + 5, y: 5, width: PW - 10, height: H - 10, rx: 14, fill: "none", stroke: "var(--pal-edge)", "stroke-width": 1 }, v);
+    squarify(items, ox + pad, pad, PW - pad * 2, H - pad * 2).forEach((t) => {
+      const g = 4, x = t.x + g, y = t.y + g, w = Math.max(0, t.w - g * 2), h = Math.max(0, t.h - g * 2), col = t.c === "그 밖의 나라" ? "var(--etc)" : colC(t.c);
+      const e = s("rect", { x, y, width: w, height: h, rx: Math.min(10, w / 4, h / 4), fill: col, class: "pop" }, v); pans.push(e);
+      s("path", { d: `M${x + 6},${y + h - 8} Q${x + w * .3},${y + h - 2} ${x + w - 6},${y + h - 10}`, fill: "none", stroke: "#ffffff", "stroke-width": 2, opacity: .22 }, v);
+      const sh = t.v / tot * 100;
+      if (w > 60 && h > 44) { const lw = Math.min(w - 12, Math.max(t.c.length * 13.5, 46) + 10); s("rect", { x: x + 6, y: y + 6, width: lw, height: 38, rx: 6, fill: "var(--card)", opacity: .92 }, v); tx(v, x + 12, y + 22, t.c, "vl", 13, "start"); tx(v, x + 12, y + 38, pc(sh), "tk", 12, "start"); }
+      pts.push({ x: x + w / 2, y: y + h / 2, r: Math.min(w, h) / 2, fn: () => [`${t.c} · ${year4}년`, [[usd(t.v), "수출"], [pc(sh), "몫"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 칸을 옮겨 볼 수 있다");
+    if (seen4 || reduce) return;
+    pans.forEach((e) => { e.style.opacity = 0; e.style.transform = "scale(.6)"; });
+    once(box, () => { seen4 = true; pans.forEach((e, k) => { e.style.transition = `transform .5s cubic-bezier(.3,1.4,.6,1) ${k * 70}ms, opacity .3s ${k * 70}ms`; requestAnimationFrame(() => { e.style.opacity = 1; e.style.transform = "none"; }); }); });
+  }
+  c4(); onResize(() => { seen4 = true; c4(); });
+
+  /* ---------- 5. duty-free bags ---------- */
+  const DU = DATA.duty, DC = DU.cols, DCOL = { 한국: "var(--bag-kr)", 중국: "var(--bag-cn)", 일본: "var(--jp)", 미국: "var(--us)", 대만: "var(--tw)", 기타국: "var(--etc)" };
+  DC.forEach((c) => { const sp = document.createElement("span"); const i = document.createElement("i"); i.className = "sw"; i.style.background = DCOL[c]; sp.append(i, c === "기타국" ? "기타" : c); document.getElementById("lg5").append(sp); });
+  let seen5 = false;
+  function c5() {
+    const box = document.getElementById("c5"), fig = document.getElementById("f5"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, n = DU.rows.length, perRow = narrow ? 5 : 10, rowsN = Math.ceil(n / perRow), cw = W / perRow, bw = Math.min(64, cw * .74), bh = bw * 1.2, rh = bh + bw * .32 + 56, H = rowsN * rh;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "2015년부터 2024년까지 면세점 매출을 쇼핑백으로 그리고 사 간 사람의 국적으로 채운 그림. 중국 국적 몫이 2021년 93.9%까지 올랐다가 2024년 71.8%로 내려왔다" }, box), pts = [], fills = [];
+    DU.rows.forEach((r, i) => {
+      const x = (i % perRow) * cw + (cw - bw) / 2, base = Math.floor(i / perRow) * rh + 26 + bw * .32 + bh, yr = r[0], cos = DU.cos.find((c) => c[0] === yr)[1];
+      s("path", { d: `M${x + bw * .3},${base - bh} Q${x + bw * .3},${base - bh - bw * .32} ${x + bw / 2},${base - bh - bw * .32} Q${x + bw * .7},${base - bh - bw * .32} ${x + bw * .7},${base - bh}`, fill: "none", stroke: "var(--bag-edge)", "stroke-width": 2 }, v);
+      s("rect", { x, y: base - bh, width: bw, height: bh, rx: 3, fill: "var(--bag)", stroke: "var(--bag-edge)", "stroke-width": 1.2 }, v);
+      const g = s("g", {}, v); let yy = base; const tot = r.slice(1).reduce((a, b) => a + b, 0);
+      DC.forEach((c, j) => { const h = r[j + 1] / tot * bh; if (h <= 0) return; yy -= h; s("rect", { x: x + 1, y: yy, width: bw - 2, height: h, fill: DCOL[c] }, g); });
+      fills.push({ g, i });
+      tx(v, x + bw / 2, base - bh - bw * .32 - 10, narrow ? `${Math.round(cos)}%` : `화장품 ${Math.round(cos)}%`, "tk", 11, "middle");
+      tx(v, x + bw / 2, base + 16, String(yr), "tk", 11, "middle");
+      tx(v, x + bw / 2, base - bh * .5 + 4, `${Math.round(r[2])}%`, "vl", 12, "middle", { style: "fill:var(--card)" });
+      pts.push({ x: x + bw / 2, y: base - bh / 2, r: bw / 2, fn: () => [`${yr}년 면세점 매출`, [...DC.map((c, j) => [pc(r[j + 1]), c, DCOL[c]]), [pc(cos), "화장품 매출 몫"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 해를 옮겨 볼 수 있다");
+    if (seen5 || reduce) return;
+    fills.forEach(({ g }) => { g.style.opacity = 0; });
+    once(box, () => { seen5 = true; fills.forEach(({ g, i }) => { g.style.transition = `opacity .5s ${i * 90}ms`; requestAnimationFrame(() => { g.style.opacity = 1; }); }); });
+  }
+  c5(); onResize(() => { seen5 = true; c5(); });
+  table("t5", ["연도", ...DC, "화장품 매출 몫"], DU.rows.map((r) => [String(r[0]), ...r.slice(1).map((x) => pc(x)), pc(DU.cos.find((c) => c[0] === r[0])[1])]));
+})();
+</script>

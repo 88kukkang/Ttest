@@ -1,0 +1,276 @@
+<title>전기 쓰는 쌍봉낙타</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a desert postcard in the supplied palette (sand, terracotta, clay, slate blue).
+   The camel's back is the year's household electricity curve; summer heat in terracotta, winter in slate blue. */
+:root {
+  --paper: #f6efe3; --card: #fcf8f1; --ink: #4c433e; --ink2: #5a5551; --muted: #5f6062; --line: #e2ccb5; --grid: #ebdac0; --axis: #b8ac9c;
+  --ghost: #bcbbb6; --board: #4c433e; --board-ink: #ebdac0; --accent: #d56b41;
+  --camel: #d8b29b; --camel2: #b87b68; --camel-ink: #67453c; --sand: #ebdac0; --dune: #e2ccb5;
+  --summer: #d56b41; --summer2: #9b3737; --winter: #3e6f90; --winter2: #8eabc9; --mild: #b6a392;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #2a2421; --card: #342d29; --ink: #ebdac0; --ink2: #e2ccb5; --muted: #b8ac9c; --line: #4c433e; --grid: #3d3531; --axis: #5a5551;
+  --ghost: #5a5551; --board: #1d1917; --board-ink: #ebdac0; --accent: #dc8c67;
+  --camel: #b87b68; --camel2: #8b4d3e; --camel-ink: #ebdac0; --sand: #4c433e; --dune: #3d3531;
+  --summer: #dc8c67; --summer2: #d56b41; --winter: #8eabc9; --winter2: #689daf; --mild: #928a7f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #2a2421; --card: #342d29; --ink: #ebdac0; --ink2: #e2ccb5; --muted: #b8ac9c; --line: #4c433e; --grid: #3d3531; --axis: #5a5551;
+  --ghost: #5a5551; --board: #1d1917; --board-ink: #ebdac0; --accent: #dc8c67;
+  --camel: #b87b68; --camel2: #8b4d3e; --camel-ink: #ebdac0; --sand: #4c433e; --dune: #3d3531;
+  --summer: #dc8c67; --summer2: #d56b41; --winter: #8eabc9; --winter2: #689daf; --mild: #928a7f; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h, .ft { font-family: var(--serif); font-weight: 700 }
+h1 { font-size: clamp(34px, 6vw, 56px); letter-spacing: -.02em }
+h1 span { font-family: var(--sans); font-weight: 500 }
+h2.h { letter-spacing: -.01em }
+.ft { font-size: 19px }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.yr { background-image: none }
+.cm { fill: var(--camel-ink); font-family: var(--serif); font-weight: 700 }
+</style>
+
+<main class="page">
+  <header>
+    <h1>전기는 여름에 가장 많이 쓸까<span>지금은 그렇다. 그런데 가정의 전기 낙타는 혹이 둘이고, 10년 전에는 겨울 혹이 더 컸다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 12</dd>
+      <dt>한 줄</dt><dd>2025년 한 가구가 쓴 전기는 8월 347kWh로 가장 많고, 1–2월(244kWh)에 두 번째 봉우리가 있다. 5월(201kWh)과 10–11월이 골짜기다. 2014년에는 1월(270kWh)이 1년 중 가장 많이 쓴 달이었고 8월은 245kWh였다. 11년 사이 여름 봉우리는 42% 높아지고 겨울 봉우리는 10% 낮아졌다.</dd>
+      <dt>분류</dt><dd>환경·교통·정치</dd>
+      <dt>본능</dt><dd>단일 관점 본능 · "에어컨 = 전기"라는 한 장면으로 1년을 본다</dd>
+      <dt>그림 방식</dt><dd>쌍봉낙타 · 1월부터 12월까지의 가구 평균 사용량으로 낙타의 등을 그리고, 2014년부터 2025년까지 해마다 혹이 자라고 줄어드는 모습을 재생한다</dd>
+      <dt>기간</dt><dd>2013년 5월–2026년 8월 (월별)</dd>
+      <dt>엮은 데이터</dt><dd>1개 · 한국전력공사 가구 평균 전력 사용량(전력데이터 개방포털, 공공데이터포털 15039291)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2014년, 한 가구가 1년 중 전기를 가장 많이 쓴 달은?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>A</i>1월</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>5월</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>8월</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">A. 1월, <span class="n">270kWh</span></span>
+      그해 8월은 245kWh였다. 이듬해 2015년부터는 8월(또는 9월)이 해마다 1위다. 2025년 8월은 347kWh, 1월은 242kWh다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <figure id="f1">
+      <p class="ft" id="f1t">한 가구가 쓴 전기로 그린 낙타</p>
+      <p class="fs">낙타의 등 = 1월(머리 쪽)부터 12월(꼬리 쪽)까지 가구 평균 사용량. 붉은 혹이 여름, 파란 혹이 겨울</p>
+      <div class="player" id="p1"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>한국전력공사 전력데이터 개방포털 「가구 평균 전력 사용량」, 17개 시도 값을 가구 수로 가중 평균했다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+    <div class="prose">
+      <h2 class="h" id="s1">혹이 둘인 낙타, 앞혹이 줄고 뒷혹이 자랐다</h2>
+      <p>가구 평균 전력 사용량을 1월부터 12월까지 이으면 낙타 등처럼 봉우리가 두 개 솟는다. 냉방의 여름(8월)과 난방·조명의 겨울(1–2월)이다. 봄(5월)과 가을(10–11월)은 골짜기다.</p>
+      <p>재생하면 2014년에는 앞(겨울) 혹이 더 크다. 해가 갈수록 뒤(여름) 혹이 자라, 2018년 폭염 때 334kWh로 처음 크게 솟았고 2024년 349kWh로 가장 높았다. 겨울 혹은 270kWh에서 240kWh대로 조금 낮아졌다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">13년 동안의 달력</h2>
+      <p>2013년 5월부터 2026년 8월까지 달마다 이었다. 여름 봉우리의 높이는 해마다 날씨에 따라 출렁이지만(2019·2020년 280kWh대, 2018·2024년 330–350kWh대), 겨울 봉우리는 240–255kWh 사이에서 거의 같다. 1년 합계는 2014년 2,711kWh에서 2025년 2,927kWh로 8% 늘었다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">가구 평균 전력 사용량, 달마다</p>
+      <p class="fs">kWh. 붉은 점 = 그해 여름 최고, 파란 점 = 그해 겨울(1–2월) 최고</p>
+      <div class="player" id="p2"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>한국전력공사 「가구 평균 전력 사용량」. 2026년 7–8월은 광주·전남(통합 뒤 집계 변경)이 빠진 15개 시도 평균이다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">어디서나 여름 혹이 더 크다</h2>
+      <p>2025년 시도별로 겨울 최고(1–2월)와 여름 최고(7–9월)를 이었다. 17개 시도 모두 여름이 더 많다. 세종(겨울 293, 여름 425kWh)과 경기(270, 390kWh)는 두 혹 모두 높고, 경북(211, 275kWh)·강원(230, 278kWh)은 낮다. 아파트가 많고 가구가 큰 곳일수록 혹이 높은 경향이 있지만, 이 자료로 원인을 가르지는 않았다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">시도별 겨울과 여름의 봉우리, 2025년</p>
+      <p class="fs">kWh. 파란 점 = 1–2월 중 높은 달, 붉은 점 = 7–9월 중 높은 달</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>한국전력공사 「가구 평균 전력 사용량」, 시도별.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">그래서, 전기는 여름에 가장 많이 쓸까</h2>
+      <p>가정에서는 지금은 그렇다. 2015년 이후 해마다 8월(2020년은 9월)이 1위다. 하지만 1년의 봉우리는 하나가 아니다. 1–2월에도 두 번째 혹이 솟고, 그 높이는 10년 넘게 거의 그대로다. 10년 전에는 겨울 혹이 더 컸다. 여름 혹이 커진 것은 에어컨이 늘고 여름이 더워진 결과로 보이며, 그만큼 봄·가을과의 차이가 벌어졌다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>한전의 월별 값은 검침·청구 주기 기준이라, "8월" 값에는 7월 중순–8월 중순 사용분이 섞여 있을 수 있다. 봉우리의 달이 실제 더위와 반달쯤 어긋날 수 있다.</li>
+      <li>주택용(가정) 전력 계약 가구의 평균이다. 아파트 단지 공용 전기, 상가·공장, 전기 대신 가스·기름으로 하는 난방은 들어 있지 않다. 그래서 겨울 혹은 실제 난방 에너지보다 훨씬 작게 보인다.</li>
+      <li>가구원 수가 줄면 가구당 사용량도 줄어든다. 1인 가구가 늘어난 효과는 이 자료에서 따로 빼지 않았다.</li>
+      <li>공공데이터포털(15039291)에는 파일 없이 링크만 있어, 전력데이터 개방포털 화면이 쓰는 조회 경로로 시도별·월별 값을 받았다(한 번에 10개월씩).</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://bigdata.kepco.co.kr/cmsmain.do?scode=S01&amp;pcode=000171&amp;pstate=L&amp;redirect=Y" target="_blank" rel="noopener">가구 평균 전력 사용량</a> (공공데이터포털 15039291)</td><td>한국전력공사</td><td>17개 시도 × 월별 대상 가구 수, 가구당 평균 사용량(kWh), 평균 요금</td><td>2013.5–2026.8</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>1개 자료 · 17개 시도 × 160개월</dd>
+      <dt>도구</dt><dd>Python(수집·집계) · SVG 일러스트와 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>가구 수 가중 평균 · 연도별 계절 곡선 · 겨울·여름 봉우리 비교</dd>
+      <dt>검증</dt><dd>시도별 대상 가구 수를 함께 받아 가중치로 썼다(2025년 12월 17개 시도 합계 2,884만 호). 시도별 값의 단순 평균이 아니라 가구 수로 가중한 전국 평균이다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>하루 중 전기는 언제 가장 많이 쓸까</h3><p>한전 본부별 시간별 사용량으로 여름과 겨울의 하루 모양을 견줄 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15151157/fileData.do" target="_blank" rel="noopener">전국 시간별 전력사용량</a> · 한국전력공사</li></ul></div>
+      <div class="q"><h3>전기요금은 혹을 따라 오를까</h3><p>같은 자료의 가구당 평균 요금으로, 누진 구간이 여름 혹을 얼마나 키우는지 볼 수 있다.</p></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const M = DATA.months, NAT = DATA.nat;
+  const YEARS = []; for (let y = 2014; y <= 2025; y++) YEARS.push(y);
+  const curve = (y) => Array.from({ length: 12 }, (_, i) => NAT[M.indexOf(`${y}${String(i + 1).padStart(2, "0")}`)]);
+  const C = YEARS.map(curve);
+  const MN = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+  const season = (i) => (i <= 1 || i === 11 ? "w" : i >= 6 && i <= 8 ? "s" : "m");
+
+  /* ---------- 1. the camel ---------- */
+  function c1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = 760, H = 430, u = W / Math.max(260, box.clientWidth);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${YEARS[Math.round(pos)]}년 월별 가구 평균 전력 사용량으로 그린 낙타` }, box);
+    const k = Math.floor(pos), f = pos - k, cur = C[k].map((x, i) => (k + 1 < C.length ? x + (C[k + 1][i] - x) * f : x));
+    // desert
+    s("path", { d: `M0,${H - 60} Q190,${H - 92} 380,${H - 66} T${W},${H - 74} V${H} H0 Z`, fill: "var(--dune)" }, v);
+    s("path", { d: `M0,${H - 34} Q260,${H - 56} 520,${H - 36} T${W},${H - 40} V${H} H0 Z`, fill: "var(--sand)" }, v);
+    s("circle", { cx: W - 70, cy: 62, r: 30, fill: "var(--summer)", opacity: .35 }, v);
+    // back: x from 190 (Jan, shoulders) to 600 (Dec, rump); y from usage
+    const x0 = 190, x1 = 600, base = 285, sy = (kwh) => base - (kwh - 180) * 1.25 * (narrowScale), xs = (i) => x0 + i / 11 * (x1 - x0);
+    var narrowScale = 1;
+    const P = cur.map((kwh, i) => [xs(i), sy(kwh)]);
+    let d = `M${x0 - 10},${base + 10} L${P[0][0] - 6},${P[0][1] + 8}`;
+    for (let i = 0; i < 12; i++) { const [x, y] = P[i]; if (i === 0) d += ` L${x},${y}`; else { const [px, py] = P[i - 1]; const cx_ = (px + x) / 2; d += ` C${cx_},${py} ${cx_},${y} ${x},${y}`; } }
+    d += ` Q${x1 + 26},${P[11][1] + 6} ${x1 + 24},${base + 6} Q${(x0 + x1) / 2},${base + 48} ${x0 - 10},${base + 10} Z`;
+    // legs (behind body)
+    [[x0 + 20, 0], [x0 + 60, 6], [x1 - 60, 0], [x1 - 22, 6]].forEach(([lx, o]) => { s("path", { d: `M${lx},${base + 20} q-4,40 2,${70 - o} h14 q4,-36 0,${-70 + o}`, fill: "var(--camel2)", stroke: "var(--camel-ink)", "stroke-width": 2.4, "stroke-linejoin": "round" }, v); s("rect", { x: lx - 3, y: base + 86 - o, width: 22, height: 8, rx: 4, fill: "var(--camel-ink)" }, v); });
+    // body
+    s("path", { d, fill: "var(--camel)", stroke: "var(--camel-ink)", "stroke-width": 2.6, "stroke-linejoin": "round" }, v);
+    // tint the humps by season: clip a band to the body
+    const cid = "cb" + Math.random().toString(36).slice(2, 7); s("path", { d }, s("clipPath", { id: cid }, s("defs", {}, v)));
+    const tg = s("g", { "clip-path": `url(#${cid})` }, v), dfs = v.querySelector("defs");
+    [["gs", "var(--summer)"], ["gw", "var(--winter)"]].forEach(([id, c]) => { const lg = s("linearGradient", { id: id + cid, x1: 0, y1: 0, x2: 0, y2: 1 }, dfs); s("stop", { offset: 0, "stop-color": c, "stop-opacity": .75 }, lg); s("stop", { offset: .55, "stop-color": c, "stop-opacity": .25 }, lg); s("stop", { offset: 1, "stop-color": c, "stop-opacity": 0 }, lg); });
+    for (let i = 0; i < 12; i++) { const sea = season(i); if (sea === "m") continue; const xa = i === 0 ? x0 - 30 : (xs(i - 1) + xs(i)) / 2, xb = i === 11 ? x1 + 40 : (xs(i) + xs(i + 1)) / 2; const top_ = Math.min(...P.slice(Math.max(0, i - 1), i + 2).map((p) => p[1])) - 4; s("rect", { x: xa - .5, y: top_, width: xb - xa + 1, height: base - top_, fill: `url(#${sea === "s" ? "gs" : "gw"}${cid})` }, tg); }
+    s("path", { d, fill: "none", stroke: "var(--camel-ink)", "stroke-width": 2.6, "stroke-linejoin": "round" }, v);
+    // neck & head (left)
+    const hx = x0 - 10, hy = P[0][1] + 20;
+    s("path", { d: `M${hx + 18},${hy + 10} Q${hx - 30},${hy - 10} ${hx - 52},${hy - 92} Q${hx - 58},${hy - 120} ${hx - 92},${hy - 118} Q${hx - 128},${hy - 114} ${hx - 128},${hy - 96} Q${hx - 124},${hy - 82} ${hx - 96},${hy - 84} Q${hx - 72},${hy - 84} ${hx - 70},${hy - 70} Q${hx - 58},${hy - 20} ${hx + 26},${hy + 44} Z`, fill: "var(--camel)", stroke: "var(--camel-ink)", "stroke-width": 2.6, "stroke-linejoin": "round" }, v);
+    s("circle", { cx: hx - 98, cy: hy - 104, r: 3.4, fill: "var(--camel-ink)" }, v);
+    s("path", { d: `M${hx - 82},${hy - 120} q4,-12 12,-6`, fill: "none", stroke: "var(--camel-ink)", "stroke-width": 2.4, "stroke-linecap": "round" }, v);
+    s("path", { d: `M${hx - 124},${hy - 92} q6,4 12,0`, fill: "none", stroke: "var(--camel-ink)", "stroke-width": 2, "stroke-linecap": "round" }, v);
+    s("circle", { cx: hx - 88, cy: hy - 96, r: 5, fill: "var(--summer)", opacity: .35 }, v);
+    // tail (right)
+    s("path", { d: `M${x1 + 22},${P[11][1] + 30} q22,18 12,52`, fill: "none", stroke: "var(--camel-ink)", "stroke-width": 3, "stroke-linecap": "round" }, v);
+    // month ticks on the back + values
+    const pts = [];
+    P.forEach(([x, y], i) => {
+      const big = i === cur.indexOf(Math.max(...cur)) || i === (cur[0] > cur[1] ? 0 : 1) || i === 4;
+      s("line", { x1: x, x2: x, y1: y - 6, y2: y - 14, stroke: "var(--camel-ink)", "stroke-width": 1.5 }, v);
+      tx(v, x, y - 20, MN[i].replace("월", ""), "tk", Math.max(12, 12.5 * u), "middle");
+      if (big) tx(v, x, y - 20 - Math.max(15, 13 * u), Math.round(cur[i]) + "kWh", "vl halo", Math.max(13, 12 * u), "middle", { "stroke-width": 4 });
+      pts.push({ x, y, r: 8, fn: () => [`${YEARS[Math.round(pos)]}년 ${MN[i]}`, [[f1(C[Math.round(pos)][i]) + "kWh", "가구 평균"]]] });
+    });
+    tx(v, 40, H - 18, `${YEARS[Math.round(pos)]}년 · 1년 ${fmt(cur.reduce((a, b) => a + b, 0))}kWh`, "cm", Math.max(16, 15 * u));
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 달을 하나씩 볼 수 있다", 1);
+  }
+  table("t1", ["연도", ...MN, "합계"], YEARS.map((y, j) => [String(y), ...C[j].map((x) => f1(x)), fmt(C[j].reduce((a, b) => a + b, 0))]));
+
+  /* ---------- 2. the whole series ---------- */
+  function c2(pos) {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const N = M.length, W = Math.max(300, box.clientWidth), H = Math.min(340, Math.max(240, W * .4)), l = 40, r = 16, top = 16, bot = 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "가구 평균 전력 사용량 2013–2026 월별" }, box);
+    const sx = (i) => l + i / (N - 1) * (W - l - r), sy = (k) => top + (1 - (k - 180) / 190) * (H - top - bot);
+    [200, 250, 300, 350].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: "gl" }, v); tx(v, l - 6, sy(t) + 4, t, "tk", 11.5, "end"); });
+    M.forEach((m, i) => { if (m.endsWith("01") && +m.slice(0, 4) % (W < 560 ? 4 : 2) === 0) tx(v, sx(i), H - 6, m.slice(0, 4), "tk", 11.5, "middle"); });
+    const k = Math.floor(pos), f = pos - k, upto = Math.min(N - 1, k);
+    const pts = []; for (let i = 0; i <= upto; i++) pts.push([sx(i), sy(NAT[i])]); if (k + 1 < N && f > 0) pts.push([sx(k + f), sy(lerp(NAT, pos))]);
+    s("path", { d: "M" + pts.map((p) => p[0].toFixed(1) + "," + p[1].toFixed(1)).join("L"), fill: "none", stroke: "var(--camel2)", "stroke-width": 2.2, "stroke-linejoin": "round" }, v);
+    const marks = [];
+    for (let y = 2014; y <= 2026; y++) {
+      const idx = (a, b) => { let best = -1; for (let mm = a; mm <= b; mm++) { const i = M.indexOf(`${y}${String(mm).padStart(2, "0")}`); if (i >= 0 && i <= upto && (best < 0 || NAT[i] > NAT[best])) best = i; } return best; };
+      const w = idx(1, 2), sm = idx(7, 9);
+      if (w >= 0) { s("circle", { cx: sx(w), cy: sy(NAT[w]), r: 4, fill: "var(--winter)" }, v); marks.push({ x: sx(w), y: sy(NAT[w]), r: 4, fn: () => [`${M[w].slice(0, 4)}.${M[w].slice(4)} 겨울 봉우리`, [[f1(NAT[w]) + "kWh", "가구 평균"]]] }); }
+      if (sm >= 0) { s("circle", { cx: sx(sm), cy: sy(NAT[sm]), r: 4.5, fill: "var(--summer)" }, v); marks.push({ x: sx(sm), y: sy(NAT[sm]), r: 4.5, fn: () => [`${M[sm].slice(0, 4)}.${M[sm].slice(4)} 여름 봉우리`, [[f1(NAT[sm]) + "kWh", "가구 평균"]]] }); }
+    }
+    pointLayer(v, tipFor(fig), marks, "좌우 화살표로 봉우리를 하나씩 볼 수 있다");
+  }
+  table("t2", ["월", "가구 평균(kWh)", "대상 가구 수"], M.map((m, i) => [`${m.slice(0, 4)}.${m.slice(4)}`, f1(NAT[i]), fmt(DATA.hosu[i])]));
+
+  /* ---------- 3. sido dumbbells ---------- */
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const S = Object.entries(DATA.sido).map(([name, v]) => { const g = (m) => (v[`2025${m}`] || [0, 0])[1]; return { name: name.replace(/(특별자치시|특별자치도|광역시|특별시|도)$/, ""), w: Math.max(g("01"), g("02")), s: Math.max(g("07"), g("08"), g("09")), lo: Math.min(...["03", "04", "05", "06", "10", "11"].map(g)) }; }).sort((a, b) => b.s - a.s);
+    const W = Math.max(300, box.clientWidth), l = 50, r = 18, top = 10, rowH = 24, H = top + S.length * rowH + 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "시도별 겨울과 여름의 전력 사용 봉우리 2025" }, box);
+    const sx = (k) => l + (k - 160) / 280 * (W - l - r), pts = [];
+    [200, 250, 300, 350, 400].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top, y2: H - 22, class: "gl" }, v); tx(v, sx(t), H - 6, t, "tk", 11.5, "middle"); });
+    S.forEach((q, j) => {
+      const y = top + j * rowH + rowH / 2;
+      s("line", { x1: sx(q.lo), x2: sx(q.s), y1: y, y2: y, stroke: "var(--line)", "stroke-width": 5, "stroke-linecap": "round" }, v);
+      s("circle", { cx: sx(q.lo), cy: y, r: 4, fill: "var(--mild)" }, v);
+      s("circle", { cx: sx(q.w), cy: y, r: 6, fill: "var(--winter)", stroke: "var(--card)", "stroke-width": 1.5 }, v);
+      s("circle", { cx: sx(q.s), cy: y, r: 6, fill: "var(--summer)", stroke: "var(--card)", "stroke-width": 1.5 }, v);
+      tx(v, l - 8, y + 4, q.name, "lb", 12.5, "end");
+      pts.push({ x: sx(q.s), y, r: 6, fn: () => [`${q.name} · 2025년`, [[Math.round(q.s) + "kWh", "여름 봉우리"], [Math.round(q.w) + "kWh", "겨울 봉우리"], [Math.round(q.lo) + "kWh", "봄·가을 가장 낮은 달"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 시도를 옮겨 볼 수 있다");
+    table("t3", ["시도", "겨울 봉우리", "여름 봉우리", "봄·가을 최저"], S.map((q) => [q.name, f1(q.w), f1(q.s), f1(q.lo)]));
+  }
+
+  const p1 = Player("p1", "낙타", c1, YEARS.length, (i) => String(YEARS[i]), 9);
+  const p2 = Player("p2", "월별 사용량", c2, M.length, (i) => `${M[i].slice(0, 4)}.${M[i].slice(4)}`, 12);
+  const all = () => { p1.render(); p2.render(); c3(); };
+  all(); onResize(all);
+})();
+</script>

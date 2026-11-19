@@ -1,0 +1,396 @@
+<title>전기차 주차장</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: the reader guesses the fire rate of electric cars on a ruler. Then two parking lots of 100,000 cars each
+   (electric vs all cars) where pressing "one year" lights random fires at the measured rates; flames per year sized by
+   fires per 10,000 cars; a map where each of the 212 electric-car fires appears month by month, shaped by what the car
+   was doing; and the same 212 marks re-sorted into rows by state, cause, place or where on the car the fire began. */
+:root {
+  --paper: #f4f2ec; --card: #fcfbf7; --ink: #2c2c2a; --ink2: #494843; --muted: #5d5b55; --line: #e1ddd3; --grid: #eae7de; --axis: #a7a8a3;
+  --accent: #d56b41; --intl: #a8451f; --board: #2c2c2a; --board-ink: #f4f2ec; --sea: #fcfbf7;
+  --ev: #3e6f90; --ev-ink: #2f5a77; --all: #5f6062; --all-ink: #494843; --fire: #d56b41; --fire-ink: #a8451f; --fire2: #ebcfa7; --mine: #903a43; --mine-ink: #862f39;
+  --lot: #4c433e; --lot-line: #b8ac9c; --car-ev: #8eabc9; --car-all: #bcbbb6; --burnt: #2c2c2a;
+  --drive: #4e6aa9; --park: #d56b41; --charge: #903a43; --m0: #efece4; --m1: #dbe1dd; --m2: #c6d6cc; --m3: #a7c4c2; --m4: #8ab5bb;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1b1b1a; --card: #252524; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3a3a37; --grid: #2f2f2d; --axis: #62635d;
+  --accent: #dc8c67; --intl: #dc8c67; --board: #dcd9cf; --board-ink: #1b1b1a; --sea: #252524;
+  --ev: #8eabc9; --ev-ink: #abbdc9; --all: #a7a8a3; --all-ink: #bcbbb6; --fire: #dc8c67; --fire-ink: #e7a08a; --fire2: #ebcfa7; --mine: #d98f98; --mine-ink: #e2a6ae;
+  --lot: #161615; --lot-line: #5a5551; --car-ev: #4e6aa9; --car-all: #5f6062; --burnt: #0e0e0d;
+  --drive: #8eabc9; --park: #dc8c67; --charge: #d98f98; --m0: #2a2c2b; --m1: #313a38; --m2: #3a4a46; --m3: #476059; --m4: #56786f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1b1b1a; --card: #252524; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3a3a37; --grid: #2f2f2d; --axis: #62635d;
+  --accent: #dc8c67; --intl: #dc8c67; --board: #dcd9cf; --board-ink: #1b1b1a; --sea: #252524;
+  --ev: #8eabc9; --ev-ink: #abbdc9; --all: #a7a8a3; --all-ink: #bcbbb6; --fire: #dc8c67; --fire-ink: #e7a08a; --fire2: #ebcfa7; --mine: #d98f98; --mine-ink: #e2a6ae;
+  --lot: #161615; --lot-line: #5a5551; --car-ev: #4e6aa9; --car-all: #5f6062; --burnt: #0e0e0d;
+  --drive: #8eabc9; --park: #dc8c67; --charge: #d98f98; --m0: #2a2c2b; --m1: #313a38; --m2: #3a4a46; --m3: #476059; --m4: #56786f; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.evi { fill: var(--ev-ink) } .fi { fill: var(--fire-ink) } .ai { fill: var(--all-ink) } .mi { fill: var(--mine-ink) }
+.lotl { fill: #f4f2ec; font-family: var(--sans); font-weight: 700 } .lott { fill: #dcd9cf; font-family: var(--sans) }
+::selection { background: var(--fire2); color: #1b1b1a }
+.btn { font: inherit; font-size: 15px; font-weight: 600; color: var(--paper); background: var(--ink); border: 0; border-radius: 10px; padding: 10px 18px; min-height: 46px; cursor: pointer }
+.btn:hover { background: var(--intl) } .btn[disabled] { opacity: .45; cursor: default }
+.btn.ghost { color: var(--ink); background: var(--paper); border: 1px solid var(--axis) } .btn.ghost:hover { background: var(--grid) }
+.guess { display: grid; gap: 12px }
+.guess .row, .simrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap }
+.guess input[type=range] { flex: 1 1 220px; min-width: 0; height: 40px; accent-color: var(--mine) }
+.guess output { font: 600 28px/1 var(--mono); font-variant-numeric: tabular-nums; min-width: 5ch; text-align: right }
+.tally { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0 }
+.tally div { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--paper); min-width: 0 }
+.tally dt { font: 500 12px/1.5 var(--mono); color: var(--muted) } .tally dd { margin: 2px 0 0; font-size: 14px; color: var(--ink2); line-height: 1.5 } .tally dd b { font: 600 20px/1.2 var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); display: block }
+@media (max-width: 560px) { .tally { grid-template-columns: minmax(0, 1fr) } .tally dd b { display: inline; margin-right: 6px } }
+.mapwrap { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 22px; align-items: start }
+@media (max-width: 800px) { .mapwrap { grid-template-columns: minmax(0, 1fr) } }
+.side { display: grid; gap: 14px; min-width: 0; font-size: 13.5px; color: var(--ink2) }
+.side ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 0 }
+.side li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--grid) } .side li b { font-variant-numeric: tabular-nums; white-space: nowrap }
+.lgs { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink2); align-items: center } .lgs span { display: inline-flex; align-items: center; gap: 6px } .lgs svg { width: 14px; height: 14px; flex: none }
+.mk { transition: transform .9s cubic-bezier(.3, .8, .3, 1) }
+@keyframes flare { 0% { transform: scale(.2); opacity: 0 } 40% { transform: scale(1.5); opacity: 1 } 100% { transform: scale(1); opacity: 1 } }
+.flare { transform-box: fill-box; transform-origin: 50% 80%; animation: flare .55s ease-out both }
+@media (prefers-reduced-motion: reduce) { .mk { transition: none } .flare { animation: none } }
+</style>
+
+<main class="page">
+  <header>
+    <h1>전기차는 불이 더 자주 날까<span>아니다. 2021–2024년 전기차 화재는 212건으로, 전기차 1만 대에 한 해 1.35건꼴이다. 같은 기간 전체 자동차는 1만 대에 1.59건이다. 네 해 모두 전기차 쪽이 낮았다. 다만 전기차는 대부분 산 지 몇 해 안 된 새 차라서, 차 나이를 맞춘 비교는 이 자료로 할 수 없다. 불이 얼마나 자주 나는지와 한 번 났을 때 얼마나 큰지도 다른 문제다.</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 41</dd>
+      <dt>한 줄</dt><dd>소방청 전기차 화재 212건(2021–2024년)을 전기차 등록 대수로 나누면 1만 대당 1.19–1.54건, 전체 자동차는 1.56–1.61건이다. 212건 가운데 달리거나 멈춰 선 중에 난 불이 117건, 주차 중 58건, 충전 중 37건이고 지하에서 난 불은 22건이다. 48건은 화물차 짐칸에서 났고 그중 33건의 원인이 담배꽁초다.</dd>
+      <dt>분류</dt><dd>안전</dd>
+      <dt>본능</dt><dd>공포 본능 · 크게 보도된 화재 몇 건이 떠올라서, 등록 대수로 나눈 숫자를 보기 전에 "전기차는 잘 탄다"고 믿는다</dd>
+      <dt>그림 방식</dt><dd>전기차 주차장 · 독자가 먼저 답을 맞혀 본다. 10만 대씩 세운 주차장 두 곳에서 버튼을 누르면 한 해치 불이 무작위로 난다. 해마다의 불꽃 크기, 화재 212건이 달마다 찍히는 지도(2021–2024 재생), 212건을 상태·원인·장소로 다시 줄 세우기</dd>
+      <dt>기간</dt><dd>2021–2024년</dd>
+      <dt>엮은 데이터</dt><dd>5개 · 전기차 화재 발생 현황 · 연간화재통계(차량 화재) · 지역별 전기차 현황정보 · 자동차등록대수현황 · 전기차 시군구별 등록대수</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">전체 자동차 1만 대에서는 한 해에 불이 1.6건 난다. 전기차 1만 대에서는 몇 건 날까? 막대를 움직여 답해 보자.</h2>
+    <div class="guess">
+      <div class="chart" id="gq"></div>
+      <div class="row">
+        <input type="range" id="gin" min="0" max="8" step="0.1" value="0" aria-label="전기차 1만 대당 한 해 화재 건수">
+        <output id="gout" for="gin">0.0건</output>
+        <button class="btn" type="button" id="gbtn" disabled>확인</button>
+      </div>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="greveal" hidden>
+      <span class="big">전기차 <span class="n">1.35건</span></span>
+      <span id="gmsg"></span> 2021–2024년 네 해를 합친 값이다. 전체 자동차(1.59건)보다 15% 낮다. 해마다 보면 전기차는 1.19–1.54건, 전체 자동차는 1.56–1.61건이다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">10만 대씩 세운 주차장</h2>
+      <p>왼쪽 주차장에는 전기차 10만 대, 오른쪽에는 여러 차가 섞인 자동차 10만 대가 서 있다. 한 칸이 100대다. <b>1년 보내기</b>를 누르면 실제 비율대로 불이 난다. 전기차 주차장에서는 한 해 평균 13.5건, 오른쪽에서는 15.9건이 나도록 맞췄다. 어느 칸에서 날지는 무작위다.</p>
+      <p>몇 번 눌러 보면 전기차 쪽 불이 더 많은 해가 꽤 자주 나온다. 평균은 전기차가 낮지만, 건수가 적으면 우연만으로도 순서가 뒤집힌다. 실제 숫자도 그렇다. 2024년 전기차 화재 73건은 우연만으로 해마다 9건쯤 오르내릴 수 있는 크기이고, 1만 대당으로는 0.14건쯤이다. 한 해 숫자만으로 "늘었다", "줄었다"를 말하기 어려운 이유다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">주차장 두 곳에서 한 해 동안 나는 불</p>
+      <p class="fs">한 칸 = 자동차 100대. 불꽃 = 그해 불이 난 칸, 검은 칸 = 지난 해에 불이 났던 칸. 2021–2024년 평균 비율로 무작위로 뽑는다</p>
+      <div class="simrow">
+        <button class="btn" type="button" id="sim1">1년 보내기</button>
+        <button class="btn ghost" type="button" id="sim10">10년 보내기</button>
+        <button class="btn ghost" type="button" id="sim0">처음부터</button>
+      </div>
+      <dl class="tally" id="tally" aria-live="polite"></dl>
+      <div class="chart" id="c1"></div>
+      <figcaption>비율은 소방청 「전기차 화재 발생 현황」(212건)과 「연간화재통계」 자동차 화재(오토바이 제외 1만 6,175건)를 2021–2024년 등록 대수(연초와 연말의 평균)의 합으로 나눈 값이다. 주차장의 불은 이 비율을 평균으로 하는 포아송 분포에서 뽑은 가상의 결과이고, 실제 화재 기록이 아니다.</figcaption>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">해마다의 불꽃</h2>
+      <p>1만 대에서 한 해에 난 불의 수만큼 불꽃을 키웠다. 파란 불꽃이 전기차, 주황 불꽃이 전체 자동차다. 전기차 화재는 2021년 24건에서 2024년 73건으로 세 배가 됐다. 같은 기간 전기차는 연말 기준 23만 대에서 68만 대로 늘었다. 건수가 는 것은 차가 늘어서이고, 1만 대당으로는 1.31건에서 1.19건으로 거의 그대로다.</p>
+      <p>전체 자동차는 해마다 4천 건 안팎의 불이 나고 1만 대당 1.6건 근처에서 움직이지 않는다. 2023년에는 전기차가 1.54건까지 올라 차이가 거의 없었고, 2024년에는 다시 1.19건으로 내려갔다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">자동차 1만 대당 한 해 화재 건수</p>
+      <p class="fs">건. 파랑 = 전기차, 주황 = 전체 자동차(전기차 포함, 오토바이 제외). 불꽃 높이 = 1만 대당 건수</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>화재: 소방청 「전기차 화재 발생 현황」(15138615), 「연간화재통계」(15060386, 장소가 자동차인 화재에서 오토바이 제외). 등록 대수: 한국전력공사 「지역별 전기차 현황정보」(15039554), 국토교통부 「자동차등록대수현황」(KOSIS 116 DT_MLTM_5498). 분모는 그해 연초와 연말 등록 대수의 평균이다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">212건이 난 곳</h2>
+      <p>전기차 화재 212건을 불이 난 시군구에 하나씩 찍었다. 동그라미는 달리거나 멈춰 선 중, 네모는 주차 중, 세모는 충전 중에 난 불이다. 재생을 누르면 2021년 1월부터 달마다 불이 찍힌다. 바탕색이 진할수록 전기차가 많이 등록된 곳이다.</p>
+      <p>가장 많이 난 곳은 제주시(12건)다. 제주시는 등록된 전기차가 4만 대로 전국 시군구 가운데 가장 많다. 시도로는 경기가 55건으로 가장 많고 전기차도 가장 많다. 불은 전기차가 많은 곳에서 많이 난다. 건수가 적어서 지역끼리 비율을 견주기는 어렵다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">전기차 화재가 난 시군구, 2021–2024년</p>
+      <p class="fs">표시 하나 = 화재 1건(시군구 안에서 흩어 찍었고 실제 위치가 아니다). 바탕 = 시군구 전기차 등록 대수</p>
+      <div class="player" id="p3"></div>
+      <div class="chips" id="k3" role="group" aria-label="차량 상태"></div>
+      <p class="stat" id="st3" aria-live="polite"></p>
+      <div class="mapwrap">
+        <div class="chart" id="c3"></div>
+        <div class="side">
+          <div class="lgs" id="lg3"></div>
+          <div class="lgs" id="lg3b"></div>
+          <div><p class="label" style="margin-bottom:4px">화재가 많은 시군구 (전기차 등록 대수)</p><ol id="top3"></ol></div>
+        </div>
+      </div>
+      <figcaption>소방청 「전기차 화재 발생 현황」(15138615, 2021–2024년), 한국교통안전공단 「전국 전기차 차종별 용도별 차량 등록대수(운행차량 기준)」(15142951). 구가 있는 시는 시 하나로 합쳤다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">212건 다시 줄 세우기</h2>
+      <p>같은 212건을 기준을 바꿔 가며 줄 세울 수 있다. <b>차량 상태</b>로 보면 달리거나 멈춰 선 중이 117건으로 절반을 넘는다. 충전 중은 37건(17%)이다. <b>지상·지하</b>로 보면 지하에서 난 불은 22건(10%)이고, 그 가운데 11건이 충전 중, 9건이 주차 중이었다.</p>
+      <p><b>불이 시작된 곳</b>으로 줄 세우면 뜻밖의 줄이 보인다. 48건이 적재함, 곧 전기 화물차의 짐칸에서 시작됐다. 그 가운데 34건의 원인이 부주의이고, 원인이 담배꽁초로 적힌 화재는 212건 가운데 33건이다. 배터리와 상관없는 불도 "전기차 화재"로 세어진다. <b>발화 요인</b>으로는 전기적 요인 52건, 원인 미상 50건, 부주의 43건, 교통사고 32건 순이다. 전체 자동차 화재에서는 기계적 요인이 34%로 가장 많은데 전기차에서는 6%다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">전기차 화재 212건, 기준별로 다시 줄 세우기</p>
+      <p class="fs">표시 하나 = 화재 1건. 동그라미 = 운행·정차 중, 네모 = 주차 중, 세모 = 충전 중</p>
+      <div class="chips" id="k4" role="group" aria-label="줄 세우는 기준"></div>
+      <div class="chart" id="c4"></div>
+      <figcaption>소방청 「전기차 화재 발생 현황」(15138615). 분류는 화재 조사 기록에 적힌 그대로다. 불이 시작된 곳에서 가장 많은 "기타 차량 위치"에 차 바닥의 배터리가 드는지는 자료에 설명이 없다. 수가 적은 분류는 "그 밖"으로 묶었다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 전기차는 불이 더 자주 날까</h2>
+      <p>등록 대수로 나누면 더 자주 나지 않는다. 네 해 모두 전기차가 전체 자동차보다 낮았고, 네 해를 합치면 15% 낮다. 전기차 화재 건수가 해마다 느는 것은 전기차가 늘어서다.</p>
+      <p>하지만 이 숫자가 "전기차가 더 안전하다"는 뜻은 아니다. 2024년 말 전기차 68만 대 가운데 다섯에 넷은 2021년 이후에 늘어난 차다. 길 위의 자동차는 훨씬 오래된 차가 섞여 있고, 전체 자동차 화재의 가장 큰 원인은 낡으면 늘어나는 기계적 요인이다. 같은 나이의 차끼리 견주면 결과가 달라질 수 있다. 그리고 이 자료는 불이 몇 번 났는지만 센다. 지하 주차장에서 충전 중에 난 불처럼 한 번이 크게 번지는 경우는 건수로 드러나지 않는다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>차 나이를 맞추지 못했다. 전기차는 2020년 말 13만 5천 대에서 2024년 말 68만 4천 대가 됐다. 대부분 새 차다. 연식별 화재 건수와 등록 대수가 있어야 같은 나이끼리 견줄 수 있는데, 공개된 파일에는 없다.</li>
+      <li>달린 거리도 맞추지 못했다. 분모는 등록 대수이고, 많이 달리는 차(택시·화물차)가 어느 쪽에 더 많은지는 반영하지 않았다.</li>
+      <li>건수는 피해 크기가 아니다. 전기차 화재 파일에는 진화에 걸린 시간, 재산 피해, 옆 차로 번졌는지가 없다. 배터리 화재는 끄기 어렵다는 점은 이 숫자와 별개의 문제다.</li>
+      <li>"전체 자동차"에는 전기차도 들어 있고, 하이브리드와 수소차도 들어 있다. 전기차를 뺀 나머지만 계산해도 1만 대당 1.59건으로 같다. 오토바이와 건설기계는 뺐다.</li>
+      <li>전기차 화재는 한 해 수십 건이라 우연으로도 크게 흔들린다. 시도나 시군구끼리 비율을 견주거나 한 해의 오르내림에 뜻을 두기 어렵다.</li>
+      <li>소방청의 전기차 화재 파일은 2024년까지다. 전기차 등록 대수는 한국전력공사 파일의 월말 값을 썼다.</li>
+      <li>주차장 그림은 평균 비율로 만든 가상의 실험이다. 지도의 표시는 시군구 안에 흩어 찍은 것이고 실제 불이 난 자리가 아니다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15138615/fileData.do" target="_blank" rel="noopener">전기차 화재 발생 현황</a> (15138615)</td><td>소방청</td><td>화재 1건마다 날짜, 시군구, 발화 요인, 장소, 지상·지하, 차량 상태, 발화 지점</td><td>2021–2024</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15060386/fileData.do" target="_blank" rel="noopener">연간화재통계</a> (15060386)</td><td>소방청</td><td>장소가 자동차인 화재 건수와 발화 요인</td><td>2021–2024</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15039554/fileData.do" target="_blank" rel="noopener">지역별 전기차 현황정보</a> (15039554)</td><td>한국전력공사</td><td>월말 전기차 등록 대수(전국 합)</td><td>2020.12–2024.12</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=116&amp;tblId=DT_MLTM_5498" target="_blank" rel="noopener">자동차등록대수현황 시도별</a> (KOSIS 116 DT_MLTM_5498)</td><td>국토교통부</td><td>연말 자동차 등록 대수(전국 합)</td><td>2020.12–2024.12</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15142951/fileData.do" target="_blank" rel="noopener">전국 전기차 차종별 용도별 차량 등록대수</a> (15142951)</td><td>한국교통안전공단</td><td>시군구별 전기차 등록 대수(지도 바탕)</td><td>최근 시점</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>전기차 화재 212건 × 속성 9개 · 자동차 화재 약 1만 7천 건(4년) · 월말 전기차 등록 대수 · 연말 자동차 등록 대수 · 시군구 229곳</dd>
+      <dt>도구</dt><dd>Python(수집·집계) · SVG 주차장 시뮬레이터, 불꽃, 화재 지도, 다시 줄 세우는 표시(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>화재 건수 ÷ 등록 대수(연초·연말 평균) × 1만 · 4년 합산 비율 · 포아송 무작위 추출(주차장) · 건수의 우연 변동(√건수)</dd>
+      <dt>검증</dt><dd>전기차 화재 연도별 합 24 + 43 + 72 + 73 = 212건. 시군구별 전기차 등록 대수의 합이 파일 전체 합(71만 9,039대)과 같다. 212건 모두 시군구 지도에 맞췄다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>전기차는 어디에 많을까</h3><p>시군구별 전기차 등록 대수를 전체 자동차나 인구로 나누면, 전기차가 실제로 많이 다니는 곳이 보인다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15142951/fileData.do" target="_blank" rel="noopener">전국 전기차 차종별 용도별 차량 등록대수</a> · 한국교통안전공단</li></ul></div>
+      <div class="q"><h3>충전기는 차만큼 늘었을까</h3><p>지역별 충전기 수와 전기차 수를 나란히 놓으면, 충전기 한 대를 몇 대가 나눠 쓰는지 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15039555/fileData.do" target="_blank" rel="noopener">지역별 전기차 충전기 현황정보</a> · 한국전력공사</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.16</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const once = (el, fn, th = .25) => { if (reduce) return false; const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); fn(); }, { threshold: th }); io.observe(el); return true; };
+  const f2 = (n) => n.toLocaleString("ko-KR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const RT = DATA.rate, sum = (k) => RT.reduce((a, r) => a + r[k], 0);
+  const EVR = sum("ev_fire") / sum("ev_reg") * 1e4, ALLR = sum("all_fire") / sum("all_reg") * 1e4;
+  const FLAME = "M.5,0 C.56,.2 .92,.4 .86,.7 C.82,.9 .66,1 .5,1 C.34,1 .18,.9 .14,.7 C.1,.48 .3,.42 .31,.2 C.38,.3 .46,.28 .5,0 Z";
+  const flame = (g, cx, base, h, col, inner, cls) => { const w = h * .72, wrap = cls ? s("g", { class: cls }, g) : g, e = s("g", { transform: `translate(${cx - w / 2},${base - h}) scale(${w},${h})` }, wrap); s("path", { d: FLAME, fill: col }, e); if (inner) s("path", { d: FLAME, fill: inner, transform: "translate(.26,.42) scale(.48,.56)" }, e); return e; };
+
+  /* ---------- 0. guess ruler ---------- */
+  const gin = document.getElementById("gin"), gout = document.getElementById("gout"), gbtn = document.getElementById("gbtn"); let revealed = false;
+  function drawGuess() {
+    const box = document.getElementById("gq"); box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), H = 134, l = 16, r = 16, y0 = 84, x = (val) => l + (W - l - r) * val / 8, g = +gin.value;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": revealed ? `자동차 1만 대당 화재. 전체 자동차 1.59건, 전기차 1.35건, 내 답 ${f1(g)}건` : `자동차 1만 대당 화재를 고르는 자. 전체 자동차 1.59건, 내 답 ${f1(g)}건` }, box);
+    s("line", { x1: x(0), x2: x(8), y1: y0, y2: y0, stroke: "var(--axis)", "stroke-width": 2, "stroke-linecap": "round" }, v);
+    for (let t = 0; t <= 8; t++) { s("line", { x1: x(t), x2: x(t), y1: y0 - 5, y2: y0 + 5, stroke: "var(--axis)", "stroke-width": 1.5 }, v); tx(v, x(t), y0 + 22, t, "tk", 11.5, "middle"); }
+    tx(v, x(8), y0 + 22 + 14, "1만 대당 건", "mt", 11.5, "end");
+    const mark = (val, col, inner, label, cls, row, show = true) => { if (!show) return; flame(v, x(val), y0 - 2, 30, col, inner); const right = x(val) > W - 110; tx(v, x(val) + (right ? -14 : 14), y0 - 42 + row * 16, label, "vl halo " + cls, 12.5, right ? "end" : "start", { "stroke-width": 4 }); };
+    mark(ALLR, "var(--fire)", "var(--fire2)", `전체 자동차 ${f2(ALLR)}`, "fi", 1);
+    mark(g, "var(--mine)", null, `내 답 ${f1(g)}`, "mi", 2, g > 0 || revealed);
+    mark(EVR, "var(--ev)", "var(--fire2)", `전기차 ${f2(EVR)}`, "evi", 0, revealed);
+  }
+  gin.addEventListener("input", () => { gout.textContent = f1(+gin.value) + "건"; gbtn.disabled = false; drawGuess(); });
+  gbtn.addEventListener("click", () => {
+    revealed = true; gin.disabled = true; gbtn.disabled = true; const g = +gin.value, d = g - EVR;
+    document.getElementById("gmsg").textContent = Math.abs(d) < .25 ? `${f1(g)}건이라고 답했다. 거의 맞혔다.` : d > 0 ? `${f1(g)}건이라고 답했다. 실제의 ${f1(g / EVR)}배로 봤다.` : `${f1(g)}건이라고 답했다. 실제보다 낮게 봤다.`;
+    document.getElementById("greveal").hidden = false; drawGuess();
+  });
+
+  /* ---------- 1. parking-lot simulator ---------- */
+  const COLS = 40, ROWS = 25, NC = COLS * ROWS, LAM = [EVR * 10, ALLR * 10];
+  const sim = { years: 0, tot: [0, 0], now: [[], []], past: [new Set(), new Set()], evMore: 0, same: 0, timer: 0 };
+  const pois = (lam) => { const Lm = Math.exp(-lam); let k = 0, p = 1; do { k++; p *= Math.random(); } while (p > Lm); return k - 1; };
+  function stepSim() {
+    sim.now.forEach((arr, j) => arr.forEach((c) => sim.past[j].add(c)));
+    sim.now = LAM.map((lam) => { const n = pois(lam), set = new Set(); while (set.size < n) set.add(Math.floor(Math.random() * NC)); return [...set]; });
+    sim.years++; sim.now.forEach((a, j) => { sim.tot[j] += a.length; });
+    if (sim.now[0].length > sim.now[1].length) sim.evMore++; else if (sim.now[0].length === sim.now[1].length) sim.same++;
+  }
+  function c1(animate) {
+    const box = document.getElementById("c1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 640, gap = 18, lw = narrow ? W : (W - gap) / 2, pad = 8, head = 30, cw = (lw - pad * 2) / COLS, ch = cw * 1.25, lh = head + ROWS * ch + pad, H = narrow ? lh * 2 + gap : lh;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": sim.years ? `주차장 실험 ${sim.years}년째. 올해 불: 전기차 주차장 ${sim.now[0].length}건, 전체 자동차 주차장 ${sim.now[1].length}건` : "전기차 10만 대 주차장과 전체 자동차 10만 대 주차장. 아직 불이 나지 않았다" }, box);
+    [["전기차 10만 대", "var(--car-ev)"], ["전체 자동차 10만 대", "var(--car-all)"]].forEach(([name, col], j) => {
+      const ox = narrow ? 0 : j * (lw + gap), oy = narrow ? j * (lh + gap) : 0, g = s("g", { transform: `translate(${ox},${oy})` }, v);
+      s("rect", { x: 0, y: 0, width: lw, height: lh, rx: 8, fill: "var(--lot)" }, g);
+      tx(g, pad + 2, 20, name, "lotl", 14); tx(g, lw - pad - 2, 20, sim.years ? `올해 ${sim.now[j].length}건` : "한 칸 = 100대", "lott", 13, "end");
+      for (let rr = 5; rr < ROWS; rr += 5) s("line", { x1: pad, x2: lw - pad, y1: head + rr * ch - .5, y2: head + rr * ch - .5, stroke: "var(--lot-line)", "stroke-width": .6, opacity: .5 }, g);
+      const now = new Set(sim.now[j]);
+      for (let c = 0; c < NC; c++) {
+        const x = pad + (c % COLS) * cw, y = head + Math.floor(c / COLS) * ch;
+        if (now.has(c)) continue;
+        s("rect", { x: x + cw * .14, y: y + ch * .1, width: cw * .72, height: ch * .8, rx: cw * .16, fill: sim.past[j].has(c) ? "var(--burnt)" : col, stroke: sim.past[j].has(c) ? "var(--fire)" : "none", "stroke-width": .7 }, g);
+      }
+      now.forEach((c) => { const x = pad + (c % COLS) * cw + cw / 2, y = head + Math.floor(c / COLS) * ch + ch * .95; s("circle", { cx: x, cy: y - ch * .45, r: cw * 1.1, fill: "var(--fire)", opacity: .28 }, g); flame(g, x, y, Math.max(13, ch * 1.9), "var(--fire)", "var(--fire2)", animate ? "flare" : null); });
+    });
+    const t = document.getElementById("tally"); t.replaceChildren();
+    const cell = (k, big, rest) => { const d = document.createElement("div"), dt = document.createElement("dt"), dd = document.createElement("dd"); dt.textContent = k; dd.append(bEl(big), rest); d.append(dt, dd); t.append(d); };
+    if (!sim.years) { cell("올해", "–", "아직 한 해도 보내지 않았다"); cell("지금까지 평균", "–", "전기차 13.5건 · 전체 15.9건이 기대값"); cell("전기차 쪽이 더 많았던 해", "–", "버튼을 눌러 확인"); }
+    else { cell(`${sim.years}년째 올해`, `${sim.now[0].length} : ${sim.now[1].length}`, "전기차 : 전체 자동차(건)"); cell("지금까지 한 해 평균", `${f1(sim.tot[0] / sim.years)} : ${f1(sim.tot[1] / sim.years)}`, "기대값 13.5 : 15.9"); cell("전기차 쪽이 더 많았던 해", `${sim.evMore}번`, `${sim.years}년 가운데${sim.same ? ` · 같았던 해 ${sim.same}번` : ""}`); }
+  }
+  const run = (n) => { clearInterval(sim.timer); if (reduce || n === 1) { for (let k = 0; k < n; k++) stepSim(); c1(n === 1); return; } let k = 0; stepSim(); c1(true); sim.timer = setInterval(() => { if (++k >= n) { clearInterval(sim.timer); return; } stepSim(); c1(true); }, 420); };
+  document.getElementById("sim1").addEventListener("click", () => run(1));
+  document.getElementById("sim10").addEventListener("click", () => run(10));
+  document.getElementById("sim0").addEventListener("click", () => { clearInterval(sim.timer); Object.assign(sim, { years: 0, tot: [0, 0], now: [[], []], past: [new Set(), new Set()], evMore: 0, same: 0 }); c1(); });
+
+  /* ---------- 2. flames by year ---------- */
+  let grow2 = 1;
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, cols = narrow ? 2 : 4, rowsN = Math.ceil(RT.length / cols), CH = narrow ? 250 : 340, H = CH * rowsN, top = 24, max = 2, gw = (W - 30) / cols, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "자동차 1만 대당 화재 건수를 불꽃 높이로 그린 그림. 전기차는 2021년 1.31건, 2022년 1.38건, 2023년 1.54건, 2024년 1.19건이고 전체 자동차는 1.56–1.61건" }, box);
+    for (let rw = 0; rw < rowsN; rw++) { const base = rw * CH + CH - 62, hOf = (val) => (CH - 62 - top) * val / max; [0, .5, 1, 1.5, 2].forEach((t) => { s("line", { x1: 30, x2: W, y1: base - hOf(t), y2: base - hOf(t), class: "gl" }, v); tx(v, 26, base - hOf(t) + 4, f1(t), "tk", 11, "end"); }); s("line", { x1: 30, x2: W, y1: base, y2: base, class: "ax" }, v); }
+    RT.forEach((d, k) => {
+      const rw = Math.floor(k / cols), base = rw * CH + CH - 62, hOf = (val) => (CH - 62 - top) * val / max, cx = 30 + gw * (k % cols) + gw / 2, off = Math.min(50, gw * .24);
+      [[d.ev, "var(--ev)", "evi", -off, d.ev_fire, d.ev_reg, "전기차"], [d.all, "var(--fire)", "fi", off, d.all_fire, d.all_reg, "전체 자동차"]].forEach(([val, col, cls, dx, fires, reg, name]) => {
+        const h = Math.max(2, hOf(val) * grow2); flame(v, cx + dx, base, h, col, "var(--fire2)");
+        if (grow2 === 1) tx(v, cx + dx, base - h - 6, f2(val), "vl halo " + cls, narrow ? 13 : 14, "middle", { "stroke-width": 4 });
+        tx(v, cx + dx, base + 32, `${fmt(fires)}건`, "tk", 11.5, "middle"); tx(v, cx + dx, base + 46, reg >= 1e6 ? `${fmt(reg / 1e4)}만 대` : `${f1(reg / 1e4)}만 대`, "tk", 11.5, "middle");
+        pts.push({ x: cx + dx, y: base - h / 2, r: Math.max(14, h / 2), fn: () => [`${d.y}년 ${name}`, [[`${f2(val)}건`, "1만 대당"], [`${fmt(fires)}건`, "화재"], [`${fmt(reg)}대`, "등록 대수(연초·연말 평균)"]]] });
+      });
+      tx(v, cx, base + 16, d.y, "lb", 13.5, "middle");
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 불꽃을 옮겨 볼 수 있다");
+  }
+  table("t2", ["연도", "전기차 화재", "전기차 등록(평균)", "전기차 1만 대당", "자동차 화재", "자동차 등록(평균)", "전체 1만 대당", "전기차 뺀 1만 대당"], RT.map((d) => [d.y, fmt(d.ev_fire), fmt(d.ev_reg), f2(d.ev), fmt(d.all_fire), fmt(d.all_reg), f2(d.all), f2(d.non)]).concat([["4년 합", fmt(sum("ev_fire")), fmt(sum("ev_reg")), f2(EVR), fmt(sum("all_fire")), fmt(sum("all_reg")), f2(ALLR), f2((sum("all_fire") - sum("ev_fire")) / (sum("all_reg") - sum("ev_reg")) * 1e4)]]));
+
+  /* ---------- fires ---------- */
+  const P = DATA.P, ST = ["운행·정차 중", "주차 중", "충전 중"], SC = ["var(--drive)", "var(--park)", "var(--charge)"];
+  const F = DATA.fires.map(([d, p, st, c1, c2, loc, ug, pt, fl], i) => ({ i, d, p, st, c1, c2, loc, ug, pt, fl, m: (+d.slice(0, 4) - 2021) * 12 + (+d.slice(5, 7) - 1) }));
+  const shape = (g, x, y, r, st, extra = {}) => st === 0 ? s("circle", { cx: x, cy: y, r, fill: SC[0], ...extra }, g) : st === 1 ? s("rect", { x: x - r * .9, y: y - r * .9, width: r * 1.8, height: r * 1.8, rx: r * .2, fill: SC[1], ...extra }, g) : s("path", { d: `M${x},${y - r * 1.15} L${x + r * 1.1},${y + r * .85} L${x - r * 1.1},${y + r * .85} Z`, fill: SC[2], ...extra }, g);
+  const tipOf = (f) => [`${f.d} · ${P[f.p].s} ${P[f.p].n}`, [[ST[f.st], "차량 상태", SC[f.st]], [f.c2 && f.c2 !== f.c1 ? `${f.c1}(${f.c2})` : f.c1, "발화 요인"], [`${f.loc} · ${f.fl}`, "장소"], [f.pt, "불이 시작된 곳"]]];
+
+  /* ---------- 3. map ---------- */
+  const GX0 = Math.min(...P.map((p) => p.x)) - 22, GX1 = Math.max(...P.map((p) => p.x)) + 22, GY0 = Math.min(...P.map((p) => p.y)) - 22, GY1 = Math.max(...P.map((p) => p.y)) + 22;
+  const byCode = new Map(); P.forEach((p) => p.codes.forEach((c) => byCode.set(c, p)));
+  const evc = (n) => n < 1000 ? 0 : n < 3000 ? 1 : n < 6000 ? 2 : n < 12000 ? 3 : 4;
+  // spread marks inside a district: phyllotaxis around the centroid, in date order
+  const seen = new Map(); F.forEach((f) => { const k = seen.get(f.p) || 0; seen.set(f.p, k + 1); const a = k * 2.39996, rr = 3.1 * Math.sqrt(k); f.ox = Math.cos(a) * rr; f.oy = Math.sin(a) * rr; });
+  let flt3 = -1; const NM = 48, mlab = (k) => `${2021 + Math.floor(k / 12)}.${String(k % 12 + 1).padStart(2, "0")}`;
+  function draw3(pos) {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"), k = Math.min(NM - 1, Math.floor(pos + 1e-6)); box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), sc = W / (GX1 - GX0), H = (GY1 - GY0) * sc, shown = F.filter((f) => f.m <= k && (flt3 < 0 || f.st === flt3));
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${mlab(k)}까지 전기차 화재 ${shown.length}건을 시군구에 찍은 지도` }, box);
+    const g = s("g", { transform: `translate(${-GX0 * sc},${-GY0 * sc}) scale(${sc})` }, v);
+    DATA.U.forEach(([code, d]) => { const p = byCode.get(code); s("path", { d, fill: p ? `var(--m${evc(p.ev)})` : "var(--m0)", stroke: "var(--card)", "stroke-width": .5 / sc }, g); });
+    DATA.sidoPaths.forEach((sp) => s("path", { d: sp.d, fill: "none", stroke: "var(--axis)", "stroke-width": .9 / sc }, g));
+    const r = (W < 400 ? 3.1 : 3.8) / sc, pts = [];
+    shown.forEach((f) => { const p = P[f.p], x = p.x + f.ox * (W < 400 ? .85 : 1), y = p.y + f.oy * (W < 400 ? .85 : 1), fresh = f.m === k && k < NM - 1; if (fresh) s("circle", { cx: x, cy: y, r: r * 3, fill: "var(--fire)", opacity: .35 }, g); shape(g, x, y, fresh ? r * 1.5 : r, f.st, { stroke: "var(--card)", "stroke-width": .6 / sc }); pts.push({ x: (x - GX0) * sc, y: (y - GY0) * sc, r: r * sc, fn: () => tipOf(f) }); });
+    const cnt = [0, 1, 2].map((q) => F.filter((f) => f.m <= k && f.st === q).length);
+    const st = document.getElementById("st3"); st.replaceChildren(`2021.01–${mlab(k)} · `, bEl(`${cnt[0] + cnt[1] + cnt[2]}건`), ` · 운행·정차 중 ${cnt[0]} · 주차 중 ${cnt[1]} · 충전 중 ${cnt[2]}`);
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 화재를 하나씩 옮겨 볼 수 있다");
+  }
+  const pl3 = Player("p3", "전기차 화재 지도", draw3, NM, mlab, 14);
+  chips("k3", [[-1, "전체"], [0, ST[0]], [1, ST[1]], [2, ST[2]]], -1, (k) => { flt3 = k; pl3.render(); });
+  const lgShape = (box, st, name) => { const sp = document.createElement("span"), v = s("svg", { viewBox: "0 0 14 14", "aria-hidden": "true" }); shape(v, 7, 7, 5, st); sp.append(v, name); box.append(sp); };
+  ST.forEach((name, st) => lgShape(document.getElementById("lg3"), st, name));
+  [["1천 대 미만", 0], ["1–3천", 1], ["3–6천", 2], ["6천–1.2만", 3], ["1.2만 대 이상", 4]].forEach(([name, k]) => { const sp = document.createElement("span"), i = document.createElement("i"); i.className = "sw"; i.style.background = `var(--m${k})`; i.style.border = "1px solid var(--axis)"; sp.append(i, name); document.getElementById("lg3b").append(sp); });
+  const byPlace = new Map(); F.forEach((f) => byPlace.set(f.p, (byPlace.get(f.p) || 0) + 1));
+  [...byPlace].sort((a, b) => b[1] - a[1] || P[b[0]].ev - P[a[0]].ev).slice(0, 7).forEach(([pi, n]) => { const li = document.createElement("li"); li.append(`${P[pi].s} ${P[pi].n}`, bEl(`${n}건 · ${fmt(P[pi].ev)}대`)); document.getElementById("top3").append(li); });
+  table("t3", ["날짜", "시도", "시군구", "차량 상태", "발화 요인", "세부 요인", "장소", "층", "불이 시작된 곳"], F.map((f) => [f.d, P[f.p].s, P[f.p].n, ST[f.st], f.c1, f.c2, f.loc, f.fl, f.pt]));
+
+  /* ---------- 4. re-sort the 212 marks ---------- */
+  const small = (map, min, other = "그 밖") => (val) => (map.get(val) || 0) >= min ? val : other;
+  const cnt = (key) => { const m = new Map(); F.forEach((f) => m.set(f[key], (m.get(f[key]) || 0) + 1)); return m; };
+  const c1m = cnt("c1"), locm = cnt("loc"), ptm = cnt("pt");
+  const DIM = { st: ["차량 상태", (f) => ST[f.st]], pt: ["불이 시작된 곳", (f) => /좌석/.test(f.pt) ? "좌석" : f.pt === "기타차량위치" ? "기타 차량 위치" : f.pt], c1: ["발화 요인", (f) => small(c1m, 10)(f.c1)], loc: ["불이 난 장소", (f) => small(locm, 10, "그 밖의 도로")(f.loc)], ug: ["지상·지하", (f) => f.ug ? "지하" : "지상"] };
+  let dim4 = "st"; const m4 = {};
+  function build4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth); m4.W = W; m4.narrow = W < 560;
+    const v = s("svg", { viewBox: `0 0 ${W} 100`, role: "img" }, box); m4.v = v; m4.lab = s("g", {}, v);
+    m4.marks = F.map((f) => { const g = s("g", { class: "mk" }, v); shape(g, 0, 0, m4.narrow ? 4.2 : 5.2, f.st); return g; });
+    m4.pts = []; pointLayer(v, tipFor(fig), m4.pts, "화살표 키로 화재를 하나씩 옮겨 볼 수 있다"); m4.base = v.getAttribute("aria-label");
+    lay4();
+  }
+  function lay4() {
+    const { W, narrow, v } = m4, key = DIM[dim4][1], groups = new Map(); F.forEach((f) => { const k = key(f); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(f); });
+    const order = [...groups].sort((a, b) => (a[0].startsWith("그 밖") ? 1 : 0) - (b[0].startsWith("그 밖") ? 1 : 0) || b[1].length - a[1].length);
+    const lw = narrow ? 0 : 150, cw = narrow ? 11.5 : 14, per = Math.floor((W - lw - 4) / cw), rh = narrow ? 12.5 : 15; let y = 6; m4.lab.replaceChildren(); m4.pts.length = 0;
+    order.forEach(([name, list]) => {
+      list.sort((a, b) => a.st - b.st || a.i - b.i); const rows = Math.ceil(list.length / per), share = pc(list.length / F.length * 100);
+      if (narrow) { tx(m4.lab, 0, y + 12, name, "lb", 13.5); tx(m4.lab, W, y + 12, `${list.length}건 · ${share}`, "vl", 13.5, "end"); y += 22; }
+      else { tx(m4.lab, 0, y + rh * .5 + 5, name, "lb", 14); tx(m4.lab, lw - 14, y + rh * .5 + 5, `${list.length}건`, "vl", 14, "end"); if (rows > 1) tx(m4.lab, lw - 14, y + rh * .5 + 22, share, "tk", 11.5, "end"); }
+      list.forEach((f, k) => { const x = lw + (k % per) * cw + cw / 2, yy = y + Math.floor(k / per) * rh + rh / 2; m4.marks[f.i].style.transform = `translate(${x}px,${yy}px)`; m4.pts.push({ x, y: yy, r: 5, fn: () => tipOf(f) }); });
+      y += Math.max(rows * rh, narrow ? 0 : 26) + (narrow ? 12 : 14);
+      s("line", { x1: 0, x2: W, y1: y - (narrow ? 6 : 7), y2: y - (narrow ? 6 : 7), class: "gl" }, m4.lab);
+    });
+    v.setAttribute("viewBox", `0 0 ${W} ${y}`);
+    v.setAttribute("aria-label", `전기차 화재 212건을 ${DIM[dim4][0]}로 줄 세운 그림. ` + order.map(([n, l]) => `${n} ${l.length}건`).join(", ") + ". 화살표 키로 화재를 하나씩 옮겨 볼 수 있다");
+  }
+  chips("k4", Object.entries(DIM).map(([k, [name]]) => [k, name]), dim4, (k) => { dim4 = k; lay4(); });
+  table("t4", ["기준", "분류", "건수", "비중", "운행·정차 중", "주차 중", "충전 중"], Object.values(DIM).flatMap(([name, key]) => { const m = new Map(); F.forEach((f) => { const k = key(f); if (!m.has(k)) m.set(k, [0, 0, 0]); m.get(k)[f.st]++; }); return [...m].sort((a, b) => (b[1][0] + b[1][1] + b[1][2]) - (a[1][0] + a[1][1] + a[1][2])).map(([k, c]) => [name, k, c[0] + c[1] + c[2], pc((c[0] + c[1] + c[2]) / F.length * 100), c[0], c[1], c[2]]); }));
+
+  /* ---------- first view + resize ---------- */
+  const growOn = (el, set, draw) => { if (!once(el, () => { const t0 = performance.now(); const tick = (now) => { const k = Math.min(1, (now - t0) / 1000); set(1 - Math.pow(1 - k, 3)); draw(); if (k < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); })) return; set(0); };
+  drawGuess(); c1();
+  growOn(document.getElementById("c2"), (g) => { grow2 = g; }, c2); c2();
+  pl3.render(); build4();
+  onResize(() => { grow2 = 1; drawGuess(); c1(); c2(); pl3.render(); build4(); });
+})();
+</script>

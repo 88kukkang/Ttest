@@ -1,0 +1,366 @@
+<title>아빠 유모차</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a parade of prams, one per 2,000 parents on parental leave, pushed by fathers (green) or mothers (orange),
+   played 2010–2024. Then feeding bottles filled to the share of new parents who took leave, by company size; baby
+   onesies on a washing line sized by fathers' take-up in each industry; toy-block towers of leave-takers by age;
+   and a playground slide tracing mothers' employment from a year before birth to two years after. */
+:root {
+  --paper: #f4f2ec; --card: #fcfbf7; --ink: #2c2c2a; --ink2: #494843; --muted: #5d5b55; --line: #e1ddd3; --grid: #eae7de; --axis: #a7a8a3;
+  --accent: #3e6f42; --intl: #3e6f42; --hi-ink: #356139; --board: #2c2c2a; --board-ink: #f4f2ec; --sea: #fcfbf7;
+  --dad: #3e6f42; --dad2: #abc07b; --mom: #d56b41; --mom-ink: #a8451f; --mom2: #ead0b9; --pram: #5f6062; --wheel: #2c2c2a; --road: #d8d2c4;
+  --glass: #f1ede3; --glass-edge: #8b8a84; --teat: #dabea9; --rope: #8b4d3e; --peg: #b6a392; --block-ink: #fcfbf7; --slide: #4e6aa9; --slide2: #8eabc9; --slide3: #c9c4bd;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1b1c1a; --card: #252623; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3a3b36; --grid: #2f302c; --axis: #62635d;
+  --accent: #abc07b; --intl: #abc07b; --hi-ink: #c4d39c; --board: #dcd9cf; --board-ink: #1b1c1a; --sea: #252623;
+  --dad: #abc07b; --dad2: #3e6f42; --mom: #dc8c67; --mom-ink: #e7a08a; --mom2: #67453c; --pram: #a7a8a3; --wheel: #eeede8; --road: #3a3b36;
+  --glass: #2f302c; --glass-edge: #8b8a84; --teat: #b87b68; --rope: #cd9886; --peg: #928a7f; --block-ink: #1b1c1a; --slide: #8eabc9; --slide2: #4e6aa9; --slide3: #5f6062; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1b1c1a; --card: #252623; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3a3b36; --grid: #2f302c; --axis: #62635d;
+  --accent: #abc07b; --intl: #abc07b; --hi-ink: #c4d39c; --board: #dcd9cf; --board-ink: #1b1c1a; --sea: #252623;
+  --dad: #abc07b; --dad2: #3e6f42; --mom: #dc8c67; --mom-ink: #e7a08a; --mom2: #67453c; --pram: #a7a8a3; --wheel: #eeede8; --road: #3a3b36;
+  --glass: #2f302c; --glass-edge: #8b8a84; --teat: #b87b68; --rope: #cd9886; --peg: #928a7f; --block-ink: #1b1c1a; --slide: #8eabc9; --slide2: #4e6aa9; --slide3: #5f6062; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.hi { fill: var(--hi-ink) } .mo { fill: var(--mom-ink) }
+::selection { background: var(--dad2); color: #1b1c1a }
+.pop { transform-box: fill-box; transform-origin: 50% 100% }
+.swing { transform-box: fill-box; transform-origin: 50% 0 }
+@keyframes sway { 0%, 100% { transform: rotate(0) } 25% { transform: rotate(4deg) } 75% { transform: rotate(-4deg) } }
+@media (prefers-reduced-motion: reduce) { .swing { animation: none !important } }
+</style>
+
+<main class="page">
+  <header>
+    <h1>육아휴직은 엄마만 쓸까<span>아니다. 2024년 육아휴직을 시작한 20만 6천 명 가운데 아빠가 6만 117명, 열에 셋(29.2%)이다. 2010년에는 100명 중 3명도 안 됐다. 하지만 아이가 태어난 그해에 휴직을 쓴 비율은 엄마 72.2%, 아빠 10.2%로 아직 일곱 배 차이가 난다. 아빠 휴직자 셋 중 둘은 300명 이상 기업에 다닌다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 38</dd>
+      <dt>한 줄</dt><dd>국가데이터처 육아휴직통계로 보면 그해 육아휴직을 시작한 아빠는 2010년 1,967명(2.7%)에서 2015년 8,220명(6.0%), 2024년 6만 117명(29.2%, 잠정)이 됐다. 엄마는 7만 1,000명에서 14만 6,109명이다. 2024년에 태어난 아이의 부모 가운데 그해 휴직을 쓴 비율은 아빠 10.2%(2015년 0.6%), 엄마 72.2%(59.1%)다. 아빠 사용률은 300명 이상 기업 12.5%, 4명 이하 6.2%이고, 엄마는 78.4%와 41.0%다. 아빠 휴직자의 67.9%가 300명 이상 기업 소속이다. 아빠는 35–39세(38.7%)가, 엄마는 30–34세(42.9%)가 가장 많다. 아이를 낳은 날 일하고 있던 엄마는 2016년 39.8%에서 2024년 59.9%가 됐다.</dd>
+      <dt>분류</dt><dd>주거·일·경제</dd>
+      <dt>본능</dt><dd>간극 본능 · "엄마만 쓴다"와 "이제 아빠도 쓴다" 둘 중 하나로 나눠 보고, 그 사이의 숫자를 놓친다</dd>
+      <dt>그림 방식</dt><dd>아빠 유모차 · 유모차 하나가 육아휴직자 2,000명, 미는 사람의 색이 아빠와 엄마(2010–2024년 재생). 사용률만큼 찬 젖병, 빨랫줄의 아기 옷, 나이별 블록 탑, 출산 전후 엄마의 취업 미끄럼틀</dd>
+      <dt>기간</dt><dd>2010–2024년(2024년은 잠정)</dd>
+      <dt>엮은 데이터</dt><dd>2개 · 육아휴직통계(전체 육아휴직자, 출생아 부모의 사용률, 규모·산업·연령별, 출산 전후 모의 취업 비율) · 성별 육아휴직급여 수급자수(2025년)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2024년에 아이가 태어난 아빠(육아휴직을 쓸 수 있는 직장인) 100명 가운데, 그해 육아휴직을 쓴 사람은?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>1명쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>B</i>10명쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>30명쯤</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">B. <span class="n">10.2명</span></span>
+      2015년에는 0.6명이었다. 같은 해 엄마는 72.2명이다. "육아휴직자 열에 셋이 아빠"라는 숫자(29.2%)는 그해 휴직을 시작한 모든 부모 가운데 아빠의 몫이고, 아이가 한두 살 넘은 뒤에 쓴 아빠가 많이 들어 있다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">유모차 행렬</h2>
+      <p>그해 육아휴직을 시작한 부모 2,000명을 유모차 한 대로 세웠다. 초록 사람이 미는 유모차가 아빠, 주황이 엄마다. 2010년 행렬 37대 가운데 아빠가 미는 유모차는 1대였다. 2024년에는 103대 가운데 30대다.</p>
+      <p>재생을 누르면 해마다 초록 유모차가 앞줄부터 늘어난다. 아빠는 2010년 1,967명에서 2024년 6만 117명으로 31배가 됐고, 엄마는 7만 1,000명에서 14만 6,109명으로 두 배가 됐다. 엄마 유모차는 2022년부터 거의 그대로이고 아빠만 늘고 있다. 고용보험 육아휴직급여 통계로는 2025년에 새로 급여를 받은 사람 가운데 남자가 36.4%다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">그해 육아휴직을 시작한 아빠와 엄마</p>
+      <p class="fs">유모차 한 대 = 2,000명(반올림). 초록 = 아빠, 주황 = 엄마</p>
+      <div class="player" id="p1"></div>
+      <p class="stat" id="st1" aria-live="polite"></p>
+      <div class="chart" id="c1"></div>
+      <figcaption>국가데이터처 「육아휴직통계」 전체 육아휴직자(시작일 기준, KOSIS 101 DT_CC2024A001). 2024년은 잠정치. 공무원·교사 등 고용보험 밖의 육아휴직도 들어 있다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">사용률 젖병</h2>
+      <p>2024년에 아이가 태어난 부모 가운데 육아휴직을 쓸 수 있는 사람을 젖병 하나로 보고, 그해 실제로 쓴 비율만큼 채웠다. 엄마 젖병은 72.2%까지 찼고 아빠 젖병은 10.2%다. 젖병의 가는 선은 2015년 눈금이다. 아빠는 0.6%에서 열일곱 배가 됐지만 바닥에서 조금 올라온 높이다.</p>
+      <p>회사 크기로 나누면 젖병이 달라진다. 300명 이상 기업의 아빠는 12.5%, 4명 이하 기업의 아빠는 6.2%다. 엄마 쪽 차이는 더 크다. 300명 이상은 78.4%인데 4명 이하는 41.0%다. 작은 회사에서는 엄마도 열에 여섯이 아이가 태어난 해에 휴직을 쓰지 못했다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">아이가 태어난 해 육아휴직 사용률, 2024년</p>
+      <p class="fs">%. 젖병 하나 = 그해 아이가 태어난 부모 중 휴직 대상자 100%, 채운 높이 = 그해 휴직을 쓴 비율. 가는 선 = 2015년</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>국가데이터처 「육아휴직통계」 기업체 규모별 출생아 부모의 육아휴직 사용률(KOSIS 101 DT_CC2024D003). 대상자 = 출생일 기준 고용보험 가입자 등 육아휴직을 쓸 수 있는 부모.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">빨랫줄의 아기 옷</h2>
+      <p>산업마다 아기 옷을 한 벌씩 빨랫줄에 널었다. 옷이 클수록 그 산업에서 아이가 태어난 아빠의 육아휴직 사용률이 높다. 가장 큰 옷은 공공행정(16.1%)이고, 운수·창고(14.8%)와 사업시설관리·지원(13.7%)이 뒤를 잇는다. 가장 작은 옷은 건설업(6.7%)이다. 금융·보험(7.6%)과 도소매(7.8%)도 작다.</p>
+      <p>엄마 사용률이 높은 산업이 아빠도 높은 것은 아니다. 금융·보험은 엄마 75.3%, 아빠 7.6%다. 교육 서비스는 엄마 67.4%, 아빠 8.3%다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">산업별 아빠의 육아휴직 사용률, 2024년</p>
+      <p class="fs">%. 옷 넓이 = 그해 아이가 태어난 아빠 중 휴직을 쓴 비율. 옷 아래 작은 숫자 = 같은 산업 엄마의 사용률</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>국가데이터처 「육아휴직통계」 산업별 출생아 부모의 육아휴직 사용률(KOSIS 101 DT_CC2024D004). 산업 이름은 줄여 썼다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">나이별 블록 탑</h2>
+      <p>2024년 육아휴직자를 나이대별로 블록 2,000명에 하나씩 쌓았다. 엄마 탑은 30–34세(6만 2,714명)가 가장 높다. 아빠 탑은 한 칸 뒤인 35–39세(2만 3,291명)가 가장 높고, 40세 이상(1만 9,753명)이 그다음이다. 아빠 휴직자의 셋 중 하나가 40세 이상이다.</p>
+      <p>아빠는 아이가 조금 큰 뒤에 쓰는 경우가 많다. 2024년 아빠 휴직자 6만 117명 가운데 그해에 아이가 태어난 아빠는 1만 7,074명(28%)이다. 엄마는 14만 6,109명 가운데 7만 9,736명(55%)이 그해 아이를 낳았다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">나이대별 육아휴직자, 2024년</p>
+      <p class="fs">블록 하나 = 2,000명(반올림). 초록 = 아빠, 주황 = 엄마</p>
+      <div class="chart" id="c4"></div>
+      <figcaption>국가데이터처 「육아휴직통계」 연령대별 전체 육아휴직자(KOSIS 101 DT_CC2024A002), 연령대별 출생아 부모 중 육아휴직자(DT_CC2024B003). 2024년 잠정치.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">엄마의 미끄럼틀</h2>
+      <p>아이를 낳기 1년 전부터 낳은 뒤 2년까지, 엄마 가운데 일하고 있던 사람의 비율을 미끄럼틀로 그렸다. 2016년에 아이를 낳은 엄마는 1년 전 51.1%가 일했는데 낳은 날에는 39.8%였다. 열한 명이 미끄럼틀을 타고 내려갔고, 2년 뒤에도 42.6%까지만 돌아왔다.</p>
+      <p>미끄럼틀은 해마다 높아졌다. 2024년에 아이를 낳은 엄마는 1년 전 67.2%, 낳은 날 59.9%가 일하고 있었다. 일하는 엄마가 늘었고, 내려가는 높이는 11.3%p에서 7.3%p로 줄었다. 육아휴직을 쓸 수 있는 엄마가 그만큼 늘어난 셈이다.</p>
+    </div>
+    <figure id="f5">
+      <p class="ft">출산 전후 엄마의 취업 비율</p>
+      <p class="fs">%. 가로 = 아이를 낳은 날 기준 날짜(360일 전–720일 뒤), 선 하나 = 그해 아이를 낳은 엄마</p>
+      <div class="chart" id="c5"></div>
+      <figcaption>국가데이터처 「육아휴직통계」 출산 전·후 모(母)의 취업비율(KOSIS 101 DT_CC2024F001). 육아휴직 중인 사람은 취업자로 센다. 최근 해는 아직 지나지 않은 날이 비어 있다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t5"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <div class="prose">
+      <h2 class="h" id="s6">그래서, 육아휴직은 엄마만 쓸까</h2>
+      <p>아니다. 육아휴직자 열에 셋이 아빠이고, 14년 사이 31배가 됐다. 하지만 "이제 아빠도 쓴다"고 하기에는 이르다. 아이가 태어난 해에 쓰는 아빠는 열에 하나이고 엄마는 열에 일곱이다. 아빠 휴직은 큰 회사와 공공 부문에 몰려 있고, 작은 회사에서는 엄마도 쓰기 어렵다. 숫자는 "엄마만"에서 벗어났지만 "누구나"에는 닿지 않았다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>"육아휴직자 중 아빠 29.2%"와 "아빠 사용률 10.2%"는 다른 숫자다. 앞은 그해 휴직을 시작한 모든 부모 가운데 아빠의 몫이고, 뒤는 그해 아이가 태어난 아빠(휴직 대상자) 가운데 그해 휴직을 쓴 비율이다.</li>
+      <li>사용률은 아이가 태어난 해에 쓴 것만 센다. 이듬해 이후에 쓰는 사람은 빠지므로, 아이가 큰 뒤에 쓰는 아빠의 사용은 낮게 잡힌다.</li>
+      <li>2024년 숫자는 잠정치다.</li>
+      <li>대상자는 고용보험 가입자 등 제도를 쓸 수 있는 사람이다. 자영업자나 고용보험 밖에서 일하는 부모는 분모에도 없다.</li>
+      <li>고용보험 「성별 육아휴직급여 수급자수」(15100479)의 2025년 남자 36.4%는 월별 수급자 수를 더한 값이고 공무원·교사가 빠져 있어, 육아휴직통계의 29.2%와 기준이 다르다.</li>
+      <li>출산 전후 취업 비율에서 육아휴직 중인 사람은 취업자다. 미끄럼틀이 내려가는 것은 휴직이 아니라 일을 그만둔 것이다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_CC2024A001" target="_blank" rel="noopener">육아휴직통계: 전체 육아휴직자</a>, 연령·규모·산업별 (KOSIS 101 DT_CC2024A001–A004)</td><td>국가데이터처</td><td>아빠·엄마 육아휴직자 수</td><td>2010–2024</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_CC2024D001" target="_blank" rel="noopener">출생아 부모의 육아휴직 사용률</a>, 규모·산업·연령별 (DT_CC2024D001–D004), 출생아 부모 중 육아휴직자 (B003)</td><td>국가데이터처</td><td>아이가 태어난 해의 사용률</td><td>2015–2024</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_CC2024F001" target="_blank" rel="noopener">출산 전·후 모의 취업비율</a> (DT_CC2024F001)</td><td>국가데이터처</td><td>출산 360일 전–720일 뒤 엄마의 취업 비율</td><td>2016–2024년 출산</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15100479/fileData.do" target="_blank" rel="noopener">성별 지역별 육아휴직급여 수급자수</a> (15100479)</td><td>고용노동부</td><td>2025년 월별 남녀 수급자</td><td>2025</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>15개 연도 × 아빠·엄마 · 규모 4개 · 산업 13개 · 나이대 4개 · 출산 전후 37개 시점 × 9개 출산 연도</dd>
+      <dt>도구</dt><dd>Python(수집·집계) · SVG 유모차, 젖병, 아기 옷, 블록, 미끄럼틀(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>육아휴직자 중 아빠의 몫 · 출생아 부모의 사용률(규모·산업별) · 휴직자 중 그해 아이가 태어난 부모의 비율</dd>
+      <dt>검증</dt><dd>규모별·산업별·연령별 육아휴직자의 합이 전체(2024년 20만 6,226명)와 같다. 아빠 + 엄마 = 전체.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s10">
+    <h2 class="h" id="s10" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>아빠 휴직은 지역마다 다를까</h3><p>시도별 육아휴직자와 지역별 급여 수급자로 지역 차이를 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_CC2024A005" target="_blank" rel="noopener">시도별 전체 육아휴직자</a> · 국가데이터처</li></ul></div>
+      <div class="q"><h3>휴직 뒤에 회사로 돌아올까</h3><p>출산 뒤 2년까지의 취업 비율로, 휴직 뒤 일터로 돌아오는 엄마가 늘었는지 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_CC2024F001" target="_blank" rel="noopener">출산 전·후 모의 취업비율</a> · 국가데이터처</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.16</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const once = (el, fn, th = .25) => { if (reduce) return false; const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); fn(); }, { threshold: th }); io.observe(el); return true; };
+  const A1 = DATA.A001, YS = Object.keys(A1["부"]).map(Number).sort((a, b) => a - b), NY = YS.length;
+  const DAD = YS.map((y) => A1["부"][y]), MOM = YS.map((y) => A1["모"][y]);
+  const DC = "var(--dad)", MC = "var(--mom)";
+
+  /* ---------- 1. pram parade ---------- */
+  function pram(g, x, y, u, col) {
+    // pusher on the left, pram on the right; y = ground
+    s("circle", { cx: x - u * .62, cy: y - u * 1.42, r: u * .2, fill: col }, g);
+    s("path", { d: `M${x - u * .78},${y - u * .12} L${x - u * .72},${y - u * 1.1} Q${x - u * .66},${y - u * 1.24} ${x - u * .5},${y - u * 1.14} L${x - u * .34},${y - u * .12} Z`, fill: col }, g);
+    s("line", { x1: x - u * .5, y1: y - u * .95, x2: x - u * .12, y2: y - u * .8, stroke: col, "stroke-width": u * .11, "stroke-linecap": "round" }, g);
+    s("path", { d: `M${x - u * .12},${y - u * .8} L${x + u * .02},${y - u * .42}`, stroke: "var(--pram)", "stroke-width": u * .07, fill: "none", "stroke-linecap": "round" }, g);
+    s("path", { d: `M${x - u * .06},${y - u * .5} L${x + u * .78},${y - u * .5} Q${x + u * .76},${y - u * .16} ${x + u * .42},${y - u * .16} L${x + u * .2},${y - u * .16} Q${x - u * .04},${y - u * .18} ${x - u * .06},${y - u * .5} Z`, fill: "var(--pram)" }, g);
+    s("path", { d: `M${x + u * .36},${y - u * .5} A${u * .42},${u * .42} 0 0 1 ${x + u * .78},${y - u * .5} Z`, fill: col }, g);
+    s("path", { d: `M${x + u * .36},${y - u * .5} A${u * .42},${u * .42} 0 0 1 ${x + u * .56},${y - u * .88}`, fill: "none", stroke: "var(--card)", "stroke-width": .8, opacity: .6 }, g);
+    [x + u * .08, x + u * .62].forEach((wx) => { s("circle", { cx: wx, cy: y - u * .09, r: u * .1, fill: "none", stroke: "var(--wheel)", "stroke-width": u * .05 }, g); });
+  }
+  let grow1 = 1;
+  function draw1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1");
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, u = narrow ? 17 : 26, cw = u * 1.9, per = Math.floor(W / cw), rh = u * 1.9;
+    const k = Math.min(NY - 1, Math.floor(pos + 1e-6)), nd = Math.round(DAD[k] / 2000 * grow1), nm = Math.round(MOM[k] / 2000 * grow1), maxN = Math.max(...YS.map((_, i) => Math.round(DAD[i] / 2000) + Math.round(MOM[i] / 2000))), rows = Math.ceil(maxN / per), H = rows * rh + 16;
+    box.replaceChildren();
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": `${YS[k]}년 육아휴직자를 유모차 행렬로 그린 그림. 아빠가 미는 유모차 ${Math.round(DAD[k] / 2000)}대, 엄마가 미는 유모차 ${Math.round(MOM[k] / 2000)}대` }, box), pts = [];
+    const x0 = (W - per * cw) / 2;
+    for (let r = 0; r < rows; r++) s("rect", { x: 0, y: (r + 1) * rh + 2, width: W, height: 3, rx: 1.5, fill: "var(--road)" }, v);
+    for (let i = 0; i < nd + nm; i++) { const r = Math.floor(i / per), c = i % per; pram(v, x0 + c * cw + cw * .46, (r + 1) * rh + 2, u, i < nd ? DC : MC); }
+    pts.push({ x: W / 2, y: H / 2, r: W, fn: () => [`${YS[k]}년 육아휴직을 시작한 부모`, [[fmt(DAD[k]) + "명", "아빠", DC], [fmt(MOM[k]) + "명", "엄마", MC], [pc(DAD[k] / (DAD[k] + MOM[k]) * 100), "아빠의 몫"]]] });
+    pointLayer(v, tipFor(fig), pts, "");
+    const st = document.getElementById("st1"); st.replaceChildren();
+    st.append(`${YS[k]}년 육아휴직자 `, bEl(fmt(DAD[k] + MOM[k]) + "명"), " · 아빠 ", bEl(`${fmt(DAD[k])}명 (${pc(DAD[k] / (DAD[k] + MOM[k]) * 100)})`), " · 엄마 ", bEl(fmt(MOM[k]) + "명"));
+  }
+  const p1 = Player("p1", "유모차 행렬", (p) => draw1(p), NY, (i) => String(YS[i]), 9);
+  p1.render();
+  if (once(document.getElementById("c1"), () => { const t0 = performance.now(); let last = -1; const st = (now) => { const t = Math.min(1, (now - t0) / 1800); grow1 = t; const q = Math.round(t * 40); if (q !== last) { last = q; draw1(p1.pos); } if (t < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); })) { grow1 = 0; draw1(p1.pos); }
+  onResize(() => draw1(p1.pos));
+  table("t1", ["연도", "아빠", "엄마", "전체", "아빠의 몫"], YS.map((y, i) => [String(y), fmt(DAD[i]), fmt(MOM[i]), fmt(DAD[i] + MOM[i]), pc(DAD[i] / (DAD[i] + MOM[i]) * 100)]).reverse());
+
+  /* ---------- 2. bottles ---------- */
+  const D3 = DATA.D003, SZ = [["계", "전체"], ["300명 이상", "300명 이상"], ["50~299명", "50–299명"], ["5~49명", "5–49명"], ["4명 이하", "4명 이하"]];
+  let seen2 = false;
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, n = SZ.length, gw = W / n, bw = Math.min(54, gw * .34), bh = narrow ? 150 : 210, top = 84, base = top + bh, H = base + 46;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "기업 크기별로 아이가 태어난 해 육아휴직 사용률을 젖병에 채운 그림. 엄마 젖병은 대부분 찼고 아빠 젖병은 바닥에 가깝다" }, box), pts = [], fills = [];
+    SZ.forEach(([key, name], gi) => {
+      const gx = gi * gw + gw / 2; tx(v, gx, H - 22, name, gi ? "lb" : "vl", narrow ? 11.5 : 13, "middle"); if (gi === 1 && !narrow) tx(v, gx, H - 6, "(기업 크기)", "mt", 11, "middle");
+      if (gi === 1) s("line", { x1: gw + 2, x2: gw + 2, y1: top - 56, y2: base + 6, stroke: "var(--line)", "stroke-width": 1.5 }, v);
+      [["부", DC, "아빠", -1], ["모", MC, "엄마", 1]].forEach(([sx, col, who, dir]) => {
+        const val = D3[`${key}|${sx}`][2024], old = D3[`${key}|${sx}`][2015], x = gx + dir * (bw * .62), id = `bt${gi}${sx === "부" ? "d" : "m"}`;
+        // teat, collar, body
+        s("path", { d: `M${x - bw * .16},${top - 16} Q${x - bw * .18},${top - 34} ${x},${top - 36} Q${x + bw * .18},${top - 34} ${x + bw * .16},${top - 16} Z`, fill: "var(--teat)" }, v);
+        s("rect", { x: x - bw * .34, y: top - 17, width: bw * .68, height: 10, rx: 3, fill: col }, v);
+        const body = `M${x - bw / 2},${top + 8} Q${x - bw / 2},${top - 6} ${x - bw * .3},${top - 7} L${x + bw * .3},${top - 7} Q${x + bw / 2},${top - 6} ${x + bw / 2},${top + 8} L${x + bw / 2},${base - 8} Q${x + bw / 2},${base} ${x + bw / 2 - 8},${base} L${x - bw / 2 + 8},${base} Q${x - bw / 2},${base} ${x - bw / 2},${base - 8} Z`;
+        const cp = s("clipPath", { id }, v); s("path", { d: body }, cp);
+        s("path", { d: body, fill: "var(--glass)" }, v);
+        const fh = val / 100 * (bh + 7), f = s("rect", { x: x - bw / 2, y: base - fh, width: bw, height: fh, fill: col, "clip-path": `url(#${id})` }, v); fills.push({ f, fh, base });
+        for (let t = 25; t < 100; t += 25) s("line", { x1: x + bw / 2 - bw * .28, x2: x + bw / 2 - 2, y1: base - t / 100 * (bh + 7), y2: base - t / 100 * (bh + 7), stroke: "var(--glass-edge)", "stroke-width": 1 }, v);
+        s("path", { d: body, fill: "none", stroke: "var(--glass-edge)", "stroke-width": 1.5 }, v);
+        const oy = base - old / 100 * (bh + 7); s("line", { x1: x - bw / 2 - 4, x2: x + bw / 2 + 4, y1: oy, y2: oy, stroke: "var(--ink)", "stroke-width": 1.2, "stroke-dasharray": "3 2" }, v);
+        tx(v, x, top - 44, narrow ? f1(val) : pc(val), sx === "부" ? "vl hi" : "vl mo", narrow ? 11.5 : 13.5, "middle");
+        if (gi === 0) tx(v, x, top - 62, who, "mt", 12, "middle");
+        pts.push({ x, y: (top + base) / 2, r: bw / 2 + 4, fn: () => [`${name} · ${who}`, [[pc(val), "2024년 사용률"], [pc(old), "2015년 사용률"]]] });
+      });
+    });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 젖병을 옮겨 볼 수 있다");
+    if (seen2 || reduce) return;
+    fills.forEach(({ f, base }) => { f.setAttribute("y", base); f.setAttribute("height", 0); });
+    once(box, () => { seen2 = true; const t0 = performance.now(); const st = (now) => { const t = Math.min(1, (now - t0) / 1500), e = 1 - Math.pow(1 - t, 3); fills.forEach(({ f, fh, base }) => { f.setAttribute("y", base - fh * e); f.setAttribute("height", fh * e); }); if (t < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); }, .35);
+  }
+  c2(); onResize(() => { seen2 = true; c2(); });
+  table("t2", ["기업 크기", "아빠 2015", "아빠 2024", "엄마 2015", "엄마 2024"], SZ.map(([k, name]) => [name, pc(D3[`${k}|부`][2015]), pc(D3[`${k}|부`][2024]), pc(D3[`${k}|모`][2015]), pc(D3[`${k}|모`][2024])]));
+
+  /* ---------- 3. onesies on a line ---------- */
+  const D4 = DATA.D004, SHORT = { "C. 제조업": "제조", "F. 건설업": "건설", "G. 도매 및 소매업": "도소매", "H. 운수 및 창고업": "운수·창고", "I. 숙박 및 음식점업": "숙박·음식", "J. 정보통신업": "정보통신", "K. 금융 및 보험업": "금융·보험", "M. 전문, 과학 및 기술 서비스업": "전문·과학기술", "N. 사업시설 관리, 사업 지원 및 임대 서비스업": "사업시설·지원", "O. 공공 행정, 국방 및 사회보장 행정": "공공행정", "P. 교육 서비스업": "교육", "Q. 보건업 및 사회복지 서비스업": "보건·복지" };
+  const IND = Object.keys(SHORT).map((k) => ({ k, name: SHORT[k], dad: D4[`${k}|부`][2024], mom: D4[`${k}|모`][2024], dad15: D4[`${k}|부`][2015] })).sort((a, b) => b.dad - a.dad);
+  function onesie(g, x, y, w, col) {
+    const h = w * 1.05;
+    s("path", { d: `M${x - w * .22},${y} Q${x},${y + h * .16} ${x + w * .22},${y} L${x + w * .5},${y + h * .12} L${x + w * .4},${y + h * .36} L${x + w * .28},${y + h * .3} L${x + w * .3},${y + h * .78} Q${x + w * .16},${y + h * .86} ${x + w * .1},${y + h} L${x - w * .1},${y + h} Q${x - w * .16},${y + h * .86} ${x - w * .3},${y + h * .78} L${x - w * .28},${y + h * .3} L${x - w * .4},${y + h * .36} L${x - w * .5},${y + h * .12} Z`, fill: col }, g);
+    [-.05, .05].forEach((dx) => s("circle", { cx: x + w * dx, cy: y + h * .93, r: Math.max(1, w * .025), fill: "var(--card)" }, g));
+    return h;
+  }
+  let seen3 = false;
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 700, lines = narrow ? (W < 440 ? 3 : 2) : 1, per = Math.ceil(IND.length / lines), cw = W / per, wMax = Math.min(narrow ? 78 : 86, cw * .9), lh = wMax * 1.05 + 86, H = lines * lh + 6;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "산업별 아빠의 육아휴직 사용률을 빨랫줄에 넌 아기 옷 크기로 그린 그림. 공공행정이 가장 크고 건설업이 가장 작다" }, box), pts = [], items = [];
+    const mx = IND[0].dad;
+    for (let l = 0; l < lines; l++) { const ry = l * lh + 16; s("path", { d: `M0,${ry} Q${W / 2},${ry + 12} ${W},${ry}`, fill: "none", stroke: "var(--rope)", "stroke-width": 2 }, v);
+      IND.slice(l * per, (l + 1) * per).forEach((it, j) => { const x = j * cw + cw / 2, sag = 12 * (1 - Math.pow((x - W / 2) / (W / 2), 2)) * .98, y = ry + sag, w = wMax * Math.sqrt(it.dad / mx), g = s("g", { class: "swing" }, v);
+        [-.2, .2].forEach((dx) => s("rect", { x: x + w * dx - 2, y: y - 6, width: 4, height: 12, rx: 1, fill: "var(--peg)" }, g));
+        const h = onesie(g, x, y + 3, w, DC);
+        tx(g, x, y + 3 + h * .58, f1(it.dad), "vl", Math.max(11, w * .2), "middle", { style: "fill:var(--block-ink)" });
+        tx(v, x, ry + 12 + wMax * 1.05 + 22, it.name, "lb", narrow ? 11.5 : 12.5, "middle"); tx(v, x, ry + 12 + wMax * 1.05 + 39, `엄마 ${f1(it.mom)}`, "tk", 11, "middle");
+        items.push({ g, j: l * per + j }); pts.push({ x, y: y + h / 2, r: w / 2, fn: () => [it.k.replace(/^[A-Z]\. /, ""), [[pc(it.dad), "아빠 사용률(2024)", DC], [pc(it.mom), "엄마 사용률(2024)", MC], [pc(it.dad15), "아빠 사용률(2015)"]]] }); }); }
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 산업을 옮겨 볼 수 있다");
+    if (seen3 || reduce) return;
+    once(box, () => { seen3 = true; items.forEach(({ g, j }) => { g.style.animation = `sway 1.6s ease-in-out ${j * 90}ms 2`; }); });
+  }
+  c3(); onResize(() => { seen3 = true; c3(); });
+  table("t3", ["산업", "아빠 2024", "아빠 2015", "엄마 2024", "엄마 2015"], IND.map((it) => [it.k.replace(/^[A-Z]\. /, ""), pc(it.dad), pc(it.dad15), pc(it.mom), pc(D4[`${it.k}|모`][2015])]));
+
+  /* ---------- 4. block towers by age ---------- */
+  const A2 = DATA.A002, B3 = DATA.B003, AGE = [["30세 미만", "30세 미만"], ["30~34세", "30–34세"], ["35~39세", "35–39세"], ["40세 이상", "40세 이상"]];
+  let seen4 = false;
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, gw = W / AGE.length, cols = narrow ? 2 : 3, bs = Math.min(24, (gw - 14) / (cols * 2 + .4)), maxB = Math.max(...AGE.map(([k]) => Math.round(A2[`${k}|모`][2024] / 2000))), rows = Math.ceil(maxB / cols), top = 30, base = top + rows * bs + 8, H = base + 44;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "2024년 육아휴직자를 나이대별 블록 탑으로 쌓은 그림. 엄마는 30–34세, 아빠는 35–39세 탑이 가장 높다" }, box), pts = [], blocks = [];
+    s("rect", { x: 0, y: base, width: W, height: 4, rx: 2, fill: "var(--road)" }, v);
+    AGE.forEach(([k, name], gi) => { const gx = gi * gw + gw / 2; tx(v, gx, H - 20, name, "lb", narrow ? 12 : 13.5, "middle");
+      [["부", DC, -1, "아빠"], ["모", MC, 1, "엄마"]].forEach(([sx, col, dir, who]) => { const val = A2[`${k}|${sx}`][2024], n = Math.round(val / 2000), ox = gx + (dir < 0 ? -cols * bs - 4 : 4);
+        for (let i = 0; i < n; i++) { const r = Math.floor(i / cols), c = i % cols, g = s("g", {}, v); s("rect", { x: ox + c * bs + 1, y: base - (r + 1) * bs + 1, width: bs - 2, height: bs - 2, rx: bs * .16, fill: col }, g); s("rect", { x: ox + c * bs + bs * .22, y: base - (r + 1) * bs + bs * .22, width: bs * .56, height: bs * .56, rx: bs * .1, fill: "none", stroke: "var(--card)", "stroke-width": 1, opacity: .55 }, g); blocks.push({ g, r, gi, dir }); }
+        const ty = base - Math.ceil(n / cols) * bs - 7; tx(v, ox + cols * bs / 2, ty, narrow ? (val / 1e4).toFixed(1) + "만" : fmt(val), sx === "부" ? "vl hi" : "vl mo", narrow ? 11.5 : 12.5, "middle");
+        const born = B3[`${k}|${sx}`][2024]; pts.push({ x: ox + cols * bs / 2, y: base - Math.ceil(n / cols) * bs / 2, r: cols * bs / 2 + 2, fn: () => [`${name} · ${who}`, [[fmt(val) + "명", "2024년 육아휴직자"], [fmt(born) + "명", "그중 그해 아이가 태어난 부모"], [fmt(A2[`${k}|${sx}`][2015]) + "명", "2015년 육아휴직자"]]] }); }); });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 탑을 옮겨 볼 수 있다");
+    if (seen4 || reduce) return;
+    blocks.forEach(({ g }) => { g.style.opacity = 0; g.style.transform = "translateY(-60px)"; });
+    once(box, () => { seen4 = true; blocks.forEach(({ g, r, gi }) => { const d = r * 70 + gi * 60; g.style.transition = `transform .45s cubic-bezier(.3,1.3,.6,1) ${d}ms, opacity .2s ${d}ms`; requestAnimationFrame(() => { g.style.opacity = 1; g.style.transform = "none"; }); }); });
+  }
+  c4(); onResize(() => { seen4 = true; c4(); });
+  table("t4", ["나이대", "아빠", "아빠 중 그해 출생", "엄마", "엄마 중 그해 출생"], [["계", "전체"], ...AGE].map(([k, name]) => [name, fmt(A2[`${k}|부`][2024]), fmt(B3[`${k}|부`][2024]), fmt(A2[`${k}|모`][2024]), fmt(B3[`${k}|모`][2024])]));
+
+  /* ---------- 5. mothers' slide ---------- */
+  const F = DATA.F001, DAYS = Object.keys(F).map((k) => [k, k === "출산일" ? 0 : parseInt(k)]).sort((a, b) => a[1] - b[1]);
+  const COH = [[2016, "var(--slide3)"], [2020, "var(--slide2)"], [2024, "var(--slide)"]];
+  let seen5 = false;
+  function c5() {
+    const box = document.getElementById("c5"), fig = document.getElementById("f5"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, left = 34, right = narrow ? 12 : 30, top = 30, H = narrow ? 320 : 400, bot = 34, ch = H - top - bot, Y0 = 30, Y1 = 72;
+    const sx = (d) => left + (d + 360) / 1080 * (W - left - right), sy = (p) => top + ch - (p - Y0) / (Y1 - Y0) * ch;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "아이를 낳기 360일 전부터 720일 뒤까지 엄마의 취업 비율을 미끄럼틀 모양 선으로 그린 그림. 2016년보다 2024년 선이 훨씬 높고 덜 내려간다" }, box);
+    for (let t = 30; t <= 70; t += 10) { s("line", { x1: left, x2: W - right, y1: sy(t), y2: sy(t), class: "gl" }, v); tx(v, left - 5, sy(t) + 4, String(t), "tk", 11, "end"); }
+    [[-360, "1년 전"], [-180, "반년 전"], [0, "낳은 날"], [360, "1년 뒤"], [720, "2년 뒤"]].forEach(([d, l]) => { if (narrow && Math.abs(d) === 180) return; tx(v, sx(d), H - 10, l, d === 0 ? "vl" : "tk", 11.5, d === 720 ? "end" : d === -360 ? "start" : "middle"); });
+    s("line", { x1: sx(0), x2: sx(0), y1: top - 8, y2: top + ch, stroke: "var(--ink)", "stroke-width": 1.2, "stroke-dasharray": "4 3" }, v);
+    const paths = [];
+    COH.forEach(([y, col], ci) => { const P = DAYS.map(([k, d]) => [d, F[k][y]]).filter((p) => p[1] != null), d = P.map((p, i) => `${i ? "L" : "M"}${sx(p[0]).toFixed(1)},${sy(p[1]).toFixed(1)}`).join(""), last = P[P.length - 1], first = P[0], at0 = F["출산일"][y];
+      s("path", { d, fill: "none", stroke: col, "stroke-width": ci === 2 ? 9 : 7, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: .35 }, v);
+      paths.push(s("path", { d, fill: "none", stroke: col, "stroke-width": ci === 2 ? 3.4 : 2.6, "stroke-linecap": "round", "stroke-linejoin": "round" }, v));
+      // ladder at the start of the slide
+      s("line", { x1: sx(first[0]), x2: sx(first[0]), y1: sy(first[1]), y2: top + ch, stroke: col, "stroke-width": 1.4, opacity: .5 }, v);
+      tx(v, sx(first[0]) + (ci === 2 ? 20 : 6), sy(first[1]) - 12, narrow ? `${y}년 ${f1(first[1])}%` : `${y}년 출산 ${f1(first[1])}%`, ci === 2 ? "vl hi halo" : "lb halo", narrow ? 11.5 : 13, "start", { "stroke-width": 4 });
+      s("circle", { cx: sx(0), cy: sy(at0), r: 4.5, fill: "var(--card)", stroke: col, "stroke-width": 2 }, v); tx(v, sx(0) + 8, sy(at0) - 8, f1(at0) + "%", "vl halo", 12, "start", { "stroke-width": 4 });
+      if (last[0] > 0) tx(v, sx(last[0]), sy(last[1]) - 10, f1(last[1]) + "%", "tk halo", 11.5, "end", { "stroke-width": 4 }); });
+    // a child at the top of the newest slide
+    { const y = 2024, P0 = DAYS[0], x = sx(P0[1]) + 4, yy = sy(F[P0[0]][y]) - 26; s("circle", { cx: x, cy: yy - 9, r: 5, fill: "var(--mom)" }, v); s("rect", { x: x - 5, y: yy - 4, width: 10, height: 12, rx: 4, fill: "var(--mom)" }, v); }
+    timeLayer(v, tipFor(fig), DAYS.length, (i) => sx(DAYS[i][1]), top, top + ch, (i) => [DAYS[i][1] === 0 ? "아이를 낳은 날" : `낳은 날 ${DAYS[i][1] > 0 ? "+" : "−"}${Math.abs(DAYS[i][1])}일`, COH.map(([y, col]) => [F[DAYS[i][0]][y] == null ? "–" : pc(F[DAYS[i][0]][y]), `${y}년 출산`, col]).reverse()], "좌우 화살표로 날짜를 옮겨 볼 수 있다");
+    if (seen5 || reduce) return;
+    paths.forEach((p) => { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; });
+    once(box, () => { seen5 = true; paths.forEach((p, j) => { p.style.transition = `stroke-dashoffset 1.8s ease-in-out ${j * 250}ms`; requestAnimationFrame(() => { p.style.strokeDashoffset = 0; }); setTimeout(() => { p.style.transition = ""; p.style.strokeDasharray = ""; p.style.strokeDashoffset = ""; }, 3200); }); }, .3);
+  }
+  c5(); onResize(() => { seen5 = true; c5(); });
+  const FY = [2016, 2018, 2020, 2022, 2023, 2024];
+  table("t5", ["시점", ...FY.map((y) => `${y}년 출산`)], DAYS.filter(([, d]) => d % 90 === 0).map(([k, d]) => [k, ...FY.map((y) => F[k][y] == null ? "–" : pc(F[k][y]))]));
+})();
+</script>

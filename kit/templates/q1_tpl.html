@@ -1,0 +1,313 @@
+<title>인구 바코드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: every 읍면동 as one thin bar of a barcode, grouped by 시군구 and wrapped per 시도.
+   Bars rise (warm orange) where the dong grew since 2016 and hang (grey) where it shrank; the barcode replays 2017–2026. */
+:root {
+  --paper: #f4f2ee; --card: #fcfbf9; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #dbe1dd; --grid: #e8e7e3; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --board: #2f3133; --board-ink: #ebdac0; --accent: #3e6f90;
+  --up: #d56b41; --up-ink: #a8451f; --down: #939594; --down2: #bcbbb6; --nil: #dbe1dd;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Nanum Myeongjo", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --board: #131415; --board-ink: #ebdac0; --accent: #8eabc9;
+  --up: #dc8c67; --up-ink: #dc8c67; --down: #928a7f; --down2: #5f6062; --nil: #3a3d3f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --board: #131415; --board-ink: #ebdac0; --accent: #8eabc9;
+  --up: #dc8c67; --up-ink: #dc8c67; --down: #928a7f; --down2: #5f6062; --nil: #3a3d3f; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 800; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.yr { background-image: none; font-family: var(--serif); font-size: 26px }
+.stat b.up { color: var(--up-ink) }
+</style>
+
+<main class="page">
+  <header>
+    <h1>인구는 어디서나 줄고 있을까<span>시군구 넷 중 셋은 줄었다. 그런데 줄어든 시군구 173곳 가운데 125곳 안에는 10년 새 오히려 사람이 늘어난 동이 섬처럼 떠 있다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 1</dd>
+      <dt>한 줄</dt><dd>주민등록 인구로 2016년 10월과 2026년 10월을 견주면 전국 인구는 60만 명(1.2%) 줄었고 시군구 227곳 중 173곳(76%)이 줄었다. 그러나 줄어든 시군구 안의 읍면동 2,623곳 중 398곳(15%)은 늘었고, 늘어난 동이 하나라도 있는 곳이 125곳(72%)이다. 늘어난 동은 새 아파트 단지가 들어선 곳이 많고, 0–9세 비율이 7.3%로 줄어든 동(4.3%)보다 높다.</dd>
+      <dt>분류</dt><dd>인구·가족</dd>
+      <dt>본능</dt><dd>일반화 본능 · "인구 감소"라는 큰 흐름을 모든 동네에 똑같이 적용한다</dd>
+      <dt>그림 방식</dt><dd>인구 바코드 · 읍면동 3,493개를 막대 하나씩으로 세워 시군구끼리 묶고, 2016년보다 늘어난 동은 위로 주황, 줄어든 동은 아래로 회색. 2017년부터 2026년까지 재생한다</dd>
+      <dt>기간</dt><dd>2016–2026년, 해마다 10월 말</dd>
+      <dt>엮은 데이터</dt><dd>2개 · 행정안전부 행정동별 연령별 주민등록 인구(11개 시점) · 지역별(행정동) 성별 주민등록 인구증감(2026년 10월)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2016년부터 2026년까지 인구가 줄어든 시군구는 173곳이다. 이 가운데 안에 인구가 늘어난 읍면동이 하나라도 있는 곳은?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>열 곳 남짓</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>절반쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>넷 중 셋쯤</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. <span class="n">125곳</span>, 72%</span>
+      줄어드는 시군구의 대부분은 안쪽에 늘어나는 동을 품고 있다. 시군구 전체가 고르게 줄기보다, 사람이 한쪽으로 옮겨 가면서 나머지가 더 빨리 비는 모양이다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">3,493개 동의 바코드</h2>
+      <p>막대 하나가 읍면동 하나다. 2016년 10월보다 사람이 늘었으면 위로 주황, 줄었으면 아래로 회색 막대를 그었다. 막대 길이는 늘거나 준 비율이다. 같은 시군구의 동끼리 붙여 세웠고, 시군구 사이는 조금 띄웠다.</p>
+      <p>재생하면 회색이 해마다 깊어진다. 2026년에는 동 3,425곳 중 2,761곳(81%)이 2016년보다 줄었다. 그 사이에도 주황 막대가 군데군데 솟는다. "줄어든 시군구만"을 누르면 시군구 전체로는 줄었는데 그 안에서 늘어난 동만 남는다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">2016년 10월과 견준 읍면동 인구</p>
+      <p class="fs">막대 하나 = 읍면동 하나. 위로 = 늘어남, 아래로 = 줄어듦. 길이 = 늘거나 준 비율(100% 이상은 같은 길이)</p>
+      <div class="legend"><span><i class="sw" style="background:var(--up)"></i>늘어난 동</span><span><i class="sw" style="background:var(--down)"></i>줄어든 동</span><span><i class="sw" style="background:var(--nil)"></i>그해 비교할 수 없음</span></div>
+      <div class="chips" id="chips1" role="group" aria-label="보기"></div>
+      <div class="player" id="p1"></div>
+      <p class="stat" id="st1" aria-live="polite"></p>
+      <div class="chart" id="c1"></div>
+      <figcaption>행정안전부 「행정동별 연령별 주민등록 인구」(2016–2026년 10월 말). 시군구는 2026년 기준이고, 일반구는 시로 묶었다(예: 수원시). 2026년 인천 중·동·서구 개편 지역은 하나로 묶었다. 10년 사이 나뉘거나 합쳐지거나 이름이 바뀐 동은 시군구마다 "경계가 바뀐 동 묶음" 막대 하나로 합쳤다(68개, 2026년 인구의 9.6%).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">줄어드는 구 안의 가장 큰 섬</h2>
+      <p>시군구 전체로는 줄었는데 그 안에서 사람이 가장 많이 늘어난 동을 골랐다. 송파구는 10년 동안 1.5% 줄었지만 위례동은 1만 7천 명에서 4만 5천 명으로, 가락1동은 916명에서 2만 7천 명으로 늘었다(대단지 아파트 입주). 포항시가 6% 줄어드는 동안 흥해읍은 75% 늘었다. 새 아파트와 택지가 들어선 곳으로 시군구 안의 사람이 옮겨 간 경우가 대부분이다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">줄어든 시군구 안에서 가장 많이 늘어난 읍면동 12곳</p>
+      <p class="fs">명. 회색 점 = 2016년 10월, 주황 점 = 2026년 10월. 괄호 = 그 시군구 전체의 증감</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>행정안전부 행정동별 주민등록 인구. "경계가 바뀐 동 묶음"은 뺐다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">늘어난 동에는 아이가 있다</h2>
+      <p>2026년 10월, 늘어난 동 664곳의 주민 가운데 0–9세는 7.3%다. 줄어든 동 2,761곳에서는 4.3%다. 60대 이상은 늘어난 동이 24.3%, 줄어든 동이 34.2%다. 늘어난 동으로는 아이를 키우는 30–40대 가구가 옮겨 가고, 남은 동은 더 빨리 나이 든다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">늘어난 동과 줄어든 동의 나이 구성, 2026년 10월</p>
+      <p class="fs">주민 가운데 각 나이대의 비율(%)</p>
+      <div class="legend"><span><i class="sw" style="background:var(--up)"></i>2016년보다 늘어난 동 664곳</span><span><i class="sw" style="background:var(--down)"></i>줄어든 동 2,761곳</span></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>행정안전부 행정동별 연령별 주민등록 인구(2026년 10월). "경계가 바뀐 동 묶음"은 뺐다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">줄어드는 곳은 넓어지고, 섬은 버틴다</h2>
+      <p>2016년보다 인구가 적은 시군구의 비율은 2017년 66%에서 2026년 76%로 해마다 넓어졌다. 서울은 25개 구 중 24곳이 줄었다. 반면 2016년보다 늘어난 읍면동의 비율은 2017년 24%에서 2019년 20%로 내려온 뒤 7년째 19% 안팎에 머문다. 줄어드는 바다는 넓어져도 섬의 수는 크게 줄지 않았다. 한 달만 떼어 봐도 비슷하다. 2026년 9월에서 10월 사이 읍면동 3,621곳 중 1,188곳(33%)은 사람이 늘었다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">2016년 10월보다 줄어든 시군구, 늘어난 읍면동의 비율</p>
+      <p class="fs">%. 해마다 10월 말 기준</p>
+      <div class="chart" id="c4"></div>
+      <figcaption>행정안전부 행정동별 주민등록 인구. 부천시는 2019–2023년 광역동 운영으로 동을 견줄 수 없어 그해 동 비율 계산에서 뺐다. 한 달 증감은 「지역별(행정동) 성별 주민등록 인구증감」(2026년 10월).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 인구는 어디서나 줄고 있을까</h2>
+      <p>시군구로 보면 거의 그렇다. 10년 동안 넷 중 셋이 줄었다. 하지만 동 단위로 내려가면 줄어드는 시군구 안에도 늘어나는 동이 흔하다. 인구 감소는 모든 동네가 조금씩 비는 일이기보다, 새 아파트와 일자리 쪽으로 사람이 모이고 나머지가 빠르게 비는 일에 가깝다. 같은 시군구 안에서도 학교·병원·버스 같은 시설의 수요는 정반대로 움직일 수 있다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>주민등록 인구라 실제로 사는 사람과 다를 수 있다. 외국인은 들어 있지 않다.</li>
+      <li>읍면동은 시도·시군구·읍면동 이름으로 맞췄다. 10년 사이 나뉘거나 합쳐진 동은 시군구마다 한 막대("경계가 바뀐 동 묶음", 68개)로 합쳤고, 늘어난 동·줄어든 동 계산에서는 뺐다. 이 묶음에는 세종시·용인시처럼 새 동이 많이 생긴 곳이 들어 있어, 늘어난 동의 수는 실제보다 적게 잡혔을 수 있다.</li>
+      <li>시군구는 2026년 기준이다. 일반구는 시로 묶었고(일반구가 새로 생기거나 없어진 화성·부천 때문), 2026년에 나뉜 인천 중·동·서구 지역은 하나로 묶었다. 2023년 대구로 편입된 군위군은 대구로 셌다. 그래서 시군구는 227곳이다.</li>
+      <li>2026년 광주광역시와 전라남도가 합쳐진 전남광주통합특별시는 시도 하나로 셌다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://jumin.mois.go.kr/ageStatMonth.do" target="_blank" rel="noopener">연령별 인구현황</a> (주민등록 인구통계, 행정동 단위)</td><td>행정안전부</td><td>읍면동별 총인구와 10세 단위 연령별 인구</td><td>2016–2026년 10월</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/3033254/fileData.do" target="_blank" rel="noopener">지역별(행정동) 성별 주민등록 인구증감</a> (3033254)</td><td>행정안전부</td><td>읍면동별 전월 대비 인구증감</td><td>2026년 10월</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>11개 시점 · 읍면동 약 3,600곳씩</dd>
+      <dt>도구</dt><dd>Python(이름 맞추기·집계) · SVG 바코드와 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>2016년 10월 대비 증감률 · 시군구 증감과 그 안 동 증감의 교차</dd>
+      <dt>검증</dt><dd>읍면동을 모두 더한 전국 인구(2016년 5,167만 7,054명, 2026년 5,107만 5,282명)가 같은 통계의 전국 합계와 같은지 확인했다. 이름으로 맞춘 동 3,425곳이 2026년 인구의 90.4%를 차지한다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>늘어난 동은 모두 새 아파트 동네일까</h3><p>공동주택 준공·입주 자료와 엮으면 섬이 생긴 까닭을 동마다 확인할 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15101048/fileData.do" target="_blank" rel="noopener">청약홈 APT 경쟁률</a> · 한국부동산원</li></ul></div>
+      <div class="q"><h3>섬 옆의 동은 더 빨리 비었을까</h3><p>늘어난 동과 맞닿은 동의 감소율을 시군구 안 다른 동과 견줄 수 있다.</p></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const Y = DATA.Y, U = DATA.U, NF = Y.length - 1; // frames: 2017..2026 against 2016
+  const SHORT = (sd) => sd.replace(/특별자치시|특별자치도|특별시|광역시|통합특별시/, "").replace("전남광주", "전남광주").replace(/도$/, "").replace("경상남", "경남").replace("경상북", "경북").replace("충청남", "충남").replace("충청북", "충북").replace("경기", "경기");
+  const cityKey = (u) => u[0] + "|" + u[1];
+  const cityName = (u) => u[1] || SHORT(u[0]);
+  const valAt = (u, pos) => { const k = Math.floor(pos), f = pos - k, a = u[4][k], b = u[4][Math.min(NF, k + 1)]; if (a == null || b == null) return null; return a + (b - a) * f; };
+  const chg = (u, pos) => { const v = valAt(u, pos), b = u[4][0]; return v == null || !b ? null : (v / b - 1) * 100; };
+  const cityChange = (pos) => { const m = new Map(); U.forEach((u) => { const v = valAt(u, pos); const c = m.get(cityKey(u)) || [0, 0, 0]; if (v == null) c[2] = 1; else { c[0] += u[4][0]; c[1] += v; } m.set(cityKey(u), c); }); return m; };
+  const SIDO = [...new Set(U.map((u) => u[0]))];
+
+  /* ---------- 1. barcode ---------- */
+  // Bars are laid out once per width; each frame only updates their height, colour and opacity.
+  let mode = "all", lay = null;
+  chips("chips1", [["all", "모든 시군구"], ["shrink", "줄어든 시군구만"]], mode, (k) => { mode = k; p1.render(); });
+  function build() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, bw = narrow ? 1.6 : 2.4, step = bw + (narrow ? .8 : 1), gg = narrow ? 2.5 : 4, hh = narrow ? 12 : 15, lineH = hh * 2 + 8, headH = 24;
+    const P = [], heads = []; let y = 0;
+    SIDO.forEach((sd) => {
+      const us = U.filter((u) => u[0] === sd); y += headH; const head = { sd, y: y - 7 };
+      let x = 0, row = 0, prev = null;
+      us.forEach((u) => { if (prev && cityKey(prev) !== cityKey(u)) x += gg; if (x + bw > W) { x = 0; row++; } P.push({ u, x, y: y + row * lineH + hh, sd }); x += step; prev = u; });
+      y += (row + 1) * lineH + 8; heads.push(head);
+    });
+    const v = s("svg", { viewBox: `0 0 ${W} ${y}`, role: "img", "aria-label": "읍면동 3,493곳의 2016년 대비 인구 증감 바코드" }, box);
+    heads.forEach((h) => { tx(v, 0, h.y, SHORT(h.sd), "vl", 13, "start"); h.t2 = tx(v, W, h.y, "", "mt", 12, "end"); });
+    const g = s("g", {}, v);
+    const rects = P.map((p) => s("rect", { x: p.x, width: bw, y: p.y, height: 0 }, g));
+    const pts = P.map((p) => ({ x: p.x + bw / 2, y: p.y, r: bw, fn: () => {
+      const u = p.u, c = chg(u, lay.t), cc = lay.cm.get(cityKey(u)), now = valAt(u, lay.t);
+      const rows = [[c == null ? "비교 불가" : `${c >= 0 ? "+" : ""}${f1(c)}%`, `${Y[0]}년보다`], [`${fmt(u[4][0])}명 → ${now == null ? "–" : fmt(now) + "명"}`, ""]];
+      if (cc && !cc[2]) rows.push([`${cc[1] >= cc[0] ? "+" : ""}${f1((cc[1] / cc[0] - 1) * 100)}%`, `${cityName(u)} 전체`]);
+      return [`${SHORT(u[0])} ${u[1]} ${u[2]}`, rows]; } }));
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 동을 하나씩 옮겨 볼 수 있다");
+    lay = { W, rects, P, heads, hh, t: NF, cm: null };
+  }
+  function c1(p) {
+    const box = document.getElementById("c1");
+    if (!lay || Math.abs(lay.W - Math.max(300, box.clientWidth)) > 1) build();
+    lay.t = p + 1; const cm = cityChange(lay.t); lay.cm = cm;
+    const shrink = (u) => { const c = cm.get(cityKey(u)); return c && !c[2] && c[1] < c[0]; };
+    const sum = new Map(); let nShr = 0, nCity = 0, nIsl = 0;
+    cm.forEach((c) => { if (c[2]) return; nCity++; if (c[1] < c[0]) nShr++; });
+    lay.P.forEach((q, i) => {
+      const r = lay.rects[i], c = chg(q.u, lay.t), dim = mode === "shrink" && !shrink(q.u);
+      const st = sum.get(q.sd) || [0, 0]; if (c != null && !q.u[3]) { st[0]++; if (c > 0) st[1]++; } sum.set(q.sd, st);
+      if (c != null && c > 0 && !q.u[3] && shrink(q.u)) nIsl++;
+      if (c == null) { r.setAttribute("y", q.y - 2); r.setAttribute("height", 4); r.setAttribute("fill", "var(--nil)"); r.setAttribute("opacity", dim ? .15 : 1); return; }
+      const h = Math.max(1, Math.sqrt(Math.min(Math.abs(c), 100) / 100) * lay.hh);
+      r.setAttribute("y", c >= 0 ? q.y - h : q.y); r.setAttribute("height", h);
+      r.setAttribute("fill", c >= 0 ? "var(--up)" : "var(--down)");
+      r.setAttribute("opacity", dim ? .12 : q.u[3] ? .6 : 1);
+    });
+    lay.heads.forEach((h) => { const st = sum.get(h.sd) || [0, 0]; h.t2.textContent = `늘어난 동 ${fmt(st[1])} / ${fmt(st[0])}`; });
+    const yr = Y[Math.min(NF, Math.round(lay.t))], st = document.getElementById("st1"); st.replaceChildren();
+    st.append(`${yr}년 10월, 2016년보다 줄어든 시군구 `, bEl(`${nShr}곳`), ` / ${nCity}곳 · 그 안에서 늘어난 동 `, Object.assign(bEl(`${fmt(nIsl)}곳`), { className: "up" }));
+  }
+  const p1 = Player("p1", "인구 바코드", c1, NF, (i) => String(Y[i + 1]), 10);
+  {
+    const rows = SIDO.map((sd) => { const us = U.filter((u) => u[0] === sd && !u[3] && u[4][0] && u[4][NF] != null); const cm = cityChange(NF); const cs = [...cm.entries()].filter(([k]) => k.startsWith(sd + "|")); return [SHORT(sd), cs.length, cs.filter(([, c]) => c[1] < c[0]).length, us.length, us.filter((u) => u[4][NF] > u[4][0]).length]; });
+    table("t1", ["시도", "시군구", "줄어든 시군구", "견줄 수 있는 동", "늘어난 동"], rows);
+  }
+
+  /* ---------- 2. biggest islands ---------- */
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const cm = cityChange(NF);
+    const isl = U.filter((u) => !u[3] && u[4][0] && u[4][NF] != null && u[4][NF] > u[4][0]).filter((u) => { const c = cm.get(cityKey(u)); return c && !c[2] && c[1] < c[0]; })
+      .sort((a, b) => (b[4][NF] - b[4][0]) - (a[4][NF] - a[4][0])).slice(0, 12);
+    const W = Math.max(300, box.clientWidth), rowH = 46, top = 22, H_ = top + isl.length * rowH + 6, l = 4, r = W - 66;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H_}`, role: "img", "aria-label": "줄어든 시군구 안에서 가장 많이 늘어난 읍면동 12곳" }, box), pts = [];
+    const mx = 70000, sx = (n) => l + n / mx * (r - l);
+    [0, 20000, 40000, 60000].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top - 6, y2: H_ - 4, class: t ? "gl" : "ax" }, v); tx(v, sx(t), top - 10, t ? man(t) : "0", "tk", 11.5, t ? "middle" : "start"); });
+    isl.forEach((u, i) => {
+      const y = top + i * rowH + 30, a = u[4][0], b = u[4][NF], c = cm.get(cityKey(u)), cc = (c[1] / c[0] - 1) * 100;
+      const lab = tx(v, l, y - 12, `${SHORT(u[0])} ${u[1]} ${u[2]}`, "lb", 13, "start");
+      const sub = s("tspan", { class: "mt", dx: 6, "font-size": 12 }, lab); sub.textContent = `(${cityName(u)} ${f1(cc).replace("-", "−")}%)`;
+      s("line", { x1: sx(a), x2: sx(b), y1: y, y2: y, stroke: "var(--up)", "stroke-width": 3, opacity: .45 }, v);
+      s("circle", { cx: sx(a), cy: y, r: 5, fill: "var(--card)", stroke: "var(--down)", "stroke-width": 2.4 }, v);
+      s("circle", { cx: sx(b), cy: y, r: 6, fill: "var(--up)" }, v);
+      tx(v, sx(b) + 10, y + 4, `+${man(b - a)}`, "vl", 12.5, "start", { style: "fill:var(--up-ink)" });
+      pts.push({ x: sx(b), y, r: 6, fn: () => [`${u[1]} ${u[2]}`, [[fmt(a) + "명", "2016년 10월"], [fmt(b) + "명", "2026년 10월"], [`${f1(cc)}%`, `${cityName(u)} 전체`]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 동을 옮겨 볼 수 있다");
+    table("t2", ["시도", "시군구", "읍면동", "2016", "2026", "늘어난 수", "시군구 전체"], isl.map((u) => { const c = cm.get(cityKey(u)); return [SHORT(u[0]), u[1], u[2], fmt(u[4][0]), fmt(u[4][NF]), fmt(u[4][NF] - u[4][0]), f1((c[1] / c[0] - 1) * 100) + "%"]; }));
+  }
+
+  /* ---------- 3. ages ---------- */
+  const AGES = ["0–9세", "10대", "20대", "30대", "40대", "50대", "60대", "70대", "80대", "90세 이상"];
+  const agg = (a) => [...a.slice(0, 9), a[9] + a[10]];
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const G = agg(DATA.AG.grew2026), S_ = agg(DATA.AG.shrank2026);
+    const W = Math.max(300, box.clientWidth), l = 70, r = W < 520 ? 84 : 60, rowH = 30, top = 18, H_ = top + AGES.length * rowH + 4;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H_}`, role: "img", "aria-label": "늘어난 동과 줄어든 동의 나이 구성 2026" }, box), pts = [];
+    const sx = (p) => l + p / 20 * (W - l - r);
+    [0, 5, 10, 15, 20].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top - 4, y2: H_ - 2, class: t ? "gl" : "ax" }, v); tx(v, sx(t), top - 6, `${t}%`, "tk", 11.5, "middle"); });
+    AGES.forEach((a, i) => {
+      const y = top + i * rowH + 4;
+      tx(v, l - 8, y + 15, a, "lb", 12.5, "end");
+      s("rect", { x: l, y, width: sx(G[i]) - l, height: 10, rx: 2, fill: "var(--up)" }, v);
+      s("rect", { x: l, y: y + 12, width: sx(S_[i]) - l, height: 10, rx: 2, fill: "var(--down)" }, v);
+      tx(v, sx(Math.max(G[i], S_[i])) + 6, y + 15, `${f1(G[i])} / ${f1(S_[i])}`, "tk", 11.5, "start");
+      pts.push({ x: sx(G[i]), y: y + 5, r: 5, fn: () => [a, [[pc(G[i]), "늘어난 동"], [pc(S_[i]), "줄어든 동"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 나이대를 옮겨 볼 수 있다");
+    table("t3", ["나이", "늘어난 동 2026", "줄어든 동 2026", "늘어난 동 2016", "줄어든 동 2016"], AGES.map((a, i) => [a, pc(G[i]), pc(S_[i]), pc(agg(DATA.AG.grew2016)[i]), pc(agg(DATA.AG.shrank2016)[i])]));
+  }
+
+  /* ---------- 4. widening ---------- */
+  const SER = Y.slice(1).map((yy, k) => { const cm = cityChange(k + 1); let n = 0, sh = 0; cm.forEach((c) => { if (c[2]) return; n++; if (c[1] < c[0]) sh++; }); const us = U.filter((u) => !u[3] && u[4][0] && u[4][k + 1] != null); return { yy, city: sh / n * 100, dong: us.filter((u) => u[4][k + 1] > u[4][0]).length / us.length * 100, sh, n }; });
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), H_ = Math.min(300, Math.max(230, W * .4)), l = 40, r = 120, top = 14, bot = 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H_}`, role: "img", "aria-label": "2016년보다 줄어든 시군구와 늘어난 읍면동의 비율 2017–2026" }, box);
+    const sx = (yy) => l + (yy - 2017) / 9 * (W - l - r), sy = (p) => top + (1 - p / 100) * (H_ - top - bot);
+    [0, 25, 50, 75, 100].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t ? "gl" : "ax" }, v); tx(v, l - 6, sy(t) + 4, `${t}%`, "tk", 11.5, "end"); });
+    [2017, 2020, 2023, 2026].forEach((yy) => tx(v, sx(yy), H_ - 6, String(yy), "tk", 11.5, "middle"));
+    [["city", "var(--down)", "줄어든 시군구"], ["dong", "var(--up)", "늘어난 동"]].forEach(([k, col, nm]) => {
+      s("path", { d: "M" + SER.map((p) => `${sx(p.yy).toFixed(1)},${sy(p[k]).toFixed(1)}`).join("L"), fill: "none", stroke: col, "stroke-width": 3, "stroke-linejoin": "round" }, v);
+      SER.forEach((p) => s("circle", { cx: sx(p.yy), cy: sy(p[k]), r: 3, fill: col }, v));
+      const last = SER[SER.length - 1]; tx(v, sx(2026) + 8, sy(last[k]) + 4, `${nm} ${Math.round(last[k])}%`, "vl halo", 12.5, "start", { style: `fill:${k === "dong" ? "var(--up-ink)" : "var(--ink2)"}`, "stroke-width": 4 });
+    });
+    timeLayer(v, tipFor(fig), SER.length, (i) => sx(SER[i].yy), top, H_ - bot, (i) => [`${SER[i].yy}년 10월`, [[pc(SER[i].city), "2016년보다 줄어든 시군구"], [pc(SER[i].dong), "2016년보다 늘어난 동"]]], "좌우 화살표로 해를 옮겨 볼 수 있다");
+  }
+  table("t4", ["연도", "줄어든 시군구", "비율", "늘어난 동 비율"], SER.map((p) => [p.yy, `${p.sh} / ${p.n}`, pc(p.city), pc(p.dong)]));
+
+  const all = () => { p1.render(); c2(); c3(); c4(); };
+  all(); onResize(all);
+})();
+</script>

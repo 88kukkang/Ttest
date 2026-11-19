@@ -1,0 +1,374 @@
+<title>혼자 사는 노인의 지도</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a night map. 250 시군구 laid flat and tilted; each place is lit by its share of elders living alone
+   (colour) and carries a spike as tall as the number of them (height). The whole thing replays 2015→2024. */
+:root {
+  --paper: #f4f2ef; --card: #fdfcfa; --ink: #191a20; --ink2: #3e404a; --muted: #686b76; --line: #dfdbd4; --grid: #ece8e1; --axis: #b8b3aa;
+  --ghost: #c0bdb8; --board: #191a20; --board-ink: #ffb454; --accent: #e5533d;
+  --cap: #e5533d; --metro: #8a6bd1; --prov: #2f8f83;
+  --night: #0c0e14; --night2: #141824; --night-ink: #eef0f5; --night-muted: #9ba3b4; --night-line: #2a3142;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --display: "Black Han Sans", "IBM Plex Sans KR", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #101116; --card: #171920; --ink: #ecedf1; --ink2: #c5c8d1; --muted: #9196a3; --line: #262934; --grid: #1f222b; --axis: #3c404d;
+  --ghost: #4a4e5a; --board: #050608; --board-ink: #ffb454; --accent: #ff7a5c;
+  --cap: #ff7a5c; --metro: #a98cf0; --prov: #4cc0b0; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #101116; --card: #171920; --ink: #ecedf1; --ink2: #c5c8d1; --muted: #9196a3; --line: #262934; --grid: #1f222b; --axis: #3c404d;
+  --ghost: #4a4e5a; --board: #050608; --board-ink: #ffb454; --accent: #ff7a5c;
+  --cap: #ff7a5c; --metro: #a98cf0; --prov: #4cc0b0; color-scheme: dark }
+/*COMMON_CSS*/
+h1 { font-family: var(--display); font-weight: 400; letter-spacing: -.01em; font-size: clamp(36px, 7vw, 68px); line-height: 1.12 }
+h1 span { font-family: var(--sans); font-weight: 500 }
+h2.h { font-family: var(--display); font-weight: 400; letter-spacing: 0 }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+/* the night map breaks out of the column */
+.night { background: var(--night); color: var(--night-ink); border: 0; border-radius: 18px; padding: clamp(16px, 3vw, 32px); gap: 14px;
+  margin-inline: calc(-1 * min(48px, max(0px, (100vw - 1040px) / 2 - 16px))) }
+.night .ft { color: var(--night-ink); font-family: var(--display); font-weight: 400; font-size: clamp(22px, 3.4vw, 32px); line-height: 1.25 }
+.night .fs, .night figcaption, .night summary { color: var(--night-muted) }
+.night figcaption { border-top-color: var(--night-line) }
+.night .play { background: var(--night-ink); color: var(--night) }
+.night .play:hover { background: #ffb454 }
+.night .yr { background: #ffb454; color: var(--night); background-image: none }
+.night .scrub { accent-color: #ffb454 }
+.night .chip { background: transparent; color: var(--night-ink); border-color: var(--night-line) }
+.night .chip[aria-pressed="true"] { background: var(--night-ink); color: var(--night); border-color: var(--night-ink) }
+.night .tip { background: var(--night2); border-color: var(--night-line); color: var(--night-ink); box-shadow: 0 8px 24px rgba(0,0,0,.5) }
+.night .tip .tn { color: var(--night-muted) }
+.night th { background: var(--night); color: var(--night-ink) } .night td, .night th { border-bottom-color: var(--night-line) }
+.night .ring { stroke: #fff }
+.night .nl { fill: var(--night-ink); font-family: var(--sans) }
+.night .nm { fill: var(--night-muted); font-family: var(--mono) }
+.nhalo { paint-order: stroke; stroke: var(--night); stroke-linejoin: round }
+.ramp { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font: 12px/1.4 var(--mono); color: var(--night-muted) }
+.ramp i { display: inline-block; width: 160px; height: 10px; border-radius: 5px }
+.ramp b { color: var(--night-ink); font-weight: 600 }
+.nightgrid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(220px, 1fr); gap: 20px; align-items: start }
+@media (max-width: 760px) { .nightgrid { grid-template-columns: minmax(0, 1fr) } }
+.side { display: grid; gap: 22px }
+.bigstat { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; margin: 0 }
+.ranks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px }
+.rk { margin: 0 0 6px; font: 12px/1.5 var(--mono); color: var(--night-muted) }
+.ranks ol { margin: 0; padding-left: 18px; font-size: 13.5px; line-height: 1.75; color: var(--night-ink) }
+.ranks ol li::marker { color: var(--night-muted); font-family: var(--mono); font-size: 12px }
+.ranks ol span { color: var(--night-muted); font-family: var(--mono); font-size: 12px; margin-left: 4px }
+.bigstat div { border-top: 1px solid var(--night-line); padding-top: 8px }
+.bigstat dt { font: 12px/1.5 var(--mono); color: var(--night-muted) }
+.bigstat dd { margin: 0; font-family: var(--display); font-size: clamp(24px, 4vw, 34px); line-height: 1.15; font-variant-numeric: tabular-nums }
+.bigstat dd small { font-family: var(--sans); font-size: 13px; color: var(--night-muted); margin-left: 4px }
+</style>
+
+<main class="page">
+  <header>
+    <h1>혼자 사는 노인은 시골에 많을까<span>비율은 시골이 높다. 사람 수는 도시가 훨씬 많고, 도시의 비율이 더 빨리 오른다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 07</dd>
+      <dt>한 줄</dt><dd>2024년 혼자 사는 65세 이상 가구는 228만 8,807가구다. 노인 가운데 혼자 사는 사람의 비율은 전남(26.4%)이 가장 높고 경기·서울(19.5%·19.6%)이 낮지만, 수로는 경기(44만)·서울(36만)이 1·2위다. 도에 속한 76개 군에 사는 경우는 전체의 13.7%뿐이다. 2015년 이후 비율은 도시에서 더 빨리 올랐다.</dd>
+      <dt>분류</dt><dd>인구·가족</dd>
+      <dt>본능</dt><dd>크기 본능 · "몇 %"가 높은 곳을 "몇 명"이 많은 곳으로 착각한다</dd>
+      <dt>그림 방식</dt><dd>밤의 기둥 지도 · 250개 시군구를 기울여 눕히고, 색은 혼자 사는 비율, 기둥 높이는 사람 수로 그렸다. 2015년부터 2024년까지 재생된다</dd>
+      <dt>기간</dt><dd>2015–2024년 (보건복지부 연령별 자료는 2010–2024년)</dd>
+      <dt>엮은 데이터</dt><dd>4개 · 국가데이터처 인구주택총조사 65세 이상 1인가구(SGIS) · 행정안전부 주민등록 연령별 인구 · 보건복지부 독거노인 수(연령별, 시도별)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2024년 혼자 사는 65세 이상 노인 가구가 가장 많은 시도는 어디일까?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>전라남도</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>B</i>경기도</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>경상북도</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">B. 경기도, <span class="n">44만 3,569</span>가구</span>
+      서울(35만 6,186)이 2위, 전남은 12만 8,425가구로 7위다. 그런데 노인 가운데 혼자 사는 비율은 전남이 26.4%로 가장 높고, 경기는 19.5%로 끝에서 두 번째다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <figure class="night" id="f1">
+      <p class="ft" id="f1t">밤의 지도: 색은 비율, 기둥은 사람 수</p>
+      <p class="fs">250개 시군구. 칸의 색은 65세 이상 인구 중 혼자 사는 1인가구의 비율, 기둥 높이는 그 수다</p>
+      <div class="chips" role="group" aria-label="지도에 보일 것" id="chips1"></div>
+      <div class="player" id="p1"></div>
+      <div class="ramp" aria-hidden="true"><span>혼자 사는 비율</span><b>12%</b><i id="rampbar"></i><b>33%</b></div>
+      <div class="nightgrid">
+        <div class="chart" id="c1"></div>
+        <div class="side">
+          <dl class="bigstat" id="bs1"></dl>
+          <div class="ranks"><div><p class="rk">사람이 가장 많은 곳</p><ol id="rk1"></ol></div><div><p class="rk">비율이 가장 높은 곳</p><ol id="rk2"></ol></div></div>
+        </div>
+      </div>
+      <figcaption>국가데이터처 「인구주택총조사」 65세 이상 1인가구(SGIS 통계주제도) ÷ 행정안전부 주민등록 65세 이상 인구(12월 말). 시군구 경계는 2018년 기준(군위군은 대구, 부천시는 하나로)이다. 지도: 통계청 경계(southkorea-maps).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+    <div class="prose">
+      <h2 class="h" id="s1">불빛은 남쪽 시골이 진하고, 기둥은 수도권에 숲을 이룬다</h2>
+      <p>색이 밝을수록 노인 가운데 혼자 사는 사람이 많다. 가장 밝은 곳은 부산 중구(<span class="n">32.6%</span>)와 경남 의령군(<span class="n">32.5%</span>), 합천군, 경북 영덕군, 전남 고흥군이다. 하지만 기둥은 반대다. 가장 높은 기둥은 경기 부천시(<span class="n">3만 349</span>가구), 대구 달서구, 서울 노원구·강서구, 경기 남양주시에 서 있다. 의령군의 혼자 사는 노인은 3,462가구로 노원구의 7분의 1이다.</p>
+      <p>재생하면 2015년의 어두운 지도가 해마다 밝아진다. 비율 25%를 넘는 시군구는 2015년 <span class="n">29</span>곳에서 2024년 <span class="n">88</span>곳이 됐다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">수는 도시, 비율은 시골. 그런데 도시가 따라잡는다</h2>
+      <p>점 하나가 시군구 하나다. 오른쪽으로 갈수록 비율이 높고, 위로 갈수록 사람이 많다. 도에 속한 76개 군(초록)은 오른쪽 아래에 모여 있다. 비율은 높지만 사람은 적다. 특·광역시의 구(보라)와 시(주황)는 위쪽에 있다.</p>
+      <p>재생하면 점 구름 전체가 오른쪽 위로 이동하는데, 도시 쪽이 더 멀리 간다. 2015→2024년 혼자 사는 비율은 특·광역시에서 <span class="n">16.5→21.6%</span>(+5.1%p), 시에서 <span class="n">17.7→22.0%</span>(+4.3%p), 도의 군에서 <span class="n">23.7→26.3%</span>(+2.6%p) 올랐다. 수로는 특·광역시와 시가 2.0배, 군이 1.4배가 됐다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">시군구별 혼자 사는 노인: 비율과 수</p>
+      <p class="fs">가로: 65세 이상 중 혼자 사는 1인가구 비율. 세로: 1인가구 수(로그 눈금)</p>
+      <div class="legend" aria-hidden="true"><span><i class="sw dot" style="background:var(--metro)"></i>특·광역시의 구·군</span><span><i class="sw dot" style="background:var(--cap)"></i>시</span><span><i class="sw dot" style="background:var(--prov)"></i>도의 군</span></div>
+      <div class="player" id="p2"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>국가데이터처 「인구주택총조사」(SGIS), 행정안전부 주민등록 인구에서 계산. 광역시에 속한 군(기장·달성·군위·강화·옹진·울주)은 특·광역시 쪽으로 셌다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">17개 시도의 비율은 모두 올랐고, 간격은 좁아졌다</h2>
+      <p>2015년 가장 높은 전남(23.8%)과 가장 낮은 서울(14.7%)의 차이는 9.1%p였다. 2024년에는 전남 26.4%, 세종 18.4%로 8.0%p가 됐다. 수로 보면 경기(2.27배)·울산(2.25배)·인천(2.21배)이 가장 빨리 늘었고, 전남(1.38배)·전북(1.52배)이 가장 느렸다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">시도별 혼자 사는 노인 비율, 2015–2024년</p>
+      <p class="fs">65세 이상 인구 중 혼자 사는 1인가구 비율</p>
+      <div class="legend" aria-hidden="true"><span><i class="sw line" style="background:var(--cap)"></i>수도권</span><span><i class="sw line" style="background:var(--metro)"></i>광역시·세종</span><span><i class="sw line" style="background:var(--prov)"></i>도</span></div>
+      <div class="player" id="p3"></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>국가데이터처 「인구주택총조사」, 행정안전부 주민등록 인구.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">85세 이상 혼자 사는 노인은 14년 새 4배</h2>
+      <p>보건복지부가 집계한 독거노인은 2010년 <span class="n">105만 5,650명</span>에서 2024년 <span class="n">219만 6,738명</span>으로 2.1배가 됐다. 가장 빨리 늘어난 것은 85세 이상(<span class="n">7만 1,416 → 28만 8,004명</span>, 4.0배)이다. 혼자 사는 노인 여덟 중 한 명 이상이 85세를 넘는다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">나이별 독거노인 수, 2010–2024년</p>
+      <p class="fs">명. 아래부터 65–69세, 70–74세, 75–79세, 80–84세, 85세 이상</p>
+      <div class="player" id="p4"></div>
+      <div class="chart" id="c4"></div>
+      <figcaption>보건복지부 「독거노인 수」(2010–2021, 전국 연령별)와 「독거노인 수_연령별_시도별」(2022–2024)을 이었다. 2021년까지의 85–89세·90세 이상은 85세 이상으로 합쳤다. 인구주택총조사와 집계 방식이 달라 숫자가 다르다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 혼자 사는 노인은 시골에 많을까</h2>
+      <p>"비율"로는 맞고 "사람 수"로는 틀리다. 시골 군은 노인 넷 중 하나 이상이 혼자 살지만, 혼자 사는 노인 228만 가구 가운데 도의 군 76곳에 사는 것은 13.7%다. 열에 넷(39.8%)은 서울·경기·인천에 산다. 그리고 2015년 이후 도시의 비율이 더 빨리 올라, 시골과 도시의 차이는 줄고 있다. 돌봄이 필요한 혼자 사는 노인을 찾는다면, 아파트 단지가 빽빽한 도시의 구에 가장 많다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:20px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>비율의 분자(65세 이상 1인가구, 인구주택총조사 11월 1일 기준)와 분모(65세 이상 주민등록 인구, 12월 말)는 출처가 다르다. 주민등록 인구가 실제 거주 인구보다 많은 곳에서는 비율이 조금 낮게 나온다. 시도 순위와 변화 방향은 같은 결론이다.</li>
+      <li>"1인가구"는 혼자 사는 가구다. 같은 집에 살지 않는 가족이 가까이 있는지, 시설에 사는지는 알 수 없다.</li>
+      <li>보건복지부 독거노인 수(2024년 219만 명)와 인구주택총조사 65세 이상 1인가구(228만 가구)는 집계 방식이 달라 다르다. 시도별 순위는 두 자료가 같다(경기·서울·경남 순).</li>
+      <li>시군구 경계가 2015년 이후 바뀐 곳(군위군 대구 편입, 부천시 일반구 부활, 인천 남구→미추홀구)은 현재 경계 기준 자료를 2018년 지도에 맞췄다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:20px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15140446/fileData.do" target="_blank" rel="noopener">SGIS 통계주제도 65세이상 1인가구 변화</a> (15140446)</td><td>국가데이터처</td><td>인구주택총조사 65세 이상 1인가구, 시도·시군구별 (SGIS 주제도 자료)</td><td>2015–2024</td></tr>
+        <tr><td><a href="https://jumin.mois.go.kr/ageStatMonth.do" target="_blank" rel="noopener">주민등록 연령별 인구통계</a></td><td>행정안전부</td><td>시군구별 65세 이상 인구, 해마다 12월</td><td>2015–2024</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15127846/fileData.do" target="_blank" rel="noopener">독거노인 수</a> (15127846)</td><td>보건복지부</td><td>전국 연령별 독거노인</td><td>2010–2021</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15127847/fileData.do" target="_blank" rel="noopener">독거노인 수_연령별_시도별</a> (15127847)</td><td>보건복지부</td><td>시도 × 연령별 독거노인</td><td>2022–2024</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:20px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>4개 자료 · 시군구 264곳 × 10년, 시도 17곳, 전국 연령별 15년</dd>
+      <dt>도구</dt><dd>Python(집계) · d3-geo·topojson(지도 투영, 미리 계산) · SVG 그림과 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>비율과 수의 이중 부호화(색·높이) · 시군구 산점도 이동 · 시도 비율 시계열</dd>
+      <dt>검증</dt><dd>2023년 전국 합계 213만 8,107가구는 국가데이터처 공표치(213만 8천 가구)와 같다. 시군구 합은 시도 값과 일치한다. 주민등록 인구 시군구 합은 시도 합계와 같다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:20px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>혼자 사는 노인은 가난할까</h3><p>기초생활수급 독거노인 자료와 엮으면 혼자 사는 것과 빈곤의 겹침을 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15037820/fileData.do" target="_blank" rel="noopener">기초생활수급자 독거노인 전출입 현황</a></li></ul></div>
+      <div class="q"><h3>노인 돌봄 시설은 노인이 많은 곳에 있을까</h3>
+        <ul><li><a href="https://www.data.go.kr/data/15140478/fileData.do" target="_blank" rel="noopener">보건시설 1개당 65세 이상 노인인구</a> · 국가데이터처</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const Y = DATA.years, NY = Y.length, U = DATA.units;
+  const METRO = new Set(["서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종"]);
+  const kind = (u) => (METRO.has(u.sido) ? "metro" : u.name.endsWith("군") ? "prov" : "cap");
+  const KCOL = { metro: "var(--metro)", cap: "var(--cap)", prov: "var(--prov)" };
+  const KNAME = { metro: "특·광역시", cap: "시", prov: "군" };
+  const rate = (u, pos) => lerp(u.h, pos) / lerp(u.p, pos) * 100;
+  // night ramp: deep indigo → violet → coral → amber → pale gold
+  const STOPS = [[12, [38, 44, 92]], [17, [96, 64, 160]], [22, [214, 84, 104]], [27, [250, 150, 70]], [33, [255, 236, 160]]];
+  const ramp = (r) => { r = Math.max(STOPS[0][0], Math.min(STOPS[4][0], r)); for (let i = 1; i < STOPS.length; i++) if (r <= STOPS[i][0]) { const [a, ca] = STOPS[i - 1], [b, cb] = STOPS[i], t = (r - a) / (b - a); return `rgb(${ca.map((c, j) => Math.round(c + (cb[j] - c) * t)).join(",")})`; } };
+  document.getElementById("rampbar").style.background = `linear-gradient(90deg, ${STOPS.map(([r]) => ramp(r) + " " + ((r - 12) / 21 * 100).toFixed(0) + "%").join(", ")})`;
+
+  /* ---------- 1. the night map ---------- */
+  let show = "both";
+  chips("chips1", [["both", "색과 기둥"], ["rate", "비율(색)만"], ["count", "사람 수(기둥)만"]], show, (k) => { show = k; p1.render(); });
+  const HMAX = Math.max(...U.map((u) => Math.max(...u.h)));
+  // pull the far islands (Ongjin's Baengnyeong, Ulleung) toward the mainland so the peninsula fills the frame
+  const DX = { "23320": 34, "37430": -78 };
+  U.forEach((x) => { x.dx = DX[x.code] || 0; x.c = [x.c[0] + x.dx, x.c[1]]; });
+  const order = [...U].sort((a, b) => a.c[1] - b.c[1]); // back to front
+  const CX0 = Math.min(...U.map((x) => x.c[0])), CX1 = Math.max(...U.map((x) => x.c[0])), CY1 = Math.max(...U.map((x) => x.c[1]));
+  function c1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const narrow = box.clientWidth < 560, K = .56, SP = 150, X0 = CX0 - 24, X1 = CX1 + 22, W = X1 - X0, H = Math.round(CY1 * K + SP + 26);
+    const u = W / Math.max(240, box.clientWidth);
+    const v = s("svg", { viewBox: `${X0} 0 ${W} ${H}`, role: "img", "aria-label": `${Y[Math.round(pos)]}년 시군구별 혼자 사는 노인 비율과 수 지도` }, box);
+    const g = s("g", { transform: `translate(0 ${SP}) scale(1 ${K})` }, v);
+    const lit = show !== "count";
+    U.forEach((x) => s("path", { d: x.d, transform: x.dx ? `translate(${x.dx} 0)` : null, fill: lit ? ramp(rate(x, pos)) : "#1c2130", stroke: "#0c0e14", "stroke-width": .5 * u / K * .9, "stroke-linejoin": "round" }, g));
+    DATA.sidoPaths.forEach((p) => s("path", { d: p.d, fill: "none", stroke: lit ? "rgba(12,14,20,.85)" : "#3a4256", "stroke-width": 1.4 * u, "stroke-linejoin": "round" }, g));
+    const pts = [], hScale = SP * 1.15 / HMAX;
+    const sp = s("g", {}, v);
+    order.forEach((x) => {
+      const cx = x.c[0], cy = SP + x.c[1] * K, hv = lerp(x.h, pos), h = hv * hScale, bw = 2.6 * u;
+      if (show !== "rate") {
+        s("path", { d: `M${(cx - bw).toFixed(1)},${cy.toFixed(1)}L${cx.toFixed(1)},${(cy - h).toFixed(1)}L${(cx + bw).toFixed(1)},${cy.toFixed(1)}Z`, fill: "url(#spk)", stroke: "rgba(12,14,20,.6)", "stroke-width": .4 * u }, sp);
+        s("ellipse", { cx, cy, rx: bw * 1.1, ry: bw * .5, fill: "#fff", opacity: .55 }, sp);
+      }
+      pts.push({ x: cx, y: show === "rate" ? cy : cy - h, r: 3 * u, fn: () => { const hh = lerp(x.h, pos), rr = rate(x, pos); return [`${x.sido} ${x.name} · ${Y[Math.round(pos)]}년`, [[fmt(hh) + "가구", "혼자 사는 65세 이상"], [pc(rr), "65세 이상 중 비율"], [fmt(lerp(x.p, pos)) + "명", "65세 이상 인구"]]]; } });
+    });
+    const defs = s("defs", {}, v), lg = s("linearGradient", { id: "spk", x1: 0, y1: 1, x2: 0, y2: 0 }, defs);
+    s("stop", { offset: 0, "stop-color": "#fff", "stop-opacity": .95 }, lg); s("stop", { offset: 1, "stop-color": "#ffb454", "stop-opacity": .9 }, lg);
+    // name the tallest spikes and the brightest places
+    const fs = 12.5 * u, placed = [];
+    const label = (x, txt, sub, y) => {
+      const w = Math.max(txt.length, sub.length * .62) * fs * .95, bx = x.c[0] + 6 * u, by = y - fs * 1.1;
+      if (bx + w > X1 - 4 || placed.some(([a, b, c, d]) => bx < c && bx + w > a && by < d && by + fs * 2.3 > b)) return;
+      placed.push([bx, by, bx + w, by + fs * 2.3]);
+      tx(v, bx, y, txt, "nl nhalo", fs, "start", { "font-weight": 600, "stroke-width": 3 * u });
+      tx(v, bx, y + fs * 1.1, sub, "nm nhalo", 11 * u, "start", { "stroke-width": 3 * u });
+    };
+    if (show !== "rate") [...U].sort((a, b) => lerp(b.h, pos) - lerp(a.h, pos)).slice(0, narrow ? 3 : 5).forEach((x) => label(x, x.name, fmt(lerp(x.h, pos)), SP + x.c[1] * K - lerp(x.h, pos) * hScale - 4 * u));
+    if (show !== "count") [...U].sort((a, b) => rate(b, pos) - rate(a, pos)).slice(0, narrow ? 3 : 5).forEach((x) => label(x, x.name, pc(rate(x, pos)), SP + x.c[1] * K + 4 * u));
+    pointLayer(v, tipFor(fig), pts.sort((a, b) => a.y - b.y || a.x - b.x), "화살표 키로 시군구를 하나씩 볼 수 있다", u);
+    // headline numbers for the year
+    const nat = lerp(DATA.nat.h, pos), natp = lerp(DATA.nat.p, pos), over = U.filter((x) => rate(x, pos) >= 25).length;
+    const gun = U.filter((x) => kind(x) === "prov").reduce((a, x) => a + lerp(x.h, pos), 0);
+    const rl = (id, list, f) => { const ol = document.getElementById(id); ol.replaceChildren(); list.forEach((x) => { const li = document.createElement("li"); li.textContent = `${x.sido} ${x.name}`; const sp_ = document.createElement("span"); sp_.textContent = f(x); li.append(sp_); ol.append(li); }); };
+    rl("rk1", [...U].sort((a, b) => lerp(b.h, pos) - lerp(a.h, pos)).slice(0, 5), (x) => fmt(lerp(x.h, pos)));
+    rl("rk2", [...U].sort((a, b) => rate(b, pos) - rate(a, pos)).slice(0, 5), (x) => pc(rate(x, pos)));
+    const bs = document.getElementById("bs1"); bs.replaceChildren();
+    [["혼자 사는 65세 이상", man(nat), "가구"], ["65세 이상 중", pc(nat / natp * 100), ""], ["비율 25% 넘는 시군구", String(over), "곳"], ["도의 군 76곳에 사는 몫", pc(gun / nat * 100), ""]].forEach(([a, b, c]) => { const d = document.createElement("div"), dt = document.createElement("dt"), dd = document.createElement("dd"); dt.textContent = a; dd.textContent = b; if (c) { const sm = document.createElement("small"); sm.textContent = c; dd.append(sm); } d.append(dt, dd); bs.append(d); });
+  }
+  table("t1", ["시도", "시군구", ...Y.map((y) => y + " 가구"), "2015 비율", "2024 비율"], [...U].sort((a, b) => b.h[NY - 1] - a.h[NY - 1]).map((x) => [x.sido, x.name, ...x.h.map(fmt), pc(x.h[0] / x.p[0] * 100), pc(x.h[NY - 1] / x.p[NY - 1] * 100)]));
+
+  /* ---------- 2. scatter: rate × count, drifting year by year ---------- */
+  function c2(pos) {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(290, box.clientWidth), H = Math.min(460, Math.max(320, W * .55)), l = 52, r = 16, top = 16, bot = 40;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${Y[Math.round(pos)]}년 시군구별 혼자 사는 노인 비율과 수` }, box);
+    const x0 = 10, x1 = 35, ly0 = Math.log10(300), ly1 = Math.log10(40000);
+    const sx = (p) => l + (p - x0) / (x1 - x0) * (W - l - r), sy = (n) => top + (1 - (Math.log10(Math.max(300, n)) - ly0) / (ly1 - ly0)) * (H - top - bot);
+    [10, 15, 20, 25, 30, 35].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top, y2: H - bot, class: t === 10 ? "ax" : "gl" }, v); tx(v, sx(t), H - bot + 16, t + "%", "tk", 11.5, "middle"); });
+    [300, 1000, 3000, 10000, 30000].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: "gl" }, v); tx(v, l - 6, sy(t) + 4, t >= 10000 ? t / 1e4 + "만" : fmt(t), "tk", 11.5, "end"); });
+    tx(v, W - r, H - 4, "65세 이상 중 혼자 사는 비율 →", "mt", 12, "end");
+    const pts = [];
+    ["prov", "cap", "metro"].forEach((kk) => U.filter((x) => kind(x) === kk).forEach((x) => {
+      const px = sx(rate(x, pos)), py = sy(lerp(x.h, pos));
+      if (pos > 0) { const ox = sx(x.h[0] / x.p[0] * 100), oy = sy(x.h[0]); s("line", { x1: ox, y1: oy, x2: px, y2: py, stroke: KCOL[kk], "stroke-opacity": .18, "stroke-width": 1 }, v); }
+      s("circle", { cx: px, cy: py, r: 3.6, fill: KCOL[kk], "fill-opacity": .78, stroke: "var(--card)", "stroke-width": .8 }, v);
+      pts.push({ x: px, y: py, r: 3.6, fn: () => [`${x.sido} ${x.name} · ${KNAME[kk]}`, [[pc(rate(x, pos)), `${Y[Math.round(pos)]}년 비율`], [fmt(lerp(x.h, pos)) + "가구", "혼자 사는 65세 이상"], [pc(x.h[0] / x.p[0] * 100), "2015년 비율"]]] });
+    }));
+    // group means as big markers
+    ["prov", "cap", "metro"].forEach((kk) => { const L = U.filter((x) => kind(x) === kk); const hh = L.reduce((a, x) => a + lerp(x.h, pos), 0), pp = L.reduce((a, x) => a + lerp(x.p, pos), 0); const mx = sx(hh / pp * 100); s("line", { x1: mx, x2: mx, y1: top, y2: H - bot, stroke: KCOL[kk], "stroke-width": 2, "stroke-dasharray": "5 4" }, v); tx(v, mx + 4, top + 12 + ["metro", "cap", "prov"].indexOf(kk) * 16, `${KNAME[kk]} 평균 ${pc(hh / pp * 100)}`, "vl halo", 12, "start", { "stroke-width": 4, style: `fill:${KCOL[kk]}` }); });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 시군구를 하나씩 볼 수 있다");
+  }
+  table("t2", ["구분", "시군구 수", "2015 가구", "2024 가구", "2015 비율", "2024 비율"], ["metro", "cap", "prov"].map((kk) => { const L = U.filter((x) => kind(x) === kk); const h0 = L.reduce((a, x) => a + x.h[0], 0), h1 = L.reduce((a, x) => a + x.h[NY - 1], 0), p0 = L.reduce((a, x) => a + x.p[0], 0), p1 = L.reduce((a, x) => a + x.p[NY - 1], 0); return [KNAME[kk], String(L.length), fmt(h0), fmt(h1), pc(h0 / p0 * 100), pc(h1 / p1 * 100)]; }));
+
+  /* ---------- 3. sido rate lines ---------- */
+  const SD = Object.values(DATA.sido).map((q) => ({ ...q, r: q.h.map((h, i) => h / q.p[i] * 100), k: ["서울", "경기", "인천"].includes(q.name) ? "cap" : METRO.has(q.name) ? "metro" : "prov" }));
+  function c3(pos) {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(290, box.clientWidth), H = Math.min(440, Math.max(340, W * .5)), l = 40, r = 92, top = 14, bot = 28;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "시도별 혼자 사는 노인 비율 2015–2024" }, box);
+    const sx = (i) => l + i / (NY - 1) * (W - l - r), sy = (p) => top + (1 - (p - 13) / 15) * (H - top - bot);
+    [14, 18, 22, 26].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: "gl" }, v); tx(v, l - 6, sy(t) + 4, t + "%", "tk", 11.5, "end"); });
+    Y.forEach((y, i) => { if (i % (W < 520 ? 3 : 1) === 0 || i === NY - 1) tx(v, sx(i), H - 8, String(y), "tk", 11.5, "middle"); });
+    const k = Math.floor(pos), f = pos - k, ends = [], pts = [];
+    SD.forEach((q) => {
+      const P = []; for (let i = 0; i <= k; i++) P.push([sx(i), sy(q.r[i])]); if (k + 1 < NY && f > 0) P.push([sx(k + f), sy(lerp(q.r, pos))]);
+      s("path", { d: "M" + P.map((p) => p[0].toFixed(1) + "," + p[1].toFixed(1)).join("L"), fill: "none", stroke: KCOL[q.k], "stroke-width": q.k === "cap" ? 2.6 : 1.6, "stroke-opacity": .9 }, v);
+      const e = P[P.length - 1]; s("circle", { cx: e[0], cy: e[1], r: 3, fill: KCOL[q.k] }, v); ends.push({ y: e[1], x: e[0], q });
+      for (let i = 0; i <= k; i++) pts.push({ x: sx(i), y: sy(q.r[i]), r: 2, fn: () => [`${q.name} · ${Y[i]}년`, [[pc(q.r[i]), "65세 이상 중 혼자 사는 비율"], [fmt(q.h[i]) + "가구", "혼자 사는 65세 이상"]]] });
+    });
+    ends.sort((a, b) => a.y - b.y); for (let a = 1; a < ends.length; a++) if (ends[a].y - ends[a - 1].y < 13) ends[a].y = ends[a - 1].y + 13;
+    const shift = Math.max(0, ends[ends.length - 1].y - (H - bot)); ends.forEach((e) => (e.y -= shift));
+    ends.forEach((e) => tx(v, e.x + 8, e.y + 4, `${e.q.name} ${f1(lerp(e.q.r, pos))}`, e.q.k === "cap" ? "vl halo" : "lb halo", 11.5, "start", { "stroke-width": 3 }));
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 시도와 해를 옮겨 볼 수 있다");
+  }
+  table("t3", ["시도", ...Y.map(String)], SD.map((q) => [q.name, ...q.r.map(pc)]));
+
+  /* ---------- 4. MoHW by age, stacked ---------- */
+  const AG = Object.keys(DATA.mohw), AY = Array.from({ length: 15 }, (_, i) => 2010 + i), NAY = AY.length;
+  const ACOL = ["#c9c3e6", "#a28fd8", "#7d5fc6", "#e5533d", "#ffb454"];
+  function c4(pos) {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const W = Math.max(290, box.clientWidth), H = Math.min(360, Math.max(260, W * .45)), l = 52, r = 96, top = 16, bot = 28;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "나이별 독거노인 수 2010–2024" }, box);
+    const max = 2400000, sx = (i) => l + i / (NAY - 1) * (W - l - r), sy = (n) => top + (1 - n / max) * (H - top - bot);
+    [0, 500000, 1000000, 1500000, 2000000].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t ? "gl" : "ax" }, v); tx(v, l - 6, sy(t) + 4, t ? t / 1e4 + "만" : "0", "tk", 11.5, "end"); });
+    AY.forEach((y, i) => { if (i % (W < 520 ? 7 : 2) === 0 || i === NAY - 1) tx(v, sx(i), H - 8, String(y), "tk", 11.5, "middle"); });
+    const k = Math.floor(pos), f = pos - k, idx = []; for (let i = 0; i <= k; i++) idx.push(i); if (k + 1 < NAY && f > 0) idx.push(k + f);
+    let low = idx.map(() => 0); const xs = idx.map((i) => l + i / (NAY - 1) * (W - l - r));
+    AG.forEach((a, j) => {
+      const hi = idx.map((i, n) => low[n] + lerp(DATA.mohw[a], i));
+      s("path", { d: "M" + xs.map((x, n) => `${x.toFixed(1)},${sy(hi[n]).toFixed(1)}`).join("L") + "L" + xs.map((x, n) => `${x.toFixed(1)},${sy(low[n]).toFixed(1)}`).reverse().join("L") + "Z", fill: ACOL[j], stroke: "var(--card)", "stroke-width": .8 }, v);
+      const ex = xs[xs.length - 1], my = (sy(hi[hi.length - 1]) + sy(low[low.length - 1])) / 2;
+      tx(v, ex + 6, my + 4, `${a.replace("세", "")} ${man(lerp(DATA.mohw[a], idx[idx.length - 1]))}`, j === 4 ? "vl" : "lb", 11.5);
+      low = hi;
+    });
+    timeLayer(v, tipFor(fig), k + 1, sx, top, H - bot, (i) => [`${AY[i]}년 · ${fmt(AG.reduce((s_, a) => s_ + DATA.mohw[a][i], 0))}명`, AG.map((a, j) => [fmt(DATA.mohw[a][i]) + "명", a, ACOL[j]]).reverse()], "좌우 화살표로 해마다 볼 수 있다");
+  }
+  table("t4", ["연도", ...AG, "합계"], AY.map((y, i) => [String(y), ...AG.map((a) => fmt(DATA.mohw[a][i])), fmt(AG.reduce((s_, a) => s_ + DATA.mohw[a][i], 0))]));
+
+  const yl = (i) => String(Y[i]);
+  const p1 = Player("p1", "밤의 지도", c1, NY, yl, 9);
+  const p2 = Player("p2", "시군구 산점도", c2, NY, yl, 8);
+  const p3 = Player("p3", "시도 비율", c3, NY, yl, 8);
+  const p4 = Player("p4", "나이별 독거노인", c4, NAY, (i) => String(AY[i]), 8);
+  const all = () => { p1.render(); p2.render(); p3.render(); p4.render(); };
+  all(); onResize(all);
+})();
+</script>

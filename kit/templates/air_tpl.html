@@ -1,0 +1,527 @@
+<title>인천공항만 탈까</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: an aeronautical chart room. Pale chart paper, navy ink, amber for international routes,
+   teal for domestic. Two maps replay 2010–2025 with a departures-board year counter. */
+:root {
+  --paper: #eef1f3; --card: #fbfcfc; --ink: #102033; --ink2: #33465a; --muted: #5f7082; --line: #d8dfe5; --grid: #e6ebef; --axis: #b4c0cb;
+  --sea: #e4ecf2; --land: #d3dbe2; --land-on: #e9d3b4; --land2: #c3ced8; --landk: #b9c6d2; --coast: #fbfcfc;
+  --intl: #d9821c; --intl-soft: #f2c993; --dom: #1d8a8c; --ghost: #a9b6c2; --board: #102033; --board-ink: #f5b04c;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0b121a; --card: #111b26; --ink: #e5edf4; --ink2: #bccad7; --muted: #8798a8; --line: #233243; --grid: #1a2633; --axis: #3a4b5d;
+  --sea: #0f1a26; --land: #22303f; --land-on: #3d3a33; --land2: #2b3b4c; --landk: #3a4d61; --coast: #111b26;
+  --intl: #f0a03e; --intl-soft: #6b4a1f; --dom: #3cbfc0; --ghost: #475869; --board: #050a10; --board-ink: #f5b04c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #0b121a; --card: #111b26; --ink: #e5edf4; --ink2: #bccad7; --muted: #8798a8; --line: #233243; --grid: #1a2633; --axis: #3a4b5d;
+  --sea: #0f1a26; --land: #22303f; --land-on: #3d3a33; --land2: #2b3b4c; --landk: #3a4d61; --coast: #111b26;
+  --intl: #f0a03e; --intl-soft: #6b4a1f; --dom: #3cbfc0; --ghost: #475869; --board: #050a10; --board-ink: #f5b04c; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 16.5px/1.78 var(--sans); word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 36px 80px }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--axis) }
+:focus-visible { outline: 2px solid var(--intl); outline-offset: 2px }
+.page { max-width: 1040px; margin: 0 auto; display: grid; gap: 64px }
+.prose { max-width: 660px; display: grid; gap: 14px; min-width: 0 }
+.prose p { margin: 0 }
+.n { font-weight: 700; font-variant-numeric: tabular-nums }
+.label { font: 500 12px/1.4 var(--mono); letter-spacing: .08em; color: var(--muted); margin: 0; text-transform: uppercase }
+
+header { display: grid; gap: 22px }
+h1 { font-weight: 700; font-size: clamp(32px, 5.6vw, 54px); line-height: 1.18; margin: 0; letter-spacing: -.03em; text-wrap: balance }
+h1 span { display: block; font-weight: 500; font-size: .46em; color: var(--ink2); margin-top: 12px; letter-spacing: -.01em; line-height: 1.45 }
+.sheet, .method { display: grid; grid-template-columns: 110px minmax(0, 1fr); border-top: 2px solid var(--ink); font-size: 14.5px; margin: 0 }
+.sheet dt, .sheet dd, .method dt, .method dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line) }
+.sheet dt, .method dt { font: 500 12px/2 var(--mono); color: var(--muted) }
+.sheet dd, .method dd { color: var(--ink2) }
+@media (max-width: 560px) { .sheet, .method { grid-template-columns: 84px minmax(0, 1fr) } }
+
+.quiz { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 14px }
+.quiz h2 { font-size: 20px; line-height: 1.5; margin: 0; font-weight: 700; text-wrap: balance }
+.opts { display: grid; gap: 8px }
+.opt { display: flex; gap: 12px; align-items: center; text-align: left; font: inherit; font-size: 15.5px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; cursor: pointer; min-height: 46px }
+.opt i { font: 500 12px var(--mono); color: var(--muted); font-style: normal; width: 14px }
+.opt[data-state="right"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink) }
+.opt[data-state="wrong"] { opacity: .5 }
+.reveal { font-size: 15px; color: var(--ink2); border-top: 1px solid var(--line); padding-top: 14px }
+.reveal .big { font-size: 28px; font-weight: 700; color: var(--ink); display: block; line-height: 1.3 }
+
+section.s { display: grid; gap: 22px }
+h2.h { font-size: clamp(23px, 3.3vw, 29px); line-height: 1.35; margin: 0; font-weight: 700; letter-spacing: -.02em; text-wrap: balance }
+figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 12px; position: relative; min-width: 0 }
+@media (max-width: 560px) { figure { padding: 14px } }
+.ft { font-weight: 700; font-size: 16px; margin: 0; line-height: 1.5 }
+.fs { font-size: 13.5px; color: var(--muted); margin: -8px 0 0; line-height: 1.6 }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y }
+figcaption { font-size: 12.5px; color: var(--muted); line-height: 1.65; border-top: 1px solid var(--grid); padding-top: 10px }
+details { font-size: 13px }
+summary { cursor: pointer; color: var(--ink2); width: max-content; font: 500 12px/2 var(--mono); padding: 6px 0 }
+.tw { overflow-x: auto; margin-top: 6px; max-height: 380px }
+table { border-collapse: collapse; font-size: 12.5px; min-width: 100% }
+th, td { padding: 5px 10px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums }
+th:first-child, td:first-child { text-align: left }
+th { font-weight: 700; color: var(--ink2); position: sticky; top: 0; background: var(--card) }
+
+/* player: play button, scrubber and a departures-board year */
+.player { display: flex; align-items: center; gap: 14px; flex-wrap: wrap }
+.play { width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; display: grid; place-items: center; flex: none }
+.play svg { width: 18px; height: 18px }
+.play:hover { background: var(--intl) }
+.yr { font: 600 30px/1 var(--mono); font-variant-numeric: tabular-nums; color: var(--board-ink); background: var(--board); border-radius: 6px; padding: 8px 10px; letter-spacing: .06em;
+  background-image: linear-gradient(transparent calc(50% - .5px), rgba(255,255,255,.14) calc(50% - .5px), rgba(255,255,255,.14) calc(50% + .5px), transparent calc(50% + .5px)) }
+.scrub { flex: 1 1 180px; min-width: 0; accent-color: var(--intl); height: 32px }
+.stat { font-size: 14px; color: var(--ink2); margin: 0; min-height: 1.6em }
+.stat b { font-variant-numeric: tabular-nums }
+.chips { display: flex; flex-wrap: wrap; gap: 8px }
+.chip { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; min-height: 40px; cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink) }
+.lb { fill: var(--ink); font-family: var(--sans) }
+.vl { fill: var(--ink); font-family: var(--sans); font-weight: 700; font-variant-numeric: tabular-nums }
+.tk { fill: var(--muted); font-family: var(--mono); font-variant-numeric: tabular-nums }
+.mt { fill: var(--muted); font-family: var(--sans) }
+.halo { paint-order: stroke; stroke: var(--card); stroke-linejoin: round }
+.halo-sea { paint-order: stroke; stroke: var(--sea); stroke-linejoin: round }
+.gl { stroke: var(--grid); stroke-width: 1 }
+.ax { stroke: var(--axis); stroke-width: 1 }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink2) }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block }
+.sw.line { height: 3px; width: 18px; border-radius: 2px }
+.sw.dot { border-radius: 50% }
+.kgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px; align-items: start }
+.wgrid { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); gap: 20px; align-items: start }
+@media (max-width: 760px) { .kgrid, .wgrid { grid-template-columns: minmax(0, 1fr) } }
+.mapk { max-width: 400px; width: 100%; justify-self: center }
+.tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--axis); border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.12); padding: 8px 10px; font-size: 12.5px; line-height: 1.5; min-width: 150px; max-width: 250px; z-index: 5 }
+.tip .tn { color: var(--muted) } .tip .tv { font-weight: 700; font-size: 14px }
+.ring { fill: none; stroke: var(--ink); }
+ul.care-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; color: var(--ink2) }
+.dt { overflow-x: auto; border-top: 2px solid var(--ink) }
+.dt td, .dt th { white-space: normal; text-align: left; vertical-align: top; padding: 8px 10px 8px 0; position: static }
+.next { display: grid; border-top: 2px solid var(--ink) }
+.q { padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px }
+.q h3 { font-size: 16px; margin: 0; font-weight: 700 }
+.q p { margin: 0; font-size: 14px; color: var(--ink2) }
+.q ul { margin: 0; padding-left: 18px; font-size: 13.5px }
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px }
+</style>
+
+<main class="page">
+  <header>
+    <h1>비행기는 인천공항에서만 탈까<span>공항 이용객 절반은 인천 밖에서 탄다. 그리고 하늘길의 절반은 1,500km 안쪽에서 끝난다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 05</dd>
+      <dt>한 줄</dt><dd>2025년 우리나라 15개 공항을 오간 승객 1억 5,604만 명 가운데 인천공항은 47.5%다. 국제선만 보면 77.4%가 인천이지만, 2위 제주와 3위 김포는 국내선 공항이다. 국제선 승객의 52.8%는 서울에서 1,500km 안쪽인 일본·중국·대만을 오갔다.</dd>
+      <dt>분류</dt><dd>교통·관광</dd>
+      <dt>본능</dt><dd>크기 본능 · 가장 큰 공항 하나와 가장 먼 여행지 몇 곳이 전체 하늘길처럼 보인다</dd>
+      <dt>그림 방식</dt><dd>재생되는 두 장의 하늘 지도 · 공항 지도와 서울 중심 세계 지도를 2010년부터 2025년까지 한 해씩 넘긴다. 세계 지도는 서울에서 그은 직선이 실제 최단 항로가 되는 방위등거리도법이다</dd>
+      <dt>기간</dt><dd>2010–2025년 (16년)</dd>
+      <dt>엮은 데이터</dt><dd>3개 · 국토교통부 항공정보포털 공항별 항공통계 · 같은 곳 지역·국가별 항공통계 · 한국공항공사 공항별 여객실적(대조)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2025년 우리나라 공항을 오간 승객(출발+도착) 가운데 인천공항 이용객은 얼마나 될까?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>A</i>절반쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>넷 중 셋쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>열 중 아홉쯤</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">A. <span class="n">47.5%</span>, 7,407만 명</span>
+      국제선만 따지면 77.4%가 인천이다. 하지만 2위 제주공항(2,981만 명)은 이용객 열에 아홉이 국내선 승객이고, 3위 김포공항(2,296만 명)도 다섯에 넷이 국내선이다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">국제선은 인천, 하지만 공항은 인천만이 아니다</h2>
+      <p>원의 넓이는 그 공항을 오간 승객 수, 주황 조각은 국제선, 청록 부분은 국내선이다. 2025년 인천공항은 <span class="n">7,407만</span> 명으로 압도적인 1위지만, 제주(<span class="n">2,981만</span>)·김포(<span class="n">2,296만</span>)·김해(<span class="n">1,695만</span>) 세 곳만 합쳐도 인천의 94%다. 김해공항은 국제선 승객(<span class="n">1,050만</span>)이 국내선(<span class="n">645만</span>)보다 많은 두 번째 국제공항이다.</p>
+      <p>재생 버튼을 눌러 보면 2020–2022년에는 순위가 뒤집힌다. 해외 길이 막히자 인천은 2021년 4위(<span class="n">320만</span> 명)까지 내려갔고, 그 3년 동안 1위는 제주였다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">공항별 승객 수, 2010–2025년</p>
+      <p class="fs">출발+도착 승객. 국내선은 출발 공항과 도착 공항에서 한 번씩 잡힌다</p>
+      <div class="legend" aria-hidden="true"><span><i class="sw dot" style="background:var(--intl)"></i>국제선</span><span><i class="sw dot" style="background:var(--dom)"></i>국내선</span></div>
+      <div class="player" id="p1"></div>
+      <p class="stat" id="st1"></p>
+      <div class="kgrid">
+        <div class="chart mapk" id="c1"></div>
+        <div class="chart" id="c1b"></div>
+      </div>
+      <figcaption>국토교통부 항공정보포털 「공항별 항공통계」, 국내선·국제선 각각 1–12월 합계. 무안공항은 2024년 12월 말부터 운항이 멈춰 2025년 실적이 없다. 지도의 원 위치는 공항 자리다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">그 비행기들은 어느 나라를 오갔나</h2>
+      <p>서울을 한가운데 둔 세계 지도다. 이 지도에서는 서울에서 그은 직선이 곧 가장 짧은 하늘길이고, 동심원은 서울에서 2,000km씩 떨어진 거리다. 선의 굵기가 그 나라를 오간 승객 수다.</p>
+      <p>2025년 국제선 승객 <span class="n">9,498만</span> 명 가운데 일본이 <span class="n">2,746만</span> 명(<span class="n">28.9%</span>)으로 가장 많고, 중국(<span class="n">1,684만</span>), 베트남(<span class="n">1,042만</span>), 대만(<span class="n">583만</span>), 미국 본토(<span class="n">566만</span>)가 뒤를 잇는다. 굵은 선은 대부분 4,000km 원 안에 있다. 재생하면 2020년 이후 하늘길이 한꺼번에 가늘어졌다가, 일본·베트남 길부터 먼저 굵어지는 모습이 보인다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">나라별 국제선 승객, 서울 중심 지도</p>
+      <p class="fs">출발+도착 승객. 선은 서울에서 그 나라 대표 도시까지 그은 상징선이다</p>
+      <div class="chips" role="group" aria-label="지도 범위" id="chips2"></div>
+      <div class="player" id="p2"></div>
+      <p class="stat" id="st2"></p>
+      <div class="wgrid">
+        <div class="chart" id="c2"></div>
+        <div class="chart" id="c2b"></div>
+      </div>
+      <figcaption>국토교통부 항공정보포털 「지역·국가별 항공통계」. 나라는 비행기가 오간 공항이 있는 곳이며 승객 국적이 아니다. 괌·사이판·하와이는 원자료대로 미국 본토와 따로 셌다. 세계 지도: Natural Earth(world-atlas), 방위등거리도법.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">하늘길의 절반은 1,500km 안에서 끝난다</h2>
+      <p>나라마다 서울에서 대표 도시까지의 거리를 재고, 가까운 나라부터 승객을 차곡차곡 쌓았다. 2025년 국제선 승객의 <span class="n">52.8%</span>는 1,500km 안쪽(중국·일본·대만 등)을, <span class="n">74.5%</span>는 3,500km 안쪽(동남아 일부와 괌까지)을 오갔다. 5,000km를 넘는 곳, 곧 유럽·미주·대양주 대부분은 다 합쳐 <span class="n">16.0%</span>다.</p>
+      <p>2010년과 견주면 곡선의 모양이 바뀌었다. 1,500km 안의 비중은 비슷하지만(54.0%), 그 바깥 2,500–4,000km(필리핀·베트남·태국)가 크게 늘고 미주의 몫은 줄었다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">서울에서 가까운 나라부터 쌓은 국제선 승객 비율</p>
+      <p class="fs">가로: 서울에서 대표 도시까지 거리. 세로: 그 거리 안쪽 나라들을 오간 승객의 누적 비율</p>
+      <div class="legend" aria-hidden="true"><span><i class="sw line" style="background:var(--intl)"></i>2025년</span><span><i class="sw line" style="background:var(--ghost)"></i>2010년</span></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>국토교통부 항공정보포털 「지역·국가별 항공통계」에서 계산. 거리는 서울에서 수도(섬나라·도시국가는 그 섬이나 도시)까지의 대권거리다. 미국은 워싱턴, 중국은 베이징 기준이라 실제 노선 거리와 다르다. 14,000km 넘는 곳(브라질)은 오른쪽 끝에 모았다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">그래서, 비행기는 인천공항에서만 탈까</h2>
+      <p>아니다. 해외로 가는 승객 열에 여덟이 인천을 거치는 것은 맞지만, 공항을 오가는 승객 전체로 보면 인천은 절반이 안 된다. 제주와 김포는 국내선만으로 인천 다음가는 공항이고, 김해·청주·대구도 국제선 승객이 한 해 150만–1,050만 명이다. 인천 밖에서 탄 국제선 승객은 2025년 <span class="n">2,142만</span> 명이었다.</p>
+      <p>그리고 인천에서 뜨는 비행기도 대부분 멀리 가지 않는다. 국제선 승객 넷 중 셋은 서울에서 3,500km 안쪽, 비행 다섯 시간 안팎의 이웃 나라를 오갔다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:20px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>공항별 승객은 그 공항에서 내리고 탄 사람의 합이다. 김포에서 제주로 한 번 날면 김포와 제주에 한 명씩 잡힌다. 국내선 여행을 한 번만 세면 인천 비율은 47.5%에서 58.8%로 오른다. 그래도 열에 넷은 인천 밖이다.</li>
+      <li>나라별 승객은 비행기가 오간 외국 공항의 나라다. 승객의 국적이 아니고, 인천에서 갈아타는 환승객도 내릴 때와 탈 때 각각 잡힌다.</li>
+      <li>지도의 선은 서울에서 대표 도시로 그은 상징선이다. 김해·제주에서 뜬 국제선도 서울에서 그었고, 오사카·상하이처럼 대표 도시가 아닌 곳으로 가는 노선도 한 선에 모았다.</li>
+      <li>한국공항공사가 공공데이터포털에 올린 「공항별 여객실적」(15002610) 2025년 파일은 제주공항 국내선 정기편이 0으로 적혀 있어 약 2,600만 명이 빠져 있다. 그래서 공항별 숫자는 항공정보포털 원자료를 썼다. 두 자료의 국제선 합계는 일치한다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:20px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.airportal.go.kr/stats/transport/chartDetail2.do" target="_blank" rel="noopener">공항별 항공통계</a> (항공정보포털)</td><td>국토교통부</td><td>15개 공항 × 국내선·국제선 승객 (출발+도착)</td><td>2010–2025</td></tr>
+        <tr><td><a href="https://www.airportal.go.kr/stats/transport/chartDetail4.do" target="_blank" rel="noopener">지역·국가별 항공통계</a> (항공정보포털)</td><td>국토교통부</td><td>83개 나라·지역의 국제선 승객·운항 편수</td><td>2010–2025</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15002610/fileData.do" target="_blank" rel="noopener">공항별 여객실적</a> (15002610)</td><td>한국공항공사</td><td>대조용. 제주 국내선 누락이 있어 본문 계산에는 쓰지 않았다</td><td>2025</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:20px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>항공정보포털 통계 2종을 해마다 1–12월로 내려받음 (32회 + 16회 조회)</dd>
+      <dt>도구</dt><dd>Python(집계) · d3-geo(지도 투영, 미리 계산) · SVG 그림과 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>공항별 국내·국제 구성 · 나라별 승객 · 서울 기준 대권거리와 누적 비율</dd>
+      <dt>검증</dt><dd>공항별 통계의 국제선 합과 국가별 통계의 합계를 16개 연도 모두 대조했다. 2011–2025년은 정확히 같고, 2010년은 151명(0.0004%) 차이다. 나라별 합과 합계의 차이(나라 미상)는 2021년 5만 7천 명(1.8%)을 빼면 해마다 2만 명 이하라, 누적 비율은 합계를 분모로 계산했다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:20px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>지방 공항은 정말 텅 비어 있을까</h3><p>공항별 좌석 수와 승객 수로 탑승률을 보면, 붐비는 공항과 한산한 공항이 갈린다.</p>
+        <ul><li><a href="https://www.airportal.go.kr/stats/transport/chartDetail2.do" target="_blank" rel="noopener">공항별 항공통계(좌석 수 포함)</a> · 국토교통부</li></ul></div>
+      <div class="q"><h3>외국인은 어느 공항으로 들어올까</h3><p>출입국 통계의 국적·항구별 자료로, 인천 말고 들어오는 외국인을 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15099993/fileData.do" target="_blank" rel="noopener">월별 공항만별 출입국자</a> · 법무부</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null, GEO = /*GEO*/null;
+document.documentElement.lang = "ko";
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const s = (tag, a = {}, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  const tx = (p, x, y, str, cls, size, anchor = "start", extra = {}) => { const t = s("text", { x, y, class: cls, "text-anchor": anchor, "font-size": size, ...extra }, p); t.textContent = str; return t; };
+  const fmt = (n) => Math.round(n).toLocaleString("ko-KR");
+  const man = (n) => n >= 1e5 ? Math.round(n / 1e4).toLocaleString("ko-KR") + "만" : fmt(n);
+  const pc = (n) => n.toLocaleString("ko-KR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "%";
+  const Y = DATA.years, NY = Y.length;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const at = (arr, pos) => { const k = Math.floor(pos), f = pos - k; return k + 1 < arr.length ? arr[k] + (arr[k + 1] - arr[k]) * f : arr[k]; };
+  const yearOf = (pos) => Y[Math.min(NY - 1, Math.floor(pos + 1e-6))];
+  const short = (a) => a.replace(/\(.*\)/, "");
+
+  function table(id, head, rows) {
+    const t = document.createElement("table"), th = document.createElement("thead"), tr = document.createElement("tr");
+    head.forEach((h) => { const c = document.createElement("th"); c.textContent = h; tr.append(c); }); th.append(tr); t.append(th);
+    const tb = document.createElement("tbody");
+    rows.forEach((r) => { const row = document.createElement("tr"); r.forEach((v) => { const c = document.createElement("td"); c.textContent = v; row.append(c); }); tb.append(row); });
+    t.append(tb); document.getElementById(id).replaceChildren(t);
+  }
+  function tipFor(fig) {
+    const tip = fig.querySelector(".tip");
+    return {
+      show(ev, title, rows) {
+        tip.replaceChildren(); const h = document.createElement("div"); h.className = "tn"; h.textContent = title; tip.append(h);
+        rows.forEach(([v, k]) => { const d = document.createElement("div"); const b = document.createElement("span"); b.className = "tv"; b.textContent = v + " "; const kk = document.createElement("span"); kk.textContent = k; d.append(b, kk); tip.append(d); });
+        tip.hidden = false;
+        const fr = fig.getBoundingClientRect(); let x, y;
+        if (ev.clientX != null) { x = ev.clientX - fr.left + 14; y = ev.clientY - fr.top + 14; } else { const r = ev.target.getBoundingClientRect(); x = r.right - fr.left + 8; y = r.top - fr.top; }
+        const tw = tip.offsetWidth, th = tip.offsetHeight;
+        if (x + tw > fr.width - 8) x = Math.max(8, x - tw - 28);
+        if (y + th > fr.height - 8) y = Math.max(8, y - th - 28);
+        tip.style.left = x + "px"; tip.style.top = y + "px";
+      },
+      hide() { tip.hidden = true; },
+    };
+  }
+  /* One tab stop per chart. Pointer: nearest mark. Touch: tap picks, tooltip stays.
+     Keys: Left/Right step, Up/Down jump to the nearest mark above/below, Escape hides. pts are in viewBox units. */
+  function pointLayer(v, tip, pts, label, u) {
+    const ring = s("circle", { class: "ring", "stroke-width": 2 * u, opacity: 0 }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = i; const p = pts[i]; ring.setAttribute("cx", p.x); ring.setAttribute("cy", p.y); ring.setAttribute("r", p.r + 4 * u); ring.setAttribute("opacity", 1); const [t, rows] = p.fn(); tip.show(ev || { target: ring }, t, rows); };
+    const hide = () => { tip.hide(); ring.setAttribute("opacity", 0); };
+    const nearest = (e) => {
+      const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal, k = vb.width / r.width;
+      const x = vb.x + (e.clientX - r.left) * k, y = vb.y + (e.clientY - r.top) * k;
+      let best = -1, bd = Infinity;
+      pts.forEach((p, i) => { const d = Math.hypot(p.x - x, p.y - y) - p.r, reach = 22 * k; if (d < reach && d < bd) { bd = d; best = i; } });
+      return best;
+    };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerdown", (e) => { const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => { if (pts.length) show(idx < 0 ? 0 : idx); }); v.addEventListener("blur", hide);
+    const vert = (dir) => { const c = pts[Math.max(idx, 0)]; let best = -1, bd = Infinity; pts.forEach((p, i) => { const dy = (p.y - c.y) * dir; if (dy <= 0.5) return; const d = dy * 3 + Math.abs(p.x - c.x); if (d < bd) { bd = d; best = i; } }); return best < 0 ? Math.max(idx, 0) : best; };
+    v.addEventListener("keydown", (e) => {
+      if (!pts.length) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); const st = e.key === "ArrowRight" ? 1 : -1; show((Math.max(idx, 0) + st + pts.length) % pts.length); }
+      else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); show(vert(e.key === "ArrowDown" ? 1 : -1)); }
+      else if (e.key === "Escape") hide();
+    });
+  }
+  /* A player: play/pause, a year scrubber and a board-style year readout. At rest it shows the last year. */
+  function Player(id, label, draw, seconds = 10) {
+    const box = document.getElementById(id);
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "play"; btn.setAttribute("aria-label", label + " 재생");
+    const icon = (playing) => { btn.replaceChildren(); const v = s("svg", { viewBox: "0 0 20 20", "aria-hidden": "true" }, btn); if (playing) { s("rect", { x: 4, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); s("rect", { x: 12, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); } else s("path", { d: "M5,3 L17,10 L5,17 Z", fill: "currentColor" }, v); };
+    const yr = document.createElement("div"); yr.className = "yr"; yr.setAttribute("aria-hidden", "true");
+    const sc = document.createElement("input"); sc.type = "range"; sc.className = "scrub"; sc.min = 0; sc.max = NY - 1; sc.step = 1; sc.value = NY - 1; sc.setAttribute("aria-label", label + " 연도");
+    box.append(btn, yr, sc);
+    let pos = NY - 1, raf = 0, playing = false, t0 = 0, from = 0;
+    const render = () => { yr.textContent = yearOf(pos); sc.value = Math.round(pos); sc.setAttribute("aria-valuetext", Y[Math.round(pos)] + "년"); draw(pos); };
+    const stop = () => { playing = false; cancelAnimationFrame(raf); icon(false); btn.setAttribute("aria-label", label + " 재생"); };
+    const tick = (now) => { const k = (now - t0) / (seconds * 1000); pos = Math.min(NY - 1, from + k * (NY - 1)); render(); if (pos < NY - 1) raf = requestAnimationFrame(tick); else stop(); };
+    btn.addEventListener("click", () => {
+      if (playing) { stop(); return; }
+      if (reduce) { pos = NY - 1; render(); return; }
+      from = pos >= NY - 1 ? 0 : pos; pos = from; playing = true; icon(true); btn.setAttribute("aria-label", label + " 멈춤");
+      raf = requestAnimationFrame((n) => { t0 = n - (from / (NY - 1)) * 0; tick(n); });
+    });
+    sc.addEventListener("input", () => { stop(); pos = +sc.value; render(); });
+    icon(false);
+    return { render };
+  }
+
+  /* quiz */
+  document.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".opt").forEach((o) => { o.setAttribute("aria-pressed", o === b); o.dataset.state = o.dataset.a === "1" ? "right" : "wrong"; });
+    document.getElementById("reveal").hidden = false;
+  }));
+
+  /* ---------- 1. airports on a map of Korea ---------- */
+  const AP = DATA.airports, APN = Object.keys(AP);
+  const apTot = (a, pos) => at(AP[a].d, pos) + at(AP[a].i, pos);
+  const AMAX = Math.max(...APN.map((a) => Math.max(...AP[a].d.map((d, i) => d + AP[a].i[i]))));
+  // label side per airport so the crowded west coast stays readable
+  const SIDE = { "인천(ICN)": "w", "김포(GMP)": "ne", "제주(CJU)": "e", "김해(PUS)": "e", "대구(TAE)": "e", "청주(CJJ)": "e", "광주(KWJ)": "w", "무안(MWX)": "w", "여수(RSU)": "s", "울산(USN)": "e", "사천(HIN)": "s", "포항경주(KPO)": "e", "군산(KUV)": "w", "원주(WJU)": "e", "양양(YNY)": "e" };
+  function wedge(cx, cy, r, frac) {
+    if (frac < .004) return "";
+    if (frac >= .9999) return `M${cx - r},${cy}a${r},${r} 0 1,0 ${2 * r},0a${r},${r} 0 1,0 ${-2 * r},0Z`;
+    const a = frac * 2 * Math.PI, x = cx + r * Math.sin(a), y = cy - r * Math.cos(a);
+    return `M${cx},${cy}L${cx},${cy - r}A${r},${r} 0 ${frac > .5 ? 1 : 0},1 ${x.toFixed(2)},${y.toFixed(2)}Z`;
+  }
+  function c1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = 360, H = 440, u = W / Math.max(200, box.clientWidth);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${yearOf(pos)}년 공항별 승객 수 지도` }, box);
+    s("rect", { x: 0, y: 0, width: W, height: H, fill: "var(--sea)", rx: 10 }, v);
+    GEO.korea.forEach((c) => s("path", { d: c.d, fill: c.n === "South Korea" ? "var(--landk)" : "var(--land)", stroke: "var(--coast)", "stroke-width": .8 * u }, v));
+    const R = 44;
+    const list = APN.map((a) => ({ a, t: apTot(a, pos), i: at(AP[a].i, pos) })).sort((x, y) => y.t - x.t);
+    const pts = [];
+    list.forEach(({ a, t, i }) => {
+      const [x, y] = GEO.airports[a]; const r = Math.max(2.2, Math.sqrt(t / AMAX) * R);
+      if (t <= 0) { s("circle", { cx: x, cy: y, r: 3, fill: "none", stroke: "var(--muted)", "stroke-width": 1.2 * u, "stroke-dasharray": `${2 * u} ${2 * u}` }, v); }
+      else {
+        s("circle", { cx: x, cy: y, r, fill: "var(--dom)", "fill-opacity": .88, stroke: "var(--card)", "stroke-width": 1.2 * u }, v);
+        s("path", { d: wedge(x, y, r, i / t), fill: "var(--intl)", stroke: "var(--card)", "stroke-width": .8 * u }, v);
+      }
+      pts.push({ x, y, r, fn: () => { const tt = apTot(a, pos), ii = at(AP[a].i, pos); return [`${short(a)}공항 · ${yearOf(pos)}년`, [[man(tt) + "명", "전체"], [man(ii) + "명", "국제선"], [man(tt - ii) + "명", "국내선"]]]; } });
+    });
+    // labels for airports with 1M+ passengers, drawn last so circles never cover them
+    list.forEach(({ a, t }) => {
+      if (t < 1e6) return;
+      const [x, y] = GEO.airports[a]; const r = Math.max(2.2, Math.sqrt(t / AMAX) * R), sd = SIDE[a] || "e", fs = 12.5 * u;
+      let lx = x, ly = y, an = "start";
+      if (sd === "w") { lx = x - r - 4 * u; an = "end"; } else if (sd === "e") { lx = x + r + 4 * u; } else if (sd === "ne") { lx = x + r * .7 + 3 * u; ly = y - r * .7 - 4 * u; } else if (sd === "s") { ly = y + r + fs; an = "middle"; }
+      tx(v, lx, ly - fs * .1, short(a), "lb halo-sea", fs, an, { "font-weight": 600, "stroke-width": 3 * u });
+      tx(v, lx, ly + fs * 1.05, man(t), "tk halo-sea", 11.5 * u, an, { "stroke-width": 3 * u });
+    });
+    pointLayer(v, tipFor(fig), pts.sort((p, q) => p.y - q.y || p.x - q.x), "화살표 키로 공항을 하나씩 볼 수 있다", u);
+
+    // ranking bars
+    const b2 = document.getElementById("c1b"); b2.replaceChildren();
+    const BW = Math.max(280, b2.clientWidth), rowH = 27, l = 70, rr = 62, top = 8, BH = top + rowH * list.length + 26;
+    const vb = s("svg", { viewBox: `0 0 ${BW} ${BH}`, role: "img", "aria-label": `${yearOf(pos)}년 공항 순위` }, b2);
+    const sx = (n) => (n / AMAX) * (BW - l - rr);
+    [0, 2e7, 4e7, 6e7].forEach((t) => { s("line", { x1: l + sx(t), x2: l + sx(t), y1: top, y2: BH - 22, class: "gl" }, vb); tx(vb, l + sx(t), BH - 6, t ? fmt(t / 1e4) + "만" : "0", "tk", 11.5, "middle"); });
+    list.forEach(({ a, t, i }, j) => {
+      const y = top + j * rowH;
+      tx(vb, l - 8, y + 17, short(a), j < 3 ? "vl" : "lb", 13.5, "end");
+      s("rect", { x: l, y: y + 5, width: Math.max(0, sx(i)), height: 16, fill: "var(--intl)", rx: 2 }, vb);
+      s("rect", { x: l + sx(i), y: y + 5, width: Math.max(0, sx(t - i)), height: 16, fill: "var(--dom)", rx: 2 }, vb);
+      tx(vb, l + sx(t) + 6, y + 17, t ? man(t) : "운항 없음", "tk", 12, "start");
+    });
+    const tot = APN.reduce((sum, a) => sum + apTot(a, pos), 0), icn = apTot("인천(ICN)", pos), it = APN.reduce((sum, a) => sum + at(AP[a].i, pos), 0), ii = at(AP["인천(ICN)"].i, pos);
+    const st = document.getElementById("st1"); st.replaceChildren();
+    st.append("전체 공항 승객 ", Object.assign(document.createElement("b"), { textContent: man(tot) + "명" }), " 중 인천 ", Object.assign(document.createElement("b"), { textContent: pc(icn / tot * 100) }), " · 국제선 중 인천 ", Object.assign(document.createElement("b"), { textContent: pc(ii / it * 100) }));
+  }
+  table("t1", ["연도", ...APN.map(short), "합계", "인천 비율"], Y.map((y, k) => { const tot = APN.reduce((sum, a) => sum + AP[a].d[k] + AP[a].i[k], 0); return [String(y), ...APN.map((a) => fmt(AP[a].d[k] + AP[a].i[k])), fmt(tot), pc((AP["인천(ICN)"].d[k] + AP["인천(ICN)"].i[k]) / tot * 100)]; }));
+
+  /* ---------- 2. countries on a Seoul-centred azimuthal equidistant map ---------- */
+  const C = DATA.countries, CN = Object.keys(C), PT = GEO.pts, IT = DATA.intlTotal;
+  const CMAX = Math.max(...CN.map((c) => Math.max(...C[c].p)));
+  const EN = {}; CN.forEach((c) => { if (PT[c].en) (EN[PT[c].en] = EN[PT[c].en] || []).push(c); });
+  const RMAX = 375; // keep points beyond the map edge (Brazil, Haiti) on the rim
+  const ptXY = (c) => { const [x, y] = PT[c].xy, dx = x - 400, dy = y - 400, d = Math.hypot(dx, dy); return d > RMAX ? [400 + dx / d * RMAX, 400 + dy / d * RMAX] : [x, y]; };
+  let view = window.innerWidth < 600 ? "near" : "world";
+  const VIEWS = { world: ["온 세계", [0, 0, 800, 800]], near: ["5,000km 안쪽 확대", [400 - 146, 400 - 146, 292, 292]] };
+  const ch2 = document.getElementById("chips2");
+  Object.entries(VIEWS).forEach(([k, [name]]) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = name; b.setAttribute("aria-pressed", k === view); b.addEventListener("click", () => { view = k; ch2.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === b)); p2.render(); }); ch2.append(b); });
+  function c2(pos) {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const [vx, vy, vw, vh] = VIEWS[view][1], u = vw / Math.max(200, box.clientWidth);
+    const v = s("svg", { viewBox: `${vx} ${vy} ${vw} ${vh}`, role: "img", "aria-label": `${yearOf(pos)}년 나라별 국제선 승객, 서울 중심 지도` }, box);
+    const clip = "cl" + Math.random().toString(36).slice(2, 7);
+    const cp = s("clipPath", { id: clip }, s("defs", {}, v)); s("rect", { x: vx, y: vy, width: vw, height: vh, rx: 10 * u }, cp);
+    const g = s("g", { "clip-path": `url(#${clip})` }, v);
+    s("rect", { x: vx, y: vy, width: vw, height: vh, fill: "var(--card)" }, g);
+    s("path", { d: GEO.outline, fill: "var(--sea)" }, g);
+    const val = {}; CN.forEach((c) => (val[c] = at(C[c].p, pos)));
+    GEO.world.forEach((w) => {
+      const cs = EN[w.n]; const p = cs ? cs.reduce((sum, c) => sum + val[c], 0) : 0;
+      const fill = p >= 1000 ? "var(--land-on)" : "var(--land)";
+      s("path", { d: w.d, fill, stroke: "var(--coast)", "stroke-width": .6 * u, "stroke-linejoin": "round" }, g);
+    });
+    GEO.rings.forEach((r) => { s("circle", { cx: 400, cy: 400, r: r.r, fill: "none", stroke: "var(--ink)", "stroke-opacity": .28, "stroke-width": u, "stroke-dasharray": `${3 * u} ${4 * u}` }, g); });
+    GEO.rings.forEach((r) => { if (400 - r.r > vy + 8 * u) tx(g, 400, 400 - r.r - 4 * u, fmt(r.km) + "km", "tk halo-sea", 11 * u, "middle", { "stroke-width": 3 * u }); });
+    const order = CN.filter((c) => val[c] > 0).sort((a, b) => val[a] - val[b]);
+    const wpx = (p) => Math.max(.7, p / CMAX * 16) * u;
+    order.forEach((c) => { const [x, y] = ptXY(c); s("line", { x1: 400, y1: 400, x2: x, y2: y, stroke: "var(--intl)", "stroke-width": wpx(val[c]), "stroke-linecap": "round", "stroke-opacity": .78 }, g); });
+    const pts = [];
+    order.forEach((c) => { const [x, y] = ptXY(c), r = Math.max(2, Math.sqrt(val[c] / CMAX) * 7) * u; s("circle", { cx: x, cy: y, r, fill: "var(--card)", stroke: "var(--intl)", "stroke-width": 1.4 * u }, g); pts.push({ x, y, r, c }); });
+    s("circle", { cx: 400, cy: 400, r: 5 * u, fill: "var(--ink)", stroke: "var(--card)", "stroke-width": 2 * u }, g);
+    tx(g, 400 - 8 * u, 400 - 8 * u, "서울", "vl halo-sea", 13 * u, "end", { "stroke-width": 3 * u });
+    // greedy labels: biggest first, skip anything that would collide
+    const placed = [[400 - 36 * u, 400 - 24 * u, 400 - 4 * u, 400 - 4 * u], ...GEO.rings.map((r) => [400 - 28 * u, 400 - r.r - 16 * u, 400 + 28 * u, 400 - r.r])], fs = 12.5 * u;
+    const nLab = view === "world" ? 14 : 18;
+    [...order].reverse().slice(0, nLab + 10).forEach((c) => {
+      if (placed.length > nLab) return;
+      const [x, y] = ptXY(c), r = Math.max(2, Math.sqrt(val[c] / CMAX) * 7) * u, t1 = c, t2 = man(val[c]);
+      const w = Math.max(t1.length * fs * .95, t2.length * fs * .62) + 4 * u, h = fs * 2.3;
+      const cand = [["start", x + r + 4 * u, y - h / 2], ["end", x - r - 4 * u - w, y - h / 2], ["middle", x - w / 2, y - r - 2 * u - h], ["middle", x - w / 2, y + r + 2 * u]];
+      const ok = cand.find(([, bx, by]) => bx >= vx + 2 * u && bx + w <= vx + vw - 2 * u && by >= vy + 2 * u && by + h <= vy + vh - 2 * u && !placed.some(([a1, b1, a2, b2]) => bx < a2 && bx + w > a1 && by < b2 && by + h > b1));
+      if (!ok) return;
+      const [an, bx, by] = ok; placed.push([bx, by, bx + w, by + h]);
+      const lx = an === "start" ? bx : an === "end" ? bx + w : bx + w / 2, ly = by + h / 2;
+      tx(g, lx, ly - fs * .15, t1, "lb halo-sea", fs, an, { "font-weight": 600, "stroke-width": 3 * u });
+      tx(g, lx, ly + fs * .95, t2, "tk halo-sea", 11.5 * u, an, { "stroke-width": 3 * u });
+    });
+    const tot = at(IT, pos);
+    const lp = pts.map((p) => ({ ...p, r: Math.max(p.r, 3 * u), fn: () => { const c = p.c, k = Math.round(pos); return [`${c} · ${PT[c].city} ${fmt(PT[c].km)}km`, [[man(val[c]) + "명", `${yearOf(pos)}년 승객`], [pc(val[c] / tot * 100), "국제선 중"], [fmt(at(C[c].f, pos)) + "편", "운항"]]]; } }));
+    pointLayer(v, tipFor(fig), lp.sort((a, b) => b.p - a.p).sort((a, b) => val[b.c] - val[a.c]), "화살표 키로 승객이 많은 나라부터 볼 수 있다", u);
+    // side list: top 10
+    const b2 = document.getElementById("c2b"); b2.replaceChildren();
+    const top10 = [...order].reverse().slice(0, 10);
+    const BW = Math.max(260, b2.clientWidth), rowH = 34, l = 72, rr = 50, BH = rowH * 10 + 28;
+    const vb = s("svg", { viewBox: `0 0 ${BW} ${BH}`, role: "img", "aria-label": `${yearOf(pos)}년 국제선 승객 상위 10개 나라` }, b2);
+    tx(vb, 0, 14, "승객이 많은 10곳", "mt", 12.5);
+    top10.forEach((c, j) => {
+      const y = 26 + j * rowH, w = val[c] / CMAX * (BW - l - rr);
+      tx(vb, l - 8, y + 15, c, j < 3 ? "vl" : "lb", 13.5, "end");
+      s("rect", { x: l, y: y + 3, width: Math.max(1, w), height: 16, fill: "var(--intl)", rx: 2 }, vb);
+      tx(vb, l + w + 6, y + 15, man(val[c]), "tk", 12, "start");
+      tx(vb, l, y + 31, `${pc(val[c] / tot * 100)} · ${fmt(PT[c].km)}km`, "tk", 11, "start");
+    });
+    const st = document.getElementById("st2"); st.replaceChildren();
+    st.append("국제선 승객 ", Object.assign(document.createElement("b"), { textContent: man(tot) + "명" }), " · 오간 나라·지역 ", Object.assign(document.createElement("b"), { textContent: CN.filter((c) => C[c].p[Math.round(pos)] > 0).length + "곳" }));
+  }
+  const ranked = [...CN].sort((a, b) => C[b].p[NY - 1] - C[a].p[NY - 1]);
+  table("t2", ["나라·지역", "대표 도시", "거리(km)", ...Y.map(String)], ranked.map((c) => [c, PT[c].city, fmt(PT[c].km), ...C[c].p.map(fmt)]));
+
+  /* ---------- 3. cumulative share by distance from Seoul ---------- */
+  function cum(k) {
+    const list = CN.filter((c) => C[c].p[k] > 0).sort((a, b) => PT[a].km - PT[b].km);
+    let acc = 0; return list.map((c) => { acc += C[c].p[k]; return { c, km: Math.min(PT[c].km, 14000), share: acc / IT[k] * 100, p: C[c].p[k] }; });
+  }
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(290, box.clientWidth), H = Math.min(400, Math.max(300, W * .5)), l = 44, r = 16, top = 20, bot = 40;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "서울에서의 거리별 국제선 승객 누적 비율, 2010년과 2025년" }, box);
+    const sx = (km) => l + km / 14000 * (W - l - r), sy = (p) => top + (1 - p / 100) * (H - top - bot);
+    [0, 25, 50, 75, 100].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t ? "gl" : "ax" }, v); tx(v, l - 6, sy(t) + 4, t + "%", "tk", 11.5, "end"); });
+    (W < 520 ? [0, 4000, 8000, 12000] : [0, 2000, 4000, 6000, 8000, 10000, 12000, 14000]).forEach((km, i, arr) => tx(v, sx(km), H - bot + 18, km ? fmt(km) : "0", "tk", 11.5, i === arr.length - 1 ? "end" : "middle"));
+    tx(v, W - r, H - 4, "서울에서 거리(km)", "mt", 12, "end");
+    const step = (arr, col, w) => { let d = `M${sx(0)},${sy(0)}`, prev = 0; arr.forEach((q) => { d += `L${sx(q.km).toFixed(1)},${sy(prev).toFixed(1)}L${sx(q.km).toFixed(1)},${sy(q.share).toFixed(1)}`; prev = q.share; }); d += `L${sx(14000)},${sy(prev)}`; s("path", { d, fill: "none", stroke: col, "stroke-width": w, "stroke-linejoin": "round" }, v); };
+    const a10 = cum(0), a25 = cum(NY - 1);
+    [[1500, "1,500km", 0], [3500, "3,500km", 0], [5000, "5,000km", 1]].forEach(([km, name, row]) => {
+      const sh = a25.filter((q) => q.km <= km).pop().share;
+      s("line", { x1: sx(km), x2: sx(km), y1: sy(sh), y2: H - bot, stroke: "var(--ink)", "stroke-width": 1, "stroke-dasharray": "3 3", opacity: .5 }, v);
+      if (W >= 520 || km !== 3500) tx(v, sx(km) + 5, H - bot - 8 - row * 18, `${name} 안 ${pc(sh)}`, "tk halo", 11.5, "start", { "stroke-width": 4 });
+    });
+    step(a10, "var(--ghost)", 2);
+    step(a25, "var(--intl)", 3);
+    const pts = [];
+    a25.forEach((q, i) => { const prev = i ? a25[i - 1].share : 0; pts.push({ x: sx(q.km), y: sy(q.share), r: 3, q, prev }); });
+    const big = new Set(["중국", "일본", "대만", "베트남", "태국", "미국"]);
+    a25.forEach((q, i) => {
+      if (!big.has(q.c) || (W < 520 && q.c === "대만")) return;
+      s("circle", { cx: sx(q.km), cy: sy(q.share), r: 4, fill: "var(--intl)", stroke: "var(--card)", "stroke-width": 1.5 }, v);
+      tx(v, sx(q.km) + 7, sy(q.share) + 4, `${q.c} ${pc(q.share)}`, "vl halo", 12.5, "start", { "stroke-width": 4 });
+    });
+    const tip = tipFor(fig);
+    pointLayer(v, tip, pts.map((p) => ({ ...p, fn: () => [`${p.q.c} · ${fmt(PT[p.q.c].km)}km`, [[man(p.q.p) + "명", "2025년 승객"], [pc(p.q.share), "여기까지 누적"]]] })), "화살표 키로 가까운 나라부터 볼 수 있다", 1);
+    table("t3", ["거리 안쪽", "2010년", "2019년", "2025년"], [1500, 2500, 3500, 5000, 8000, 11000, 14000].map((km) => [fmt(km) + "km", ...[0, Y.indexOf(2019), NY - 1].map((k) => { const a = cum(k).filter((q) => q.km <= km); return pc(a.length ? a[a.length - 1].share : 0); })]));
+  }
+
+  const p1 = Player("p1", "공항 지도", c1, 10);
+  const p2 = Player("p2", "세계 지도", c2, 12);
+  const all = () => { p1.render(); p2.render(); c3(); };
+  all();
+  let lastW = 0, rt;
+  new ResizeObserver(() => { const w = document.querySelector(".page").clientWidth; if (Math.abs(w - lastW) < 2) return; lastW = w; clearTimeout(rt); rt = setTimeout(all, 80); }).observe(document.querySelector(".page"));
+})();
+</script>

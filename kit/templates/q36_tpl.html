@@ -1,0 +1,349 @@
+<title>물가 풍선</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: 457 balloons, one per CPI item, tied to a ground line at 0% — an item whose price rose over the year floats
+   up on its string, one that fell hangs below as a weight; played month by month 2015–2026. Then a till receipt of the
+   biggest risers and fallers, a knitted scarf whose stripes are the share of items in each band of change, and price
+   tags showing what 10,000 won of 2020 costs now. */
+:root {
+  --paper: #f3f2ee; --card: #fcfbf8; --ink: #2b2c2e; --ink2: #47494b; --muted: #5b5e60; --line: #dedfdb; --grid: #e8e8e4; --axis: #a7a8a3;
+  --accent: #9b3737; --intl: #9b3737; --hi-ink: #9b3737; --board: #2b2c2e; --board-ink: #f3f2ee; --sea: #fcfbf8;
+  --sky: #e6edf0; --ground: #b6a392; --string: #8a8c8a;
+  --g0: #80a15a; --g1: #4e6aa9; --g2: #903a43; --g3: #8b4d3e; --g4: #689daf; --g5: #d56b41;
+  --b0: #2b5373; --b1: #689daf; --b2: #b5c6ce; --b3: #ebdac0; --b4: #dc8c67; --b5: #d56b41; --b6: #9b3737; --bna: #dedfdb;
+  --rcpt: #fdfcf9; --rcpt-ink: #2b2c2e; --rcpt-dim: #6a6c6e; --up: #9b3737; --down: #2b5373; --tag: #ebcfa7; --tag-edge: #8b4d3e; --tag-ink: #2b2c2e; --tag-down: #b5c6ce;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1b1c1d; --card: #242628; --ink: #ecedeb; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #393c3e; --grid: #2e3133; --axis: #5f6062;
+  --accent: #e7a08a; --intl: #e7a08a; --hi-ink: #e7a08a; --board: #dbe1dd; --board-ink: #1b1c1d; --sea: #242628;
+  --sky: #1f2a33; --ground: #67605a; --string: #6f7273;
+  --g0: #abc07b; --g1: #8eabc9; --g2: #e7a3ab; --g3: #cd9886; --g4: #8ab5bb; --g5: #dc8c67;
+  --b0: #a9c3dc; --b1: #689daf; --b2: #3e5c75; --b3: #4c433e; --b4: #b87b68; --b5: #dc8c67; --b6: #f0b3a0; --bna: #2e3133;
+  --up: #e7a08a; --down: #a9c3dc; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1b1c1d; --card: #242628; --ink: #ecedeb; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #393c3e; --grid: #2e3133; --axis: #5f6062;
+  --accent: #e7a08a; --intl: #e7a08a; --hi-ink: #e7a08a; --board: #dbe1dd; --board-ink: #1b1c1d; --sea: #242628;
+  --sky: #1f2a33; --ground: #67605a; --string: #6f7273;
+  --g0: #abc07b; --g1: #8eabc9; --g2: #e7a3ab; --g3: #cd9886; --g4: #8ab5bb; --g5: #dc8c67;
+  --b0: #a9c3dc; --b1: #689daf; --b2: #3e5c75; --b3: #4c433e; --b4: #b87b68; --b5: #dc8c67; --b6: #f0b3a0; --bna: #2e3133;
+  --up: #e7a08a; --down: #a9c3dc; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.hi { fill: var(--hi-ink) } .dn { fill: var(--down) }
+::selection { background: var(--tag); color: #2b2c2e }
+/* till receipt: stays paper-white in both themes, like a real one */
+.rwrap { display: grid; justify-content: center; padding: 6px 0 2px }
+.rcpt { width: min(100%, 400px); background: var(--rcpt); color: var(--rcpt-ink); font-family: var(--mono); font-size: 13.5px; line-height: 1.55; padding: 20px 20px 30px; box-shadow: 0 10px 24px rgba(0,0,0,.18);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 9px), 97.5% 100%, 95% calc(100% - 9px), 92.5% 100%, 90% calc(100% - 9px), 87.5% 100%, 85% calc(100% - 9px), 82.5% 100%, 80% calc(100% - 9px), 77.5% 100%, 75% calc(100% - 9px), 72.5% 100%, 70% calc(100% - 9px), 67.5% 100%, 65% calc(100% - 9px), 62.5% 100%, 60% calc(100% - 9px), 57.5% 100%, 55% calc(100% - 9px), 52.5% 100%, 50% calc(100% - 9px), 47.5% 100%, 45% calc(100% - 9px), 42.5% 100%, 40% calc(100% - 9px), 37.5% 100%, 35% calc(100% - 9px), 32.5% 100%, 30% calc(100% - 9px), 27.5% 100%, 25% calc(100% - 9px), 22.5% 100%, 20% calc(100% - 9px), 17.5% 100%, 15% calc(100% - 9px), 12.5% 100%, 10% calc(100% - 9px), 7.5% 100%, 5% calc(100% - 9px), 2.5% 100%, 0 calc(100% - 9px)) }
+.rcpt h3 { font: 700 17px/1.3 var(--sans); margin: 0; text-align: center; letter-spacing: .04em }
+.rcpt .sub { text-align: center; color: var(--rcpt-dim); font-size: 12px; margin: 2px 0 8px }
+.rcpt hr { border: 0; border-top: 1.5px dashed var(--rcpt-dim); margin: 8px 0 }
+.rcpt .sec { font: 600 12px/1.6 var(--sans); color: var(--rcpt-dim); letter-spacing: .04em; margin: 2px 0 }
+.rl { display: flex; align-items: baseline; gap: 6px }
+.rl .nm { font-family: var(--sans); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0 }
+.rl .dots { flex: 1; border-bottom: 1px dotted var(--rcpt-dim); transform: translateY(-3px); min-width: 12px }
+.rl .v { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap }
+.rl .v.u { color: #9b3737 } .rl .v.d { color: #2b5373 }
+.rcpt .tot { font: 700 15px/1.6 var(--sans) }
+.rcpt .bar { height: 34px; margin-top: 12px; background: repeating-linear-gradient(90deg, #2b2c2e 0 2px, transparent 2px 5px, #2b2c2e 5px 6px, transparent 6px 9px, #2b2c2e 9px 12px, transparent 12px 14px) }
+.pr { animation: pr .28s ease-out both }
+@keyframes pr { from { opacity: 0; transform: translateY(-6px) } to { opacity: 1; transform: none } }
+@media (prefers-reduced-motion: reduce) { .pr { animation: none } }
+</style>
+
+<main class="page">
+  <header>
+    <h1>물가는 모든 게 함께 오를까<span>아니다. 물가가 2.8% 오른 2026년 10월, 457개 품목 가운데 340개(74%)가 올랐고 96개(21%)는 내렸다. 6.3% 올라 가장 뜨거웠던 2022년 7월에도 열에 하나는 내렸고, 0%였던 2019년 10월에도 열에 여섯은 올랐다. "물가"는 한 덩어리가 아니라 흩어진 풍선 무리다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 36</dd>
+      <dt>한 줄</dt><dd>국가데이터처 소비자물가조사의 품목별 지수 457개로 보면, 2026년 10월 소비자물가는 1년 전보다 2.82% 올랐다. 품목 등락률의 가운데 값은 2.02%이고, 5% 넘게 오른 품목이 109개(24%), 5% 넘게 내린 품목이 42개다. 가장 많이 오른 것은 인삼(+32.5%)·저장장치(+27.8%)·컴퓨터(+26.2%), 가장 많이 내린 것은 상추(−44.3%)·오이(−39.5%)·호박(−38.4%)이다. 5% 넘게 오른 품목은 2020년 10월 15%에서 2023년 3월 53%(244개)까지 늘었다가 24%로 줄었다. 2020년과 견주면 전체는 20.7% 올랐지만 귤은 2.3배가 됐고, TV·병원검사료 등 36개 품목은 2020년보다 싸다.</dd>
+      <dt>분류</dt><dd>주거·일·경제</dd>
+      <dt>본능</dt><dd>일반화 본능 · "물가 2.8%"라는 평균 하나로 내 장바구니의 모든 값을 짐작한다</dd>
+      <dt>그림 방식</dt><dd>물가 풍선 · 품목 하나가 풍선 하나. 1년 전보다 오른 만큼 떠오르고, 내린 품목은 추가 되어 땅 아래로 매달린다(2015–2026년 142개월 재생). 물가 영수증, 등락 띠로 짠 목도리, 2020년 1만 원의 가격표</dd>
+      <dt>기간</dt><dd>2014년 1월–2026년 10월</dd>
+      <dt>엮은 데이터</dt><dd>1개 · 품목별 소비자물가지수(품목성질별, 2020=100) 457개 품목 × 154개월</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">물가가 6.3% 올라 최근 12년 사이 가장 많이 올랐던 2022년 7월. 그때 1년 전보다 값이 내린 품목은 몇 개였을까?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>거의 없다(457개 중 5개 안쪽)</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>B</i>50개쯤(열에 하나)</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>150개쯤(셋에 하나)</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">B. <span class="n" id="qzn">50개</span></span>
+      <span id="qzt"></span>
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">457개의 풍선</h2>
+      <p>물가 조사 품목 하나를 풍선 하나로 띄웠다. 땅(0%)에 묶인 풍선은 1년 전보다 값이 오른 만큼 떠오른다. 값이 내린 품목은 추가 되어 땅 아래로 매달린다. 굵은 점선이 뉴스에 나오는 "물가 상승률", 곧 전체 평균이다.</p>
+      <p>재생을 누르면 2015년부터 달마다 풍선 무리가 움직인다. 2019–2020년에는 무리가 땅 가까이 낮게 깔려 있다. 2021년부터 떠오르기 시작해 2022–2023년에는 무리 전체가 높이 뜬다. 그때도 땅 아래에 매달린 추는 사라지지 않는다. 채소·과일 같은 농축수산물(왼쪽 초록)은 어느 해든 위아래로 가장 크게 흩어진다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">품목별 1년 전 대비 등락률</p>
+      <p class="fs">풍선 하나 = 품목 하나. 높이 = 1년 전 같은 달보다 오른 비율(%), 땅 아래 네모 추 = 내린 품목. 눈금은 ±10% 안쪽을 넓게 폈고, ±40% 밖은 가장자리에 붙였다</p>
+      <div class="legend" id="lg1"></div>
+      <div class="player" id="p1"></div>
+      <p class="stat" id="st1" aria-live="polite"></p>
+      <div class="chart" id="c1"></div>
+      <figcaption>국가데이터처 「소비자물가조사」 품목별 소비자물가지수(품목성질별, 2020=100, 전국. KOSIS 101 DT_1J22112). 등락률은 지수로 직접 계산했다.</figcaption>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">물가 영수증</h2>
+      <p>그달 가장 많이 오른 품목과 가장 많이 내린 품목을 영수증에 찍었다. 2026년 10월에는 인삼, 컴퓨터와 저장장치, 국제항공료와 경유·등유가 위쪽에 있고, 상추·오이·호박·시금치 같은 채소가 아래쪽을 채운다.</p>
+      <p>달을 바꾸면 영수증이 다시 찍힌다. 2022년 7월의 위쪽은 등유(+80.1%)와 호박·오이·배추 같은 채소다. 2026년 10월에 가장 많이 내린 바로 그 채소들이다. 같은 달 아래쪽에는 그때도 내린 품목이 찍힌다. 병원검사료, 고구마, 생강이다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">1년 전보다 많이 오른 품목과 많이 내린 품목</p>
+      <p class="fs">%. 품목별 지수의 1년 전 같은 달 대비 등락률</p>
+      <div class="chips" id="chips2" role="group" aria-label="달 고르기"></div>
+      <div class="rwrap" id="c2"></div>
+      <figcaption>국가데이터처 「소비자물가조사」 품목별 소비자물가지수(KOSIS 101 DT_1J22112).</figcaption>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">등락으로 짠 목도리</h2>
+      <p>달마다 457개 품목을 등락률 순으로 줄 세워 색실 한 줄로 삼고, 142개월을 이어 목도리를 짰다. 붉을수록 많이 오른 품목, 푸를수록 내린 품목이다. 2019–2020년의 목도리는 옅다. 5% 넘게 오른 품목이 15% 안팎이고, 넷 중 하나 넘게 내린다.</p>
+      <p>2021년 말부터 붉은 실이 위에서부터 번져 2023년 3월에는 5% 넘게 오른 품목이 244개(53%)가 된다. 물가 상승률이 가장 높았던 달(2022년 7월 6.3%)보다 여덟 달 뒤다. 묶음마다 꼭대기가 달랐기 때문이다. 품목 등락률의 가운데 값으로 보면 석유류는 2021년 11월, 채소는 2022년 7월, 외식은 2022년 9월, 가공식품은 2022년 12월, 전기·가스·수도는 2023년 1월, 외식을 뺀 개인서비스는 2023년 4월에 가장 높았다. 2026년 10월은 24%로, 2020년(15%)보다 아직 넓다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">품목의 등락률 분포, 2015–2026년</p>
+      <p class="fs">세로 한 줄 = 한 달의 457개 품목(100%). 색 = 1년 전보다 오르거나 내린 폭</p>
+      <div class="legend" id="lg3"></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>국가데이터처 「소비자물가조사」 품목별 소비자물가지수(KOSIS 101 DT_1J22112). 품목 수 기준이며 지출 비중(가중치)은 반영하지 않았다. 2021년 이전에는 아직 조사하지 않던 품목이 있어 419–443개다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">2020년 1만 원의 가격표</h2>
+      <p>2020년에 1만 원어치였던 것이 2026년 10월에 얼마인지 가격표로 달았다. 전체 물가로는 1만 2,073원이다. 귤은 2만 3,111원, 보험서비스료는 2만 1,581원, 등유는 1만 8,175원이 됐다. 김밥(1만 4,626원)·자장면(1만 3,885원) 같은 외식은 고른 16개 품목 가운데 13개가 전체보다 많이 올랐다.</p>
+      <p>왼쪽으로 간 가격표도 있다. TV는 8,267원, 병원검사료는 6,343원이다. 유치원납입금(3,971원)과 보육시설이용료(6,913원)는 정부 지원이 늘어 가계가 내는 돈이 줄어든 것으로 보인다. 휴대전화료(1만 211원)와 전세·월세(1만 600원대)는 거의 그대로다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">2020년 1만 원어치의 2026년 10월 값</p>
+      <p class="fs">원. 세로선 = 2020년 1만 원, 점선 = 전체 물가(1만 2,073원)</p>
+      <div class="chips" id="chips4" role="group" aria-label="품목 묶음"></div>
+      <div class="chart" id="c4"></div>
+      <figcaption>국가데이터처 「소비자물가조사」 품목별 소비자물가지수(2020=100)의 2026년 10월 값에 100을 곱했다. 품목은 익숙한 것을 골랐다.</figcaption>
+      <details><summary>표로 보기 (457개 품목)</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 물가는 모든 게 함께 오를까</h2>
+      <p>아니다. 물가 상승률은 457개 품목의 평균이고, 그 아래에서 품목은 저마다 움직인다. 물가가 거의 안 오르던 해에도 절반 넘는 품목은 올랐고, 가장 많이 오르던 해에도 내린 품목이 있었다. 다만 2022–2023년처럼 물가가 크게 오를 때는 오르는 품목의 범위가 넓어진다. "얼마나 올랐나"와 함께 "얼마나 많은 품목이 올랐나"를 보면, 체감 물가가 숫자와 다른 까닭이 보인다. 내가 자주 사는 것이 어느 풍선인지에 따라 물가는 다르게 느껴진다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>품목 수로 센 비율이다. 전체 물가 상승률은 품목마다 지출 비중(가중치)을 곱해 구하므로, 전세·휘발유처럼 비중이 큰 품목이 더 크게 반영된다. 품목별 가중치는 이번에 받지 못해 넣지 않았다.</li>
+      <li>등락률은 1년 전 같은 달과 견준 값이다. 한 해 전에 유난히 비쌌던 품목은 값이 평소로 돌아와도 "크게 내린" 것으로 나온다.</li>
+      <li>품목은 2020년 기준 조사 품목 458개 가운데 이름으로 구분되는 457개다. 2015–2020년에는 조사하지 않던 품목이 있어 419–443개로 계산했다.</li>
+      <li>유치원납입금·보육시설이용료·병원검사료처럼 정책으로 가계 부담이 바뀐 품목은 시장 가격의 변화와 다르다.</li>
+      <li>공공데이터포털의 「품목별 소비자물가지수」(15128439)는 경기도 자료여서 전국 품목 지수는 KOSIS 표에서 받았다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1J22112" target="_blank" rel="noopener">품목별 소비자물가지수(품목성질별: 2020=100)</a> (KOSIS 101 DT_1J22112)</td><td>국가데이터처</td><td>전국 총지수, 6개 묶음, 457개 품목의 월별 지수</td><td>2014.1–2026.10</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>457개 품목 × 154개월 = 지수 6만 9천여 개</dd>
+      <dt>도구</dt><dd>Python(수집·집계) · SVG 풍선 무리, 목도리, 가격표(JavaScript) · HTML 영수증</dd>
+      <dt>분석 기법</dt><dd>품목별 1년 전 대비 등락률 · 오른·내린 품목 수와 등락 폭 구간별 비율 · 2020년 대비 지수 수준</dd>
+      <dt>검증</dt><dd>총지수로 계산한 2026년 10월 상승률 2.82%가 발표(2.8%)와 같다. 2022년 7월 6.33%도 발표(6.3%)와 같다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>물가는 지역마다 다르게 오를까</h3><p>같은 표에 시도별 지수가 있다. 같은 품목이 지역마다 얼마나 다르게 올랐는지 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1J22112" target="_blank" rel="noopener">품목별 소비자물가지수(시도별)</a> · 국가데이터처</li></ul></div>
+      <div class="q"><h3>자주 사는 것이 더 올랐을까</h3><p>자주 사는 144개 품목으로 만든 생활물가지수와 전체 물가를 견주면 체감 물가의 차이를 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1J22005" target="_blank" rel="noopener">생활물가지수</a> · 국가데이터처</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.16</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const once = (el, fn, th = .25) => { if (reduce) return false; const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); fn(); }, { threshold: th }); io.observe(el); return true; };
+  const sgn = (v, d = 1) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d);
+  const M = DATA.m, IT = DATA.items, NI = IT.length, K0 = 12, NF = M.length - K0, LAST = NF - 1;
+  const ym = (k) => { const [y, m] = M[k + K0].split("."); return `${y}년 ${+m}월`; };
+  const yo = (v, k) => { const a = v[k + K0], b = v[k]; return a != null && b != null ? (a / b - 1) * 100 : null; };
+  const YOY = IT.map((it) => Array.from({ length: NF }, (_, k) => yo(it.v, k)));
+  const TOT = Array.from({ length: NF }, (_, k) => yo(DATA.total, k));
+  const STAT = Array.from({ length: NF }, (_, k) => { let n = 0, up = 0, dn = 0, u5 = 0, d5 = 0; YOY.forEach((y) => { const x = y[k]; if (x == null) return; n++; if (x > 0) up++; else if (x < 0) dn++; if (x >= 5) u5++; if (x <= -5) d5++; }); return { n, up, dn, u5, d5 }; });
+  const kOf = (s) => M.indexOf(s) - K0;
+
+  // quiz reveal from data
+  { const k = kOf("2022.07"), st = STAT[k]; document.getElementById("qzn").textContent = `${st.dn}개`; document.getElementById("qzt").textContent = `457개 가운데 ${st.up}개(${Math.round(st.up / st.n * 100)}%)가 올랐고 ${st.dn}개(${Math.round(st.dn / st.n * 100)}%)는 내렸다. 그달 1년 전보다 싸진 품목에는 ${YOY.map((y, i) => [y[k], IT[i].n]).filter((x) => x[0] != null).sort((a, b) => a[0] - b[0]).slice(0, 3).map((x) => `${x[1]}(${sgn(x[0])}%)`).join("·")}가 있었다.`; }
+
+  /* ---------- 1. balloons ---------- */
+  const GR = ["농축수산물", "공업제품", "전기 · 가스 · 수도", "집세", "공공서비스", "개인서비스"], GNAME = ["농축수산물", "공업제품", "전기·가스·수도", "집세", "공공서비스", "개인서비스"];
+  const ORDER = IT.map((it, i) => i).sort((a, b) => GR.indexOf(IT[a].g1) - GR.indexOf(IT[b].g1) || (IT[a].g2 > IT[b].g2 ? 1 : IT[a].g2 < IT[b].g2 ? -1 : 0));
+  { const lg = document.getElementById("lg1"); GNAME.forEach((g, j) => { const sp = document.createElement("span"); const v = s("svg", { width: 12, height: 16, viewBox: "0 0 12 16", "aria-hidden": "true" }); s("line", { x1: 6, x2: 6, y1: 9, y2: 16, stroke: "var(--string)" }, v); s("circle", { cx: 6, cy: 5.5, r: 5, fill: `var(--g${j})` }, v); sp.append(v, `${g} ${IT.filter((it) => it.g1 === GR[j]).length}`); lg.append(sp); }); }
+  let lay1 = null, grow1 = 1;
+  function build1() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, left = narrow ? 30 : 40, right = 6, top = 16, H = narrow ? 430 : 560, bot = 30, ch = H - top - bot, R = narrow ? 3 : 4.8, YC = 40;
+    // stretched scale: 0–10% takes 55% of each half, 10–40% the rest, so the crowd near the ground stays readable
+    const sc = (a) => a <= 10 ? a / 10 * .55 : .55 + (Math.min(YC, a) - 10) / 30 * .45, sy = (p) => top + ch / 2 - Math.sign(p) * sc(Math.abs(p)) * (ch / 2), y0 = sy(0);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "457개 품목을 풍선으로 그린 그림. 1년 전보다 오른 품목은 땅 위로 떠 있고 내린 품목은 땅 아래에 매달려 있다. 2022–2023년에 풍선 무리 전체가 높이 뜬다" }, box);
+    s("rect", { x: left, y: top, width: W - left - right, height: ch / 2, fill: "var(--sky)" }, v);
+    for (const t of [-40, -20, -10, -5, 0, 5, 10, 20, 40]) { const y = sy(t); if (t) s("line", { x1: left, x2: W - right, y1: y, y2: y, class: "gl" }, v); tx(v, left - 5, y + 4, (t > 0 ? "+" : t < 0 ? "−" : "") + Math.abs(t), "tk", 11, "end"); }
+    // x positions: groups get width by size, with a floor so tiny groups stay visible
+    const counts = GR.map((g) => IT.filter((it) => it.g1 === g).length), minW = narrow ? 16 : 30, gap = narrow ? 5 : 10, avail = W - left - right - gap * (GR.length - 1);
+    const small = counts.map((c) => c / NI * avail < minW), big = counts.reduce((a, c, j) => a + (small[j] ? 0 : c), 0), room = avail - small.filter(Boolean).length * minW;
+    const gw = counts.map((c, j) => small[j] ? minW : c / big * room), gx = []; let x = left; gw.forEach((w) => { gx.push(x); x += w + gap; });
+    GR.forEach((g, j) => { if (j % 2) s("rect", { x: gx[j] - gap / 2, y: top, width: gw[j] + gap, height: ch, fill: "var(--ink)", opacity: .035 }, v); if (gw[j] > 60) tx(v, gx[j] + gw[j] / 2, H - 8, GNAME[j], "mt", narrow ? 11 : 12, "middle"); });
+    s("line", { x1: left, x2: W - right, y1: y0, y2: y0, stroke: "var(--ground)", "stroke-width": 2.5 }, v);
+    const seen = GR.map(() => 0), strings = s("g", {}, v), marks = s("g", {}, v), pts = [], nodes = [];
+    ORDER.forEach((i) => { const j = GR.indexOf(IT[i].g1), px = gx[j] + (seen[j]++ + .5) / counts[j] * gw[j];
+      const ln = s("line", { x1: px, x2: px, y1: y0, y2: y0, stroke: "var(--string)", "stroke-width": .7, opacity: .55 }, strings);
+      const c = s("ellipse", { cx: px, cy: y0, rx: R, ry: R * 1.22, fill: `var(--g${j})`, "fill-opacity": .84, stroke: "var(--card)", "stroke-width": .5 }, marks);
+      const w = s("rect", { x: px - R * .8, y: y0, width: R * 1.6, height: R * 1.6, rx: 1, fill: `var(--g${j})`, "fill-opacity": .9, stroke: "var(--card)", "stroke-width": .5, opacity: 0 }, marks);
+      const p = { x: px, y: y0, r: R + 1, fn: () => { const k = lay1.k, val = YOY[i][k]; return [IT[i].n, [[val == null ? "–" : sgn(val) + "%", `${ym(k)}, 1년 전보다`], [IT[i].v[k + K0] == null ? "–" : f1(IT[i].v[k + K0]), "지수(2020=100)"], [`${GNAME[j]} · ${IT[i].g2}`, "묶음"]]]; } };
+      pts.push(p); nodes.push({ i, ln, c, w, p }); });
+    const tl = s("line", { x1: left, x2: W - right, stroke: "var(--hi-ink)", "stroke-width": 2, "stroke-dasharray": "7 4" }, v), tt = tx(v, W - right - 4, 0, "", "vl hi halo", narrow ? 12.5 : 14, "end", { "stroke-width": 4 });
+    lay1 = { W, sy, y0, nodes, tl, tt, k: LAST, R };
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 품목을 옮겨 볼 수 있다");
+  }
+  function draw1(pos) {
+    if (!lay1 || Math.abs(lay1.W - Math.max(300, document.getElementById("c1").clientWidth)) > 1) build1();
+    const k = Math.min(NF - 1, Math.floor(pos + 1e-6)), f = Math.max(0, pos - k), k2 = Math.min(NF - 1, k + 1), { sy, y0, nodes, tl, tt } = lay1; lay1.k = k;
+    nodes.forEach(({ i, ln, c, w, p }) => { const a = YOY[i][k], b = YOY[i][k2]; if (a == null) { c.setAttribute("opacity", 0); w.setAttribute("opacity", 0); ln.setAttribute("opacity", 0); p.r = -99; return; }
+      const val = (a + ((b == null ? a : b) - a) * f) * grow1, y = sy(val), dn = val < 0; c.setAttribute("opacity", dn ? 0 : 1); w.setAttribute("opacity", dn ? 1 : 0); ln.setAttribute("opacity", .55);
+      if (dn) w.setAttribute("y", y - lay1.R * .8); else c.setAttribute("cy", y - lay1.R * 1.22); ln.setAttribute("y2", y); p.y = dn ? y : y - lay1.R * 1.22; p.r = lay1.R + 1; });
+    const t = (TOT[k] + (TOT[k2] - TOT[k]) * f) * grow1, ty = sy(t); tl.setAttribute("y1", ty); tl.setAttribute("y2", ty); tt.setAttribute("y", ty - 7); tt.textContent = `전체 물가 ${sgn(TOT[k])}%`;
+    const st = document.getElementById("st1"), q = STAT[k]; st.replaceChildren();
+    st.append(`${ym(k)} 전체 물가 `, bEl(sgn(TOT[k]) + "%"), " · 오른 품목 ", bEl(`${q.up}개`), " · 내린 품목 ", bEl(`${q.dn}개`), " · 5% 넘게 오른 품목 ", bEl(`${q.u5}개`));
+  }
+  const p1 = Player("p1", "물가 풍선", (p) => draw1(p), NF, (i) => M[i + K0], 18);
+  p1.render();
+  if (once(document.getElementById("c1"), () => { const t0 = performance.now(); const st = (now) => { const t = Math.min(1, (now - t0) / 1600); grow1 = 1 - Math.pow(1 - t, 3); draw1(p1.pos); if (t < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); })) { grow1 = 0; draw1(p1.pos); }
+  onResize(() => draw1(p1.pos));
+
+  /* ---------- 2. receipt ---------- */
+  let m2 = "2026.10";
+  chips("chips2", [["2019.10", "2019년 10월"], ["2022.07", "2022년 7월"], ["2023.03", "2023년 3월"], ["2026.10", "2026년 10월"]], m2, (k) => { m2 = k; c2(true); });
+  function c2(animate) {
+    const box = document.getElementById("c2"); box.replaceChildren();
+    const k = kOf(m2), rows = YOY.map((y, i) => [y[k], IT[i].n]).filter((x) => x[0] != null).sort((a, b) => b[0] - a[0]), st = STAT[k];
+    const r = document.createElement("div"); r.className = "rcpt"; r.setAttribute("role", "group"); r.setAttribute("aria-label", `${ym(k)} 물가 영수증: 1년 전보다 많이 오른 품목 12개와 많이 내린 품목 12개`);
+    let n = 0; const add = (el) => { if (animate) { el.classList.add("pr"); el.style.animationDelay = `${n++ * 38}ms`; } r.append(el); return el; };
+    const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+    add(el("h3", "", "물 가 영 수 증")); add(el("div", "sub", `${ym(k)} · 1년 전 같은 달보다`)); add(el("hr"));
+    const line = ([val, name], cls) => { const l = el("div", "rl"); l.append(el("span", "nm", name), el("span", "dots"), el("span", "v " + cls, sgn(val) + "%")); add(l); };
+    add(el("div", "sec", "많이 오른 품목")); rows.slice(0, 12).forEach((x) => line(x, "u")); add(el("hr"));
+    add(el("div", "sec", "많이 내린 품목")); rows.slice(-12).reverse().forEach((x) => line(x, "d")); add(el("hr"));
+    const sum = (a, b) => { const l = el("div", "rl"); l.append(el("span", "nm", a), el("span", "dots"), el("span", "v", b)); add(l); };
+    sum("오른 품목", `${st.up}개`); sum("내린 품목", `${st.dn}개`); sum("그대로", `${st.n - st.up - st.dn}개`); add(el("hr"));
+    const t = el("div", "rl tot"); t.append(el("span", "nm", "전체 물가"), el("span", "dots"), el("span", "v", sgn(TOT[k], 2) + "%")); add(t);
+    add(el("div", "bar")); box.append(r);
+  }
+  c2(false);
+
+  /* ---------- 3. scarf ---------- */
+  const BINS = [[-Infinity, -10, "var(--b0)", "10% 넘게 내림"], [-10, -5, "var(--b1)", "5–10% 내림"], [-5, -1e-9, "var(--b2)", "0–5% 내림"], [-1e-9, 2, "var(--b3)", "0–2% 오름"], [2, 5, "var(--b4)", "2–5% 오름"], [5, 10, "var(--b5)", "5–10% 오름"], [10, Infinity, "var(--b6)", "10% 넘게 오름"]];
+  const DIST = Array.from({ length: NF }, (_, k) => { const c = BINS.map(() => 0); let n = 0; YOY.forEach((y) => { const x = y[k]; if (x == null) return; n++; c[BINS.findIndex((b) => x >= b[0] && x < b[1])]++; }); return { c, n }; });
+  [...BINS].reverse().forEach(([, , col, name]) => { const sp = document.createElement("span"); const i = document.createElement("i"); i.className = "sw"; i.style.background = col; sp.append(i, name); document.getElementById("lg3").append(sp); });
+  let seen3 = false;
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, left = narrow ? 34 : 44, right = narrow ? 14 : 26, top = 14, H = narrow ? 300 : 380, bot = 30, ch = H - top - bot, cw = (W - left - right) / NF;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "2015년부터 2026년까지 달마다 품목의 등락률 분포를 색 줄로 이어 짠 목도리. 2022–2023년에 붉은 실이 절반을 넘는다" }, box);
+    const g = s("g", {}, v);
+    DIST.forEach((d, k) => { let y = top; [...BINS.keys()].reverse().forEach((b) => { const h = d.c[b] / d.n * ch; if (h > 0) s("rect", { x: left + k * cw, y, width: cw + .4, height: h, fill: BINS[b][2] }, g); y += h; }); });
+    // knit texture and fringe
+    for (let yy = top + 6; yy < top + ch; yy += 6) s("line", { x1: left, x2: left + NF * cw, y1: yy, y2: yy, stroke: "var(--card)", "stroke-width": .5, opacity: .28 }, v);
+    for (let yy = top + 4; yy < top + ch; yy += 9) s("line", { x1: left + NF * cw, x2: left + NF * cw + (narrow ? 9 : 16), y1: yy, y2: yy + 2, stroke: "var(--b4)", "stroke-width": 2, "stroke-linecap": "round" }, v);
+    [0, 25, 50, 75, 100].forEach((t) => { const y = top + ch - t / 100 * ch; tx(v, left - 5, y + 4, t + "%", "tk", 11, "end"); if (t === 50) s("line", { x1: left, x2: left + NF * cw, y1: y, y2: y, stroke: "var(--ink)", "stroke-width": 1, "stroke-dasharray": "3 3", opacity: .6 }, v); });
+    M.slice(K0).forEach((m, k) => { if (m.endsWith(".01") && (!narrow || (+m.slice(0, 4)) % 2 === 1)) { s("line", { x1: left + k * cw, x2: left + k * cw, y1: top + ch, y2: top + ch + 5, stroke: "var(--axis)" }, v); tx(v, left + k * cw + 2, H - 8, m.slice(0, 4), "tk", 11, "start"); } });
+    const pk = STAT.reduce((b, q, k) => q.u5 / q.n > STAT[b].u5 / STAT[b].n ? k : b, 0), px = left + (pk + .5) * cw, py = top + STAT[pk].u5 / STAT[pk].n * ch;
+    s("circle", { cx: px, cy: py, r: 4, fill: "var(--card)", stroke: "var(--ink)", "stroke-width": 1.5 }, v);
+    tx(v, px - 8, py + 18, `${ym(pk)} 5% 넘게 오른 품목 ${Math.round(STAT[pk].u5 / STAT[pk].n * 100)}%`, "vl halo", narrow ? 11.5 : 13, "end", { "stroke-width": 4 });
+    timeLayer(v, tipFor(fig), NF, (i) => left + (i + .5) * cw, top, top + ch, (i) => [`${ym(i)} · 전체 물가 ${sgn(TOT[i])}%`, [...BINS.keys()].reverse().map((b) => [`${DIST[i].c[b]}개 (${Math.round(DIST[i].c[b] / DIST[i].n * 100)}%)`, BINS[b][3], BINS[b][2]])], "좌우 화살표로 달을 옮겨 볼 수 있다");
+    if (seen3 || reduce) return;
+    const cp = s("clipPath", { id: "knit" }, v), cr = s("rect", { x: left, y: 0, width: 0, height: H }, cp); g.setAttribute("clip-path", "url(#knit)");
+    once(box, () => { seen3 = true; const t0 = performance.now(); const st = (now) => { const t = Math.min(1, (now - t0) / 2200); cr.setAttribute("width", (1 - Math.pow(1 - t, 2)) * (NF * cw + 2)); if (t < 1) requestAnimationFrame(st); else g.removeAttribute("clip-path"); }; requestAnimationFrame(st); });
+  }
+  c3(); onResize(() => { seen3 = true; c3(); });
+  table("t3", ["달(매년 1·4·7·10월)", "전체 물가", "품목 수", "오른 품목", "내린 품목", "5% 넘게 오름", "5% 넘게 내림"], STAT.map((q, k) => [k, q]).filter(([k]) => /\.(01|04|07|10)$/.test(M[k + K0])).map(([k, q]) => [M[k + K0], sgn(TOT[k]) + "%", String(q.n), `${q.up} (${Math.round(q.up / q.n * 100)}%)`, `${q.dn} (${Math.round(q.dn / q.n * 100)}%)`, `${q.u5} (${Math.round(q.u5 / q.n * 100)}%)`, `${q.d5} (${Math.round(q.d5 / q.n * 100)}%)`]).reverse());
+
+  /* ---------- 4. price tags ---------- */
+  const KL = M.length - 1, LV = Object.fromEntries(IT.map((it) => [it.n, it.v[KL]])), won = (idx) => `${fmt(idx * 100)}원`;
+  const SETS = { 먹거리: ["귤", "소금", "초콜릿", "김", "식용유", "달걀", "빵", "커피", "고등어", "사과", "돼지고기", "닭고기", "라면", "우유", "배추", "국산쇠고기", "쌀", "두부", "양파"],
+    외식: ["김밥", "생선회(외식)", "떡볶이", "자장면", "햄버거", "칼국수", "비빔밥", "치킨", "냉면", "김치찌개백반", "구내식당식사비", "삼겹살(외식)", "피자", "맥주(외식)", "소주(외식)", "커피(외식)"],
+    "에너지·교통": ["등유", "지역난방비", "경유", "국제항공료", "도시가스", "전기료", "휘발유", "택시료", "국내항공료", "도시철도료", "상수도료", "시내버스료", "주차료", "자동차보험료"],
+    "서비스·기기": ["보험서비스료", "세탁료", "목욕료", "공동주택관리비", "영화관람료", "미용료", "컴퓨터", "휴대전화기", "외래진료비", "전세", "월세", "휴대전화료", "TV", "마스크", "보육시설이용료", "병원검사료", "유치원납입금"] };
+  let set4 = "먹거리", seen4 = false;
+  chips("chips4", Object.keys(SETS).map((k) => [k, k]), set4, (k) => { set4 = k; seen4 = true; c4(); });
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const list = SETS[set4].filter((n) => LV[n] != null).sort((a, b) => LV[b] - LV[a]), W = Math.max(300, box.clientWidth), narrow = W < 560, left = narrow ? 96 : 150, right = narrow ? 8 : 20, rh = narrow ? 34 : 36, top = 30, H = top + list.length * rh + 12;
+    const X0 = 30, X1 = 240, sx = (idx) => left + (Math.max(X0, Math.min(X1, idx)) - X0) / (X1 - X0) * (W - left - right), tw = narrow ? 62 : 74, th = 22;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": `${set4} 품목의 2020년 1만 원어치가 2026년 10월에 얼마인지 가격표로 그린 그림` }, box), pts = [], tags = [];
+    [50, 100, 150, 200].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top - 6, y2: H - 6, stroke: t === 100 ? "var(--ink)" : "var(--grid)", "stroke-width": t === 100 ? 1.6 : 1 }, v); tx(v, sx(t), top - 12, t === 100 ? (narrow ? "1만 원" : "2020년 1만 원") : `${t / 100 % 1 ? (t / 100).toFixed(1) : t / 100}만${narrow ? "" : " 원"}`, t === 100 ? "vl" : "tk", 11, "middle"); });
+    const all = DATA.total[KL]; s("line", { x1: sx(all), x2: sx(all), y1: top - 2, y2: H - 6, stroke: "var(--hi-ink)", "stroke-width": 1.4, "stroke-dasharray": "5 4" }, v);
+    list.forEach((n, i) => { const idx = LV[n], y = top + i * rh + rh / 2, x = sx(idx), up = idx >= 100, g = s("g", {}, v);
+      tx(v, left - 10, y + 4, n, "lb", narrow ? 12 : 13, "end");
+      s("line", { x1: sx(100), x2: x, y1: y, y2: y, stroke: "var(--string)", "stroke-width": 1.2 }, g);
+      const tx0 = Math.max(left + 2, Math.min(W - tw - 2, up ? x - 8 : x - tw + 8));
+      s("path", { d: up ? `M${tx0},${y} l8,${-th / 2} h${tw - 8} v${th} h${-(tw - 8)} Z` : `M${tx0 + tw},${y} l-8,${-th / 2} h${-(tw - 8)} v${th} h${tw - 8} Z`, fill: up ? "var(--tag)" : "var(--tag-down)", stroke: "var(--tag-edge)", "stroke-width": 1 }, g);
+      s("circle", { cx: up ? tx0 + 7 : tx0 + tw - 7, cy: y, r: 2, fill: "var(--card)", stroke: "var(--tag-edge)", "stroke-width": .8 }, g);
+      tx(g, up ? tx0 + tw - 5 : tx0 + 5, y + 4, fmt(idx * 100), "vl", narrow ? 11.5 : 12.5, up ? "end" : "start", { style: "fill:var(--tag-ink)" });
+      tags.push({ g, i, dx: sx(100) - x });
+      pts.push({ x, y, r: 14, fn: () => { const it = IT.find((q) => q.n === n), yv = YOY[IT.indexOf(it)][LAST]; return [n, [[won(idx), "2020년 1만 원어치의 지금 값"], [sgn(idx - 100) + "%", "2020년보다"], [yv == null ? "–" : sgn(yv) + "%", "1년 전보다"]]]; } }); });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 품목을 옮겨 볼 수 있다");
+    if (seen4 || reduce) return;
+    tags.forEach(({ g, dx }) => { g.style.transform = `translateX(${dx}px)`; g.style.opacity = .2; });
+    once(box, () => { seen4 = true; tags.forEach(({ g, i }) => { g.style.transition = `transform .8s cubic-bezier(.2,.8,.3,1) ${i * 45}ms, opacity .4s ${i * 45}ms`; requestAnimationFrame(() => { g.style.transform = "none"; g.style.opacity = 1; }); }); });
+  }
+  c4(); onResize(() => { seen4 = true; c4(); });
+  table("t4", ["품목", "묶음", "2020년 1만 원어치의 지금 값", "2020년보다", "1년 전보다"], IT.map((it, i) => [it, i]).filter(([it]) => it.v[KL] != null).sort((a, b) => b[0].v[KL] - a[0].v[KL]).map(([it, i]) => [it.n, `${it.g1} · ${it.g2}`, won(it.v[KL]), sgn(it.v[KL] - 100) + "%", YOY[i][LAST] == null ? "–" : sgn(YOY[i][LAST]) + "%"]));
+})();
+</script>

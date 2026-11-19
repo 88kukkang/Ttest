@@ -1,0 +1,532 @@
+<title>차오르는 술잔</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@700&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: an illustrated pojangmacha table. Six hand-drawn vessels hold each kind of drink; their liquid rises and
+   falls with that drink's yearly shipments (each vessel full at its own best year). Warm paper, ink outlines. */
+:root {
+  --paper: #fbf3e6; --card: #fffaf1; --ink: #3a2a1f; --ink2: #5b4636; --muted: #6c5a4a; --line: #ecdcc6; --grid: #f2e6d4; --axis: #cdb89c;
+  --ghost: #d6c6b0; --board: #3a2a1f; --board-ink: #ffd27a; --accent: #d2553d;
+  --wood: #c88a57; --wood2: #a96d3f; --tent: #e0573f; --glass: #e9f3ef; --outline: #3a2a1f;
+  --beer: #f2b53b; --foam: #fffaf0; --soju: #8fd3a0; --bottle: #3f9a5c; --mak: #efe6cf; --wine: #9b2d3a; --whisky: #d88a2a; --high: #f4dc7a; --ice: #ffffff;
+  --men: #2f6fa8; --women: #d2553d;
+  --sans: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --display: "Gaegu", "Gowun Dodum", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1b1714; --card: #231e1a; --ink: #f4e9da; --ink2: #d9c9b4; --muted: #ad9c88; --line: #3a312a; --grid: #2c2520; --axis: #5a4c40;
+  --ghost: #4e443b; --board: #0d0b09; --board-ink: #ffd27a; --accent: #ff7a5c;
+  --wood: #6e4a2e; --wood2: #57391f; --tent: #9c3a2a; --glass: #33403b; --outline: #f4e9da;
+  --beer: #f2b53b; --foam: #fff4dc; --soju: #6fbf86; --bottle: #58b977; --mak: #e8dcc0; --wine: #c2445a; --whisky: #e39a3a; --high: #e8cf68; --ice: #e8f4f2;
+  --men: #6aa8e0; --women: #ff7a5c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1b1714; --card: #231e1a; --ink: #f4e9da; --ink2: #d9c9b4; --muted: #ad9c88; --line: #3a312a; --grid: #2c2520; --axis: #5a4c40;
+  --ghost: #4e443b; --board: #0d0b09; --board-ink: #ffd27a; --accent: #ff7a5c;
+  --wood: #6e4a2e; --wood2: #57391f; --tent: #9c3a2a; --glass: #33403b; --outline: #f4e9da;
+  --beer: #f2b53b; --foam: #fff4dc; --soju: #6fbf86; --bottle: #58b977; --mak: #e8dcc0; --wine: #c2445a; --whisky: #e39a3a; --high: #e8cf68; --ice: #e8f4f2;
+  --men: #6aa8e0; --women: #ff7a5c; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 16.5px/1.78 var(--sans); word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 36px 80px }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--axis) }
+:focus-visible { outline: 2px solid var(--intl); outline-offset: 2px }
+.page { max-width: 1040px; margin: 0 auto; display: grid; gap: 64px }
+.prose { max-width: 660px; display: grid; gap: 14px; min-width: 0 }
+.prose p { margin: 0 }
+.n { font-weight: 700; font-variant-numeric: tabular-nums }
+.label { font: 500 12px/1.4 var(--mono); letter-spacing: .08em; color: var(--muted); margin: 0; text-transform: uppercase }
+
+header { display: grid; gap: 22px }
+h1 { font-weight: 700; font-size: clamp(32px, 5.6vw, 54px); line-height: 1.18; margin: 0; letter-spacing: -.03em; text-wrap: balance }
+h1 span { display: block; font-weight: 500; font-size: .46em; color: var(--ink2); margin-top: 12px; letter-spacing: -.01em; line-height: 1.45 }
+.sheet, .method { display: grid; grid-template-columns: 110px minmax(0, 1fr); border-top: 2px solid var(--ink); font-size: 14.5px; margin: 0 }
+.sheet dt, .sheet dd, .method dt, .method dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line) }
+.sheet dt, .method dt { font: 500 12px/2 var(--mono); color: var(--muted) }
+.sheet dd, .method dd { color: var(--ink2) }
+@media (max-width: 560px) { .sheet, .method { grid-template-columns: 84px minmax(0, 1fr) } }
+
+.quiz { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 14px }
+.quiz h2 { font-size: 20px; line-height: 1.5; margin: 0; font-weight: 700; text-wrap: balance }
+.opts { display: grid; gap: 8px }
+.opt { display: flex; gap: 12px; align-items: center; text-align: left; font: inherit; font-size: 15.5px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; cursor: pointer; min-height: 46px }
+.opt i { font: 500 12px var(--mono); color: var(--muted); font-style: normal; width: 14px }
+.opt[data-state="right"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink) }
+.opt[data-state="wrong"] { opacity: .5 }
+.reveal { font-size: 15px; color: var(--ink2); border-top: 1px solid var(--line); padding-top: 14px }
+.reveal .big { font-size: 28px; font-weight: 700; color: var(--ink); display: block; line-height: 1.3 }
+
+section.s { display: grid; gap: 22px }
+h2.h { font-size: clamp(23px, 3.3vw, 29px); line-height: 1.35; margin: 0; font-weight: 700; letter-spacing: -.02em; text-wrap: balance }
+figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 12px; position: relative; min-width: 0 }
+@media (max-width: 560px) { figure { padding: 14px } }
+.ft { font-weight: 700; font-size: 16px; margin: 0; line-height: 1.5 }
+.fs { font-size: 13.5px; color: var(--muted); margin: -8px 0 0; line-height: 1.6 }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y }
+figcaption { font-size: 12.5px; color: var(--muted); line-height: 1.65; border-top: 1px solid var(--grid); padding-top: 10px }
+details { font-size: 13px }
+summary { cursor: pointer; color: var(--ink2); width: max-content; font: 500 12px/2 var(--mono); padding: 6px 0 }
+.tw { overflow-x: auto; margin-top: 6px; max-height: 380px }
+table { border-collapse: collapse; font-size: 12.5px; min-width: 100% }
+th, td { padding: 5px 10px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums }
+th:first-child, td:first-child { text-align: left }
+th { font-weight: 700; color: var(--ink2); position: sticky; top: 0; background: var(--card) }
+
+/* player: play button, scrubber and a departures-board year */
+.player { display: flex; align-items: center; gap: 14px; flex-wrap: wrap }
+.play { width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; display: grid; place-items: center; flex: none }
+.play svg { width: 18px; height: 18px }
+.play:hover { background: var(--intl) }
+.yr { font: 600 30px/1 var(--mono); font-variant-numeric: tabular-nums; color: var(--board-ink); background: var(--board); border-radius: 6px; padding: 8px 10px; letter-spacing: .06em;
+  background-image: linear-gradient(transparent calc(50% - .5px), rgba(255,255,255,.14) calc(50% - .5px), rgba(255,255,255,.14) calc(50% + .5px), transparent calc(50% + .5px)) }
+.scrub { flex: 1 1 180px; min-width: 0; accent-color: var(--intl); height: 32px }
+.stat { font-size: 14px; color: var(--ink2); margin: 0; min-height: 1.6em }
+.stat b { font-variant-numeric: tabular-nums }
+.chips { display: flex; flex-wrap: wrap; gap: 8px }
+.chip { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; min-height: 40px; cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink) }
+.lb { fill: var(--ink); font-family: var(--sans) }
+.vl { fill: var(--ink); font-family: var(--sans); font-weight: 700; font-variant-numeric: tabular-nums }
+.tk { fill: var(--muted); font-family: var(--mono); font-variant-numeric: tabular-nums }
+.mt { fill: var(--muted); font-family: var(--sans) }
+.halo { paint-order: stroke; stroke: var(--card); stroke-linejoin: round }
+.halo-sea { paint-order: stroke; stroke: var(--sea); stroke-linejoin: round }
+.gl { stroke: var(--grid); stroke-width: 1 }
+.ax { stroke: var(--axis); stroke-width: 1 }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink2) }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block }
+.sw.line { height: 3px; width: 18px; border-radius: 2px }
+.sw.dot { border-radius: 50% }
+.tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--axis); border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.12); padding: 8px 10px; font-size: 12.5px; line-height: 1.5; min-width: 150px; max-width: 250px; z-index: 5 }
+.tip .tn { color: var(--muted) } .tip .tv { font-weight: 700; font-size: 14px }
+.ring { fill: none; stroke: var(--ink); }
+ul.care-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; color: var(--ink2) }
+.dt { overflow-x: auto; border-top: 2px solid var(--ink) }
+.dt td, .dt th { white-space: normal; text-align: left; vertical-align: top; padding: 8px 10px 8px 0; position: static }
+.next { display: grid; border-top: 2px solid var(--ink) }
+.q { padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px }
+.q h3 { font-size: 16px; margin: 0; font-weight: 700 }
+.q p { margin: 0; font-size: 14px; color: var(--ink2) }
+.q ul { margin: 0; padding-left: 18px; font-size: 13.5px }
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px }
+
+body { font-size: 17px }
+h1, h2.h, .ft { font-family: var(--display); font-weight: 700 }
+h1 { font-size: clamp(40px, 7vw, 66px); letter-spacing: -.01em; line-height: 1.1 }
+h1 span { font-family: var(--sans); font-weight: 400; font-size: .4em }
+h2.h { font-size: clamp(28px, 4vw, 36px); letter-spacing: 0; line-height: 1.25 }
+.ft { font-size: 23px; line-height: 1.3 }
+.quiz, figure { border-radius: 20px; border-width: 2px }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.yr { background-image: none; border-radius: 10px }
+.vn { fill: var(--ink); font-family: var(--display); font-weight: 700 }
+.vv { fill: var(--ink2); font-family: var(--mono); font-weight: 600 }
+.vd { font-family: var(--mono); font-weight: 600 }
+.hand { fill: var(--ink); font-family: var(--display); font-weight: 700 }
+</style>
+
+<main class="page">
+  <header>
+    <h1>우리는 술을 덜 마시게 됐을까<span>술의 양은 줄었다. 마시는 사람은 그대로이고, 여성의 고위험 음주는 두 배가 됐다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 10</dd>
+      <dt>한 줄</dt><dd>20세 이상 한 명당 술 출고량은 2008년 90.3L에서 2023년 77.0L로 15% 줄었다. 맥주(−13%)와 소주(−15%)가 정점에서 내려왔고, 막걸리와 와인은 반짝 늘었다가 꺾였다. 하지만 1년에 한 번 이상 마시는 성인 비율은 남성 84.8%, 여성 72.6%(2024년)로 20년 전과 비슷하고, 여성의 고위험 음주율은 2005년 3.4%에서 2023년 7.7%가 됐다.</dd>
+      <dt>분류</dt><dd>건강·생활</dd>
+      <dt>본능</dt><dd>직선 본능 · "요즘 사람들은 술을 덜 마신다"는 한 가지 흐름으로 모두를 묶는다</dd>
+      <dt>그림 방식</dt><dd>차오르는 잔 · 포장마차 탁자 위 여섯 잔에 주종별 출고량을 채우고, 2005년부터 2023년까지 해마다 잔이 차고 비는 모습을 재생한다</dd>
+      <dt>기간</dt><dd>출고량 2005–2023 · 음주율 1998–2024 · 알코올 사망률 2000–2023</dd>
+      <dt>엮은 데이터</dt><dd>6개 · 한국건강증진개발원 절주 통계(주류 출고현황, 성인 음주율, 고위험 음주율) · 통계청 사망원인통계 알코올 관련 사망 · 행정안전부 주민등록 인구</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">20세 이상 한 명당 술 출고량은 2008년과 2023년 사이 어떻게 변했을까?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>늘었다</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>거의 그대로다</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>15%쯤 줄었다</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. <span class="n">90.3L → 77.0L</span></span>
+      맥주로 치면 한 사람이 한 해에 500mL 캔 27개쯤 덜 마신 셈이다. 다만 2020–2021년 코로나 때 크게 줄었다가 2022년에 다시 조금 늘었다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">잔마다 차오르는 때가 달랐다</h2>
+      <p>여섯 잔에 주종별 한 해 출고량을 채웠다. 잔이 가득 찬 해가 그 술이 가장 많이 나간 해다. 재생하면 막걸리 사발은 2011년에 넘칠 듯 찼다가 비어 가고, 와인 잔은 코로나가 한창이던 2021년에 가장 높이 찬다. 위스키는 2020년 바닥까지 내려갔다가 2023년 다시 두 배 넘게 올라온다.</p>
+      <p>맥주(2016년)와 소주(2008년)는 정점에서 13%, 15% 내려왔다. 나라 전체로 보면 2015년 375만 8천 kL가 가장 많았고 2023년은 333만 8천 kL다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">주종별 술 출고량, 해마다</p>
+      <p class="fs">잔은 그 술이 가장 많이 나간 해를 가득으로 놓았다. 잔끼리의 높이는 양을 비교하지 않는다. 아래 숫자가 실제 출고량</p>
+      <div class="player" id="p1"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>한국건강증진개발원 「절주 통계: 총 주요 주류 출고현황」(국세청 자료, 국내 생산 + 수입). 소주는 희석식과 증류식, 위스키는 위스키와 브랜디, 기타 주류는 리큐르·일반증류주·약주·청주·기타주류를 합쳤다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">한 사람이 마시는 양은 코로나 때 꺾였다</h2>
+      <p>출고량을 20세 이상 인구로 나눴다. 2008–2015년에는 한 명당 87–91L에서 오르내리다가, 2016년부터 줄기 시작해 2021년 74.8L까지 내려갔다. 2022년 회식과 모임이 돌아오며 77.8L로 조금 올랐지만, 2019년(83.1L) 수준으로는 돌아가지 않았다. 줄어든 양의 대부분은 맥주(54.7→44.6L)와 소주(26.7→19.6L)에서 나왔다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">20세 이상 한 명당 술 출고량</p>
+      <p class="fs">L. 아래부터 맥주, 소주, 막걸리, 와인, 위스키, 기타 주류</p>
+      <div class="player" id="p2"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>출고량: 한국건강증진개발원 절주 통계. 인구: 행정안전부 주민등록 인구(해마다 12월, 20세 이상). 주민등록 인구 통계가 2008년부터라 그 전은 그리지 않았다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">마시는 사람은 줄지 않았다</h2>
+      <p>그런데 술을 마시는 사람의 비율은 거의 그대로다. 최근 1년 동안 한 번 이상 마신 성인은 2024년 남성 <span class="n">84.8%</span>, 여성 <span class="n">72.6%</span>다. 여성은 1998년 59.3%에서 오히려 늘었다. 한 번에 많이 자주 마시는 고위험 음주(주 2회 이상, 한 번에 남성 7잔·여성 5잔 이상)는 남성이 20% 안팎에서 제자리이고, 여성은 <span class="n">3.4%</span>(2005)에서 <span class="n">7.7%</span>(2023)로 두 배가 넘었다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">성인 음주율과 고위험 음주율</p>
+      <p class="fs">실선: 최근 1년 동안 한 번 이상 마신 사람(연간 음주율). 점선: 고위험 음주율</p>
+      <div class="legend" aria-hidden="true"><span><i class="sw line" style="background:var(--men)"></i>남성</span><span><i class="sw line" style="background:var(--women)"></i>여성</span><span><i class="sw line" style="background:repeating-linear-gradient(90deg,var(--muted) 0 4px,transparent 4px 7px)"></i>고위험 음주율</span></div>
+      <div class="player" id="p3"></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>한국건강증진개발원 「절주 통계」(질병관리청 국민건강영양조사). 19세 이상, 1998·2001·2005년은 3년 주기 조사였다. 2022년 연간 음주율은 원자료에 없다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">술 때문에 숨지는 사람은 줄지 않았다</h2>
+      <p>알코올 관련 질환으로 숨진 사람은 인구 10만 명당 2000년 5.7명에서 2004년 10.4명까지 늘었고, 그 뒤 20년 가까이 9–10명에 머물렀다. 2023년 8.7명(4,462명)으로 조금 내려왔지만, 남성(15.0명)이 여성(2.5명)의 여섯 배다. 양이 줄어든 효과가 사망에 나타나려면 시간이 더 걸릴 수 있다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">알코올 관련 사망률</p>
+      <p class="fs">인구 10만 명당</p>
+      <div class="chart" id="c4"></div>
+      <figcaption>통계청 사망원인통계(한국건강증진개발원 절주 통계 「알코올 질환 전체 사망자수 및 인구 10만 명당 사망률」). 원자료 2022·2023년 행은 남자·여자·총계 열 순서가 바뀌어 있어(총계가 남자 열에 있음) 바로잡아 썼다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 우리는 술을 덜 마시게 됐을까</h2>
+      <p>양으로는 그렇다. 한 사람 몫의 출고량은 15년 새 15% 줄었고, 그 대부분은 맥주와 소주에서 빠졌다. 하지만 "덜 마신다"가 모두의 이야기는 아니다. 마시는 사람의 비율은 그대로이고, 여성의 고위험 음주는 늘었으며, 술로 숨지는 사람은 거의 줄지 않았다. 잔은 작아졌지만 술자리는 그대로다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:26px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>출고량은 공장과 수입업자가 내보낸 양이다. 재고, 해외여행 중 마신 술, 집에서 담근 술은 들어 있지 않다.</li>
+      <li>출고량은 술의 부피다. 소주처럼 도수가 낮아진 술은 같은 부피라도 알코올이 적다. 이 페이지는 도수를 가정해 순수 알코올로 바꾸지 않았다.</li>
+      <li>원자료 「총 출고량」 열은 2005–2008년에 주종별 합보다 22만–32만 kL 많다. 이 페이지는 주종별 합을 총량으로 썼다(2009년 이후는 두 값이 같다).</li>
+      <li>음주율은 설문 조사(국민건강영양조사) 결과라 응답자가 적게 말할 가능성이 있다. 2020–2021년은 코로나로 조사 방식에 제약이 있었다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:26px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15050202/fileData.do" target="_blank" rel="noopener">총 주요 주류 출고현황</a> (15050202)</td><td>한국건강증진개발원</td><td>주종별 출고량(kL), 국내분(15050201)·수입분(15050200) 대조</td><td>2005–2023</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15050196/fileData.do" target="_blank" rel="noopener">19세 이상 성인의 연도별 음주율</a> (15050196)</td><td>한국건강증진개발원</td><td>성별·연령별 연간 음주율</td><td>1998–2024</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15050197/fileData.do" target="_blank" rel="noopener">19세 이상 성인의 고위험 음주율</a> (15050197)</td><td>한국건강증진개발원</td><td>성별·연령별 고위험 음주율</td><td>2005–2023</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15050211/fileData.do" target="_blank" rel="noopener">알코올 질환 사망자수 및 사망률</a> (15050211)</td><td>한국건강증진개발원</td><td>성별 사망자 수·10만 명당 사망률</td><td>1983–2023</td></tr>
+        <tr><td><a href="https://jumin.mois.go.kr/ageStatMonth.do" target="_blank" rel="noopener">주민등록 연령별 인구통계</a></td><td>행정안전부</td><td>20세 이상 인구, 해마다 12월</td><td>2008–2023</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:26px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>5개 자료 · 1998–2024</dd>
+      <dt>도구</dt><dd>Python(집계) · 손그림 느낌의 SVG 일러스트와 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>주종별 정점 대비 · 성인 1인당 출고량 · 성별 음주율 시계열</dd>
+      <dt>검증</dt><dd>총 출고량 = 국내분 + 수입분을 주종별로 대조했다(맥주 2023년: 168만 7,101 + 23만 8,696 ≈ 193만 2,003 kL, 차이 0.3%). 2009년 이후 주종별 합과 총계가 같다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 국세청 「주세 신고현황」(3059791)은 파일이 없어 같은 국세청 출고 자료를 정리한 절주 통계를 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:26px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>20대 여성은 왜 더 많이 마시게 됐을까</h3><p>연령별 고위험 음주율로 나이와 세대를 나눠 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15050198/fileData.do" target="_blank" rel="noopener">음주자의 고위험 음주율</a> · 한국건강증진개발원</li></ul></div>
+      <div class="q"><h3>음주운전은 술의 양과 함께 줄었을까</h3>
+        <ul><li><a href="https://www.data.go.kr/data/15096931/fileData.do" target="_blank" rel="noopener">음주운전 교통사고 현황</a> · 도로교통공단</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = {"years":[2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023],"V":{"맥주":[1837655.0,1880049.0,1982697.0,2058550.0,2002517.0,1956826.0,2022215.0,2103654.0,2156597.0,2173472.0,2208808.0,2217762.0,2168596.0,2145118.0,2088837.0,1856393.0,1807620.0,1916914.0,1932003.0],"소주":[929840.0,959534.0,963678.0,1004704.0,930720.0,931393.0,923734.0,951655.0,906724.0,958679.0,956568.0,936176.0,950074.0,921851.0,919513.0,878521.0,830194.0,868307.0,850730.0],"막걸리":[166319.0,170165.0,172370.0,176398.0,260701.0,412279.0,458198.0,448047.0,426216.0,430896.0,416046.0,399673.0,409407.0,402596.0,370527.0,379992.0,363135.0,342542.0,338876.0],"와인":[39412.0,45046.0,61127.0,56015.0,45972.0,46915.0,46384.0,46505.0,52091.0,53664.0,61905.0,56722.0,51737.0,56332.0,64539.0,80003.0,113762.0,100259.0,79558.0],"위스키":[34082.0,33004.0,36367.0,32409.0,26982.0,27292.0,24298.0,21132.0,19232.0,18989.0,18044.0,17582.0,16596.0,14752.0,12454.0,10488.0,11368.0,20120.0,23677.0],"기타 주류":[85564.0,87836.0,74559.0,68866.0,66156.0,59600.0,60762.0,63225.0,67179.0,65762.0,96415.0,81409.0,85323.0,100659.0,94657.0,99356.0,104837.0,115069.0,113595.0]},"tot":[3092872.0,3175634.0,3290798.0,3396942.0,3333048.0,3434305.0,3535591.0,3634218.0,3628039.0,3701462.0,3757786.0,3709324.0,3681733.0,3641308.0,3550527.0,3304753.0,3230916.0,3363211.0,3338439.0],"perAdult":{"2008":90.29957588513038,"2009":87.62295363390264,"2010":88.21457056612105,"2011":89.7875197670943,"2012":91.2380063989304,"2013":90.0530120596764,"2014":90.83868861306759,"2015":91.18502414951352,"2016":89.06151670832031,"2017":87.57915075888842,"2018":85.89642856772166,"2019":83.1039283669012,"2020":76.73762110502213,"2021":74.84318139000351,"2022":77.84634008591956,"2023":77.02731297450909},"drink":{"남":{"1998":83.4,"2001":82.7,"2005":86.5,"2007":85.1,"2008":85.7,"2009":86.1,"2010":88.1,"2011":88.1,"2012":85.8,"2013":85.9,"2014":86.3,"2015":86.6,"2016":87.1,"2017":86.1,"2018":86.1,"2019":86.7,"2020":85.0,"2021":83.3,"2023":84.7,"2024":84.8},"여":{"1998":59.3,"2001":59.6,"2005":70.9,"2007":65.2,"2008":67.7,"2009":68.5,"2010":70.5,"2011":71.1,"2012":69.2,"2013":68.8,"2014":70.6,"2015":70.9,"2016":71.6,"2017":75.0,"2018":73.6,"2019":72.0,"2020":71.4,"2021":70.7,"2023":73.1,"2024":72.6}},"highrisk":{"남":{"2005":19.9,"2007":21.3,"2008":24.5,"2009":21.4,"2010":22.0,"2011":23.2,"2012":21.8,"2013":19.7,"2014":20.7,"2015":20.8,"2016":21.2,"2017":21.0,"2018":20.8,"2019":18.6,"2020":21.6,"2021":19.7,"2022":21.3,"2023":19.9},"여":{"2005":3.4,"2007":3.5,"2008":6.2,"2009":5.4,"2010":5.6,"2011":4.9,"2012":6.0,"2013":5.5,"2014":6.6,"2015":5.8,"2016":6.3,"2017":7.2,"2018":8.4,"2019":6.5,"2020":6.3,"2021":6.9,"2022":7.0,"2023":7.7}},"drinkAge":{"남":{"1998":[89.8,89.9,85.3,77.7,69.4,0.0],"2001":[93.1,90.2,85.0,77.4,67.4,0.0],"2005":[93.4,93.3,88.5,85.2,73.5,56.7],"2007":[90.0,91.8,89.4,84.4,67.6,59.7],"2008":[90.9,92.8,89.5,81.3,76.3,55.6],"2009":[93.1,89.7,89.7,83.6,75.7,59.9],"2010":[96.7,94.3,89.6,84.6,74.8,61.6],"2011":[95.3,93.7,86.5,86.9,82.3,62.3],"2012":[90.3,90.0,88.0,85.0,75.8,67.0],"2013":[91.9,90.0,88.0,84.5,77.4,61.5],"2014":[92.1,91.3,90.2,80.4,76.0,64.5],"2015":[94.4,92.1,87.3,82.3,74.8,67.2],"2016":[92.6,93.4,87.8,85.5,77.6,63.9],"2017":[88.1,92.1,89.4,84.0,80.9,61.6],"2018":[89.4,90.6,89.3,83.3,80.4,64.8],"2019":[92.0,92.1,88.6,81.8,81.8,62.1],"2020":[89.5,91.6,87.2,83.3,74.8,59.7],"2021":[88.3,90.5,83.2,81.3,78.4,55.4],"2023":[85.3,89.0,90.5,85.9,74.8,61.8],"2024":[86.2,88.7,90.1,85.0,75.5,61.3]},"여":{"1998":[77.2,68.3,53.3,36.8,26.6,0.0],"2001":[86.7,73.7,63.7,44.3,30.0,0.0],"2005":[87.4,78.6,75.3,62.3,45.0,33.6],"2007":[80.5,73.2,68.5,59.0,41.7,25.1],"2008":[84.0,74.7,72.4,59.8,42.5,29.0],"2009":[85.4,76.4,74.1,58.0,43.9,26.7],"2010":[81.0,79.5,77.0,65.1,48.0,29.3],"2011":[87.6,79.1,74.6,62.1,50.4,28.5],"2012":[86.5,72.5,74.8,61.6,47.5,31.6],"2013":[83.5,79.5,70.3,62.9,45.6,27.0],"2014":[86.2,76.4,75.4,62.0,46.6,38.1],"2015":[83.5,74.1,78.6,66.4,53.9,29.1],"2016":[85.5,77.5,76.9,67.7,49.3,30.3],"2017":[90.7,81.5,81.0,66.7,54.4,29.7],"2018":[85.4,81.7,79.5,66.8,54.3,32.2],"2019":[87.3,78.8,76.4,64.3,52.5,30.0],"2020":[85.7,79.6,75.1,66.1,49.0,29.1],"2021":[88.9,78.1,74.5,64.6,46.2,23.8],"2023":[87.5,79.3,78.1,68.6,52.8,28.4],"2024":[87.5,79.3,79.0,69.0,53.2,28.0]}},"hrAge":{"남":{"2005":[13.0,19.3,28.1,23.6,17.8,12.8],"2007":[16.8,26.9,30.2,18.6,14.9,3.8],"2008":[21.0,26.7,31.1,30.1,16.3,8.7],"2009":[20.2,23.6,27.3,22.3,14.6,7.1],"2010":[17.8,27.1,26.7,25.2,13.7,8.6],"2011":[19.7,30.5,28.1,25.8,12.7,4.4],"2012":[19.3,25.4,27.8,24.5,13.1,6.8],"2013":[18.7,23.7,25.9,20.3,8.9,4.3],"2014":[14.6,26.2,26.0,24.8,14.0,6.6],"2015":[14.6,25.1,27.6,23.1,16.7,5.8],"2016":[17.7,23.5,25.7,26.0,17.5,6.3],"2017":[17.0,24.1,27.2,23.5,15.2,7.2],"2018":[16.7,20.6,27.7,24.1,20.6,7.2],"2019":[13.1,19.0,23.2,24.0,17.7,10.5],"2020":[14.3,23.3,30.1,24.3,21.2,7.9],"2021":[16.0,20.3,24.3,24.2,18.2,8.3],"2022":[15.9,20.0,28.9,27.2,19.6,9.5],"2023":[15.4,15.3,29.7,26.0,18.5,7.7]},"여":{"2005":[6.2,3.1,3.4,2.5,1.0,0.9],"2007":[5.4,4.0,4.2,2.1,0.5,0.6],"2008":[10.4,7.0,7.1,3.7,0.4,0.8],"2009":[8.1,6.3,6.0,3.8,2.0,0.2],"2010":[7.8,8.3,6.6,2.5,0.3,0.4],"2011":[8.2,6.9,4.2,2.6,0.8,0.5],"2012":[9.2,8.4,6.4,2.5,0.7,0.2],"2013":[8.8,7.6,4.4,4.2,0.8,0.0],"2014":[8.9,9.1,7.1,4.5,1.4,1.0],"2015":[10.6,6.2,4.7,4.7,2.0,0.3],"2016":[9.6,8.6,5.7,4.9,0.9,0.3],"2017":[11.1,9.0,6.4,5.5,3.4,0.5],"2018":[14.9,9.5,8.0,5.1,2.3,0.2],"2019":[9.0,8.1,7.2,4.0,3.5,0.8],"2020":[8.3,9.1,7.3,3.5,1.0,0.3],"2021":[9.5,10.3,8.0,3.3,0.5,0.4],"2022":[8.8,9.3,7.1,7.0,1.9,0.8],"2023":[10.3,9.5,9.0,5.9,2.9,0.2]}},"ageLabels":["20-29","30-39","40-49","50-59","60-69","70세 이상"],"deathRate":{"1983":{"t":1.2,"m":2.5,"f":0.2},"1984":{"t":1.3,"m":2.7,"f":0.1},"1985":{"t":1.5,"m":2.8,"f":0.2},"1986":{"t":1.5,"m":3.0,"f":0.1},"1987":{"t":1.7,"m":3.3,"f":0.2},"1988":{"t":0.8,"m":1.6,"f":0.1},"1989":{"t":1.3,"m":2.5,"f":0.1},"1990":{"t":1.5,"m":2.9,"f":0.1},"1991":{"t":3.4,"m":6.7,"f":0.3},"1992":{"t":4.5,"m":8.9,"f":0.4},"1993":{"t":4.8,"m":9.2,"f":0.4},"1994":{"t":5.6,"m":10.6,"f":0.6},"1995":{"t":5.9,"m":11.1,"f":0.6},"1996":{"t":5.6,"m":10.6,"f":0.5},"1997":{"t":5.6,"m":10.6,"f":0.6},"1998":{"t":5.6,"m":10.5,"f":0.7},"1999":{"t":6.0,"m":11.2,"f":0.7},"2000":{"t":5.7,"m":10.7,"f":0.7},"2001":{"t":6.4,"m":11.9,"f":0.8},"2002":{"t":8.5,"m":15.8,"f":1.2},"2003":{"t":9.8,"m":18.2,"f":1.4},"2004":{"t":10.4,"m":19.2,"f":1.5},"2005":{"t":9.6,"m":17.6,"f":1.6},"2006":{"t":9.2,"m":16.8,"f":1.6},"2007":{"t":9.6,"m":17.5,"f":1.6},"2008":{"t":9.4,"m":17.1,"f":1.6},"2009":{"t":8.9,"m":16.1,"f":1.7},"2010":{"t":9.1,"m":16.5,"f":1.7},"2011":{"t":9.0,"m":15.9,"f":2.0},"2012":{"t":9.0,"m":16.2,"f":1.9},"2013":{"t":8.9,"m":15.6,"f":2.1},"2014":{"t":8.8,"m":15.5,"f":2.2},"2015":{"t":9.3,"m":16.3,"f":2.4},"2016":{"t":9.3,"m":16.1,"f":2.4},"2017":{"t":9.4,"m":16.4,"f":2.3},"2018":{"t":9.6,"m":16.5,"f":2.6},"2019":{"t":9.1,"m":15.8,"f":2.5},"2020":{"t":10.0,"m":17.3,"f":2.8},"2021":{"t":9.6,"m":16.5,"f":2.7},"2022":{"t":9.8,"m":16.7,"f":3.0},"2023":{"t":8.7,"m":15.0,"f":2.5}},"deathN":{"1983":{"t":494.0,"m":464.0,"f":30.0},"1984":{"t":539.0,"m":514.0,"f":25.0},"1985":{"t":611.0,"m":576.0,"f":35.0},"1986":{"t":642.0,"m":613.0,"f":29.0},"1987":{"t":714.0,"m":671.0,"f":43.0},"1988":{"t":341.0,"m":321.0,"f":20.0},"1989":{"t":524.0,"m":502.0,"f":22.0},"1990":{"t":657.0,"m":631.0,"f":26.0},"1991":{"t":1522.0,"m":1457.0,"f":65.0},"1992":{"t":2023.0,"m":1932.0,"f":91.0},"1993":{"t":2169.0,"m":2069.0,"f":100.0},"1994":{"t":2525.0,"m":2401.0,"f":124.0},"1995":{"t":2680.0,"m":2542.0,"f":138.0},"1996":{"t":2559.0,"m":2448.0,"f":111.0},"1997":{"t":2611.0,"m":2482.0,"f":129.0},"1998":{"t":2617.0,"m":2464.0,"f":153.0},"1999":{"t":2820.0,"m":2659.0,"f":161.0},"2000":{"t":2698.0,"m":2542.0,"f":156.0},"2001":{"t":3069.0,"m":2870.0,"f":199.0},"2002":{"t":4106.0,"m":3807.0,"f":299.0},"2003":{"t":4740.0,"m":4400.0,"f":340.0},"2004":{"t":5048.0,"m":4674.0,"f":374.0},"2005":{"t":4676.0,"m":4289.0,"f":387.0},"2006":{"t":4490.0,"m":4107.0,"f":383.0},"2007":{"t":4701.0,"m":4305.0,"f":396.0},"2008":{"t":4643.0,"m":4243.0,"f":400.0},"2009":{"t":4430.0,"m":4010.0,"f":420.0},"2010":{"t":4535.0,"m":4111.0,"f":424.0},"2011":{"t":4493.0,"m":3996.0,"f":497.0},"2012":{"t":4549.0,"m":4075.0,"f":474.0},"2013":{"t":4476.0,"m":3955.0,"f":521.0},"2014":{"t":4487.0,"m":3927.0,"f":560.0},"2015":{"t":4746.0,"m":4140.0,"f":606.0},"2016":{"t":4747.0,"m":4121.0,"f":626.0},"2017":{"t":4809.0,"m":4207.0,"f":602.0},"2018":{"t":4910.0,"m":4233.0,"f":677.0},"2019":{"t":4694.0,"m":4054.0,"f":640.0},"2020":{"t":5155.0,"m":4426.0,"f":729.0},"2021":{"t":4928.0,"m":4229.0,"f":699.0},"2022":{"t":5033.0,"m":4272.0,"f":761.0},"2023":{"t":4462.0,"m":3812.0,"f":650.0}},"perAdultPop":{"2008":37618582,"2009":38038526,"2010":38931267,"2011":39377310,"2012":39832282,"2013":40287814,"2014":40747638,"2015":41210561,"2016":41649010,"2017":42038921,"2018":42391844,"2019":42723937,"2020":43065617,"2021":43169143,"2022":43203200,"2023":43340977}};
+document.documentElement.lang = "ko";
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const s = (tag, a = {}, p) => { const e = document.createElementNS(NS, tag); for (const k in a) if (a[k] != null) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  const tx = (p, x, y, str, cls, size, anchor = "start", extra = {}) => { const t = s("text", { x, y, class: cls, "text-anchor": anchor, "font-size": size, ...extra }, p); t.textContent = str; return t; };
+  const fmt = (n) => Math.round(n).toLocaleString("ko-KR");
+  const f1 = (n) => n.toLocaleString("ko-KR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const pc = (n) => f1(n) + "%";
+  const man = (n) => n >= 1e5 ? f1(n / 1e4).replace(/\.0$/, "") + "만" : fmt(n);
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lerp = (arr, pos) => { const k = Math.floor(pos), f = pos - k; return k + 1 < arr.length ? arr[k] + (arr[k + 1] - arr[k]) * f : arr[k]; };
+  const bEl = (t) => Object.assign(document.createElement("b"), { textContent: t });
+
+  function table(id, head, rows) {
+    const t = document.createElement("table"), th = document.createElement("thead"), tr = document.createElement("tr");
+    head.forEach((h) => { const c = document.createElement("th"); c.textContent = h; tr.append(c); }); th.append(tr); t.append(th);
+    const tb = document.createElement("tbody");
+    rows.forEach((r) => { const row = document.createElement("tr"); r.forEach((v) => { const c = document.createElement("td"); c.textContent = v; row.append(c); }); tb.append(row); });
+    t.append(tb); document.getElementById(id).replaceChildren(t);
+  }
+  function tipFor(fig) {
+    const tip = fig.querySelector(".tip");
+    return {
+      show(ev, title, rows) {
+        tip.replaceChildren(); const h = document.createElement("div"); h.className = "tn"; h.textContent = title; tip.append(h);
+        rows.forEach(([v, k, col]) => { const d = document.createElement("div"); if (col) { const i = document.createElement("i"); i.className = "sw dot"; i.style.background = col; i.style.marginRight = "6px"; d.append(i); } const b = document.createElement("span"); b.className = "tv"; b.textContent = v + " "; const kk = document.createElement("span"); kk.textContent = k; d.append(b, kk); tip.append(d); });
+        tip.hidden = false;
+        const fr = fig.getBoundingClientRect(); let x, y;
+        if (ev.clientX != null) { x = ev.clientX - fr.left + 14; y = ev.clientY - fr.top + 14; } else { const r = (ev.rect || ev.target.getBoundingClientRect()); x = r.right - fr.left + 8; y = r.top - fr.top; }
+        const tw = tip.offsetWidth, th = tip.offsetHeight;
+        if (x + tw > fr.width - 8) x = Math.max(8, x - tw - 28);
+        if (y + th > fr.height - 8) y = Math.max(8, y - th - 28);
+        tip.style.left = x + "px"; tip.style.top = y + "px";
+      },
+      hide() { tip.hidden = true; },
+    };
+  }
+  /* Marks you can point at. One tab stop per chart; Left/Right step, Up/Down jump rows, Escape hides.
+     pts: {x, y, r, fn() -> [title, rows]} in viewBox units; u = viewBox units per CSS px. */
+  function pointLayer(v, tip, pts, label, u = 1) {
+    const ring = s("circle", { class: "ring", "stroke-width": 2 * u, opacity: 0 }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = i; const p = pts[i]; ring.setAttribute("cx", p.x); ring.setAttribute("cy", p.y); ring.setAttribute("r", p.r + 4 * u); ring.setAttribute("opacity", 1); const [t, rows] = p.fn(); tip.show(ev || { target: ring }, t, rows); };
+    const hide = () => { tip.hide(); ring.setAttribute("opacity", 0); };
+    const nearest = (e) => {
+      const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal, k = vb.width / r.width;
+      const x = vb.x + (e.clientX - r.left) * k, y = vb.y + (e.clientY - r.top) * k;
+      let best = -1, bd = Infinity;
+      pts.forEach((p, i) => { const d = Math.hypot(p.x - x, p.y - y) - p.r, reach = 18 * k; if (d < reach && d < bd) { bd = d; best = i; } });
+      return best;
+    };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerdown", (e) => { const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => { if (pts.length) show(idx < 0 ? 0 : idx); }); v.addEventListener("blur", hide);
+    const vert = (dir) => { const c = pts[Math.max(idx, 0)]; let best = -1, bd = Infinity; pts.forEach((p, i) => { const dy = (p.y - c.y) * dir; if (dy <= 0.5) return; const d = dy * 3 + Math.abs(p.x - c.x); if (d < bd) { bd = d; best = i; } }); return best < 0 ? Math.max(idx, 0) : best; };
+    v.addEventListener("keydown", (e) => {
+      if (!pts.length) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show((Math.max(idx, 0) + (e.key === "ArrowRight" ? 1 : -1) + pts.length) % pts.length); }
+      else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); show(vert(e.key === "ArrowDown" ? 1 : -1)); }
+      else if (e.key === "Escape") hide();
+    });
+  }
+  /* A time cursor over a chart: pointer or Left/Right picks a time index, a vertical rule follows it. */
+  function timeLayer(v, tip, n, xOf, y0, y1, fn, label, u = 1) {
+    const rule = s("line", { y1: y0, y2: y1, stroke: "var(--ink)", "stroke-width": u, opacity: 0, "pointer-events": "none" }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = Math.max(0, Math.min(n - 1, i)); const x = xOf(idx); rule.setAttribute("x1", x); rule.setAttribute("x2", x); rule.setAttribute("opacity", .5); const [t, rows] = fn(idx); const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; tip.show(ev || { rect: { right: r.left + (x - vb.x) / vb.width * r.width, top: r.top + 20 } }, t, rows); };
+    const hide = () => { tip.hide(); rule.setAttribute("opacity", 0); };
+    const at = (e) => { const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; const x = vb.x + (e.clientX - r.left) * vb.width / r.width; let best = 0, bd = Infinity; for (let i = 0; i < n; i++) { const d = Math.abs(xOf(i) - x); if (d < bd) { bd = d; best = i; } } return best; };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; show(at(e), e); });
+    v.addEventListener("pointerdown", (e) => show(at(e), e));
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => show(idx < 0 ? n - 1 : idx)); v.addEventListener("blur", hide);
+    v.addEventListener("keydown", (e) => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show(idx + (e.key === "ArrowRight" ? 1 : -1)); } else if (e.key === "Home") { e.preventDefault(); show(0); } else if (e.key === "End") { e.preventDefault(); show(n - 1); } else if (e.key === "Escape") hide(); });
+  }
+  /* A player: play/pause, scrubber and a large time readout. Frames 0..n-1; at rest it shows the last frame. */
+  function Player(id, label, draw, n, labelOf, seconds = 10) {
+    const box = document.getElementById(id);
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "play"; btn.setAttribute("aria-label", label + " 재생");
+    const icon = (playing) => { btn.replaceChildren(); const v = s("svg", { viewBox: "0 0 20 20", "aria-hidden": "true" }, btn); if (playing) { s("rect", { x: 4, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); s("rect", { x: 12, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); } else s("path", { d: "M5,3 L17,10 L5,17 Z", fill: "currentColor" }, v); };
+    const yr = document.createElement("div"); yr.className = "yr"; yr.setAttribute("aria-hidden", "true");
+    const sc = document.createElement("input"); sc.type = "range"; sc.className = "scrub"; sc.min = 0; sc.max = n - 1; sc.step = 1; sc.value = n - 1; sc.setAttribute("aria-label", label + " 시점");
+    box.append(btn, yr, sc);
+    let pos = n - 1, raf = 0, playing = false, t0 = 0, from = 0;
+    const render = () => { const k = Math.min(n - 1, Math.floor(pos + 1e-6)); yr.textContent = labelOf(k); sc.value = Math.round(pos); sc.setAttribute("aria-valuetext", labelOf(Math.round(pos))); draw(pos); };
+    const stop = () => { playing = false; cancelAnimationFrame(raf); icon(false); btn.setAttribute("aria-label", label + " 재생"); };
+    const tick = (now) => { pos = Math.min(n - 1, from + (now - t0) / (seconds * 1000) * (n - 1)); render(); if (pos < n - 1) raf = requestAnimationFrame(tick); else stop(); };
+    btn.addEventListener("click", () => {
+      if (playing) { stop(); return; }
+      if (reduce) { pos = n - 1; render(); return; }
+      from = pos >= n - 1 ? 0 : pos; pos = from; playing = true; icon(true); btn.setAttribute("aria-label", label + " 멈춤");
+      raf = requestAnimationFrame((t) => { t0 = t; tick(t); });
+    });
+    sc.addEventListener("input", () => { stop(); pos = +sc.value; render(); });
+    icon(false);
+    return { render, get pos() { return pos; } };
+  }
+  document.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".opt").forEach((o) => { o.setAttribute("aria-pressed", o === b); o.dataset.state = o.dataset.a === "1" ? "right" : "wrong"; });
+    document.getElementById("reveal").hidden = false;
+  }));
+  function chips(id, opts, cur, onPick) {
+    const box = document.getElementById(id);
+    opts.forEach(([k, name]) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = name; b.setAttribute("aria-pressed", k === cur); b.addEventListener("click", () => { box.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === b)); onPick(k); }); box.append(b); });
+  }
+  function onResize(fn) {
+    let lastW = 0, rt;
+    new ResizeObserver(() => { const w = document.querySelector(".page").clientWidth; if (Math.abs(w - lastW) < 2) return; lastW = w; clearTimeout(rt); rt = setTimeout(fn, 80); }).observe(document.querySelector(".page"));
+  }
+
+  const Y = DATA.years, NY = Y.length, V = DATA.V, KINDS = Object.keys(V);
+  const COL = { "맥주": "var(--beer)", "소주": "var(--soju)", "막걸리": "var(--mak)", "와인": "var(--wine)", "위스키": "var(--whisky)", "기타 주류": "var(--high)" };
+  const MAX = {}; KINDS.forEach((k) => (MAX[k] = Math.max(...V[k])));
+  const kl = (n) => n >= 1e5 ? f1(n / 1e4).replace(/\.0$/, "") + "만 kL" : fmt(n) + " kL";
+  const W2 = 2.4; // outline width
+
+  /* each vessel: interior path (liquid clip), drawn in a 150 x 175 cell whose table line is y = 170 */
+  const VES = {
+    "맥주": { inner: "M47,78 H93 V160 Q93,165 88,165 H52 Q47,165 47,160 Z", top: 78, bot: 165,
+      draw(g, lv) { s("path", { d: "M100,92 h12 a13 13 0 0 1 13 13 v34 a13 13 0 0 1 -13 13 h-12", fill: "none", stroke: "var(--outline)", "stroke-width": 7, "stroke-linecap": "round" }, g); s("path", { d: "M100,92 h12 a13 13 0 0 1 13 13 v34 a13 13 0 0 1 -13 13 h-12", fill: "none", stroke: "var(--glass)", "stroke-width": 3, "stroke-linecap": "round" }, g); return "M40,70 H100 V162 Q100,170 92,170 H48 Q40,170 40,162 Z"; },
+      deco(g, y) { if (y < 158) [[55, 6], [66, 7], [77, 6.5], [88, 6]].forEach(([x, r]) => s("circle", { cx: x, cy: y, r, fill: "var(--foam)", stroke: "var(--outline)", "stroke-width": 1.2 }, g)); } },
+    "소주": { inner: "M67,46 H83 V72 Q99,84 99,100 V160 Q99,165 94,165 H56 Q51,165 51,160 V100 Q51,84 67,72 Z", top: 46, bot: 165,
+      draw(g) { return "M63,30 H87 V68 Q104,80 104,98 V162 Q104,170 96,170 H54 Q46,170 46,162 V98 Q46,80 63,68 Z"; },
+      deco(g) { s("rect", { x: 61, y: 24, width: 28, height: 10, rx: 3, fill: "var(--bottle)", stroke: "var(--outline)", "stroke-width": W2 }, g); s("rect", { x: 50, y: 118, width: 50, height: 26, rx: 3, fill: "var(--card)", stroke: "var(--outline)", "stroke-width": 1.6 }, g); tx(g, 75, 136, "소주", "hand", 14, "middle"); }, tint: "var(--bottle)" },
+    "막걸리": { inner: "M32,118 H118 C118,146 99,165 75,165 C51,165 32,146 32,118 Z", top: 118, bot: 165,
+      draw(g) { s("ellipse", { cx: 75, cy: 171, rx: 22, ry: 4, fill: "var(--outline)", opacity: .25 }, g); return "M26,112 H124 C124,146 102,170 75,170 C48,170 26,146 26,112 Z"; },
+      deco(g) { s("path", { d: "M30,112 Q75,104 120,112", fill: "none", stroke: "var(--outline)", "stroke-width": 1.4, opacity: .6 }, g); } },
+    "와인": { inner: "M53,66 H97 C100,98 92,118 75,120 C58,118 50,98 53,66 Z", top: 66, bot: 120,
+      draw(g) { s("line", { x1: 75, y1: 124, x2: 75, y2: 166, stroke: "var(--outline)", "stroke-width": 4, "stroke-linecap": "round" }, g); s("ellipse", { cx: 75, cy: 168, rx: 20, ry: 4, fill: "var(--glass)", stroke: "var(--outline)", "stroke-width": W2 }, g); return "M48,58 H102 C106,98 96,122 75,124 C54,122 44,98 48,58 Z"; },
+      deco() {} },
+    "위스키": { inner: "M51,104 H99 L95,164 H55 Z", top: 104, bot: 164,
+      draw(g) { return "M44,96 H106 L101,170 H49 Z"; },
+      deco(g, y) { [[60, 120, -8], [80, 128, 10], [68, 140, 4]].forEach(([x, yy, a]) => { if (yy > y - 14) s("rect", { x: x - 9, y: Math.max(yy, y - 6) - 9, width: 18, height: 18, rx: 4, fill: "var(--ice)", "fill-opacity": .55, stroke: "var(--outline)", "stroke-width": 1.3, transform: `rotate(${a} ${x} ${yy})` }, g); }); } },
+    "기타 주류": { inner: "M57,44 H93 L90,164 H60 Z", top: 44, bot: 164,
+      draw(g) { return "M50,36 H100 L96,170 H54 Z"; },
+      deco(g, y) { for (let i = 0; i < 6; i++) { const yy = 160 - i * 18; if (yy > y + 6) s("circle", { cx: 66 + (i % 3) * 9, cy: yy, r: 2.2, fill: "none", stroke: "var(--outline)", "stroke-width": 1, opacity: .7 }, g); } s("circle", { cx: 98, cy: 38, r: 13, fill: "#f7e36a", stroke: "var(--outline)", "stroke-width": W2 }, g); s("path", { d: "M98,27 V49 M87,38 H109 M90,30 L106,46 M106,30 L90,46", stroke: "var(--outline)", "stroke-width": 1, opacity: .55 }, g); } },
+  };
+  let clipN = 0;
+  function c1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const narrow = box.clientWidth < 620, cols = narrow ? 3 : 6, rows = 6 / cols, CW = 150, CH = narrow ? 238 : 232, top = 36;
+    const W = CW * cols, H = top + CH * rows + 6;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${Y[Math.round(pos)]}년 주종별 술 출고량 잔 그림` }, box);
+    // awning and table
+    const aw = s("g", {}, v);
+    for (let i = 0; i < cols * 3; i++) s("path", { d: `M${i * W / (cols * 3)},0 h${W / (cols * 3)} v18 a${W / (cols * 6)} ${W / (cols * 6) * .5} 0 0 1 ${-W / (cols * 3)} 0 Z`, fill: i % 2 ? "var(--card)" : "var(--tent)", stroke: "var(--outline)", "stroke-width": 1.4 }, aw);
+    const pts = [];
+    KINDS.forEach((k, j) => {
+      const cx = (j % cols) * CW, cy = top + Math.floor(j / cols) * CH, g = s("g", { transform: `translate(${cx} ${cy})` }, v), d = VES[k];
+      s("rect", { x: -2, y: 170, width: CW + 4, height: 14, fill: "var(--wood)", stroke: "var(--outline)", "stroke-width": 1.6 }, g);
+      s("line", { x1: 0, x2: CW, y1: 177, y2: 177, stroke: "var(--wood2)", "stroke-width": 1.4, "stroke-dasharray": "14 9" }, g);
+      const val = lerp(V[k], pos), frac = Math.max(0, Math.min(1, val / MAX[k])), ly = d.bot - (d.bot - d.top) * frac * .94;
+      const outer = d.draw(g, ly);
+      s("path", { d: outer, fill: "var(--glass)", "fill-opacity": .8 }, g);
+      if (d.tint) s("path", { d: outer, fill: d.tint, "fill-opacity": .22 }, g);
+      const id = "vc" + (clipN++); s("path", { d: d.inner }, s("clipPath", { id }, s("defs", {}, g)));
+      const lq = s("g", { "clip-path": `url(#${id})` }, g);
+      s("rect", { x: 0, y: ly, width: CW, height: 200, fill: COL[k] }, lq);
+      s("path", { d: `M0,${ly} Q37,${ly - 3} 75,${ly} T150,${ly}`, fill: "none", stroke: "var(--card)", "stroke-width": 2, opacity: .7 }, lq);
+      s("rect", { x: 0, y: ly + 3, width: 14, height: 200, fill: "#fff", opacity: .25 }, lq);
+      d.deco(g, ly);
+      s("path", { d: outer, fill: "none", stroke: "var(--outline)", "stroke-width": W2, "stroke-linejoin": "round" }, g);
+      s("path", { d: outer.replace(/^M(\d+),(\d+)/, (m, a, b) => `M${+a + 7},${+b + 10}`).split(" ")[0] + ` v40`, stroke: "#fff", "stroke-width": 3, "stroke-linecap": "round", opacity: .55, fill: "none" }, g);
+      // labels
+      tx(g, CW / 2, 202, k, "vn", narrow ? 23 : 20, "middle");
+      tx(g, CW / 2, 224, kl(val), "vv", narrow ? 16 : 12.5, "middle");
+      const ch = (val / V[k][0] - 1) * 100;
+      pts.push({ x: cx + CW / 2, y: cy + 110, r: 50, fn: () => [`${k} · ${Y[Math.round(pos)]}년`, [[kl(lerp(V[k], pos)), "출고량"], [pc(lerp(V[k], pos) / MAX[k] * 100), `가장 많던 ${Y[V[k].indexOf(MAX[k])]}년 대비`], [(ch >= 0 ? "+" : "") + f1(ch) + "%", "2005년 대비"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 잔을 하나씩 볼 수 있다");
+  }
+  table("t1", ["연도", ...KINDS, "합계"], Y.map((y, i) => [String(y), ...KINDS.map((k) => fmt(V[k][i])), fmt(DATA.tot[i])]));
+
+  /* ---------- 2. per adult, stacked by kind ---------- */
+  const PY = Object.keys(DATA.perAdult).map(Number), NP = PY.length;
+  const PER = (k, y) => V[k][Y.indexOf(y)] * 1000 / DATA.perAdultPop[y];
+  function c2(pos) {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), H = Math.min(360, Math.max(260, W * .45)), l = 34, r = 94, top = 16, bot = 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "20세 이상 한 명당 술 출고량 2008–2023" }, box);
+    const sx = (i) => l + i / (NP - 1) * (W - l - r), sy = (L) => top + (1 - L / 100) * (H - top - bot);
+    [0, 25, 50, 75, 100].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t ? "gl" : "ax" }, v); tx(v, l - 6, sy(t) + 4, t, "tk", 11.5, "end"); });
+    PY.forEach((y, i) => { if (i % (W < 560 ? 5 : 3) === 0 || i === NP - 1) tx(v, sx(i), H - 6, String(y), "tk", 11.5, "middle"); });
+    const k0 = Math.floor(pos), f = pos - k0, idx = []; for (let i = 0; i <= k0; i++) idx.push(i); if (k0 + 1 < NP && f > 0) idx.push(k0 + f);
+    const xs = idx.map((i) => l + i / (NP - 1) * (W - l - r)); let low = idx.map(() => 0);
+    KINDS.forEach((k) => {
+      const ser = PY.map((y) => PER(k, y)), hi = idx.map((i, n) => low[n] + lerp(ser, i));
+      s("path", { d: "M" + xs.map((x, n) => `${x.toFixed(1)},${sy(hi[n]).toFixed(1)}`).join("L") + "L" + xs.map((x, n) => `${x.toFixed(1)},${sy(low[n]).toFixed(1)}`).reverse().join("L") + "Z", fill: COL[k], stroke: "var(--outline)", "stroke-width": 1.2, "stroke-linejoin": "round" }, v);
+      const mid = (hi[hi.length - 1] + low[low.length - 1]) / 2; if (hi[hi.length - 1] - low[low.length - 1] > 5) tx(v, xs[xs.length - 1] + 6, sy(mid) + 4, `${k} ${f1(lerp(ser, idx[idx.length - 1]))}`, "lb", 11.5);
+      low = hi;
+    });
+    const tot = low[low.length - 1]; tx(v, xs[xs.length - 1], sy(tot) - 8, f1(tot) + "L", "vl halo", 13, "middle", { "stroke-width": 4 });
+    timeLayer(v, tipFor(fig), k0 + 1, sx, top, H - bot, (i) => [`${PY[i]}년 · ${f1(KINDS.reduce((a, k) => a + PER(k, PY[i]), 0))}L`, KINDS.map((k) => [f1(PER(k, PY[i])) + "L", k, COL[k]]).reverse()], "좌우 화살표로 해마다 볼 수 있다");
+  }
+  table("t2", ["연도", ...KINDS, "합계(L)"], PY.map((y) => [String(y), ...KINDS.map((k) => f1(PER(k, y))), f1(KINDS.reduce((a, k) => a + PER(k, y), 0))]));
+
+  /* ---------- 3. drinking rates by sex ---------- */
+  const DY = [...new Set([...Object.keys(DATA.drink["남"]), ...Object.keys(DATA.highrisk["남"])])].map(Number).sort((a, b) => a - b);
+  const LINES = [["남", "drink", "var(--men)", false, "남성 음주율"], ["여", "drink", "var(--women)", false, "여성 음주율"], ["남", "highrisk", "var(--men)", true, "남성 고위험"], ["여", "highrisk", "var(--women)", true, "여성 고위험"]];
+  function c3(pos) {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), H = Math.min(380, Math.max(280, W * .48)), l = 36, r = 104, top = 14, bot = 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "성인 음주율과 고위험 음주율 1998–2024" }, box);
+    const y0 = 1998, y1 = 2024, sx = (y) => l + (y - y0) / (y1 - y0) * (W - l - r), sy = (p) => top + (1 - p / 100) * (H - top - bot);
+    [0, 25, 50, 75, 100].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t ? "gl" : "ax" }, v); tx(v, l - 6, sy(t) + 4, t + "%", "tk", 11.5, "end"); });
+    [1998, 2004, 2010, 2016, 2024].forEach((y) => tx(v, sx(y), H - 6, String(y), "tk", 11.5, "middle"));
+    const yNow = y0 + pos * (y1 - y0) / (DY.length - 1) * (DY.length - 1) / (DY.length - 1);
+    const cut = DY[Math.min(DY.length - 1, Math.round(pos))];
+    const ends = [], pts = [];
+    LINES.forEach(([sex, key, col, dash, name]) => {
+      const D = DATA[key][sex], ys = Object.keys(D).map(Number).filter((y) => y <= cut).sort((a, b) => a - b); if (!ys.length) return;
+      s("path", { d: "M" + ys.map((y) => `${sx(y).toFixed(1)},${sy(D[y]).toFixed(1)}`).join("L"), fill: "none", stroke: col, "stroke-width": dash ? 2.4 : 3, "stroke-dasharray": dash ? "6 4" : "none", "stroke-linejoin": "round" }, v);
+      ys.forEach((y) => { s("circle", { cx: sx(y), cy: sy(D[y]), r: 2.6, fill: col }, v); pts.push({ x: sx(y), y: sy(D[y]), r: 3, fn: () => [`${name} · ${y}년`, [[pc(D[y]), name]]] }); });
+      const ly = ys[ys.length - 1]; ends.push({ y: sy(D[ly]), x: sx(ly), t: `${name} ${f1(D[ly])}`, col, dash });
+    });
+    ends.sort((a, b) => a.y - b.y); for (let a = 1; a < ends.length; a++) if (ends[a].y - ends[a - 1].y < 15) ends[a].y = ends[a - 1].y + 15;
+    ends.forEach((e) => tx(v, e.x + 8, e.y + 4, e.t, e.dash ? "lb halo" : "vl halo", 12, "start", { "stroke-width": 4 }));
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 점을 하나씩 볼 수 있다");
+  }
+  table("t3", ["연도", "남성 음주율", "여성 음주율", "남성 고위험", "여성 고위험"], DY.map((y) => [String(y), ...LINES.map(([sex, key]) => (DATA[key][sex][y] != null ? pc(DATA[key][sex][y]) : "–"))]));
+
+  /* ---------- 4. alcohol-related death rate ---------- */
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const DYs = Object.keys(DATA.deathRate).map(Number).filter((y) => y >= 2000), n = DYs.length;
+    const W = Math.max(300, box.clientWidth), H = Math.min(300, Math.max(220, W * .36)), l = 30, r = 12, top = 22, bot = 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "알코올 관련 사망률 2000–2023" }, box);
+    const bw = (W - l - r) / n, sy = (p) => top + (1 - p / 12) * (H - top - bot), pts = [];
+    [0, 4, 8, 12].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t ? "gl" : "ax" }, v); tx(v, l - 6, sy(t) + 4, t, "tk", 11.5, "end"); });
+    DYs.forEach((y, i) => {
+      const d = DATA.deathRate[y], x = l + i * bw + bw * .15, w = bw * .7;
+      s("rect", { x, y: sy(d.t), width: w, height: sy(0) - sy(d.t), rx: Math.min(4, w / 3), fill: y === 2023 ? "var(--accent)" : "var(--ghost)", stroke: "var(--outline)", "stroke-width": 1 }, v);
+      if (i % (W < 560 ? 6 : 3) === 0 || y === 2023) tx(v, x + w / 2, H - 6, String(y), "tk", 11, "middle");
+      pts.push({ x: x + w / 2, y: sy(d.t), r: w / 2, fn: () => [`${y}년`, [[f1(d.t) + "명", "10만 명당"], [f1(d.m) + "명", "남성"], [f1(d.f) + "명", "여성"], [fmt(DATA.deathN[y].t) + "명", "사망자"]]] });
+    });
+    tx(v, l + (n - 1) * bw + bw / 2, sy(DATA.deathRate[2023].t) - 8, "8.7", "vl halo", 13, "middle", { "stroke-width": 4 });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 해마다 볼 수 있다");
+    table("t4", ["연도", "10만 명당(전체)", "남성", "여성", "사망자 수"], DYs.map((y) => [String(y), f1(DATA.deathRate[y].t), f1(DATA.deathRate[y].m), f1(DATA.deathRate[y].f), fmt(DATA.deathN[y].t)]));
+  }
+
+  const p1 = Player("p1", "술잔", c1, NY, (i) => String(Y[i]), 10);
+  const p2 = Player("p2", "1인당 출고량", c2, NP, (i) => String(PY[i]), 8);
+  const p3 = Player("p3", "음주율", c3, DY.length, (i) => String(DY[i]), 8);
+  const all = () => { p1.render(); p2.render(); p3.render(); c4(); };
+  all(); onResize(all);
+})();
+</script>

@@ -1,0 +1,521 @@
+<title>서버 랙 불빛</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a map of Korea where each blinking server rack stands for 20 MW of contracted power (or one data centre),
+   placed in the eleven supply regions. Then a dial: the reader sets how much of the contracted power is really used,
+   and a row of LED segments (1 TWh each) grows or shrinks next to fixed rows for Jeju, Seoul homes, farming, public
+   use, electronics factories and all homes. Batteries per region share the same dial. Last, the monthly meter of one
+   public data centre. */
+:root {
+  --paper: #f4f2ec; --card: #fcfbf7; --ink: #2c2c2a; --ink2: #494843; --muted: #5d5b55; --line: #e1ddd3; --grid: #eae7de; --axis: #a7a8a3;
+  --accent: #416e59; --intl: #416e59; --board: #2c2c2a; --board-ink: #f4f2ec; --sea: #fcfbf7;
+  --rack: #2c2c2a; --rack-edge: #5f6062; --led: #abc07b; --led2: #d56b41; --dc: #d56b41; --dc-ink: #a8451f; --ref: #8eabc9; --ref-ink: #3f5890; --off: #e6e2d8;
+  --r0: #efece4; --r1: #dbe1dd; --r2: #c6d6cc; --r3: #a7c4c2; --bat: #80a15a; --bat-ink: #4d6a2f; --shell: #8b8a84;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #191b1a; --card: #232625; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #383b3a; --grid: #2d302f; --axis: #62635d;
+  --accent: #91b0a1; --intl: #91b0a1; --board: #dcd9cf; --board-ink: #191b1a; --sea: #232625;
+  --rack: #0f100f; --rack-edge: #939594; --led: #c4d39c; --led2: #dc8c67; --dc: #dc8c67; --dc-ink: #e7a08a; --ref: #4e6aa9; --ref-ink: #abbdc9; --off: #343736;
+  --r0: #2a2d2c; --r1: #313a38; --r2: #3a4a46; --r3: #476059; --bat: #abc07b; --bat-ink: #c4d39c; --shell: #a7a8a3; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #191b1a; --card: #232625; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #383b3a; --grid: #2d302f; --axis: #62635d;
+  --accent: #91b0a1; --intl: #91b0a1; --board: #dcd9cf; --board-ink: #191b1a; --sea: #232625;
+  --rack: #0f100f; --rack-edge: #939594; --led: #c4d39c; --led2: #dc8c67; --dc: #dc8c67; --dc-ink: #e7a08a; --ref: #4e6aa9; --ref-ink: #abbdc9; --off: #343736;
+  --r0: #2a2d2c; --r1: #313a38; --r2: #3a4a46; --r3: #476059; --bat: #abc07b; --bat-ink: #c4d39c; --shell: #a7a8a3; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 16.5px/1.78 var(--sans); word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 36px 80px }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--axis) }
+:focus-visible { outline: 2px solid var(--intl); outline-offset: 2px }
+.page { max-width: 1040px; margin: 0 auto; display: grid; gap: 64px }
+.prose { max-width: 660px; display: grid; gap: 14px; min-width: 0 }
+.prose p { margin: 0 }
+.n { font-weight: 700; font-variant-numeric: tabular-nums }
+.label { font: 500 12px/1.4 var(--mono); letter-spacing: .08em; color: var(--muted); margin: 0; text-transform: uppercase }
+
+header { display: grid; gap: 22px }
+h1 { font-weight: 700; font-size: clamp(32px, 5.6vw, 54px); line-height: 1.18; margin: 0; letter-spacing: -.03em; text-wrap: balance }
+h1 span { display: block; font-weight: 500; font-size: .46em; color: var(--ink2); margin-top: 12px; letter-spacing: -.01em; line-height: 1.45 }
+.sheet, .method { display: grid; grid-template-columns: 110px minmax(0, 1fr); border-top: 2px solid var(--ink); font-size: 14.5px; margin: 0 }
+.sheet dt, .sheet dd, .method dt, .method dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line) }
+.sheet dt, .method dt { font: 500 12px/2 var(--mono); color: var(--muted) }
+.sheet dd, .method dd { color: var(--ink2) }
+@media (max-width: 560px) { .sheet, .method { grid-template-columns: 84px minmax(0, 1fr) } }
+
+.quiz { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 14px }
+.quiz h2 { font-size: 20px; line-height: 1.5; margin: 0; font-weight: 700; text-wrap: balance }
+.opts { display: grid; gap: 8px }
+.opt { display: flex; gap: 12px; align-items: center; text-align: left; font: inherit; font-size: 15.5px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; cursor: pointer; min-height: 46px }
+.opt i { font: 500 12px var(--mono); color: var(--muted); font-style: normal; width: 14px }
+.opt[data-state="right"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink) }
+.opt[data-state="wrong"] { opacity: .5 }
+.reveal { font-size: 15px; color: var(--ink2); border-top: 1px solid var(--line); padding-top: 14px }
+.reveal .big { font-size: 28px; font-weight: 700; color: var(--ink); display: block; line-height: 1.3 }
+
+section.s { display: grid; gap: 22px }
+h2.h { font-size: clamp(23px, 3.3vw, 29px); line-height: 1.35; margin: 0; font-weight: 700; letter-spacing: -.02em; text-wrap: balance }
+figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 12px; position: relative; min-width: 0 }
+@media (max-width: 560px) { figure { padding: 14px } }
+.ft { font-weight: 700; font-size: 16px; margin: 0; line-height: 1.5 }
+.fs { font-size: 13.5px; color: var(--muted); margin: -8px 0 0; line-height: 1.6 }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y }
+figcaption { font-size: 12.5px; color: var(--muted); line-height: 1.65; border-top: 1px solid var(--grid); padding-top: 10px }
+details { font-size: 13px }
+summary { cursor: pointer; color: var(--ink2); width: max-content; font: 500 12px/2 var(--mono); padding: 6px 0 }
+.tw { overflow-x: auto; margin-top: 6px; max-height: 380px }
+table { border-collapse: collapse; font-size: 12.5px; min-width: 100% }
+th, td { padding: 5px 10px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums }
+th:first-child, td:first-child { text-align: left }
+th { font-weight: 700; color: var(--ink2); position: sticky; top: 0; background: var(--card) }
+
+/* player: play button, scrubber and a departures-board year */
+.player { display: flex; align-items: center; gap: 14px; flex-wrap: wrap }
+.play { width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; display: grid; place-items: center; flex: none }
+.play svg { width: 18px; height: 18px }
+.play:hover { background: var(--intl) }
+.yr { font: 600 30px/1 var(--mono); font-variant-numeric: tabular-nums; color: var(--board-ink); background: var(--board); border-radius: 6px; padding: 8px 10px; letter-spacing: .06em;
+  background-image: linear-gradient(transparent calc(50% - .5px), rgba(255,255,255,.14) calc(50% - .5px), rgba(255,255,255,.14) calc(50% + .5px), transparent calc(50% + .5px)) }
+.scrub { flex: 1 1 180px; min-width: 0; accent-color: var(--intl); height: 32px }
+.stat { font-size: 14px; color: var(--ink2); margin: 0; min-height: 1.6em }
+.stat b { font-variant-numeric: tabular-nums }
+.chips { display: flex; flex-wrap: wrap; gap: 8px }
+.chip { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; min-height: 40px; cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink) }
+.lb { fill: var(--ink); font-family: var(--sans) }
+.vl { fill: var(--ink); font-family: var(--sans); font-weight: 700; font-variant-numeric: tabular-nums }
+.tk { fill: var(--muted); font-family: var(--mono); font-variant-numeric: tabular-nums }
+.mt { fill: var(--muted); font-family: var(--sans) }
+.halo { paint-order: stroke; stroke: var(--card); stroke-linejoin: round }
+.halo-sea { paint-order: stroke; stroke: var(--sea); stroke-linejoin: round }
+.gl { stroke: var(--grid); stroke-width: 1 }
+.ax { stroke: var(--axis); stroke-width: 1 }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink2) }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block }
+.sw.line { height: 3px; width: 18px; border-radius: 2px }
+.sw.dot { border-radius: 50% }
+.tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--axis); border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.12); padding: 8px 10px; font-size: 12.5px; line-height: 1.5; min-width: 150px; max-width: 250px; z-index: 5 }
+.tip .tn { color: var(--muted) } .tip .tv { font-weight: 700; font-size: 14px }
+.ring { fill: none; stroke: var(--ink); }
+ul.care-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; color: var(--ink2) }
+.dt { overflow-x: auto; border-top: 2px solid var(--ink) }
+.dt td, .dt th { white-space: normal; text-align: left; vertical-align: top; padding: 8px 10px 8px 0; position: static }
+.next { display: grid; border-top: 2px solid var(--ink) }
+.q { padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px }
+.q h3 { font-size: 16px; margin: 0; font-weight: 700 }
+.q p { margin: 0; font-size: 14px; color: var(--ink2) }
+.q ul { margin: 0; padding-left: 18px; font-size: 13.5px }
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px }
+
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.di { fill: var(--dc-ink) } .ri { fill: var(--ref-ink) } .bi { fill: var(--bat-ink) }
+::selection { background: var(--led); color: #191b1a }
+.mapwrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 22px; align-items: start }
+@media (max-width: 800px) { .mapwrap { grid-template-columns: minmax(0, 1fr) } }
+.dial { display: grid; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; background: var(--paper) }
+.dial label { font-size: 14px; color: var(--ink2) }
+.dial .row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap }
+.dial input[type=range] { flex: 1 1 220px; min-width: 0; height: 40px; accent-color: var(--dc) }
+.dial output { font: 600 30px/1 var(--mono); font-variant-numeric: tabular-nums; min-width: 4.4ch; text-align: right }
+.dial .ends { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); gap: 12px }
+.readout { font-size: 15px; color: var(--ink2); margin: 0; line-height: 1.6 } .readout b { font-variant-numeric: tabular-nums } .readout .bigv { font: 600 28px/1.25 var(--mono); color: var(--ink); display: block; font-variant-numeric: tabular-nums }
+@keyframes blink { 0%, 100% { opacity: 1 } 50% { opacity: .25 } }
+.blink { animation: blink 1.8s ease-in-out infinite }
+@media (prefers-reduced-motion: reduce) { .blink { animation: none } }
+</style>
+
+<main class="page">
+  <header>
+    <h1>AI 데이터센터는 전기를 얼마나 쓸까<span>공개된 자료로는 정확히 알 수 없다. 한국전력이 공개한 것은 쓴 전기가 아니라 계약한 전력이다. 2023년 말 데이터센터 150곳이 1,986MW를 계약했다. 이 전력을 1년 내내 쉬지 않고 전부 써도 17.4TWh로, 전국 판매전력량의 3.2%가 상한이다. 계약전력의 71%는 수도권에 있다. 견줘 보면 반도체 같은 전자·통신 제조업이 한 해 63.5TWh를 쓴다.</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 44</dd>
+      <dt>한 줄</dt><dd>한국전력의 데이터센터 전기공급 현황(2023년 12월 31일)으로는 서울 48곳 653MW, 경기 34곳 681MW, 인천 8곳 69MW다. 계약전력의 절반을 쓴다고 가정하면 8.7TWh로 전국의 1.6%이고, 제주도 전체가 쓰는 전기(6.1TWh)보다 많다. 서울의 데이터센터가 계약전력을 다 쓰면 서울 전기의 11.6%다.</dd>
+      <dt>분류</dt><dd>환경·교통·정치</dd>
+      <dt>본능</dt><dd>크기 본능 · "전기 먹는 하마"라는 말만 듣고, 그 숫자가 전체의 몇 %인지, 그리고 실제 사용량인지 계약한 양인지 묻지 않는다</dd>
+      <dt>그림 방식</dt><dd>서버 랙 불빛 · 랙 하나가 계약전력 20MW인 지도(깜박이는 불빛), 독자가 가동률을 정하면 길이가 바뀌는 LED 막대(1칸 = 1TWh)와 지역별 배터리, 공공 데이터센터 한 곳의 달마다 계량기</dd>
+      <dt>기간</dt><dd>2023년 12월 31일 기준(판매전력량은 2023년, 데이터센터 한 곳은 2020년 1월–2021년 7월)</dd>
+      <dt>엮은 데이터</dt><dd>3개 · 데이터센터 전기공급 현황 · 행정구역별 용도별 판매전력량 · 인천데이터센터 전기사용량</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">전국 데이터센터가 한국전력과 계약한 전력(2023년 말 1,986MW)을 1년 내내 쉬지 않고 전부 쓴다면, 전국에서 쓰는 전기의 몇 %일까?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>A</i>3%쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>13%쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>30%쯤</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">A. <span class="n">3.2%</span></span>
+      1,986MW × 8,760시간 = 17.4TWh이고, 2023년 전국 판매전력량은 546TWh다. 실제로는 계약한 전력을 다 쓰지 않으므로 이보다 적다. 얼마나 적은지는 공개돼 있지 않다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">서버 랙이 선 곳</h2>
+      <p>계약전력 20MW를 서버 랙 하나로 세웠다. 전국 1,986MW가 랙 99개다. 서울에 33개(653MW), 경기에 34개(681MW)가 서 있다. 인천까지 합치면 수도권이 1,403MW로 71%다. 수도권 밖에서는 부산·울산·경남 179MW, 대전·충남 162MW, 강원 85MW 순이다.</p>
+      <p><b>데이터센터 수</b>를 누르면 랙 하나가 데이터센터 한 곳이 된다. 150곳 가운데 서울이 48곳, 경기가 34곳이다. 경기는 서울보다 곳 수가 적은데 계약전력은 더 많다. 한 곳당 계약전력이 경기는 20MW, 서울은 14MW다. 큰 데이터센터는 경기에 있다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">데이터센터 전기공급 현황, 2023년 12월 31일</p>
+      <p class="fs" id="fs1"></p>
+      <div class="chips" id="k1" role="group" aria-label="세는 단위"></div>
+      <div class="mapwrap">
+        <div class="chart" id="c1"></div>
+        <div class="chart" id="c1b"></div>
+      </div>
+      <figcaption>한국전력공사 「데이터센터 전기공급 현황」(공공데이터포털 15127315). 한국전력 지역본부 단위라 대전·충남(세종 포함), 광주·전남, 대구·경북, 부산·울산·경남은 하나로 묶여 있다. 계약전력은 그만큼까지 쓸 수 있게 계약한 양이고 실제 사용량이 아니다. 랙의 자리는 지역 안에 임의로 놓았다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">가동률을 정해 보자</h2>
+      <p>실제로 얼마나 쓰는지는 계약전력 가운데 몇 %를 쓰느냐에 달려 있고, 그 숫자는 공개돼 있지 않다. 그래서 직접 정해 볼 수 있게 했다. 막대를 움직이면 주황 LED 줄이 길어지거나 짧아진다. LED 한 칸이 1TWh다. 아래 파란 줄은 2023년에 실제로 팔린 전기다.</p>
+      <p>가동률을 100%로 올려도 주황 줄은 17.4칸이다. 전국 농림어업이 쓰는 전기(18.8TWh)에 못 미치고, 전자·통신 제조업(63.5TWh)의 4분의 1 남짓이다. 50%로 두면 8.7칸으로 제주도 전체(6.1TWh)보다 많고 서울의 가정이 쓰는 전기(14.7TWh)보다 적다. 어느 쪽이든 전국의 한 자릿수 %다. 다만 이것은 2023년 말의 계약전력으로 그린 것이고, 그 뒤에 늘어난 데이터센터는 들어 있지 않다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">데이터센터가 쓰는 전기(가정)와 다른 전기 사용량</p>
+      <p class="fs">LED 한 칸 = 1TWh(10억 kWh). 주황 = 데이터센터 계약전력 × 내가 정한 가동률 × 1년, 파랑 = 2023년 판매전력량</p>
+      <div class="dial">
+        <label for="util">계약전력 가운데 실제로 쓰는 비율(가동률)</label>
+        <div class="row"><input type="range" id="util" min="0" max="100" step="5" value="50"><output id="uout" for="util">50%</output></div>
+        <div class="ends"><span>0% · 전혀 안 씀</span><span>100% · 하루 종일 최대로</span></div>
+      </div>
+      <p class="readout" id="rd2" aria-live="polite"></p>
+      <div class="chart" id="c2"></div>
+      <figcaption>데이터센터: 한국전력공사 「데이터센터 전기공급 현황」의 계약전력 1,986MW × 8,760시간 × 가동률. 나머지: 한국전력공사 「한국전력통계」 행정구역별 용도별 판매전력량(KOSIS 310 DT_31002_A006), 2023년. 전자·통신 제조업은 2024년에 57.5TWh다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">지역 전기에서 차지하는 몫</h2>
+      <p>같은 가동률로 지역마다 배터리를 채웠다. 배터리 하나가 그 지역에서 한 해에 팔린 전기 전체이고, 채워진 부분이 그 지역 데이터센터의 몫이다. 전국으로는 작아도 서울에서는 작지 않다. 서울의 데이터센터가 계약전력을 다 쓰면 서울 전기의 11.6%다. 가동률 50%에서도 5.8%다.</p>
+      <p>경기는 계약전력이 서울보다 많지만 공장이 많아 전체 사용량이 서울의 세 배 가까이라서, 몫은 4.3%(가동률 100%)에 그친다. 강원이 4.4%로 경기와 비슷하다. 전기를 많이 쓰는 시설이 전기를 적게 쓰는 지역에 들어서면 그 지역의 몫은 크게 움직인다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">지역 판매전력량 가운데 데이터센터의 몫(가정)</p>
+      <p class="fs">배터리 하나 = 그 지역의 2023년 판매전력량 100%. 채운 부분 = 데이터센터 계약전력 × 가동률 × 1년. 눈금은 15%까지</p>
+      <div class="dial">
+        <label for="util2">가동률(위 그림과 함께 움직인다)</label>
+        <div class="row"><input type="range" id="util2" min="0" max="100" step="5" value="50"><output id="uout2" for="util2">50%</output></div>
+      </div>
+      <div class="chart" id="c3"></div>
+      <figcaption>한국전력공사 「데이터센터 전기공급 현황」(2023년 말 계약전력), 「한국전력통계」 행정구역별 판매전력량(2023년). 제주는 데이터센터가 0곳이라 뺐다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">한 곳의 계량기</h2>
+      <p>실제 사용량이 공개된 데이터센터가 하나 있다. 인천시가 운영하는 인천데이터센터다. 2020년 한 해에 463만 kWh를 썼다. 달마다 32만–44만 kWh다. 2020년에 가장 많이 쓴 달은 8월(43만 8천 kWh)이고 2021년 1월(43만 9천 kWh)에도 비슷하게 썼다. 서버는 쉬지 않고 돌기 때문에 달마다 차이가 크지 않다.</p>
+      <p>이 센터가 한 해 쓴 전기를 시간으로 나누면 평균 0.53MW다. 전국 데이터센터의 계약전력 1,986MW는 그 3,800배쯤이다. 데이터센터 한 곳의 평균 계약전력은 13MW(경기는 20MW)로, 이 센터가 평균으로 쓰는 전력의 25배다. 다만 계약전력과 실제로 쓴 전력을 견준 것이라 그대로 "25배 크다"는 뜻은 아니다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">인천데이터센터의 달마다 전기 사용량</p>
+      <p class="fs">만 kWh. 2020년 1월–2021년 7월</p>
+      <div class="chart" id="c4"></div>
+      <figcaption>인천광역시 「인천데이터센터(IDC) 전기사용량 현황」(공공데이터포털 15086512). 지방자치단체가 운영하는 공공 전산 시설 한 곳이고, 민간 데이터센터를 대표하지 않는다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, AI 데이터센터는 전기를 얼마나 쓸까</h2>
+      <p>공개 자료가 답해 주는 것은 여기까지다. 2023년 말 데이터센터가 계약한 전력은 1,986MW이고, 다 써도 전국의 3.2%다. "전기 먹는 하마"라는 말에 견주면 전국 단위로는 아직 작다. 전자·통신 제조업 한 업종이 그 서너 배를 쓴다.</p>
+      <p>하지만 두 가지는 숫자보다 크다. 첫째는 몰려 있다는 것이다. 계약전력의 71%가 수도권에 있고, 서울에서는 전체 전기의 5–12%에 해당할 수 있다. 둘째는 이 자료가 2023년 말에 멈춰 있다는 것이다. AI용 데이터센터가 그 뒤 얼마나 늘었는지, 실제로 얼마를 쓰는지는 한국전력이 사용량을 공개해야 알 수 있다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>이 장의 데이터센터 사용량은 측정값이 아니라 "계약전력 × 가동률"로 만든 범위다. 가동률은 독자가 정하는 가정이고, 실제 값은 공개돼 있지 않다.</li>
+      <li>자료는 2023년 12월 31일 기준 한 시점뿐이다. 그 뒤에 새로 지은 데이터센터와 늘린 계약전력은 들어 있지 않다. 늘어나는 속도는 이 자료로 알 수 없다.</li>
+      <li>"AI 데이터센터"만 따로 나눈 숫자가 아니다. 한국전력이 데이터센터로 분류한 고객 전체이고, 어떤 시설이 여기에 드는지는 파일에 설명이 없다.</li>
+      <li>한국전력과 계약한 전력만 센다. 자체 발전기로 쓰는 전기는 들어 있지 않다.</li>
+      <li>지역은 한국전력 지역본부 단위다. 세종은 대전·충남에 들어 있다고 보고 계산했다.</li>
+      <li>업종별 판매전력량에는 데이터센터나 정보통신업을 따로 나눈 항목이 없다. 그래서 데이터센터가 실제로 쓴 전기를 통계에서 떼어 낼 수 없었다. 2023년에는 서비스업 판매량이 앞뒤 해보다 20TWh쯤 적게 적혀 있어, 서비스업과는 견주지 않았다.</li>
+      <li>전자·통신 제조업에는 반도체뿐 아니라 디스플레이, 통신 장비 등이 함께 들어 있다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15127315/fileData.do" target="_blank" rel="noopener">데이터센터 전기공급 현황</a> (15127315)</td><td>한국전력공사</td><td>지역본부별 고객 호수와 계약전력(MW)</td><td>2023.12.31</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=310&amp;tblId=DT_31002_A006" target="_blank" rel="noopener">행정구역별 용도별 판매전력량</a> (KOSIS 310 DT_31002_A006)</td><td>한국전력공사</td><td>시도별·용도별 판매전력량(MWh)</td><td>2023</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15086512/fileData.do" target="_blank" rel="noopener">인천데이터센터(IDC) 전기사용량 현황</a> (15086512)</td><td>인천광역시</td><td>달마다 전기 사용량(kWh)</td><td>2020.1–2021.7</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>지역본부 11곳의 데이터센터 호수·계약전력 · 시도 17개 × 용도 11가지 판매전력량 · 공공 데이터센터 한 곳의 19개월</dd>
+      <dt>도구</dt><dd>Python(수집·집계) · SVG 서버 랙 지도, LED 막대, 배터리, 계량기 막대(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>계약전력 × 8,760시간 × 가동률 = 연간 사용량의 범위 · 지역 판매전력량 대비 몫 · 수도권 비중 · 연간 사용량 ÷ 시간 = 평균 전력</dd>
+      <dt>검증</dt><dd>지역본부 11곳의 합 = 150호, 1,986MW. 시도별 판매전력량의 합이 전국 합계와 같다. 다른 포털 자료(업종별 전력사용량, 시군구별 용도업종별 전력사용량)에는 데이터센터 항목이 없음을 확인했다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>전기는 어디서 만들고 어디서 쓸까</h3><p>시도별 판매전력량과 발전량을 나란히 놓으면, 전기를 만드는 곳과 쓰는 곳이 얼마나 떨어져 있는지 보인다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=310&amp;tblId=DT_31002_A006" target="_blank" rel="noopener">행정구역별 용도별 판매전력량</a> · 한국전력공사</li></ul></div>
+      <div class="q"><h3>집에서 쓰는 전기는 얼마나 늘었을까</h3><p>가정용 판매전력량은 2010년 61TWh에서 2025년 86TWh가 됐다. 가구 수와 여름 기온으로 나눠 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=310&amp;tblId=DT_31002N_A004" target="_blank" rel="noopener">용도별 판매전력량 추이</a> · 한국전력공사</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다(데이터센터 사용량은 가정한 범위) · 정리 2026.11.16</footer>
+</main>
+
+<script>
+const DATA = {"geo":{"paths":[{"n":"서울","d":"M181,195L184,192L184,190L188,193L192,191L193,186L196,185L197,187L199,187L199,185L201,181L207,181L208,181L208,186L210,190L208,194L212,194L214,192L215,196L213,196L211,200L213,201L212,203L209,204L206,208L203,207L203,204L200,204L197,207L194,206L193,207L190,201L188,203L185,203L186,198L186,196Z"},{"n":"부산","d":"M347,441L348,444L349,446L347,451L347,448L344,444L348,443L346,442ZM347,440L348,439L344,434L347,435L350,433L351,434L351,430L352,429L361,427L362,423L365,423L370,419L372,415L371,414L375,415L377,414L377,412L379,413L382,412L384,414L384,416L386,417L383,418L382,420L381,426L379,432L377,432L377,434L371,435L370,437L371,438L371,440L369,441L366,439L366,437L363,441L363,444L361,442L361,445L358,445L357,439L353,442L348,442ZM369,441L369,441L369,441Z"},{"n":"대구","d":"M323,383L322,383L321,387L317,387L315,388L311,390L313,388L313,386L309,383L310,380L314,381L316,380L315,378L311,375L314,370L318,370L319,368L317,366L311,366L313,361L315,358L317,357L319,358L318,360L321,362L324,357L323,354L325,354L329,353L330,351L337,350L338,350L341,354L340,358L341,360L342,364L338,368L338,370L336,372L337,375L336,379L332,380L330,380L330,377L327,377L323,380Z"},{"n":"인천","d":"M159,226L159,226L159,226ZM128,224L129,225L133,228L129,230L127,226ZM159,226L157,229L155,228L155,223L159,223L160,225ZM160,197L165,199L167,202L161,204L155,209L154,209L152,206L150,206L148,204L153,201L158,201L160,200ZM184,192L181,195L180,202L182,203L182,208L180,209L177,213L176,212L173,216L168,216L167,215L172,215L169,212L169,205L168,207L168,204L170,205L168,201L168,197L166,192L167,191L170,190L172,187L174,187L178,191L180,192ZM172,215L172,215L172,215ZM96,182L94,185L94,182ZM146,176L145,179L150,182L150,184L147,186L145,182L141,179L143,179L143,176ZM21,172L21,172L21,172ZM141,169L147,170L145,173L139,174L139,175L136,173L138,170ZM155,168L160,172L162,175L161,179L162,180L162,183L163,188L161,191L158,190L157,191L152,191L149,187L153,185L151,180L148,178L148,171L151,169L151,168ZM17,168L17,168L17,168ZM17,168L15,170L14,168L16,165L18,166ZM14,152L18,152L18,154L16,155L15,158L10,157L9,152L10,153Z"},{"n":"광주","d":"M181,425L181,427L185,428L191,425L195,425L197,430L198,432L200,431L202,433L201,435L201,437L196,443L194,441L192,442L189,442L184,445L182,444L181,441L179,439L174,440L172,438L172,434L174,433L172,431L174,431L175,429L176,430L179,425Z"},{"n":"대전","d":"M240,327L236,332L231,328L232,325L229,324L229,329L227,333L226,330L224,329L223,326L224,325L221,324L221,319L223,317L223,310L226,309L229,306L229,302L232,302L232,305L237,306L238,304L240,306L240,308L241,310L244,309L245,312L242,313L242,316L241,317L239,325Z"},{"n":"울산","d":"M397,386L397,388L398,390L397,393L398,395L396,403L394,403L394,401L391,397L392,402L391,404L389,404L390,407L391,406L389,413L390,415L388,415L386,417L384,416L384,414L382,412L379,413L377,412L379,410L377,407L375,407L372,406L369,401L365,399L366,398L361,398L361,397L359,395L363,392L363,389L361,389L367,385L368,381L372,380L378,379L382,382L382,385L385,387L390,383Z"},{"n":"세종","d":"M223,282L225,284L222,287L224,288L225,291L227,295L230,295L233,297L233,302L232,302L229,302L229,306L226,309L223,310L220,311L216,307L217,305L214,300L214,298L217,293L213,291L213,282L211,280L213,278L217,279L220,282Z"},{"n":"경기","d":"M180,247L180,247L180,247ZM180,247L181,246L175,240L174,237L176,236L173,235L174,232L172,232L173,228L172,227L173,223L174,225L183,226L183,224L185,224L185,221L182,222L174,219L174,218L169,219L166,222L171,225L172,228L172,230L170,228L166,229L165,232L164,230L164,228L166,227L164,223L170,219L175,217L180,209L182,208L182,203L180,202L181,195L186,196L186,198L185,203L188,203L190,201L193,207L194,206L197,207L200,204L203,204L203,207L206,208L209,204L212,203L213,201L211,200L213,196L215,196L214,192L212,194L208,194L210,190L208,186L208,181L207,181L201,181L199,185L199,187L197,187L196,185L193,186L192,191L188,193L184,190L184,192L180,192L178,191L174,187L172,187L170,190L167,191L165,190L163,185L163,181L162,179L162,175L162,171L166,174L168,174L171,172L173,172L174,167L175,163L174,161L175,158L173,158L174,154L176,152L178,153L181,151L183,152L185,150L190,142L189,139L193,136L194,137L198,136L196,133L197,132L198,129L200,126L208,121L209,122L209,126L213,125L214,129L215,130L215,133L218,136L222,131L224,132L222,135L223,138L225,138L226,140L231,138L234,139L236,139L236,144L237,148L241,150L244,150L244,153L249,154L250,159L249,163L247,162L243,166L243,169L242,171L244,175L241,177L244,178L245,177L245,184L243,185L245,188L249,185L252,187L257,192L261,191L264,192L266,194L268,195L268,197L265,197L261,201L263,201L264,204L265,207L263,212L261,214L262,221L261,221L261,224L260,230L258,233L256,237L252,236L251,241L247,244L245,247L242,245L240,246L238,246L237,249L235,251L232,251L233,254L230,256L228,256L225,258L223,262L222,260L218,258L216,256L212,254L209,254L207,256L202,258L200,258L193,261L192,259L188,256L186,252L183,252L183,248ZM181,245L182,241L181,240L183,238L185,237L180,234L179,236L175,240ZM189,224L189,224L189,224Z"},{"n":"강원","d":"M351,166L351,166L351,166ZM342,153L342,153L342,153ZM339,147L339,147L339,147ZM339,147L343,154L347,159L347,162L351,166L351,167L360,176L362,180L366,183L365,187L365,188L370,193L370,196L371,199L376,205L377,209L381,213L381,214L383,219L385,220L385,222L388,223L387,225L390,227L389,228L389,233L390,236L387,237L385,240L383,239L379,244L380,247L376,247L374,244L369,241L367,242L366,245L360,243L358,243L355,242L353,247L349,246L347,243L346,243L343,242L341,246L342,247L337,247L333,245L331,242L329,243L325,242L322,241L321,238L319,240L316,240L313,238L312,235L308,235L304,238L302,235L307,231L306,229L302,230L301,228L299,228L297,226L293,229L291,227L290,230L287,232L284,232L284,229L282,226L279,225L276,227L274,228L276,232L275,235L273,236L270,235L269,235L264,237L262,235L260,230L261,224L261,221L262,221L261,214L263,212L265,207L264,204L263,201L261,201L265,197L268,197L268,195L266,194L264,192L261,191L257,192L252,187L249,185L245,188L243,185L245,184L245,177L244,178L241,177L244,175L242,171L243,169L243,166L247,162L249,163L250,159L249,154L244,153L244,150L241,150L237,148L236,144L236,139L234,139L231,138L226,140L225,138L223,138L222,135L224,132L222,131L218,136L215,133L215,130L214,129L213,125L209,126L209,122L208,121L211,117L213,119L220,116L223,116L224,118L231,115L236,117L237,116L240,119L247,115L250,116L256,116L260,115L262,115L263,114L266,119L271,117L277,119L280,122L281,121L282,118L285,118L287,118L290,115L293,115L296,112L298,112L300,107L303,105L306,97L306,89L309,87L314,93L313,94L316,101L318,104L317,105L322,112L322,114L325,119L326,123L329,128L330,134L332,138L335,141L336,144ZM370,197L370,197L370,197Z"},{"n":"충북","d":"M223,262L225,258L228,256L230,256L233,254L232,251L235,251L237,249L238,246L240,246L242,245L245,247L247,244L251,241L252,236L256,237L258,233L260,230L262,235L264,237L269,235L270,235L273,236L275,235L276,232L274,228L276,227L279,225L282,226L284,229L284,232L287,232L290,230L291,227L293,229L297,226L299,228L301,228L302,230L306,229L307,231L302,235L304,238L308,235L312,235L313,238L316,240L319,240L321,238L322,241L325,242L329,243L331,242L333,245L332,247L330,246L326,248L327,249L324,252L322,252L321,254L318,256L315,264L317,266L314,270L311,270L310,271L306,270L303,266L300,264L300,267L298,266L298,270L293,269L292,268L289,269L288,272L285,270L283,276L286,279L285,280L282,278L281,280L277,278L277,280L275,282L272,282L271,283L275,284L276,286L275,291L272,288L271,286L269,288L269,290L266,290L264,293L267,294L269,294L271,298L273,298L273,301L271,303L270,307L271,309L270,312L271,313L271,317L269,318L268,320L269,324L271,324L273,321L273,323L278,326L282,324L284,326L283,327L285,331L281,330L279,332L280,336L280,338L278,339L278,344L275,346L274,346L271,349L269,347L264,349L257,348L255,345L253,347L252,344L250,340L248,338L249,335L248,333L248,329L247,328L244,329L243,326L240,327L239,325L241,317L242,316L242,313L245,312L244,309L241,310L240,308L240,306L238,304L237,306L232,305L232,302L233,302L233,297L230,295L227,295L225,291L224,288L222,287L225,284L223,282L225,281L225,279L228,278L227,276L231,275L233,277L234,275L232,273L233,272L229,268L227,268L227,266L225,265L225,263Z"},{"n":"충남","d":"M150,292L150,292L150,292ZM150,292L150,292L150,292ZM150,292L150,297L153,302L153,306L155,308L154,311L152,309L150,310L149,307L146,307L146,296L145,293L149,290ZM133,276L133,276L133,276ZM133,276L133,276L133,276ZM176,251L176,251L176,251ZM176,251L183,254L183,254L186,262L189,263L192,262L193,261L200,258L202,258L207,256L209,254L212,254L216,256L218,258L222,260L223,262L225,263L225,265L227,266L227,268L229,268L233,272L232,273L234,275L233,277L231,275L227,276L228,278L225,279L225,281L223,282L220,282L217,279L213,278L211,280L213,282L213,291L217,293L214,298L214,300L217,305L216,307L220,311L223,310L223,317L221,319L221,324L224,325L223,326L224,329L226,330L227,333L229,329L229,324L232,325L231,328L236,332L240,327L243,326L244,329L247,328L248,329L248,333L249,335L248,338L250,340L252,344L250,344L249,351L248,349L243,347L243,351L241,353L237,353L235,348L232,350L231,349L229,346L229,340L227,338L225,339L222,340L221,340L220,343L218,341L211,343L210,345L207,344L205,342L205,339L201,336L197,336L194,338L191,337L190,340L190,344L186,346L185,348L180,349L179,350L179,351L173,350L174,348L167,338L165,338L163,336L161,336L163,331L162,327L164,325L160,319L163,317L164,316L161,313L159,313L160,308L158,304L159,299L157,296L158,295L156,292L153,290L149,289L147,290L145,292L143,292L144,289L143,285L141,284L141,278L139,279L138,282L136,284L132,283L132,281L133,280L136,281L138,279L135,276L133,276L131,276L132,278L130,280L131,277L129,274L131,274L133,268L136,266L135,263L136,261L140,260L142,261L143,258L143,254L145,256L144,259L146,263L143,267L145,267L143,269L143,271L144,270L147,269L145,267L147,265L149,268L149,264L152,263L155,261L153,260L154,258L151,258L147,254L150,255L150,253L146,253L147,251L151,250L154,250L158,250L157,249L159,245L162,245L162,247L171,251ZM159,300L159,300L159,300ZM169,302L167,304L166,303L162,306L163,307L165,306L165,304L168,304ZM162,318L162,318L162,318Z"},{"n":"전북","d":"M176,352L176,352L176,352ZM252,344L253,347L255,345L257,348L264,349L269,347L271,349L271,351L272,353L273,357L271,358L271,360L269,360L268,364L266,364L261,367L260,367L258,371L253,375L253,380L252,382L250,386L251,389L250,389L249,392L247,395L250,398L253,402L251,403L252,406L254,406L253,409L251,411L249,414L250,416L249,419L247,420L240,415L235,414L231,420L229,418L225,420L221,419L218,417L217,419L215,417L212,420L209,420L204,418L206,416L205,412L203,413L204,408L203,407L203,404L200,404L200,407L198,408L198,410L195,411L194,410L190,404L187,404L188,403L185,402L185,404L181,404L179,406L180,409L179,413L175,416L173,415L172,418L168,417L167,418L167,420L164,419L163,420L161,418L161,414L158,412L159,410L158,408L156,408L154,407L159,399L159,400L162,397L168,397L169,394L172,394L174,395L174,394L172,393L166,392L161,393L157,390L157,387L165,381L166,382L170,376L170,372L177,371L175,367L174,362L169,362L169,357L167,356L167,359L165,357L163,358L160,366L158,370L156,370L155,368L158,369L160,366L163,358L162,354L171,353L176,352L178,353L181,350L179,350L180,349L185,348L186,346L190,344L190,340L191,337L194,338L197,336L201,336L205,339L205,342L207,344L210,345L211,343L218,341L220,343L221,340L222,340L225,339L227,338L229,340L229,346L231,349L232,350L235,348L237,353L241,353L243,351L243,347L248,349L249,351L250,344Z"},{"n":"전남","d":"M164,530L164,531L170,532L166,532L166,533L162,536L160,534L160,532ZM172,528L175,530L173,531L174,533L173,537L171,536L171,534L172,531L171,530ZM191,526L194,531L193,533L191,533L188,531L189,528ZM165,525L169,526L169,530L167,529L167,531L164,529ZM187,517L187,517L187,517ZM203,514L203,514L203,514ZM203,514L203,514L203,514ZM187,517L185,516L184,517L182,515L184,515L187,513L191,515L188,518ZM203,514L201,513L201,511L204,512L204,513L206,512L208,515L205,516ZM176,509L176,509L176,509ZM176,509L178,510L179,514L182,520L176,519L172,514L171,510L172,509ZM196,509L196,512L193,513L189,511L191,508L193,509ZM173,507L173,507L173,507ZM187,505L189,509L187,511L184,510L181,513L182,510L181,510L181,508L183,505ZM191,503L191,503L191,503ZM239,502L241,502L243,504L244,506L240,507L240,506L237,504L237,501ZM218,499L219,501L217,506L214,505L210,506L208,502L210,500L211,502L215,499ZM262,496L262,496L262,496ZM183,496L183,496L183,496ZM238,495L239,495L238,498L241,500L237,501L237,499L235,497ZM184,494L184,494L184,494ZM262,496L264,500L260,499L256,495L261,494ZM140,491L144,492L146,495L147,495L151,499L149,504L145,509L143,508L145,511L139,511L137,512L134,513L133,512L130,513L131,511L129,510L127,507L129,503L134,500L139,495ZM124,486L125,486L129,490L127,492L128,493L124,496L122,495L125,494L127,491ZM121,486L123,486L122,488L124,489L124,492L121,493L122,490L121,488ZM133,482L136,486L130,488L129,485ZM74,480L75,481L73,483L72,487L70,485L73,479ZM263,478L261,479L264,483L265,486L264,491L261,490L257,487L258,484L261,481L259,476ZM254,475L254,475L254,475ZM117,477L119,477L121,480L116,483L114,481L113,482L113,478ZM128,473L130,472L131,474L134,474L134,479L132,479L131,477L126,478L125,476L127,472ZM149,472L150,472L149,475ZM119,469L119,472L120,472L117,475L115,475L115,477L112,477L111,476L112,472L114,472ZM131,466L131,466L131,466ZM143,465L143,465L143,465ZM129,462L131,462L132,465L129,467L129,470L126,470L123,468L126,468L125,465L126,464L129,465ZM143,465L141,466L138,465L142,463L142,461L144,461L142,459L144,458L148,460L146,461L146,463L149,463L150,466L148,468L146,467L147,465ZM125,457L127,459L127,463L123,465L121,463L119,463L121,459L123,459ZM260,456L263,458L263,461L261,459L257,458L257,457L259,455ZM262,459L262,459L262,459ZM131,447L133,448L134,453L131,453L130,450L128,450ZM124,443L124,443L124,443ZM124,443L123,442L129,436L130,443L128,445L124,444ZM191,503L190,503L191,505L188,504L185,503L183,498L184,494L183,491L182,489L181,493L181,499L179,500L180,501L178,504L176,505L174,507L173,507L169,510L170,513L168,517L165,516L164,518L161,519L161,517L162,515L162,512L159,512L158,510L160,510L159,508L161,507L161,505L158,506L157,504L158,502L157,499L158,498L157,496L155,494L150,495L151,494L142,489L143,486L141,485L141,479L142,479L143,473L147,475L146,477L148,480L151,476L149,475L150,473L156,471L155,470L151,471L148,470L151,466L153,465L151,461L152,458L151,458L152,454L150,450L149,453L150,454L149,458L146,458L146,455L144,453L144,451L146,453L149,451L147,450L151,448L150,445L148,446L147,441L145,441L144,444L141,445L142,447L140,449L138,448L139,446L138,444L134,444L133,440L135,439L140,440L139,439L141,436L146,437L148,434L146,440L148,443L150,444L152,442L153,444L151,446L152,447L157,442L155,441L157,440L154,439L148,432L150,429L147,431L144,429L145,425L147,422L149,422L152,414L153,409L156,408L158,408L159,410L158,412L161,414L161,418L163,420L164,419L167,420L167,418L168,417L172,418L173,415L175,416L179,413L180,409L179,406L181,404L185,404L185,402L188,403L187,404L190,404L194,410L195,411L198,410L198,408L200,407L200,404L203,404L203,407L204,408L203,413L205,412L206,416L204,418L209,420L212,420L215,417L217,419L218,417L221,419L225,420L229,418L231,420L235,414L240,415L247,420L250,427L250,432L256,437L256,439L260,444L262,445L264,449L261,453L262,456L260,456L259,454L256,458L254,457L254,459L252,461L250,458L248,458L250,461L248,462L249,465L251,465L251,467L254,466L256,464L262,463L263,464L262,469L260,472L261,476L257,477L253,474L252,478L250,479L251,481L251,486L248,484L246,486L244,481L246,479L244,478L247,476L248,474L245,469L242,469L244,465L243,465L242,462L240,462L240,465L238,465L232,467L229,466L232,468L234,468L231,471L233,473L230,475L231,477L235,481L238,483L237,485L240,486L241,489L239,491L236,491L235,490L232,493L235,494L234,496L226,502L227,503L226,505L224,502L222,501L223,499L221,497L219,497L218,495L212,497L210,496L209,493L212,490L214,490L214,486L216,484L219,484L219,480L222,477L223,483L226,483L227,479L227,474L224,476L221,476L220,473L217,476L216,479L215,480L209,480L209,482L206,483L204,486L200,487L198,500L197,502L195,501L195,504ZM158,476L157,477L154,475L154,477L151,477L157,478ZM181,425L179,425L176,430L175,429L174,431L172,431L174,433L172,434L172,438L174,440L179,439L181,441L182,444L184,445L189,442L192,442L194,441L196,443L201,437L201,435L202,433L200,431L198,432L197,430L195,425L191,425L185,428L181,427Z"},{"n":"경북","d":"M399,382L399,382L399,382ZM393,347L393,347L393,347ZM394,344L394,344L394,344ZM395,262L395,262L395,262ZM395,262L395,266L398,270L400,274L399,276L399,281L397,284L395,287L394,293L396,296L397,300L396,303L396,309L393,315L392,318L391,326L392,330L391,331L393,335L393,338L396,340L394,344L392,345L392,348L393,347L393,349L396,351L402,349L405,343L407,343L408,349L405,353L406,354L403,359L404,361L403,364L404,364L401,373L401,376L399,382L397,386L390,383L385,387L382,385L382,382L378,379L372,380L368,381L367,385L361,389L360,390L356,387L354,387L351,389L348,392L345,392L344,394L342,394L339,393L337,393L336,391L333,391L329,393L327,391L324,388L323,383L323,380L327,377L330,377L330,380L332,380L336,379L337,375L336,372L338,370L338,368L342,364L341,360L340,358L341,354L338,350L337,350L330,351L329,353L325,354L323,354L324,357L321,362L318,360L319,358L317,357L315,358L313,361L311,366L317,366L319,368L318,370L314,370L311,375L315,378L316,380L314,381L310,380L309,383L313,386L313,388L311,390L309,386L305,385L302,387L297,386L294,384L297,382L296,376L294,375L293,372L292,373L291,369L286,367L285,368L282,368L279,365L275,365L274,362L272,362L271,360L271,358L273,357L272,353L271,351L271,349L274,346L275,346L278,344L278,339L280,338L280,336L279,332L281,330L285,331L283,327L284,326L282,324L278,326L273,323L273,321L271,324L269,324L268,320L269,318L271,317L271,313L270,312L271,309L270,307L271,303L273,301L273,298L271,298L269,294L267,294L264,293L266,290L269,290L269,288L271,286L272,288L275,291L276,286L275,284L271,283L272,282L275,282L277,280L277,278L281,280L282,278L285,280L286,279L283,276L285,270L288,272L289,269L292,268L293,269L298,270L298,266L300,267L300,264L303,266L306,270L310,271L311,270L314,270L317,266L315,264L318,256L321,254L322,252L324,252L327,249L326,248L330,246L332,247L333,245L337,247L342,247L341,246L343,242L346,243L347,243L349,246L353,247L355,242L358,243L360,243L366,245L367,242L369,241L374,244L376,247L380,247L379,244L383,239L385,240L387,237L390,236L391,240L393,243L395,245L394,248L395,256ZM592,227L592,227L592,227ZM592,227L592,227L592,227ZM515,196L515,202L511,205L507,203L505,199L509,197Z"},{"n":"경남","d":"M309,466L312,468L313,466L316,467L316,472L313,473L312,470L310,470L311,468L308,467ZM273,464L273,464L273,464ZM283,458L281,463L284,460L286,463L286,466L283,465L282,466L278,465L278,463L281,458ZM267,456L267,456L267,456ZM273,464L276,469L280,466L283,466L286,468L285,470L285,475L283,477L281,478L277,478L276,475L277,472L275,472L273,473L274,476L272,477L268,475L269,473L266,466L265,464L267,460L270,459L269,458L270,456L272,455L275,456L274,461L273,461ZM282,447L282,447L282,447ZM335,471L332,472L333,476L331,476L332,478L330,479L327,479L329,476L327,476L327,473L325,470L328,470L328,467L327,464L326,466L323,466L322,469L319,466L319,462L320,460L323,457L326,460L327,459L331,460L328,456L329,453L332,454L333,451L335,450L335,447L338,447L338,449L337,453L339,455L339,459L337,461L338,463L340,461L340,465L337,465L340,470L338,470L338,468L334,469ZM318,441L318,441L318,441ZM318,441L319,442L310,445L312,447L317,445L318,443L319,444L319,447L321,448L318,451L316,451L316,453L314,459L315,462L317,459L319,461L317,465L313,466L310,465L312,463L311,461L311,463L309,461L306,462L305,460L309,459L308,455L305,456L305,458L303,459L300,455L296,456L297,460L293,459L291,461L288,457L285,457L283,454L285,453L284,451L285,449L284,445L285,442L283,443L282,447L279,445L282,449L279,452L278,450L275,452L276,450L274,449L272,454L266,455L264,457L262,453L261,453L264,449L262,445L260,444L256,439L256,437L250,432L250,427L247,420L249,419L250,416L249,414L251,411L253,409L254,406L252,406L251,403L253,402L250,398L247,395L249,392L250,389L251,389L250,386L252,382L253,380L253,375L258,371L260,367L261,367L266,364L268,364L269,360L271,360L272,362L274,362L275,365L279,365L282,368L285,368L286,367L291,369L292,373L293,372L294,375L296,376L297,382L294,384L297,386L302,387L305,385L309,386L311,390L315,388L317,387L321,387L322,383L323,383L324,388L327,391L329,393L333,391L336,391L337,393L339,393L342,394L344,394L345,392L348,392L351,389L354,387L356,387L360,390L361,389L363,389L363,392L359,395L361,397L361,398L366,398L365,399L369,401L372,406L375,407L377,407L379,410L377,412L377,414L375,415L371,414L372,415L370,419L365,423L362,423L361,427L352,429L351,430L351,434L350,433L347,435L344,434L348,439L347,440L347,441L346,442L344,442L345,440L344,439L342,442L340,442L337,438L336,436L334,436L331,435L330,437L328,433L328,429L326,432L329,436L329,440L331,442L329,442L329,444L326,442L328,441L325,440L324,438L322,440L321,439L317,440Z"},{"n":"제주","d":"M141,632L141,632L141,632ZM138,604L138,604L138,604ZM138,604L138,604L138,604ZM192,594L192,594L192,594ZM179,590L179,590L179,590ZM192,594L192,597L194,599L193,606L191,607L188,613L187,615L182,615L181,616L171,619L168,621L166,620L162,621L158,623L156,621L153,620L149,622L146,621L142,625L139,621L134,619L133,616L133,612L138,606L141,604L141,602L144,601L146,599L156,596L160,594L161,594L168,592L171,592L172,591L173,592L179,590L182,590L186,590L186,592L189,593L191,593Z"}],"cen":{"서울":[199.4,195.1],"부산":[365.6,433.8],"대구":[328.3,361.8],"인천":[161.9,199.2],"광주":[189.6,436.0],"대전":[232.5,317.8],"울산":[387.3,395.4],"세종":[221.0,295.2],"경기":[206.0,201.1],"강원":[309.3,175.4],"충북":[263.0,277.8],"충남":[189.2,301.4],"전북":[209.3,378.5],"전남":[189.9,460.6],"경북":[345.7,315.7],"경남":[304.4,424.0],"제주":[164.4,607.2],"창원":[330.2,430.2]},"box":[60.599999999999994,87.1,534.7,636.7]},"dc":[{"n":"서울","cnt":48,"mw":653,"sido":["서울"],"sales23":49218956.0,"svc23":29153018.0,"full":5720280},{"n":"인천","cnt":8,"mw":69,"sido":["인천"],"sales23":25875669.0,"svc23":7361938.0,"full":604440},{"n":"경기","cnt":34,"mw":681,"sido":["경기"],"sales23":140312047.0,"svc23":35224624.0,"full":5965560},{"n":"강원","cnt":7,"mw":85,"sido":["강원"],"sales23":17114657.0,"svc23":6212163.0,"full":744600},{"n":"충북","cnt":4,"mw":30,"sido":["충북"],"sales23":29450797.0,"svc23":4001572.0,"full":262800},{"n":"대전충남","cnt":17,"mw":162,"sido":["대전","충남","세종"],"sales23":63484373.0,"svc23":9867199.0,"full":1419120},{"n":"전북","cnt":1,"mw":2,"sido":["전북"],"sales23":21443448.0,"svc23":4411432.0,"full":17520},{"n":"광주전남","cnt":9,"mw":62,"sido":["광주","전남"],"sales23":43068108.0,"svc23":7344188.0,"full":543120},{"n":"대구경북","cnt":7,"mw":63,"sido":["대구","경북"],"sales23":60186450.0,"svc23":12219151.0,"full":551880},{"n":"부산울산경남","cnt":15,"mw":179,"sido":["부산","울산","경남"],"sales23":89733588.0,"svc23":16686486.0,"full":1568040},{"n":"제주","cnt":0,"mw":0,"sido":["제주"],"sales23":6077863.0,"svc23":2874554.0,"full":0}],"dcTot":{"cnt":150,"mw":1986},"years":[2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],"sido":["서울","부산","대구","인천","광주","대전","울산","세종","경기","강원","충북","충남","전북","전남","경북","경남","제주"],"sales":{"합계":{"계":[434160228.0,455070261.0,466592949.0,474848580.0,477591701.0,483654816.0,497038904.0,507746386.0,526149160.0,520498738.0,509269715.0,533430811.0,547932742.0,545965955.0,549820665.0,549417259.0],"서울":[47295094.0,46902991.0,47234102.0,46555105.0,45018862.0,45381484.0,46493234.0,46298158.0,47810210.0,47167205.0,45787926.0,47295807.0,48788677.0,49218956.0,50351994.0,51137877.0],"부산":[20263683.0,20561980.0,20664842.0,20364705.0,19980898.0,20002307.0,20467093.0,21007358.0,21216605.0,20802410.0,20503969.0,21067833.0,21493648.0,21555665.0,21851300.0,22099968.0],"대구":[14479994.0,14821949.0,14954958.0,15080052.0,14858786.0,14947708.0,15268114.0,15386372.0,15675749.0,15265584.0,14758568.0,15443949.0,16039260.0,16288850.0,16746899.0,16726373.0],"인천":[21827575.0,22241135.0,22651946.0,22673441.0,22578048.0,23211766.0,23875857.0,24515313.0,24921926.0,24280690.0,23638583.0,24901194.0,25506864.0,25875669.0,25964395.0,26344736.0],"광주":[7860058.0,8047387.0,8130493.0,8274074.0,8197276.0,8333873.0,8558369.0,8683649.0,8773811.0,8603297.0,8531108.0,8973447.0,9116871.0,9083242.0,9343348.0,9337863.0],"대전":[8867404.0,9059777.0,9160107.0,9225140.0,9102524.0,9182737.0,9379633.0,9423804.0,9648827.0,9415699.0,9405221.0,9748621.0,10016877.0,9922139.0,10169884.0,10349066.0],"울산":[26515704.0,28198241.0,29362724.0,29992969.0,30115124.0,30286140.0,32095217.0,31609850.0,33748169.0,34138999.0,33157834.0,33593123.0,32919181.0,31826127.0,31919081.0,30098713.0],"세종":[0.0,0.0,578610.0,2345527.0,2437032.0,2641139.0,2801866.0,2918758.0,3087693.0,3226179.0,3393223.0,4295363.0,3182079.0,3935500.0,4151676.0,4298526.0],"경기":[93074874.0,96844504.0,100291952.0,102227067.0,102180707.0,105048003.0,109403901.0,114847859.0,122695954.0,123022307.0,124688964.0,133445948.0,140531012.0,140312047.0,143301641.0,145316214.0],"강원":[14848026.0,15876040.0,15904382.0,15794741.0,15778145.0,16206618.0,16498768.0,16552836.0,16845836.0,16368275.0,16120067.0,16808006.0,17325520.0,17114657.0,16688343.0,16427302.0],"충북":[19444836.0,20453357.0,21361911.0,21665043.0,22179261.0,22949032.0,24008863.0,24843477.0,26239895.0,26732303.0,26901894.0,28402063.0,29412227.0,29450797.0,27567058.0,26913056.0],"충남":[38809312.0,42650115.0,44492412.0,45466812.0,47294961.0,47286062.0,48453931.0,50180209.0,52012705.0,52644854.0,50422732.0,48801626.0,50259638.0,49626734.0,50036920.0,49905693.0],"전북":[18949073.0,21168359.0,21462325.0,21708655.0,22297413.0,22086860.0,22733495.0,22799647.0,22961959.0,22280693.0,20538912.0,21486861.0,21838474.0,21443448.0,21640147.0,21725065.0],"전남":[25059932.0,27136864.0,28484719.0,30302068.0,31722944.0,32637829.0,33096902.0,33562076.0,34118388.0,32385388.0,30973975.0,33486886.0,34665105.0,33984866.0,33580744.0,33379687.0],"경북":[41589052.0,44167299.0,44799525.0,45444247.0,46016364.0,44956836.0,44647503.0,45455611.0,45958814.0,44314767.0,41001627.0,44258297.0,44601033.0,43897600.0,43732809.0,42556884.0],"경남":[31549221.0,33071204.0,33014947.0,33530619.0,33435157.0,33876325.0,34497477.0,34647864.0,35158610.0,34472017.0,34069974.0,35734059.0,36190920.0,36351796.0,36577870.0,36569834.0],"제주":[3574624.0,3710080.0,3864639.0,4094900.0,4220090.0,4429553.0,4738201.0,5013545.0,5272604.0,5374285.0,5373288.0,5687730.0,6045356.0,6077863.0,6196556.0,6230402.0]},"가정용":{"계":[61194167.0,61564248.0,63536151.0,63970473.0,62675313.0,63794045.0,66173065.0,66517356.0,70687230.0,70455408.0,74073576.0,77558386.0,78557569.0,79885924.0,84426796.0,85831652.0],"서울":[13082017.0,12951729.0,13401442.0,13319847.0,12892129.0,12964825.0,13311577.0,13131172.0,13766796.0,13499066.0,13982706.0,14656127.0,14550103.0,14692966.0,15336443.0,15545769.0],"부산":[4359192.0,4344476.0,4442765.0,4437009.0,4309603.0,4352290.0,4472262.0,4473510.0,4660700.0,4624742.0,4837487.0,4974889.0,5054430.0,5143237.0,5441256.0,5504823.0],"대구":[3057073.0,3027758.0,3050594.0,3076642.0,2973764.0,3024175.0,3143661.0,3151904.0,3314918.0,3252483.0,3411777.0,3461331.0,3580477.0,3643338.0,3935409.0,3991306.0],"인천":[3321915.0,3390185.0,3594327.0,3643784.0,3596277.0,3662376.0,3819581.0,3856852.0,4112199.0,4121503.0,4294880.0,4586787.0,4704964.0,4909826.0,5244285.0,5425742.0],"광주":[1737371.0,1744357.0,1760440.0,1850640.0,1841416.0,1880747.0,1948144.0,1954876.0,2056435.0,2038974.0,2154034.0,2215918.0,2249750.0,2261231.0,2401829.0,2420053.0],"대전":[1782091.0,1804496.0,1846191.0,1856172.0,1826425.0,1849215.0,1899110.0,1872890.0,1970225.0,1938646.0,2019639.0,2102655.0,2142124.0,2171029.0,2312804.0,2362400.0],"울산":[1385012.0,1387237.0,1415434.0,1445229.0,1419552.0,1450241.0,1488489.0,1487143.0,1552259.0,1546257.0,1611703.0,1638730.0,1648161.0,1655912.0,1765791.0,1789595.0],"세종":[0.0,0.0,35895.0,157398.0,192589.0,272724.0,333148.0,384903.0,470529.0,507708.0,558990.0,612111.0,645445.0,663134.0,708491.0,719458.0],"경기":[14496372.0,14727284.0,15445318.0,15554163.0,15291673.0,15607128.0,16311036.0,16587710.0,18016468.0,18228495.0,19387551.0,20775255.0,21128150.0,21681941.0,22962874.0,23504294.0],"강원":[1827988.0,1844749.0,1876292.0,1885497.0,1868276.0,1888434.0,1928362.0,1940933.0,2060399.0,2081091.0,2197106.0,2289719.0,2332245.0,2347691.0,2433938.0,2477590.0],"충북":[1836657.0,1861050.0,1898041.0,1915496.0,1891278.0,1940308.0,2011175.0,2027281.0,2184846.0,2179834.0,2291890.0,2385627.0,2434713.0,2467050.0,2598278.0,2658720.0],"충남":[2424496.0,2474957.0,2518449.0,2448583.0,2423744.0,2509792.0,2629227.0,2691823.0,2897959.0,2887132.0,3038547.0,3184715.0,3250542.0,3343172.0,3564940.0,3620803.0],"전북":[2204505.0,2230907.0,2268132.0,2282596.0,2236213.0,2276416.0,2340425.0,2326183.0,2431432.0,2397330.0,2519052.0,2588903.0,2597581.0,2608515.0,2734491.0,2738331.0],"전남":[2131937.0,2150657.0,2187655.0,2206805.0,2163133.0,2205174.0,2281952.0,2284124.0,2380293.0,2358630.0,2500682.0,2578822.0,2606963.0,2630641.0,2768978.0,2772627.0],"경북":[3053418.0,3083420.0,3133988.0,3177243.0,3118273.0,3176918.0,3293587.0,3302463.0,3498309.0,3466430.0,3631035.0,3709248.0,3763344.0,3737831.0,3927706.0,3963937.0],"경남":[3891355.0,3928248.0,4026934.0,4055225.0,3983189.0,4057544.0,4226226.0,4260988.0,4482335.0,4475992.0,4718536.0,4826057.0,4863308.0,4912623.0,5210684.0,5254195.0],"제주":[602705.0,612721.0,634238.0,658131.0,647664.0,675632.0,735092.0,782601.0,831090.0,850989.0,917914.0,971492.0,1005271.0,1015787.0,1078599.0,1082008.0]},"공공용":{"계":[19871542.0,20539308.0,21422339.0,21982157.0,21669250.0,22178571.0,22908419.0,23604532.0,24568575.0,24458147.0,23622904.0,25025912.0,26218458.0,26604249.0,27108812.0,27922698.0],"서울":[3551453.0,3539259.0,3624262.0,3678016.0,3577029.0,3639448.0,3665453.0,3581534.0,3718778.0,3697299.0,3432231.0,3575378.0,3731551.0,3801000.0,3830364.0,3931469.0],"부산":[1180519.0,1244280.0,1279869.0,1211194.0,1167560.0,1174232.0,1220802.0,1305876.0,1345988.0,1332992.0,1249802.0,1280159.0,1318967.0,1318707.0,1339656.0,1360389.0],"대구":[585212.0,639385.0,661680.0,720295.0,720034.0,747243.0,779742.0,826396.0,863982.0,852760.0,808903.0,866403.0,896890.0,919691.0,954150.0,973255.0],"인천":[843201.0,855575.0,892624.0,907600.0,885272.0,901663.0,891181.0,921748.0,951152.0,947488.0,871533.0,943788.0,1061842.0,1096854.0,1115953.0,1155140.0],"광주":[468853.0,479558.0,495329.0,508170.0,490832.0,519066.0,549136.0,565527.0,577510.0,574010.0,524607.0,568578.0,596484.0,606241.0,610915.0,626600.0],"대전":[923198.0,974860.0,1009641.0,994017.0,996964.0,948718.0,945572.0,954681.0,1031276.0,1042761.0,1029942.0,1107741.0,1196638.0,1140535.0,1102742.0,1124563.0],"울산":[288764.0,344663.0,372416.0,416334.0,420002.0,433216.0,450158.0,489865.0,506777.0,479123.0,457346.0,505195.0,540143.0,553125.0,568276.0,570475.0],"세종":[0.0,0.0,32970.0,158417.0,192574.0,246413.0,274841.0,299675.0,317409.0,329515.0,326228.0,342947.0,369610.0,383229.0,390975.0,399394.0],"경기":[4843835.0,4889042.0,5125386.0,5265656.0,5137297.0,5127615.0,5337048.0,5533662.0,5763235.0,5768005.0,5665320.0,5941474.0,6148678.0,6366362.0,6522800.0,6759835.0],"강원":[1144266.0,1186992.0,1229972.0,1227319.0,1234181.0,1302530.0,1338782.0,1400421.0,1496466.0,1435426.0,1385801.0,1478686.0,1562036.0,1575416.0,1619228.0,1675118.0],"충북":[949999.0,1090487.0,1123754.0,1157096.0,1140218.0,1192535.0,1204239.0,1267140.0,1301822.0,1315758.0,1265385.0,1360538.0,1414053.0,1419800.0,1437504.0,1489426.0],"충남":[982272.0,1033217.0,1049549.0,1026569.0,992261.0,1007144.0,1065147.0,1089613.0,1135633.0,1121458.0,1061727.0,1121942.0,1205339.0,1220812.0,1245781.0,1299349.0],"전북":[808956.0,853924.0,879868.0,905862.0,905035.0,997780.0,1057537.0,1096968.0,1132037.0,1117306.0,1066828.0,1082470.0,1117563.0,1136577.0,1160667.0,1180221.0],"전남":[724215.0,772159.0,835185.0,848671.0,854225.0,888012.0,930548.0,964024.0,995476.0,1000292.0,1177568.0,1373405.0,1384767.0,1341290.0,1388421.0,1411734.0],"경북":[1267612.0,1293506.0,1364412.0,1416472.0,1411809.0,1460187.0,1522577.0,1578115.0,1648637.0,1661268.0,1586986.0,1706260.0,1790827.0,1799956.0,1846306.0,1904464.0],"경남":[1086368.0,1113725.0,1198079.0,1287147.0,1294726.0,1329556.0,1388559.0,1427560.0,1465601.0,1456429.0,1395218.0,1437292.0,1522501.0,1552871.0,1596999.0,1667695.0],"제주":[219642.0,226199.0,243851.0,250462.0,246012.0,259990.0,286688.0,301727.0,315891.0,323854.0,316304.0,333656.0,360568.0,371784.0,378075.0,393570.0]},"서비스업":{"계":[129923067.0,130762276.0,132498774.0,132054877.0,128629517.0,132049197.0,137982086.0,140952297.0,149983025.0,148310526.0,144443994.0,148181597.0,155219784.0,135356324.0,161049216.0,164066494.0],"서울":[28311959.0,28144047.0,28116229.0,27462677.0,26463097.0,26735844.0,27585977.0,27647345.0,28584165.0,28337213.0,26860179.0,27499011.0,28974161.0,29153018.0,29813740.0,30331560.0],"부산":[7589828.0,7434380.0,7337031.0,7330290.0,7141257.0,7211682.0,7539824.0,7582169.0,7736225.0,7510465.0,7416837.0,7507103.0,7934443.0,7614648.0,8234870.0,8453559.0],"대구":[5306065.0,5337494.0,5378230.0,5308713.0,5137239.0,5203463.0,5368813.0,5470438.0,5675069.0,5591492.0,5406278.0,5562421.0,5850911.0,5425031.0,6061851.0,6085946.0],"인천":[6113408.0,6256396.0,6326536.0,6281839.0,6175099.0,6364880.0,6846858.0,7154416.0,7820525.0,7797607.0,7391006.0,7572381.0,8047040.0,7361938.0,8642070.0,8939487.0],"광주":[2972508.0,2997554.0,3036596.0,3031697.0,2985154.0,3036910.0,3115344.0,3174973.0,3293830.0,3234348.0,3165538.0,3272320.0,3388222.0,3155443.0,3479209.0,3506064.0],"대전":[3724977.0,3720508.0,3760029.0,3758077.0,3640153.0,3779404.0,3935470.0,3955921.0,4107000.0,4067843.0,4026171.0,4112045.0,4281816.0,4197137.0,4548813.0,4664868.0],"울산":[2620468.0,2927722.0,3440380.0,3675815.0,3392090.0,3495222.0,3843139.0,3649386.0,3982738.0,3780243.0,3614653.0,3497844.0,3481349.0,1239957.0,3738492.0,3856670.0],"세종":[0.0,0.0,107229.0,476738.0,465186.0,519738.0,590633.0,645424.0,716973.0,770635.0,806969.0,1520211.0,290326.0,811553.0,1072765.0,1179115.0],"경기":[29405201.0,29712961.0,29826560.0,29980799.0,29681236.0,30798442.0,32219335.0,33434551.0,36852914.0,36766527.0,36288050.0,37299472.0,40545794.0,35224624.0,42149254.0,43212573.0],"강원":[5915618.0,5950310.0,5985865.0,5947614.0,5766094.0,5865276.0,6179523.0,6203749.0,6439502.0,6289923.0,6175120.0,6398541.0,6626692.0,6212163.0,6809533.0,6875074.0],"충북":[4470763.0,4507819.0,4535277.0,4536270.0,4354886.0,4477619.0,4652918.0,4804638.0,5384580.0,5305664.0,5212990.0,5365193.0,5613790.0,4001572.0,5720482.0,5851909.0],"충남":[6552613.0,6349167.0,6603709.0,6399261.0,6258873.0,6753172.0,7167562.0,7164439.0,7643615.0,7583962.0,7468271.0,7230648.0,7707805.0,4858509.0,7917061.0,8086292.0],"전북":[4612316.0,4630623.0,4742703.0,4696897.0,4537971.0,4671358.0,4814017.0,4910318.0,5258501.0,5152493.0,5048965.0,5146076.0,5313085.0,4411432.0,5352127.0,5359485.0],"전남":[5099642.0,5032637.0,5128688.0,5070480.0,4969124.0,5157332.0,5422859.0,5690659.0,5936592.0,6069505.0,5708835.0,5739917.0,5915581.0,4188745.0,6080605.0,6102498.0],"경북":[7523485.0,7951228.0,8288663.0,8116028.0,7824164.0,7864509.0,8140209.0,8487402.0,9019634.0,8724876.0,8480620.0,8788905.0,9033740.0,6794120.0,8885235.0,8912567.0],"경남":[8063310.0,8125612.0,8152875.0,8175464.0,7973643.0,8136258.0,8416652.0,8667737.0,9097115.0,8861115.0,8915532.0,9042660.0,9371342.0,7831881.0,9558712.0,9638014.0],"제주":[1629902.0,1674354.0,1721762.0,1798799.0,1854989.0,1969206.0,2141850.0,2308732.0,2433585.0,2465336.0,2457351.0,2626848.0,2843687.0,2874554.0,2984396.0,3010815.0]},"농림어업":{"계":[10041855.0,10574979.0,12074003.0,13061606.0,13556459.0,14644965.0,15396810.0,15981131.0,17126089.0,17304666.0,17036658.0,18496161.0,19285373.0,18777187.0,19064577.0,19362481.0],"서울":[18390.0,15661.0,14928.0,13887.0,13361.0,14231.0,14684.0,15150.0,15917.0,15194.0,14757.0,19189.0,19956.0,19802.0,19758.0,19798.0],"부산":[91613.0,92913.0,97763.0,93161.0,95473.0,96752.0,106631.0,107927.0,121838.0,110821.0,106915.0,110847.0,112183.0,113291.0,109688.0,107476.0],"대구":[60250.0,61529.0,64790.0,67041.0,63345.0,66068.0,68684.0,69142.0,71615.0,71232.0,72005.0,79759.0,85684.0,110744.0,142611.0,148076.0],"인천":[84984.0,84511.0,103592.0,103997.0,114712.0,132422.0,142255.0,142953.0,149307.0,151959.0,143486.0,166780.0,165992.0,160298.0,163552.0,162432.0],"광주":[53288.0,57151.0,65475.0,70262.0,71219.0,72806.0,74005.0,74608.0,76172.0,74320.0,72418.0,76903.0,87214.0,85373.0,83568.0,84534.0],"대전":[22863.0,22665.0,25297.0,25826.0,26491.0,28359.0,27562.0,28643.0,31998.0,32481.0,32961.0,37039.0,39500.0,37142.0,36826.0,37111.0],"울산":[68994.0,72583.0,77373.0,80826.0,79596.0,74015.0,76079.0,80221.0,83071.0,80392.0,80504.0,90321.0,92980.0,88937.0,91837.0,91301.0],"세종":[0.0,0.0,16863.0,65814.0,65955.0,73944.0,79228.0,69469.0,78781.0,81895.0,83300.0,90952.0,91637.0,94558.0,96004.0,93297.0],"경기":[1734861.0,1698236.0,1985029.0,2087187.0,2140966.0,2263979.0,2338988.0,2371347.0,2542274.0,2605405.0,2527503.0,2712094.0,2803262.0,2741735.0,2739726.0,2746724.0],"강원":[373143.0,361158.0,431374.0,465744.0,507427.0,546991.0,577378.0,607139.0,659119.0,693533.0,698450.0,783547.0,791361.0,785989.0,794163.0,807700.0],"충북":[479321.0,482659.0,553410.0,583998.0,605989.0,668578.0,709252.0,721131.0,805162.0,837037.0,834980.0,920412.0,956883.0,948222.0,967310.0,979922.0],"충남":[1274345.0,1329584.0,1547733.0,1602407.0,1628947.0,1767004.0,1875034.0,1928066.0,2112522.0,2136303.0,2043578.0,2291760.0,2389068.0,2377748.0,2445935.0,2467008.0],"전북":[819057.0,900120.0,1010655.0,1076552.0,1120214.0,1285640.0,1384058.0,1415004.0,1528635.0,1537829.0,1547056.0,1704721.0,1784102.0,1717006.0,1771522.0,1798715.0],"전남":[1787955.0,2005879.0,2225686.0,2438191.0,2544135.0,2743853.0,2881301.0,3096126.0,3268746.0,3268517.0,3187514.0,3461170.0,3636671.0,3471862.0,3554148.0,3675594.0],"경북":[1109736.0,1131055.0,1298131.0,1412155.0,1440916.0,1588826.0,1662500.0,1747462.0,1896131.0,1927672.0,1937129.0,2135822.0,2295285.0,2203757.0,2268226.0,2308023.0],"경남":[1112878.0,1248488.0,1492768.0,1701768.0,1784500.0,1930699.0,2050330.0,2141813.0,2250820.0,2211889.0,2254783.0,2369741.0,2414495.0,2344777.0,2338490.0,2402503.0],"제주":[950177.0,1010787.0,1063136.0,1172790.0,1253213.0,1290798.0,1328839.0,1364930.0,1433981.0,1468187.0,1399316.0,1445104.0,1519101.0,1475948.0,1441211.0,1432266.0]},"광업":{"계":[1682953.0,1928240.0,1616371.0,1478042.0,1570929.0,1630854.0,1754503.0,1746243.0,1478380.0,1492515.0,1552100.0,1806892.0,1758985.0,1709275.0,1638861.0,1483708.0],"서울":[13183.0,13046.0,11283.0,2715.0,2703.0,3106.0,3594.0,4064.0,2609.0,2067.0,1946.0,1902.0,2004.0,1932.0,1877.0,1896.0],"부산":[15492.0,18386.0,20053.0,20557.0,22702.0,21068.0,23195.0,25289.0,20964.0,18191.0,18093.0,19576.0,20393.0,19867.0,17824.0,18149.0],"대구":[77014.0,71467.0,3635.0,3874.0,4113.0,4444.0,4703.0,5858.0,5778.0,6673.0,11484.0,15128.0,16922.0,22693.0,26064.0,23145.0],"인천":[73519.0,74608.0,72399.0,70069.0,73523.0,83342.0,92925.0,71529.0,44716.0,46549.0,53695.0,87829.0,86695.0,82428.0,72293.0,66288.0],"광주":[1020.0,1399.0,1331.0,1939.0,2302.0,2430.0,2280.0,2898.0,1715.0,1780.0,1754.0,3490.0,3438.0,2824.0,2587.0,2143.0],"대전":[1378.0,1952.0,1967.0,2350.0,2281.0,2532.0,2113.0,3326.0,884.0,982.0,906.0,877.0,1175.0,1309.0,1269.0,1152.0],"울산":[18598.0,20531.0,20415.0,20051.0,19389.0,20661.0,21516.0,20103.0,16310.0,13076.0,13973.0,15117.0,13921.0,12193.0,11715.0,10799.0],"세종":[0.0,0.0,4224.0,18440.0,19669.0,22505.0,20193.0,16364.0,13123.0,13779.0,10923.0,11510.0,11588.0,12598.0,11406.0,10500.0],"경기":[253581.0,251681.0,245369.0,236524.0,244570.0,259545.0,299012.0,317263.0,282987.0,274639.0,258425.0,271724.0,261890.0,258949.0,242270.0,225341.0],"강원":[306130.0,331799.0,343841.0,347751.0,364636.0,367336.0,401251.0,398287.0,390573.0,408545.0,446395.0,452010.0,445375.0,434639.0,427274.0,373583.0],"충북":[95044.0,102894.0,105055.0,110890.0,113110.0,116955.0,129606.0,139856.0,117622.0,123427.0,127046.0,128817.0,124485.0,119604.0,118185.0,106205.0],"충남":[490426.0,681164.0,417407.0,255449.0,274278.0,280838.0,292888.0,248313.0,168165.0,172239.0,198913.0,341587.0,339103.0,335587.0,325673.0,296228.0],"전북":[57268.0,57588.0,65833.0,68120.0,70214.0,69440.0,69160.0,85300.0,62903.0,64056.0,65127.0,69757.0,66663.0,65496.0,63189.0,59264.0],"전남":[63263.0,60584.0,59315.0,64730.0,60894.0,64881.0,68567.0,73217.0,65946.0,73913.0,75960.0,82528.0,76732.0,70917.0,64515.0,64254.0],"경북":[147507.0,165057.0,167680.0,172737.0,214434.0,223169.0,229232.0,224568.0,208318.0,200766.0,197009.0,228781.0,219137.0,198840.0,184236.0,162234.0],"경남":[62675.0,68924.0,69323.0,74589.0,75692.0,82166.0,87007.0,95989.0,71211.0,67524.0,65373.0,68712.0,61534.0,61544.0,61174.0,55931.0],"제주":[6816.0,7014.0,6927.0,7083.0,6217.0,6266.0,7239.0,14019.0,4556.0,4309.0,5078.0,7547.0,7929.0,7855.0,7311.0,6595.0]},"제조업":{"계":[211446642.0,229701206.0,235445313.0,242301428.0,249490234.0,249357182.0,252824020.0,258944827.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"서울":[2318092.0,2239249.0,2065958.0,2077962.0,2070544.0,2024028.0,1911951.0,1918893.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"부산":[7027039.0,7427545.0,7487361.0,7272494.0,7244302.0,7146285.0,7104377.0,7512587.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"대구":[5394380.0,5684316.0,5796029.0,5903488.0,5960292.0,5902315.0,5902508.0,5862634.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"인천":[11390548.0,11579860.0,11662470.0,11666153.0,11733166.0,12067082.0,12083058.0,12367815.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"광주":[2627018.0,2767368.0,2771323.0,2811367.0,2806354.0,2821914.0,2869458.0,2910767.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"대전":[2412897.0,2535296.0,2516982.0,2588699.0,2610211.0,2574509.0,2569807.0,2608343.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"울산":[22133868.0,23445505.0,24036707.0,24354713.0,24784494.0,24812786.0,26215841.0,25883132.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"세종":[0.0,0.0,381428.0,1468720.0,1501059.0,1505815.0,1503823.0,1502923.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"경기":[42341024.0,45565300.0,47664290.0,49102739.0,49684965.0,50991294.0,52898480.0,56603326.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"강원":[5280881.0,6201032.0,6037038.0,5920815.0,6037531.0,6236052.0,6073473.0,6002307.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"충북":[11613052.0,12408448.0,13146375.0,13361293.0,14073780.0,14553036.0,15301673.0,15883431.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"충남":[27085160.0,30782026.0,32355565.0,33734544.0,35716859.0,34968111.0,35424074.0,37057955.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"전북":[10446971.0,12495197.0,12495135.0,12678628.0,13427765.0,12786226.0,13068299.0,12965874.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"전남":[15252920.0,17114948.0,18048189.0,19673192.0,21131433.0,21578576.0,21511674.0,21453926.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"경북":[28487294.0,30543033.0,30546652.0,31149611.0,32006769.0,30643227.0,29799399.0,30115601.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"경남":[17332635.0,18586207.0,18074967.0,18236426.0,18323406.0,18340103.0,18328702.0,18053777.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"제주":[165382.0,179005.0,194727.0,207635.0,211994.0,227661.0,238493.0,241536.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},"2)제조업(11차)":{"계":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,262305861.0,258477476.0,248540483.0,262361863.0,266892573.0,283632995.0,256532403.0,250750226.0],"서울":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1721945.0,1616366.0,1496106.0,1544200.0,1510903.0,1550238.0,1349813.0,1307385.0],"부산":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,7330890.0,7205199.0,6874835.0,7175259.0,7053232.0,7345915.0,6708005.0,6655572.0],"대구":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,5744387.0,5490944.0,5048120.0,5458907.0,5608376.0,6167353.0,5626815.0,5504645.0],"인천":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,11844027.0,11215584.0,10883983.0,11543628.0,11440330.0,12264324.0,10726242.0,10595647.0],"광주":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2768149.0,2679865.0,2612757.0,2836237.0,2791763.0,2972131.0,2765240.0,2698469.0],"대전":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2507444.0,2332986.0,2295602.0,2388264.0,2355623.0,2374987.0,2167430.0,2158972.0],"울산":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,27607014.0,28239908.0,27379654.0,27845916.0,27142626.0,28276003.0,25742970.0,23779872.0],"세종":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1490878.0,1522647.0,1606813.0,1717632.0,1773473.0,1970428.0,1872036.0,1896762.0],"경기":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,59238076.0,59379236.0,60562115.0,66445929.0,69643238.0,74038437.0,68684716.0,68867448.0],"강원":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,5799777.0,5459757.0,5217195.0,5405503.0,5567812.0,5758759.0,4604208.0,4218238.0],"충북":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,16445863.0,16970583.0,17169602.0,18241476.0,18868303.0,20494549.0,16725298.0,15826873.0],"충남":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,38054811.0,38743760.0,36611696.0,34630974.0,35367782.0,37490906.0,34537529.0,34136013.0],"전북":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,12548451.0,12011679.0,10291884.0,10894934.0,10959480.0,11504422.0,10558152.0,10589049.0],"전남":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,21471335.0,19614531.0,18323416.0,20251044.0,21044390.0,22281411.0,19724076.0,19352979.0],"경북":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,29687785.0,28333755.0,25168848.0,27689281.0,27498700.0,29163096.0,26621100.0,25305659.0],"경남":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,17791528.0,17399068.0,16720533.0,17989597.0,17957740.0,19648100.0,17811810.0,17551495.0],"제주":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,253501.0,261610.0,277326.0,303083.0,308801.0,331935.0,306964.0,305147.0]},"화학":{"계":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,40143338.0,40187213.0,38342495.0,41256268.0,40984440.0,44798511.0,41631203.0,39501666.0],"서울":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,63276.0,46089.0,42680.0,42368.0,41500.0,42324.0,37472.0,46021.0],"부산":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,245598.0,260611.0,267302.0,274846.0,265574.0,281762.0,277166.0,264165.0],"대구":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,192539.0,193313.0,180967.0,190597.0,190558.0,193597.0,183540.0,179848.0],"인천":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,409414.0,360823.0,346736.0,366478.0,371618.0,401329.0,428053.0,546217.0],"광주":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,60440.0,63030.0,60415.0,69093.0,71690.0,76212.0,74151.0,74072.0],"대전":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,220849.0,218162.0,215052.0,227197.0,225245.0,239995.0,207927.0,197337.0],"울산":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,9892795.0,10655853.0,10260380.0,11015276.0,10727845.0,11379226.0,10411807.0,9108329.0],"세종":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,603.0,127246.0,130641.0,147510.0,166838.0,198173.0,192694.0,184300.0],"경기":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,4907469.0,5000468.0,5269538.0,5984298.0,6122299.0,6645633.0,6176934.0,6188634.0],"강원":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,95823.0,99476.0,94865.0,92586.0,90514.0,96484.0,90499.0,86697.0],"충북":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1444339.0,1555680.0,1676841.0,1786806.0,1825453.0,2090819.0,1893113.0,1772378.0],"충남":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,3332294.0,3411987.0,3692469.0,3907125.0,4005245.0,4241540.0,4059281.0,3923944.0],"전북":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,4015365.0,3828090.0,2212314.0,2048646.0,2108594.0,2212092.0,2148043.0,2262405.0],"전남":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,11625590.0,10696851.0,10473373.0,11517313.0,11187207.0,12944837.0,11933916.0,11222829.0],"경북":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2856435.0,2895375.0,2651750.0,2775867.0,2843567.0,2967611.0,2787668.0,2732225.0],"경남":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,768344.0,757103.0,739376.0,782246.0,711849.0,755688.0,699539.0,682724.0],"제주":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,12165.0,17057.0,27794.0,28015.0,28844.0,31189.0,29399.0,29539.0]},"1차금속":{"계":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,45050028.0,41871358.0,36342999.0,35043680.0,35043548.0,35511904.0,30084241.0,28892197.0],"서울":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,15035.0,14234.0,12718.0,12425.0,12209.0,12486.0,10893.0,10310.0],"부산":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2111434.0,2063674.0,1958849.0,2005157.0,1876308.0,1864010.0,1637814.0,1602248.0],"대구":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,302183.0,286415.0,271550.0,280566.0,284163.0,304608.0,260728.0,265476.0],"인천":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2163568.0,2000466.0,1879205.0,1985355.0,1961718.0,2040383.0,1602603.0,1434956.0],"광주":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,68473.0,58643.0,58784.0,54321.0,45593.0,44033.0,39361.0,36853.0],"대전":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,53018.0,52651.0,48889.0,48358.0,49150.0,49360.0,43068.0,43169.0],"울산":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,4978589.0,4920483.0,4988678.0,4100923.0,3905498.0,3211593.0,2780443.0,2813512.0],"세종":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,335901.0,28753.0,34870.0,39712.0,39146.0,41518.0,38464.0,39755.0],"경기":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1940416.0,1885515.0,1847768.0,1980014.0,1989370.0,2076416.0,1878774.0,1828151.0],"강원":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1173045.0,1011434.0,952602.0,944326.0,1032633.0,848666.0,333733.0,243258.0],"충북":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,467328.0,447627.0,372026.0,391285.0,397056.0,424191.0,386134.0,369050.0],"충남":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,9900999.0,9884531.0,8185862.0,4722811.0,4760849.0,5171871.0,4502646.0,4307393.0],"전북":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2199706.0,1967003.0,1823963.0,2318215.0,2359042.0,2303569.0,2011037.0,2012062.0],"전남":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,4964780.0,4029625.0,2730658.0,3384074.0,4134280.0,3790286.0,2691809.0,2876631.0],"경북":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,10600688.0,9723628.0,7763869.0,9051156.0,8559279.0,9513259.0,8545622.0,7736299.0],"경남":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,3773810.0,3495573.0,3411173.0,3722344.0,3634607.0,3813219.0,3318988.0,3271015.0],"제주":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1055.0,1102.0,1535.0,2639.0,2647.0,2437.0,2124.0,2057.0]},"전자,통신":{"계":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,51461659.0,51983260.0,53310591.0,57788476.0,60192109.0,63505918.0,57451081.0,57436105.0],"서울":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,42528.0,40789.0,44816.0,62799.0,57524.0,54980.0,48641.0,47011.0],"부산":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,97181.0,95452.0,96405.0,102955.0,102227.0,105587.0,96584.0,100353.0],"대구":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,265271.0,256407.0,256179.0,259983.0,293622.0,427157.0,368695.0,366931.0],"인천":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1084208.0,1033298.0,1081011.0,1307722.0,1385964.0,1522604.0,1480972.0,1531496.0],"광주":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,713446.0,703265.0,739773.0,816994.0,799169.0,825059.0,766189.0,779916.0],"대전":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,397256.0,235818.0,241084.0,298833.0,225366.0,219374.0,197876.0,197158.0],"울산":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,36420.0,36442.0,35894.0,35984.0,37322.0,41513.0,40997.0,41677.0],"세종":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,11172.0,193972.0,221384.0,234153.0,254929.0,282422.0,282394.0,301374.0],"경기":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,27845595.0,28222464.0,29374462.0,33034901.0,35973675.0,38425780.0,35950677.0,36404607.0],"강원":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,50634.0,51188.0,50381.0,58655.0,63910.0,67715.0,68397.0,80245.0],"충북":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,4394005.0,4708481.0,4908533.0,5191666.0,5269241.0,5567519.0,3146443.0,2527855.0],"충남":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,11483385.0,11446346.0,11303599.0,11086797.0,10552175.0,10778843.0,10206192.0,10292103.0],"전북":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,441868.0,435765.0,430232.0,459813.0,450531.0,464562.0,423177.0,384999.0],"전남":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,47786.0,44788.0,46236.0,55441.0,55980.0,59326.0,52219.0,52924.0],"경북":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,4037761.0,3988449.0,3971468.0,4149463.0,4026262.0,3960253.0,3663212.0,3660221.0],"경남":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,512385.0,489591.0,508042.0,630793.0,642572.0,701393.0,656724.0,665534.0],"제주":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,758.0,745.0,1094.0,1523.0,1639.0,1832.0,1694.0,1701.0]}},"idc":[[2020,1,398290],[2020,2,315730],[2020,3,381333],[2020,4,363520],[2020,5,386290],[2020,6,388480],[2020,7,411500],[2020,8,438240],[2020,9,382640],[2020,10,374360],[2020,11,370620],[2020,12,422940],[2021,1,439360],[2021,2,373130],[2021,3,385020],[2021,4,372780],[2021,5,380990],[2021,6,387950],[2021,7,436520]]};
+document.documentElement.lang = "ko";
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const s = (tag, a = {}, p) => { const e = document.createElementNS(NS, tag); for (const k in a) if (a[k] != null) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  const tx = (p, x, y, str, cls, size, anchor = "start", extra = {}) => { const t = s("text", { x, y, class: cls, "text-anchor": anchor, "font-size": size, ...extra }, p); t.textContent = str; return t; };
+  const fmt = (n) => Math.round(n).toLocaleString("ko-KR");
+  const f1 = (n) => n.toLocaleString("ko-KR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const pc = (n) => f1(n) + "%";
+  const man = (n) => n >= 1e5 ? f1(n / 1e4).replace(/\.0$/, "") + "만" : fmt(n);
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lerp = (arr, pos) => { const k = Math.floor(pos), f = pos - k; return k + 1 < arr.length ? arr[k] + (arr[k + 1] - arr[k]) * f : arr[k]; };
+  const bEl = (t) => Object.assign(document.createElement("b"), { textContent: t });
+
+  function table(id, head, rows) {
+    const t = document.createElement("table"), th = document.createElement("thead"), tr = document.createElement("tr");
+    head.forEach((h) => { const c = document.createElement("th"); c.textContent = h; tr.append(c); }); th.append(tr); t.append(th);
+    const tb = document.createElement("tbody");
+    rows.forEach((r) => { const row = document.createElement("tr"); r.forEach((v) => { const c = document.createElement("td"); c.textContent = v; row.append(c); }); tb.append(row); });
+    t.append(tb); document.getElementById(id).replaceChildren(t);
+  }
+  function tipFor(fig) {
+    const tip = fig.querySelector(".tip");
+    return {
+      show(ev, title, rows) {
+        tip.replaceChildren(); const h = document.createElement("div"); h.className = "tn"; h.textContent = title; tip.append(h);
+        rows.forEach(([v, k, col]) => { const d = document.createElement("div"); if (col) { const i = document.createElement("i"); i.className = "sw dot"; i.style.background = col; i.style.marginRight = "6px"; d.append(i); } const b = document.createElement("span"); b.className = "tv"; b.textContent = v + " "; const kk = document.createElement("span"); kk.textContent = k; d.append(b, kk); tip.append(d); });
+        tip.hidden = false;
+        const fr = fig.getBoundingClientRect(); let x, y;
+        if (ev.clientX != null) { x = ev.clientX - fr.left + 14; y = ev.clientY - fr.top + 14; } else { const r = (ev.rect || ev.target.getBoundingClientRect()); x = r.right - fr.left + 8; y = r.top - fr.top; }
+        const tw = tip.offsetWidth, th = tip.offsetHeight;
+        if (x + tw > fr.width - 8) x = Math.max(8, x - tw - 28);
+        if (y + th > fr.height - 8) y = Math.max(8, y - th - 28);
+        tip.style.left = x + "px"; tip.style.top = y + "px";
+      },
+      hide() { tip.hidden = true; },
+    };
+  }
+  /* Marks you can point at. One tab stop per chart; Left/Right step, Up/Down jump rows, Escape hides.
+     pts: {x, y, r, fn() -> [title, rows]} in viewBox units; u = viewBox units per CSS px. */
+  function pointLayer(v, tip, pts, label, u = 1) {
+    const ring = s("circle", { class: "ring", "stroke-width": 2 * u, opacity: 0 }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = i; const p = pts[i]; ring.setAttribute("cx", p.x); ring.setAttribute("cy", p.y); ring.setAttribute("r", p.r + 4 * u); ring.setAttribute("opacity", 1); const [t, rows] = p.fn(); tip.show(ev || { target: ring }, t, rows); };
+    const hide = () => { tip.hide(); ring.setAttribute("opacity", 0); };
+    const nearest = (e) => {
+      const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal, k = vb.width / r.width;
+      const x = vb.x + (e.clientX - r.left) * k, y = vb.y + (e.clientY - r.top) * k;
+      let best = -1, bd = Infinity;
+      pts.forEach((p, i) => { const d = Math.hypot(p.x - x, p.y - y) - p.r, reach = 18 * k; if (d < reach && d < bd) { bd = d; best = i; } });
+      return best;
+    };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerdown", (e) => { const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => { if (pts.length) show(idx < 0 ? 0 : idx); }); v.addEventListener("blur", hide);
+    const vert = (dir) => { const c = pts[Math.max(idx, 0)]; let best = -1, bd = Infinity; pts.forEach((p, i) => { const dy = (p.y - c.y) * dir; if (dy <= 0.5) return; const d = dy * 3 + Math.abs(p.x - c.x); if (d < bd) { bd = d; best = i; } }); return best < 0 ? Math.max(idx, 0) : best; };
+    v.addEventListener("keydown", (e) => {
+      if (!pts.length) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show((Math.max(idx, 0) + (e.key === "ArrowRight" ? 1 : -1) + pts.length) % pts.length); }
+      else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); show(vert(e.key === "ArrowDown" ? 1 : -1)); }
+      else if (e.key === "Escape") hide();
+    });
+  }
+  /* A time cursor over a chart: pointer or Left/Right picks a time index, a vertical rule follows it. */
+  function timeLayer(v, tip, n, xOf, y0, y1, fn, label, u = 1) {
+    const rule = s("line", { y1: y0, y2: y1, stroke: "var(--ink)", "stroke-width": u, opacity: 0, "pointer-events": "none" }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = Math.max(0, Math.min(n - 1, i)); const x = xOf(idx); rule.setAttribute("x1", x); rule.setAttribute("x2", x); rule.setAttribute("opacity", .5); const [t, rows] = fn(idx); const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; tip.show(ev || { rect: { right: r.left + (x - vb.x) / vb.width * r.width, top: r.top + 20 } }, t, rows); };
+    const hide = () => { tip.hide(); rule.setAttribute("opacity", 0); };
+    const at = (e) => { const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; const x = vb.x + (e.clientX - r.left) * vb.width / r.width; let best = 0, bd = Infinity; for (let i = 0; i < n; i++) { const d = Math.abs(xOf(i) - x); if (d < bd) { bd = d; best = i; } } return best; };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; show(at(e), e); });
+    v.addEventListener("pointerdown", (e) => show(at(e), e));
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => show(idx < 0 ? n - 1 : idx)); v.addEventListener("blur", hide);
+    v.addEventListener("keydown", (e) => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show(idx + (e.key === "ArrowRight" ? 1 : -1)); } else if (e.key === "Home") { e.preventDefault(); show(0); } else if (e.key === "End") { e.preventDefault(); show(n - 1); } else if (e.key === "Escape") hide(); });
+  }
+  /* A player: play/pause, scrubber and a large time readout. Frames 0..n-1; at rest it shows the last frame. */
+  function Player(id, label, draw, n, labelOf, seconds = 10) {
+    const box = document.getElementById(id);
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "play"; btn.setAttribute("aria-label", label + " 재생");
+    const icon = (playing) => { btn.replaceChildren(); const v = s("svg", { viewBox: "0 0 20 20", "aria-hidden": "true" }, btn); if (playing) { s("rect", { x: 4, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); s("rect", { x: 12, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); } else s("path", { d: "M5,3 L17,10 L5,17 Z", fill: "currentColor" }, v); };
+    const yr = document.createElement("div"); yr.className = "yr"; yr.setAttribute("aria-hidden", "true");
+    const sc = document.createElement("input"); sc.type = "range"; sc.className = "scrub"; sc.min = 0; sc.max = n - 1; sc.step = 1; sc.value = n - 1; sc.setAttribute("aria-label", label + " 시점");
+    box.append(btn, yr, sc);
+    let pos = n - 1, raf = 0, playing = false, t0 = 0, from = 0;
+    const render = () => { const k = Math.min(n - 1, Math.floor(pos + 1e-6)); yr.textContent = labelOf(k); sc.value = Math.round(pos); sc.setAttribute("aria-valuetext", labelOf(Math.round(pos))); draw(pos); };
+    const stop = () => { playing = false; cancelAnimationFrame(raf); icon(false); btn.setAttribute("aria-label", label + " 재생"); };
+    const tick = (now) => { pos = Math.min(n - 1, from + (now - t0) / (seconds * 1000) * (n - 1)); render(); if (pos < n - 1) raf = requestAnimationFrame(tick); else stop(); };
+    btn.addEventListener("click", () => {
+      if (playing) { stop(); return; }
+      if (reduce) { pos = n - 1; render(); return; }
+      from = pos >= n - 1 ? 0 : pos; pos = from; playing = true; icon(true); btn.setAttribute("aria-label", label + " 멈춤");
+      raf = requestAnimationFrame((t) => { t0 = t; tick(t); });
+    });
+    sc.addEventListener("input", () => { stop(); pos = +sc.value; render(); });
+    icon(false);
+    return { render, get pos() { return pos; } };
+  }
+  document.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".opt").forEach((o) => { o.setAttribute("aria-pressed", o === b); o.dataset.state = o.dataset.a === "1" ? "right" : "wrong"; });
+    document.getElementById("reveal").hidden = false;
+  }));
+  function chips(id, opts, cur, onPick) {
+    const box = document.getElementById(id);
+    opts.forEach(([k, name]) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = name; b.setAttribute("aria-pressed", k === cur); b.addEventListener("click", () => { box.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === b)); onPick(k); }); box.append(b); });
+  }
+  function onResize(fn) {
+    let lastW = 0, rt;
+    new ResizeObserver(() => { const w = document.querySelector(".page").clientWidth; if (Math.abs(w - lastW) < 2) return; lastW = w; clearTimeout(rt); rt = setTimeout(fn, 80); }).observe(document.querySelector(".page"));
+  }
+
+  const f2 = (n) => n.toLocaleString("ko-KR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const DC = DATA.dc, MW = DATA.dcTot.mw, CNT = DATA.dcTot.cnt, G = DATA.geo, yi = DATA.years.indexOf(2023), S = (use, sd) => DATA.sales[use][sd][yi] / 1e6;
+  const NATION = S("합계", "계"), FULL = MW * 8760 / 1e6;
+  const RN = { "대전충남": "대전·충남", "광주전남": "광주·전남", "대구경북": "대구·경북", "부산울산경남": "부산·울산·경남" }, nm = (d) => RN[d.n] || d.n;
+
+  /* ---------- 1. rack map ---------- */
+  let mode1 = "mw";
+  const ANCH = { 서울: [176, 176], 경기: [248, 232], 인천: [128, 214], 강원: [316, 170], 충북: [286, 292], 대전충남: [186, 310], 전북: [208, 380], 광주전남: [176, 458], 대구경북: [344, 326], 부산울산경남: [340, 428], 제주: [0, 0] };
+  const regOf = new Map(); DC.forEach((d, k) => d.sido.forEach((sd) => regOf.set(sd, k)));
+  function rack(g, x, y, w, h, k) {
+    s("rect", { x: x - w / 2, y: y - h / 2, width: w, height: h, rx: w * .14, fill: "var(--rack)", stroke: "var(--rack-edge)", "stroke-width": w * .06 }, g);
+    for (let q = 0; q < 3; q++) { const e = s("circle", { cx: x - w * .2 + (q % 2) * w * .4, cy: y - h * .28 + q * h * .28, r: w * .11, fill: (k + q) % 5 === 0 ? "var(--led2)" : "var(--led)", class: reduce ? null : "blink" }, g); e.style.animationDelay = (((k * 7 + q * 13) % 18) / 10) + "s"; }
+  }
+  function c1() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const [bx0, by0, bx1, by1] = G.box, W = Math.max(280, box.clientWidth), sc = W / (bx1 - bx0), H = (by1 - by0) * sc, unit = mode1 === "mw" ? 20 : 1, key = mode1 === "mw" ? "mw" : "cnt", pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": mode1 === "mw" ? "데이터센터 계약전력을 서버 랙으로 세운 지도. 서울 653MW, 경기 681MW로 수도권에 71%가 있다" : "데이터센터 수를 서버 랙으로 세운 지도. 서울 48곳, 경기 34곳" }, box);
+    const g = s("g", { transform: `translate(${-bx0 * sc},${-by0 * sc}) scale(${sc})` }, v), mx = Math.max(...DC.map((d) => d.mw));
+    G.paths.forEach((p) => { const k = regOf.get(p.n), d = DC[k], t = d ? d.mw / mx : 0; s("path", { d: p.d, fill: `var(--r${t > .5 ? 3 : t > .15 ? 2 : t > .05 ? 1 : 0})`, stroke: "var(--card)", "stroke-width": .8 / sc }, g); });
+    const rw = mode1 === "mw" ? 7.4 : 6, rh = rw * 1.55, gap = 1.6; let kk = 0;
+    DC.forEach((d) => {
+      const n = Math.round(d[key] / unit); if (!n) return; const [ax, ay] = ANCH[d.n], cols = Math.ceil(Math.sqrt(n * 1.5)), rowsN = Math.ceil(n / cols);
+      for (let i = 0; i < n; i++, kk++) rack(g, ax + ((i % cols) - (cols - 1) / 2) * (rw + gap), ay + (Math.floor(i / cols) - (rowsN - 1) / 2) * (rh + gap), rw, rh, kk);
+      const ly = ay + rowsN * (rh + gap) / 2 + 11 / sc; tx(g, ax, ly, `${nm(d)} ${mode1 === "mw" ? fmt(d.mw) + "MW" : d.cnt + "곳"}`, "lb halo", 12.5 / sc, "middle", { "stroke-width": 3.5 / sc });
+      pts.push({ x: (ax - bx0) * sc, y: (ay - by0) * sc, r: Math.max(12, cols * (rw + gap) * sc / 2), fn: () => [nm(d), [[`${fmt(d.mw)}MW`, "계약전력"], [`${d.cnt}곳`, "데이터센터"], [d.cnt ? `${f1(d.mw / d.cnt)}MW` : "–", "한 곳당"], [pc(d.mw / MW * 100), "전국 계약전력 중"]]] });
+    });
+    document.getElementById("fs1").textContent = mode1 === "mw" ? "서버 랙 하나 = 계약전력 20MW(반올림). 바탕이 진할수록 계약전력이 많은 지역" : "서버 랙 하나 = 데이터센터 1곳. 바탕이 진할수록 계약전력이 많은 지역";
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 지역을 옮겨 볼 수 있다");
+    const b2 = document.getElementById("c1b"); b2.replaceChildren();
+    const list = [...DC].filter((d) => d.cnt).sort((a, b) => b[key] - a[key]), W2 = Math.max(260, b2.clientWidth), rhh = 30, l = 104, rr = 124, H2 = list.length * rhh + 34, m2 = list[0][key];
+    const v2 = s("svg", { viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": "지역별 " + (mode1 === "mw" ? "계약전력" : "데이터센터 수") + " 막대. " + list.slice(0, 4).map((d) => `${nm(d)} ${mode1 === "mw" ? d.mw + "MW" : d.cnt + "곳"}`).join(", ") }, b2);
+    list.forEach((d, k) => { const y = 4 + k * rhh, w = (W2 - l - rr) * d[key] / m2, cap = ["서울", "경기", "인천"].includes(d.n); tx(v2, l - 8, y + 18, nm(d), "lb", 13, "end"); s("rect", { x: l, y: y + 6, width: Math.max(2, w), height: rhh - 13, rx: 2, fill: cap ? "var(--dc)" : "var(--shell)" }, v2); tx(v2, l + Math.max(2, w) + 6, y + 18, mode1 === "mw" ? `${fmt(d.mw)}MW · ${pc(d.mw / MW * 100)}` : `${d.cnt}곳 · ${pc(d.cnt / CNT * 100)}`, "vl", 12.5); });
+    const capv = DC.filter((d) => ["서울", "경기", "인천"].includes(d.n)).reduce((a, d) => a + d[key], 0), tot = mode1 === "mw" ? MW : CNT;
+    tx(v2, 0, H2 - 8, `주황 = 수도권 ${fmt(capv)}${mode1 === "mw" ? "MW" : "곳"}(${pc(capv / tot * 100)}) · 전국 ${fmt(tot)}${mode1 === "mw" ? "MW" : "곳"}`, "mt", 12.5);
+  }
+  chips("k1", [["mw", "계약전력(MW)"], ["cnt", "데이터센터 수"]], "mw", (k) => { mode1 = k; c1(); });
+  table("t1", ["지역본부", "데이터센터(호)", "계약전력(MW)", "한 곳당(MW)", "계약전력 비중", "지역 판매전력량 2023(TWh)", "다 쓰면 지역 전기의"], DC.map((d) => [nm(d), d.cnt, fmt(d.mw), d.cnt ? f1(d.mw / d.cnt) : "–", pc(d.mw / MW * 100), f1(d.sales23 / 1e6), pc(d.full / d.sales23 * 100)]).concat([["전국", CNT, fmt(MW), f1(MW / CNT), "100.0%", f1(NATION), pc(FULL / NATION * 100)]]));
+
+  /* ---------- 2. utilisation dial + LED rows ---------- */
+  let util = 50; const uin = document.getElementById("util"), uin2 = document.getElementById("util2");
+  const REFS = [["제주도 전체", S("합계", "제주")], ["서울의 가정용", S("가정용", "서울")], ["전국 농림어업", S("농림어업", "계")], ["전국 공공용", S("공공용", "계")], ["전자·통신 제조업", S("전자,통신", "계")], ["전국 가정용", S("가정용", "계")]];
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const dcv = FULL * util / 100, rowsD = [["데이터센터(가동률 " + util + "%)", dcv, true], ...REFS.map(([n, v]) => [n, v, false])];
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, per = narrow ? 20 : 40, l = narrow ? 0 : 150, rr = narrow ? 0 : 70, cw = (W - l - rr) / per, ch = narrow ? 13 : 15, lg = 4, pts = []; let y = 4;
+    const v = s("svg", { viewBox: `0 0 ${W} 100`, role: "img" }, box);
+    rowsD.forEach(([name, val, isDC]) => {
+      const lines = Math.max(1, Math.ceil(Math.max(val, isDC ? FULL : val) / per)), col = isDC ? "var(--dc)" : "var(--ref)";
+      if (narrow) { tx(v, 0, y + 12, name, "lb", 13.5, "start", isDC ? { "font-weight": 700 } : {}); tx(v, W, y + 12, f1(val) + "TWh", "vl " + (isDC ? "di" : "ri"), 13.5, "end"); y += 20; }
+      else { tx(v, l - 10, y + ch - 3, name, "lb", 13.5, "end", isDC ? { "font-weight": 700 } : {}); tx(v, W, y + ch - 3, f1(val) + "TWh", "vl " + (isDC ? "di" : "ri"), 13.5, "end"); }
+      const y0 = y, nCells = Math.ceil(isDC ? FULL : val);
+      for (let i = 0; i < nCells; i++) {
+        const x = l + (i % per) * cw, yy = y + Math.floor(i / per) * (ch + lg), fill = Math.max(0, Math.min(1, val - i));
+        s("rect", { x: x + 1, y: yy, width: cw - 2, height: ch, rx: 2, fill: "var(--off)" }, v);
+        if (fill > 0) s("rect", { x: x + 1, y: yy, width: Math.max(1, (cw - 2) * fill), height: ch, rx: 2, fill: col }, v);
+      }
+      y += lines * (ch + lg) + (narrow ? 8 : 10);
+      pts.push({ x: l + Math.min(per, Math.max(1, val)) * cw / 2, y: (y0 + y) / 2 - 6, r: 12, fn: () => [name, [[`${f2(val)}TWh`, isDC ? "가정한 사용량" : "2023년 판매전력량"], [pc(val / NATION * 100), "전국 판매전력량 중"], ...(isDC ? [] : [[`${f1(dcv / val * 100)}%`, "데이터센터(가정)가 이것의"]])]] });
+    });
+    v.setAttribute("viewBox", `0 0 ${W} ${y}`);
+    v.setAttribute("aria-label", `가동률 ${util}%일 때 데이터센터 ${f1(dcv)}TWh를 다른 전기 사용량과 견준 LED 막대. ` + REFS.map(([n, val]) => `${n} ${f1(val)}TWh`).join(", "));
+    const rd = document.getElementById("rd2"), big = document.createElement("span"); big.className = "bigv"; big.textContent = `연 ${f1(dcv)}TWh · 전국의 ${f2(dcv / NATION * 100)}%`;
+    const more = REFS.filter(([, val]) => dcv > val).map(([n]) => n), next = REFS.find(([, val]) => dcv <= val);
+    rd.replaceChildren(big, util === 0 ? "가동률 0%는 전혀 쓰지 않는다는 뜻이다." : more.length ? `${more[more.length - 1]}(${f1(REFS[more.length - 1][1])}TWh)보다 많고${next ? `, ${next[0]}(${f1(next[1])}TWh)보다 적다.` : " 여기 놓은 모든 줄보다 많다."}` : `${next[0]}(${f1(next[1])}TWh)보다 적다.`);
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표 키로 줄을 옮겨 볼 수 있다");
+  }
+  table("t2", ["항목", "TWh", "전국 판매전력량 중"], [["데이터센터, 가동률 100%", f2(FULL), pc(FULL / NATION * 100)], ["데이터센터, 가동률 75%", f2(FULL * .75), pc(FULL * .75 / NATION * 100)], ["데이터센터, 가동률 50%", f2(FULL * .5), pc(FULL * .5 / NATION * 100)], ["데이터센터, 가동률 25%", f2(FULL * .25), pc(FULL * .25 / NATION * 100)], ...REFS.map(([n, val]) => [n + " (2023)", f2(val), pc(val / NATION * 100)]), ["전국 판매전력량 (2023)", f2(NATION), "100.0%"]]);
+
+  /* ---------- 3. batteries by region ---------- */
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const list = DC.filter((d) => d.cnt).map((d) => ({ d, v: d.full * util / 100 / d.sales23 * 100, full: d.full / d.sales23 * 100 })).sort((a, b) => b.full - a.full);
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, cols = narrow ? 2 : 5, gap = narrow ? 14 : 20, bw = (W - gap * (cols - 1)) / cols, bh = narrow ? 30 : 34, cellH = bh + 46, rowsN = Math.ceil(list.length / cols), H = rowsN * cellH, MAXP = 15, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `가동률 ${util}%일 때 지역 전기에서 데이터센터가 차지하는 몫. ` + list.slice(0, 4).map((o) => `${nm(o.d)} ${f1(o.v)}%`).join(", ") }, box);
+    list.forEach((o, k) => {
+      const x = (k % cols) * (bw + gap), y = Math.floor(k / cols) * cellH, w = bw - 8;
+      tx(v, x, y + 14, nm(o.d), "lb", 13.5); tx(v, x + w, y + 14, f1(o.v) + "%", "vl bi", 14, "end");
+      s("rect", { x, y: y + 22, width: w, height: bh, rx: 5, fill: "var(--off)", stroke: "var(--shell)", "stroke-width": 1.4 }, v); s("rect", { x: x + w, y: y + 22 + bh * .3, width: 6, height: bh * .4, rx: 2, fill: "var(--shell)" }, v);
+      s("rect", { x: x + 3, y: y + 25, width: Math.max(0, (w - 6) * Math.min(1, o.v / MAXP)), height: bh - 6, rx: 3, fill: "var(--bat)" }, v);
+      s("line", { x1: x + 3 + (w - 6) * Math.min(1, o.full / MAXP), x2: x + 3 + (w - 6) * Math.min(1, o.full / MAXP), y1: y + 20, y2: y + 24 + bh, stroke: "var(--ink)", "stroke-width": 1.2, "stroke-dasharray": "2 2" }, v);
+      tx(v, x, y + bh + 37, `다 쓰면 ${f1(o.full)}%`, "tk", 11.5);
+      pts.push({ x: x + w / 2, y: y + 22 + bh / 2, r: bh / 2 + 4, fn: () => [nm(o.d), [[`${f1(o.v)}%`, `가동률 ${util}%일 때`], [`${f1(o.full)}%`, "계약전력을 다 쓰면"], [`${fmt(o.d.mw)}MW`, "계약전력"], [`${f1(o.d.sales23 / 1e6)}TWh`, "지역 판매전력량(2023)"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 지역을 옮겨 볼 수 있다");
+  }
+  table("t3", ["지역본부", "계약전력(MW)", "지역 판매전력량(TWh)", "가동률 100%", "가동률 50%", "가동률 25%"], DC.filter((d) => d.cnt).sort((a, b) => b.full / b.sales23 - a.full / a.sales23).map((d) => [nm(d), fmt(d.mw), f1(d.sales23 / 1e6), pc(d.full / d.sales23 * 100), pc(d.full / d.sales23 * 50), pc(d.full / d.sales23 * 25)]));
+  const setU = (val) => { util = +val; uin.value = util; uin2.value = util; document.getElementById("uout").textContent = util + "%"; document.getElementById("uout2").textContent = util + "%"; c2(); c3(); };
+  uin.addEventListener("input", () => setU(uin.value)); uin2.addEventListener("input", () => setU(uin2.value));
+
+  /* ---------- 4. one centre's meter ---------- */
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const M = DATA.idc, n = M.length, W = Math.max(300, box.clientWidth), narrow = W < 560, H = narrow ? 240 : 280, l = 30, r = 6, top = 22, bot = 40, max = 50, bw = (W - l - r) / n, y = (val) => top + (H - top - bot) * (1 - val / max);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "인천데이터센터의 달마다 전기 사용량. 32만에서 44만 kWh 사이이고 2020년 8월, 2021년 1월과 7월이 많다" }, box);
+    [0, 10, 20, 30, 40, 50].forEach((t) => { s("line", { x1: l, x2: W - r, y1: y(t), y2: y(t), class: "gl" }, v); tx(v, l - 6, y(t) + 4, t, "tk", 11, "end"); });
+    const mxv = Math.max(...M.map((m) => m[2]));
+    M.forEach(([yy, mm, val], k) => {
+      const x = l + k * bw, h = y(0) - y(val / 1e4), segs = Math.floor(h / 6);
+      for (let q = 0; q < segs; q++) s("rect", { x: x + bw * .16, y: y(0) - (q + 1) * 6 + 1, width: bw * .68, height: 4.6, rx: 1, fill: val === mxv ? "var(--dc)" : "var(--bat)" }, v);
+      if (mm === 1 || k === 0) tx(v, x + bw / 2, H - 8, yy, "tk", 11, "middle"); tx(v, x + bw / 2, H - 22, mm, "tk", 11, "middle");
+      if (val === mxv) tx(v, x + bw / 2, y(val / 1e4) - 6, f1(val / 1e4), "vl di", 12.5, "middle");
+    });
+    timeLayer(v, tipFor(fig), n, (k) => l + k * bw + bw / 2, top, y(0), (k) => { const [yy, mm, val] = M[k]; return [`${yy}년 ${mm}월`, [[`${fmt(val)}kWh`, "사용량"], [`${f2(val / (new Date(yy, mm, 0).getDate() * 24) / 1000)}MW`, "평균 전력"]]]; }, "좌우 화살표 키로 달을 옮겨 볼 수 있다");
+  }
+  table("t4", ["연도", "월", "사용량(kWh)"], DATA.idc.map(([yy, mm, val]) => [yy, mm, fmt(val)]));
+
+  /* ---------- first view + resize ---------- */
+  c1(); c2(); c3(); c4();
+  onResize(() => { c1(); c2(); c3(); c4(); });
+})();
+</script>

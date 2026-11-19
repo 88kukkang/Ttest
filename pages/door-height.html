@@ -1,0 +1,522 @@
+<title>문 높이</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: doorways. The height of each doorway is an employment rate, so the doors people with disabilities walk through are
+   visibly lower. A street of 228 doors (one per 시군구) swings open as far as each area meets its legal hiring quota. */
+:root {
+  --paper: #f3f1ec; --card: #fdfcf9; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #dbe1dd; --grid: #e8e7e3; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --accent: #3e6f90; --wall: #ebdac0; --wall2: #e2ccb5; --frame: #67453c; --light: #fff6e0; --floor: #b6a392;
+  --dis: #d56b41; --all: #3e6f90; --dis-ink: #a8451f; --short: #d56b41; --met: #416e59; --leaf-short: #dc8c67; --leaf-met: #91b0a1;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #8eabc9; --wall: #3a3431; --wall2: #4c433e; --frame: #b6a392; --light: #5a5551; --floor: #5f6062;
+  --dis: #dc8c67; --all: #8eabc9; --dis-ink: #dc8c67; --short: #dc8c67; --met: #91b0a1; --leaf-short: #d56b41; --leaf-met: #416e59; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #8eabc9; --wall: #3a3431; --wall2: #4c433e; --frame: #b6a392; --light: #5a5551; --floor: #5f6062;
+  --dis: #dc8c67; --all: #8eabc9; --dis-ink: #dc8c67; --short: #dc8c67; --met: #91b0a1; --leaf-short: #d56b41; --leaf-met: #416e59; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 16.5px/1.78 var(--sans); word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 36px 80px }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--axis) }
+:focus-visible { outline: 2px solid var(--intl); outline-offset: 2px }
+.page { max-width: 1040px; margin: 0 auto; display: grid; gap: 64px }
+.prose { max-width: 660px; display: grid; gap: 14px; min-width: 0 }
+.prose p { margin: 0 }
+.n { font-weight: 700; font-variant-numeric: tabular-nums }
+.label { font: 500 12px/1.4 var(--mono); letter-spacing: .08em; color: var(--muted); margin: 0; text-transform: uppercase }
+
+header { display: grid; gap: 22px }
+h1 { font-weight: 700; font-size: clamp(32px, 5.6vw, 54px); line-height: 1.18; margin: 0; letter-spacing: -.03em; text-wrap: balance }
+h1 span { display: block; font-weight: 500; font-size: .46em; color: var(--ink2); margin-top: 12px; letter-spacing: -.01em; line-height: 1.45 }
+.sheet, .method { display: grid; grid-template-columns: 110px minmax(0, 1fr); border-top: 2px solid var(--ink); font-size: 14.5px; margin: 0 }
+.sheet dt, .sheet dd, .method dt, .method dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line) }
+.sheet dt, .method dt { font: 500 12px/2 var(--mono); color: var(--muted) }
+.sheet dd, .method dd { color: var(--ink2) }
+@media (max-width: 560px) { .sheet, .method { grid-template-columns: 84px minmax(0, 1fr) } }
+
+.quiz { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 14px }
+.quiz h2 { font-size: 20px; line-height: 1.5; margin: 0; font-weight: 700; text-wrap: balance }
+.opts { display: grid; gap: 8px }
+.opt { display: flex; gap: 12px; align-items: center; text-align: left; font: inherit; font-size: 15.5px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; cursor: pointer; min-height: 46px }
+.opt i { font: 500 12px var(--mono); color: var(--muted); font-style: normal; width: 14px }
+.opt[data-state="right"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink) }
+.opt[data-state="wrong"] { opacity: .5 }
+.reveal { font-size: 15px; color: var(--ink2); border-top: 1px solid var(--line); padding-top: 14px }
+.reveal .big { font-size: 28px; font-weight: 700; color: var(--ink); display: block; line-height: 1.3 }
+
+section.s { display: grid; gap: 22px }
+h2.h { font-size: clamp(23px, 3.3vw, 29px); line-height: 1.35; margin: 0; font-weight: 700; letter-spacing: -.02em; text-wrap: balance }
+figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 12px; position: relative; min-width: 0 }
+@media (max-width: 560px) { figure { padding: 14px } }
+.ft { font-weight: 700; font-size: 16px; margin: 0; line-height: 1.5 }
+.fs { font-size: 13.5px; color: var(--muted); margin: -8px 0 0; line-height: 1.6 }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y }
+figcaption { font-size: 12.5px; color: var(--muted); line-height: 1.65; border-top: 1px solid var(--grid); padding-top: 10px }
+details { font-size: 13px }
+summary { cursor: pointer; color: var(--ink2); width: max-content; font: 500 12px/2 var(--mono); padding: 6px 0 }
+.tw { overflow-x: auto; margin-top: 6px; max-height: 380px }
+table { border-collapse: collapse; font-size: 12.5px; min-width: 100% }
+th, td { padding: 5px 10px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums }
+th:first-child, td:first-child { text-align: left }
+th { font-weight: 700; color: var(--ink2); position: sticky; top: 0; background: var(--card) }
+
+/* player: play button, scrubber and a departures-board year */
+.player { display: flex; align-items: center; gap: 14px; flex-wrap: wrap }
+.play { width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--ink); color: var(--paper); cursor: pointer; display: grid; place-items: center; flex: none }
+.play svg { width: 18px; height: 18px }
+.play:hover { background: var(--intl) }
+.yr { font: 600 30px/1 var(--mono); font-variant-numeric: tabular-nums; color: var(--board-ink); background: var(--board); border-radius: 6px; padding: 8px 10px; letter-spacing: .06em;
+  background-image: linear-gradient(transparent calc(50% - .5px), rgba(255,255,255,.14) calc(50% - .5px), rgba(255,255,255,.14) calc(50% + .5px), transparent calc(50% + .5px)) }
+.scrub { flex: 1 1 180px; min-width: 0; accent-color: var(--intl); height: 32px }
+.stat { font-size: 14px; color: var(--ink2); margin: 0; min-height: 1.6em }
+.stat b { font-variant-numeric: tabular-nums }
+.chips { display: flex; flex-wrap: wrap; gap: 8px }
+.chip { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; min-height: 40px; cursor: pointer }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink) }
+.lb { fill: var(--ink); font-family: var(--sans) }
+.vl { fill: var(--ink); font-family: var(--sans); font-weight: 700; font-variant-numeric: tabular-nums }
+.tk { fill: var(--muted); font-family: var(--mono); font-variant-numeric: tabular-nums }
+.mt { fill: var(--muted); font-family: var(--sans) }
+.halo { paint-order: stroke; stroke: var(--card); stroke-linejoin: round }
+.halo-sea { paint-order: stroke; stroke: var(--sea); stroke-linejoin: round }
+.gl { stroke: var(--grid); stroke-width: 1 }
+.ax { stroke: var(--axis); stroke-width: 1 }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink2) }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block }
+.sw.line { height: 3px; width: 18px; border-radius: 2px }
+.sw.dot { border-radius: 50% }
+.tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--axis); border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,.12); padding: 8px 10px; font-size: 12.5px; line-height: 1.5; min-width: 150px; max-width: 250px; z-index: 5 }
+.tip .tn { color: var(--muted) } .tip .tv { font-weight: 700; font-size: 14px }
+.ring { fill: none; stroke: var(--ink); }
+ul.care-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; color: var(--ink2) }
+.dt { overflow-x: auto; border-top: 2px solid var(--ink) }
+.dt td, .dt th { white-space: normal; text-align: left; vertical-align: top; padding: 8px 10px 8px 0; position: static }
+.next { display: grid; border-top: 2px solid var(--ink) }
+.q { padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px }
+.q h3 { font-size: 16px; margin: 0; font-weight: 700 }
+.q p { margin: 0; font-size: 14px; color: var(--ink2) }
+.q ul { margin: 0; padding-left: 18px; font-size: 13.5px }
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px }
+
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+:focus-visible { outline-color: var(--accent) }
+</style>
+
+<main class="page">
+  <header>
+    <h1>장애인은 일하기 어려울까<span>그렇다. 일할 나이(15–64세)의 고용률은 장애인 48.3%, 전체 70.5%다. 10년 동안 전체의 문은 높아졌는데 장애인의 문은 그대로다. 일자리가 가장 많은 곳일수록 의무고용을 덜 채운다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 10</dd>
+      <dt>한 줄</dt><dd>2025년 5월 15–64세 고용률은 장애인 48.3%(장애인경제활동실태조사), 전체 70.5%(경제활동인구조사)로 22.2%p 차이다. 2015년(48.2% 대 66.2%, 18.0%p 차이)보다 틈이 벌어졌다. 30대는 54.0% 대 81.2%로 같은 나이에서도 27%p 차이가 난다. 정신 장애는 10.0%, 지체·시각 장애는 42%대다. 의무고용 사업체의 시군구별 장애인 고용을 보면, 근로자 10만 명 넘는 15곳 중 8곳이 의무고용 인원을 채우지 못했다(서울 강남구 87.0%, 중구 80.6%).</dd>
+      <dt>분류</dt><dd>주거·일·경제</dd>
+      <dt>본능</dt><dd>운명 본능 · 장애가 있으면 일하기 어려운 것이 당연하고 바뀌지 않는다고 여긴다(실제로는 나이·장애 유형·지역마다 크게 다르다)</dd>
+      <dt>그림 방식</dt><dd>문 높이 · 고용률만큼 높은 출입문을 장애인과 전체로 나란히 세웠다. 시군구 228곳은 문 하나씩으로, 의무고용을 채운 만큼 문이 열린다</dd>
+      <dt>기간</dt><dd>고용률 2015–2025년(5월) · 시군구 의무고용 2025년</dd>
+      <dt>엮은 데이터</dt><dd>3개 · 한국장애인고용공단 장애인경제활동실태조사 · 통계청 경제활동인구조사 · 한국장애인고용공단 지역별 장애인 고용 현황</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2025년 5월, 30대 전체 인구의 고용률은 81.2%다. 30대 장애인의 고용률은?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>75%쯤, 조금 낮다</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>B</i>54%쯤, 넷 중 하나 넘게 차이 난다</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>20%쯤, 다섯 중 하나만 일한다</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">B. <span class="n">54.0%</span>, 27.2%p 낮다</span>
+      장애인 전체(15세 이상)의 고용률 34.0%가 낮은 데에는 장애인의 68%가 60세 이상이라는 까닭도 있다. 그러나 나이를 맞춰도 30–50대에서 27–28%p씩 차이가 난다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">나이마다 두 개의 문</h2>
+      <p>나이대마다 출입문 두 개를 세웠다. 문의 높이가 고용률이다. 왼쪽은 장애인, 오른쪽은 전체 인구의 문이다. 2025년 30–50대 장애인의 문은 50–54%에 멈춰 있고, 같은 나이 전체의 문은 78–81%까지 올라간다.</p>
+      <p>2015년으로 바꿔 보면 차이가 보인다. 10년 동안 전체의 문은 30대에서 74.2%에서 81.2%로 높아졌지만, 30대 장애인의 문은 56.4%에서 54.0%로 낮아졌다. 15–29세 장애인만 26.1%에서 38.6%로 크게 올라갔다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">나이대별 고용률, 장애인과 전체</p>
+      <p class="fs">문 높이 = 고용률(위 점선 = 100%)</p>
+      <div class="legend"><span><i class="sw" style="background:var(--dis)"></i>장애인</span><span><i class="sw" style="background:var(--all)"></i>전체 인구</span></div>
+      <div class="chips" id="chips1" role="group" aria-label="연도"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>한국장애인고용공단 「장애인경제활동실태조사」(2015년 5월, 2025년 상반기=5월 기준), 통계청 「경제활동인구조사」 연령계층별(같은 해 5월). 두 조사는 방식이 달라 같은 잣대로 잰 것은 아니다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">벌어지는 틈</h2>
+      <p>15–64세 고용률을 해마다 이었다. 전체는 2015년 66.2%에서 2025년 70.5%로 올랐다. 장애인은 48–50% 사이를 오르내리다 2025년 48.3%다. 둘 사이의 틈은 18.0%p에서 22.2%p로 넓어졌다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">15–64세 고용률, 2015–2025년</p>
+      <p class="fs">%. 해마다 5월. 칠한 부분 = 두 고용률의 차이</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>장애인경제활동실태조사(2022년부터 반기 조사, 상반기 값), 경제활동인구조사(5월).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">장애마다 다른 문</h2>
+      <p>장애 유형마다 고용률이 크게 다르다. 지체 장애(42.3%)와 시각 장애(42.6%)는 열 중 넷이 일한다. 발달 장애(지적·자폐성)는 30.0%다. 정신 장애는 10.0%로, 열 명 중 한 명만 일한다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">장애 유형별 고용률, 2025년 상반기</p>
+      <p class="fs">%. 15세 이상. 점선 = 전체 인구 고용률</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>장애인경제활동실태조사. 지체 외 = 뇌병변·안면 장애, 시각 외 = 청각·언어 장애, 신체내부 = 신장·심장·간·호흡기·장루요루·뇌전증 장애, 정신 장애 = 정신적 장애에서 발달 장애를 뺀 값.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">문 228개의 거리</h2>
+      <p>법은 상시 50명 이상 사업체에 일정한 비율(민간 3.1%) 이상 장애인을 고용하도록 정한다. 시군구마다 문을 하나씩 세우고, 의무고용 인원을 채운 만큼 문을 열었다. 다 채운 곳은 초록 문이 활짝 열리고, 못 채운 곳은 주황 문이 덜 열린다. 근로자가 많은 시군구일수록 윗줄에 놓았다.</p>
+      <p>윗줄로 갈수록 주황 문이 많다. 근로자 10만 명 넘는 15곳 중 8곳(서울 강남·중구·서초·종로·용산, 경기 성남·용인·화성)이 의무고용을 채우지 못했다. 근로자 5천 명이 안 되는 73곳은 의무 인원의 164.8%를 고용했다. 228곳 중 미달은 36곳이다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">시군구별 의무고용 인원 대비 장애인 고용, 2025년</p>
+      <p class="fs">문 하나 = 시군구 하나. 열린 정도 = 의무고용 인원을 채운 정도(60% 이하 = 닫힘, 160% 이상 = 활짝)</p>
+      <div class="legend"><span><i class="sw" style="background:var(--leaf-met)"></i>의무 인원 채움</span><span><i class="sw" style="background:var(--leaf-short)"></i>못 채움</span></div>
+      <div class="chart" id="c4"></div>
+      <figcaption>한국장애인고용공단 「지역별 장애인 고용 현황」(2025년). 의무고용 사업체를 사업장 소재지로 묶었다. 장애인 고용인원은 중증 장애인 1명을 2명으로 세는 의무고용 산정 방식이다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 장애인은 일하기 어려울까</h2>
+      <p>그렇다. 나이를 맞춰도 장애인의 고용률은 30–50대에서 전체보다 27–28%p, 60세 이상에서 21.5%p 낮다(15–29세는 7.6%p). 15–64세로 보면 지난 10년 동안 그 틈은 좁혀지지 않고 넓어졌다. 다만 "장애인은 일할 수 없다"는 운명 같은 이야기는 아니다. 장애 유형에 따라 고용률은 10%에서 43%까지 다르고, 15–29세는 10년 사이 12%p 넘게 올랐다. 그리고 문을 가장 넓게 열 수 있는 곳, 일자리가 가장 많은 대도시의 큰 사업체들이 의무고용을 가장 덜 채운다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>장애인 고용률은 장애인경제활동실태조사(등록장애인 표본조사), 전체 고용률은 경제활동인구조사로, 서로 다른 조사다. 두 조사 모두 5월 기준이지만 같은 잣대로 잰 숫자는 아니다.</li>
+      <li>15세 이상 장애인의 68%가 60세 이상이라, 나이를 맞추지 않은 고용률(34.0% 대 63.8%)은 차이를 크게 보이게 한다. 이 페이지는 나이대별과 15–64세를 함께 보였다.</li>
+      <li>시군구별 의무고용 현황은 50명 이상 의무고용 사업체만의 이야기이고, 사업장 소재지 기준이다. 본사가 몰린 곳의 숫자는 그 회사 전체의 고용을 반영할 수 있다. 시군구로 묶으면 의무를 넘게 채운 사업체가 못 채운 사업체를 가려, 미달 사업체 수는 이보다 많다.</li>
+      <li>장애인 고용인원은 중증 장애인을 2명으로 센다. 실제 일하는 사람 수와 다르다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15004124/fileData.do" target="_blank" rel="noopener">장애인경제활동실태조사</a> (15004124, KOSIS 383 DT_38304_2013_N002·N004)</td><td>한국장애인고용공단</td><td>연령별·장애유형별 인구와 취업자, 고용률</td><td>2015–2025</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1DA7002S" target="_blank" rel="noopener">경제활동인구조사 연령계층별 경제활동인구</a></td><td>통계청</td><td>연령계층별 고용률(5월)</td><td>2015–2025</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15080750/fileData.do" target="_blank" rel="noopener">지역별 장애인 고용 현황</a> (15080750)</td><td>한국장애인고용공단</td><td>시군구별 사업체 수, 적용대상 근로자, 의무고용 인원, 장애인 고용인원</td><td>2025</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>고용률 11개 시점 · 장애 유형 7개 · 시군구 228곳</dd>
+      <dt>도구</dt><dd>Python(집계) · SVG 출입문과 여닫이 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>나이대를 맞춘 고용률 비교 · 의무고용 인원 대비 고용 인원(달성률)</dd>
+      <dt>검증</dt><dd>장애 유형별 고용률은 취업자 ÷ 15세 이상 인구로 다시 계산해 표의 합계(34.0%)와 맞췄다. 시군구 228곳을 더한 장애인 고용인원(28만 2,225명)과 근로자(849만 4,437명)로 전국 고용률 3.32%를 다시 계산했다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>큰 기업일수록 장애인을 덜 고용할까</h3><p>기업 규모별 장애인 고용률과 부담금 납부 현황으로 시군구에서 본 무늬를 사업체 단위로 확인할 수 있다.</p></div>
+      <div class="q"><h3>장애인 일자리는 어떤 일일까</h3><p>장애인경제활동실태조사의 직업·산업별 취업자로 일자리의 종류와 임금을 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15004124/fileData.do" target="_blank" rel="noopener">장애인경제활동실태조사</a> · 한국장애인고용공단</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = {"age":{"2015":{"dis":{"전체":34.8,"15~29세":26.1,"30~39세":56.4,"40~49세":54.9,"50~59세":50.1,"60세 이상":21.8,"15~64세":48.2},"all":{"전체":61.2,"30~39세":74.2,"40~49세":79.3,"50~59세":74.9,"60세 이상":41.1,"15~29세":41.4,"15~64세":66.2}},"2025":{"dis":{"전체":34.0,"15~29세":38.6,"30~39세":54.0,"40~49세":52.3,"50~59세":50.2,"60세 이상":26.8,"15~64세":48.3},"all":{"전체":63.8,"30~39세":81.2,"40~49세":80.2,"50~59세":77.6,"60세 이상":48.3,"15~29세":46.2,"15~64세":70.5}}},"ser":[[2015,34.8,48.2,61.2,66.2],[2016,36.1,50.2,61.1,66.3],[2017,36.5,49.2,61.5,67.0],[2018,34.5,49.0,61.3,67.0],[2019,34.9,50.0,61.5,67.1],[2020,34.9,48.0,60.2,65.8],[2021,34.6,49.0,61.2,66.9],[2022,36.4,50.3,63.0,69.2],[2023,36.1,49.8,63.5,69.9],[2024,33.8,48.4,63.5,70.0],[2025,34.0,48.3,63.8,70.5]],"typ":[["전체","소계",2561123.0,870644.0],["신체외부 장애","지체",1130981.0,478828.0],["신체외부 장애","지체 외",230135.0,28941.0],["감각 장애","시각",244990.0,104447.0],["감각 장애","시각 외",457369.0,133973.0],["정신적 장애","소계",331727.0,78767.0],["정신적 장애","발달 장애",228513.0,68441.0],["신체내부 장애","소계",165921.0,45687.0]],"dist":[["서울 종로구",426,265294,8344,7861],["서울 중구",740,460146,14048,11316],["서울 용산구",273,128170,3947,3424],["서울 성동구",357,94404,2896,3482],["서울 광진구",143,35019,1055,1201],["서울 동대문구",128,41636,1243,1510],["서울 중랑구",97,19779,595,997],["서울 성북구",107,43532,1302,1835],["서울 강북구",68,11076,315,571],["서울 도봉구",85,16525,484,878],["서울 노원구",119,24993,747,1167],["서울 은평구",102,15079,426,759],["서울 서대문구",146,63945,1946,1782],["서울 마포구",486,120352,3510,3900],["서울 양천구",126,25516,746,1173],["서울 강서구",446,192257,5765,6563],["서울 구로구",412,81158,2307,3002],["서울 금천구",490,91681,2600,4054],["서울 영등포구",842,424987,12807,16713],["서울 동작구",110,41427,1247,1129],["서울 관악구",120,24879,716,1092],["서울 서초구",1014,378668,11261,10465],["서울 강남구",2092,601299,17625,15333],["서울 송파구",638,249082,7427,7614],["서울 강동구",193,73937,2203,2226],["부산 중구",80,13369,374,342],["부산 서구",47,18537,601,841],["부산 동구",88,16917,500,727],["부산 영도구",56,12664,384,546],["부산 부산진구",178,50200,1606,1815],["부산 동래구",110,17502,496,738],["부산 남구",99,30773,970,1061],["부산 북구",73,14862,423,610],["부산 해운대구",164,24863,701,956],["부산 사하구",204,27694,749,1101],["부산 금정구",132,23083,653,1000],["부산 강서구",236,31900,872,975],["부산 연제구",95,18511,545,714],["부산 수영구",60,12099,344,331],["부산 사상구",128,22508,630,997],["부산 기장군",122,17811,503,805],["대구 중구",73,29578,927,1121],["대구 동구",168,39211,1216,1819],["대구 서구",86,12102,341,352],["대구 남구",59,21470,653,700],["대구 북구",130,20728,598,762],["대구 수성구",157,32961,1003,1389],["대구 달서구",266,43054,1228,1322],["대구 달성군",181,33296,955,952],["대구 군위군",13,1586,44,116],["인천 중구",113,34472,1039,1057],["인천 동구",31,22505,686,616],["인천 미추홀구",135,26032,744,1152],["인천 연수구",181,38897,1129,1218],["인천 남동구",370,75073,2257,2564],["인천 부평구",176,40400,1187,1573],["인천 계양구",100,15456,433,942],["인천 서구",300,51032,1473,1904],["인천 강화군",26,3121,87,128],["광주 동구",56,18492,588,685],["광주 서구",125,33299,1037,1139],["광주 남구",73,15926,462,575],["광주 북구",181,35398,1015,1670],["광주 광산구",228,38358,1076,1421],["대전 동구",72,46237,1644,1956],["대전 중구",100,27663,878,1349],["대전 서구",186,66411,2100,2401],["대전 유성구",306,73257,2205,1957],["대전 대덕구",131,35969,1100,1473],["울산 중구",63,32338,1140,1550],["울산 남구",220,44137,1258,1306],["울산 동구",224,41619,1176,831],["울산 북구",140,21264,597,666],["울산 울주군",188,29564,828,743],["세종특별자치시",199,77563,2661,2582],["경기 수원시",519,288526,9000,9240],["경기 성남시",914,277524,8239,7794],["경기 의정부시",130,18730,527,796],["경기 안양시",388,90669,2628,2792],["경기 부천시",310,49787,1402,2096],["경기 광명시",87,23649,692,999],["경기 평택시",461,84272,2385,2485],["경기 동두천시",35,5122,145,275],["경기 안산시",529,78828,2178,2329],["경기 고양시",338,49347,1393,2085],["경기 과천시",129,44452,1348,1221],["경기 구리시",49,8151,231,330],["경기 남양주시",187,27210,749,1315],["경기 오산시",120,18128,503,537],["경기 시흥시",292,48123,1349,1484],["경기 군포시",132,19944,552,701],["경기 의왕시",70,15482,454,492],["경기 하남시",111,19103,533,740],["경기 용인시",597,156558,4554,4240],["경기 파주시",258,33490,915,1150],["경기 이천시",160,58716,1743,1831],["경기 안성시",193,31512,883,1123],["경기 김포시",215,26493,715,706],["경기 화성시",844,139829,3900,3484],["경기 광주시",149,20627,572,625],["경기 양주시",119,13811,377,591],["경기 포천시",117,15650,430,430],["경기 여주시",67,8497,234,350],["경기 연천군",19,2048,55,105],["경기 가평군",25,3145,90,145],["경기 양평군",37,4620,129,199],["강원 춘천시",139,33005,1036,1477],["강원 원주시",199,70521,2401,2981],["강원 강릉시",87,12315,349,470],["강원 동해시",24,2679,70,147],["강원 태백시",16,2754,85,290],["강원 속초시",19,3477,104,146],["강원 삼척시",19,3561,105,114],["강원 홍천군",24,8883,268,249],["강원 횡성군",42,5690,160,262],["강원 영월군",19,2323,70,241],["강원 평창군",19,3845,115,169],["강원 정선군",19,7531,258,338],["강원 철원군",11,1417,42,35],["강원 화천군",6,675,19,95],["강원 양구군",5,809,26,52],["강원 인제군",9,1121,33,71],["강원 고성군",9,2020,62,72],["강원 양양군",10,1301,36,60],["충북 청주시",517,104505,3099,3616],["충북 충주시",124,19319,539,619],["충북 제천시",49,7742,222,299],["충북 보은군",23,2645,70,75],["충북 옥천군",22,2300,63,72],["충북 영동군",22,2684,74,189],["충북 증평군",19,2290,63,102],["충북 진천군",128,21893,624,604],["충북 괴산군",25,3618,100,111],["충북 음성군",163,28260,821,878],["충북 단양군",14,1573,45,58],["충남 천안시",489,92456,2633,2884],["충남 공주시",69,16345,485,520],["충남 보령시",40,8915,282,394],["충남 아산시",303,62704,1791,1825],["충남 서산시",115,25790,746,663],["충남 논산시",61,7363,202,212],["충남 계룡시",12,970,26,59],["충남 당진시",147,25959,738,843],["충남 금산군",30,4036,112,201],["충남 부여군",26,3403,100,225],["충남 서천군",29,4093,123,149],["충남 청양군",14,1554,42,82],["충남 홍성군",49,19116,663,790],["충남 예산군",71,11108,313,445],["충남 태안군",12,5190,178,189],["전북 전주시",281,67273,2132,2874],["전북 군산시",142,23593,672,957],["전북 익산시",136,34560,1023,1659],["전북 정읍시",50,6656,182,260],["전북 남원시",24,3240,96,135],["전북 김제시",58,8165,228,475],["전북 완주군",79,15039,457,619],["전북 진안군",9,1221,36,131],["전북 무주군",7,1017,31,50],["전북 장수군",6,781,23,99],["전북 임실군",10,1850,57,48],["전북 순창군",7,1094,33,32],["전북 고창군",22,2673,74,118],["전북 부안군",13,2070,58,51],["전남 목포시",79,13507,390,812],["전남 여수시",172,30514,864,981],["전남 순천시",93,13614,383,503],["전남 나주시",102,64460,2287,2533],["전남 광양시",120,20622,585,548],["전남 담양군",30,3707,105,139],["전남 곡성군",11,1591,44,43],["전남 구례군",8,959,28,36],["전남 고흥군",21,2840,80,71],["전남 보성군",14,1731,51,88],["전남 화순군",42,5622,158,131],["전남 장흥군",9,1566,50,57],["전남 강진군",9,1387,45,54],["전남 해남군",25,3385,92,110],["전남 영암군",110,15550,428,444],["전남 무안군",39,14330,499,611],["전남 함평군",16,1385,37,37],["전남 영광군",20,3447,100,108],["전남 장성군",29,2802,73,81],["전남 완도군",13,1456,43,92],["전남 진도군",11,1452,45,157],["전남 신안군",12,1487,45,49],["경북 포항시",291,77629,2263,2238],["경북 경주시",182,38174,1187,1359],["경북 김천시",76,25902,881,1131],["경북 안동시",71,24056,804,1109],["경북 구미시",239,42077,1181,1045],["경북 영주시",38,7361,211,257],["경북 영천시",66,9269,258,318],["경북 상주시",29,4357,124,143],["경북 문경시",29,3869,110,181],["경북 경산시",165,30088,858,841],["경북 의성군",17,1508,41,81],["경북 청송군",7,814,24,46],["경북 영양군",3,497,16,81],["경북 영덕군",16,1594,44,87],["경북 청도군",24,3325,91,157],["경북 고령군",23,2032,53,66],["경북 성주군",25,2588,70,71],["경북 칠곡군",80,8683,225,279],["경북 예천군",16,2358,70,188],["경북 봉화군",8,648,16,42],["경북 울진군",16,2154,64,177],["경북 울릉군",2,218,6,11],["경남 창원시",677,152638,4536,5417],["경남 진주시",154,43471,1432,1606],["경남 통영시",38,4368,116,163],["경남 사천시",79,17906,518,463],["경남 김해시",360,48268,1319,1427],["경남 밀양시",63,9267,257,314],["경남 거제시",223,35451,984,1084],["경남 양산시",222,36038,1010,1247],["경남 의령군",16,2123,60,79],["경남 함안군",67,8910,240,322],["경남 창녕군",41,4062,108,102],["경남 고성군",30,3574,101,151],["경남 남해군",17,1932,52,122],["경남 하동군",12,1673,49,101],["경남 산청군",16,1910,52,124],["경남 함양군",15,2035,59,76],["경남 거창군",28,2657,70,97],["경남 합천군",16,1800,50,77],["제주 제주시",208,50383,1532,2097],["제주 서귀포시",59,11720,340,395]]};
+document.documentElement.lang = "ko";
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const s = (tag, a = {}, p) => { const e = document.createElementNS(NS, tag); for (const k in a) if (a[k] != null) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  const tx = (p, x, y, str, cls, size, anchor = "start", extra = {}) => { const t = s("text", { x, y, class: cls, "text-anchor": anchor, "font-size": size, ...extra }, p); t.textContent = str; return t; };
+  const fmt = (n) => Math.round(n).toLocaleString("ko-KR");
+  const f1 = (n) => n.toLocaleString("ko-KR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const pc = (n) => f1(n) + "%";
+  const man = (n) => n >= 1e5 ? f1(n / 1e4).replace(/\.0$/, "") + "만" : fmt(n);
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lerp = (arr, pos) => { const k = Math.floor(pos), f = pos - k; return k + 1 < arr.length ? arr[k] + (arr[k + 1] - arr[k]) * f : arr[k]; };
+  const bEl = (t) => Object.assign(document.createElement("b"), { textContent: t });
+
+  function table(id, head, rows) {
+    const t = document.createElement("table"), th = document.createElement("thead"), tr = document.createElement("tr");
+    head.forEach((h) => { const c = document.createElement("th"); c.textContent = h; tr.append(c); }); th.append(tr); t.append(th);
+    const tb = document.createElement("tbody");
+    rows.forEach((r) => { const row = document.createElement("tr"); r.forEach((v) => { const c = document.createElement("td"); c.textContent = v; row.append(c); }); tb.append(row); });
+    t.append(tb); document.getElementById(id).replaceChildren(t);
+  }
+  function tipFor(fig) {
+    const tip = fig.querySelector(".tip");
+    return {
+      show(ev, title, rows) {
+        tip.replaceChildren(); const h = document.createElement("div"); h.className = "tn"; h.textContent = title; tip.append(h);
+        rows.forEach(([v, k, col]) => { const d = document.createElement("div"); if (col) { const i = document.createElement("i"); i.className = "sw dot"; i.style.background = col; i.style.marginRight = "6px"; d.append(i); } const b = document.createElement("span"); b.className = "tv"; b.textContent = v + " "; const kk = document.createElement("span"); kk.textContent = k; d.append(b, kk); tip.append(d); });
+        tip.hidden = false;
+        const fr = fig.getBoundingClientRect(); let x, y;
+        if (ev.clientX != null) { x = ev.clientX - fr.left + 14; y = ev.clientY - fr.top + 14; } else { const r = (ev.rect || ev.target.getBoundingClientRect()); x = r.right - fr.left + 8; y = r.top - fr.top; }
+        const tw = tip.offsetWidth, th = tip.offsetHeight;
+        if (x + tw > fr.width - 8) x = Math.max(8, x - tw - 28);
+        if (y + th > fr.height - 8) y = Math.max(8, y - th - 28);
+        tip.style.left = x + "px"; tip.style.top = y + "px";
+      },
+      hide() { tip.hidden = true; },
+    };
+  }
+  /* Marks you can point at. One tab stop per chart; Left/Right step, Up/Down jump rows, Escape hides.
+     pts: {x, y, r, fn() -> [title, rows]} in viewBox units; u = viewBox units per CSS px. */
+  function pointLayer(v, tip, pts, label, u = 1) {
+    const ring = s("circle", { class: "ring", "stroke-width": 2 * u, opacity: 0 }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = i; const p = pts[i]; ring.setAttribute("cx", p.x); ring.setAttribute("cy", p.y); ring.setAttribute("r", p.r + 4 * u); ring.setAttribute("opacity", 1); const [t, rows] = p.fn(); tip.show(ev || { target: ring }, t, rows); };
+    const hide = () => { tip.hide(); ring.setAttribute("opacity", 0); };
+    const nearest = (e) => {
+      const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal, k = vb.width / r.width;
+      const x = vb.x + (e.clientX - r.left) * k, y = vb.y + (e.clientY - r.top) * k;
+      let best = -1, bd = Infinity;
+      pts.forEach((p, i) => { const d = Math.hypot(p.x - x, p.y - y) - p.r, reach = 18 * k; if (d < reach && d < bd) { bd = d; best = i; } });
+      return best;
+    };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerdown", (e) => { const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => { if (pts.length) show(idx < 0 ? 0 : idx); }); v.addEventListener("blur", hide);
+    const vert = (dir) => { const c = pts[Math.max(idx, 0)]; let best = -1, bd = Infinity; pts.forEach((p, i) => { const dy = (p.y - c.y) * dir; if (dy <= 0.5) return; const d = dy * 3 + Math.abs(p.x - c.x); if (d < bd) { bd = d; best = i; } }); return best < 0 ? Math.max(idx, 0) : best; };
+    v.addEventListener("keydown", (e) => {
+      if (!pts.length) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show((Math.max(idx, 0) + (e.key === "ArrowRight" ? 1 : -1) + pts.length) % pts.length); }
+      else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); show(vert(e.key === "ArrowDown" ? 1 : -1)); }
+      else if (e.key === "Escape") hide();
+    });
+  }
+  /* A time cursor over a chart: pointer or Left/Right picks a time index, a vertical rule follows it. */
+  function timeLayer(v, tip, n, xOf, y0, y1, fn, label, u = 1) {
+    const rule = s("line", { y1: y0, y2: y1, stroke: "var(--ink)", "stroke-width": u, opacity: 0, "pointer-events": "none" }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = Math.max(0, Math.min(n - 1, i)); const x = xOf(idx); rule.setAttribute("x1", x); rule.setAttribute("x2", x); rule.setAttribute("opacity", .5); const [t, rows] = fn(idx); const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; tip.show(ev || { rect: { right: r.left + (x - vb.x) / vb.width * r.width, top: r.top + 20 } }, t, rows); };
+    const hide = () => { tip.hide(); rule.setAttribute("opacity", 0); };
+    const at = (e) => { const r = v.getBoundingClientRect(), vb = v.viewBox.baseVal; const x = vb.x + (e.clientX - r.left) * vb.width / r.width; let best = 0, bd = Infinity; for (let i = 0; i < n; i++) { const d = Math.abs(xOf(i) - x); if (d < bd) { bd = d; best = i; } } return best; };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; show(at(e), e); });
+    v.addEventListener("pointerdown", (e) => show(at(e), e));
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => show(idx < 0 ? n - 1 : idx)); v.addEventListener("blur", hide);
+    v.addEventListener("keydown", (e) => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); show(idx + (e.key === "ArrowRight" ? 1 : -1)); } else if (e.key === "Home") { e.preventDefault(); show(0); } else if (e.key === "End") { e.preventDefault(); show(n - 1); } else if (e.key === "Escape") hide(); });
+  }
+  /* A player: play/pause, scrubber and a large time readout. Frames 0..n-1; at rest it shows the last frame. */
+  function Player(id, label, draw, n, labelOf, seconds = 10) {
+    const box = document.getElementById(id);
+    const btn = document.createElement("button"); btn.type = "button"; btn.className = "play"; btn.setAttribute("aria-label", label + " 재생");
+    const icon = (playing) => { btn.replaceChildren(); const v = s("svg", { viewBox: "0 0 20 20", "aria-hidden": "true" }, btn); if (playing) { s("rect", { x: 4, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); s("rect", { x: 12, y: 3, width: 4, height: 14, rx: 1, fill: "currentColor" }, v); } else s("path", { d: "M5,3 L17,10 L5,17 Z", fill: "currentColor" }, v); };
+    const yr = document.createElement("div"); yr.className = "yr"; yr.setAttribute("aria-hidden", "true");
+    const sc = document.createElement("input"); sc.type = "range"; sc.className = "scrub"; sc.min = 0; sc.max = n - 1; sc.step = 1; sc.value = n - 1; sc.setAttribute("aria-label", label + " 시점");
+    box.append(btn, yr, sc);
+    let pos = n - 1, raf = 0, playing = false, t0 = 0, from = 0;
+    const render = () => { const k = Math.min(n - 1, Math.floor(pos + 1e-6)); yr.textContent = labelOf(k); sc.value = Math.round(pos); sc.setAttribute("aria-valuetext", labelOf(Math.round(pos))); draw(pos); };
+    const stop = () => { playing = false; cancelAnimationFrame(raf); icon(false); btn.setAttribute("aria-label", label + " 재생"); };
+    const tick = (now) => { pos = Math.min(n - 1, from + (now - t0) / (seconds * 1000) * (n - 1)); render(); if (pos < n - 1) raf = requestAnimationFrame(tick); else stop(); };
+    btn.addEventListener("click", () => {
+      if (playing) { stop(); return; }
+      if (reduce) { pos = n - 1; render(); return; }
+      from = pos >= n - 1 ? 0 : pos; pos = from; playing = true; icon(true); btn.setAttribute("aria-label", label + " 멈춤");
+      raf = requestAnimationFrame((t) => { t0 = t; tick(t); });
+    });
+    sc.addEventListener("input", () => { stop(); pos = +sc.value; render(); });
+    icon(false);
+    return { render, get pos() { return pos; } };
+  }
+  document.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".opt").forEach((o) => { o.setAttribute("aria-pressed", o === b); o.dataset.state = o.dataset.a === "1" ? "right" : "wrong"; });
+    document.getElementById("reveal").hidden = false;
+  }));
+  function chips(id, opts, cur, onPick) {
+    const box = document.getElementById(id);
+    opts.forEach(([k, name]) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = name; b.setAttribute("aria-pressed", k === cur); b.addEventListener("click", () => { box.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === b)); onPick(k); }); box.append(b); });
+  }
+  function onResize(fn) {
+    let lastW = 0, rt;
+    new ResizeObserver(() => { const w = document.querySelector(".page").clientWidth; if (Math.abs(w - lastW) < 2) return; lastW = w; clearTimeout(rt); rt = setTimeout(fn, 80); }).observe(document.querySelector(".page"));
+  }
+
+  const AG = ["15~29세", "30~39세", "40~49세", "50~59세", "60세 이상", "15~64세"];
+  const AGN = { "15~29세": "15–29세", "30~39세": "30대", "40~49세": "40대", "50~59세": "50대", "60세 이상": "60세 이상", "15~64세": "15–64세" };
+  const ease = (t) => 1 - Math.pow(1 - t, 3);
+
+  /* ---------- 1. pairs of doorways ---------- */
+  let yr = "2025", cur1 = null, raf1 = 0;
+  chips("chips1", [["2025", "2025년"], ["2015", "2015년"]], yr, (k) => { yr = k; animate1(); });
+  function c1() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, H = narrow ? 300 : 340, floor = H - 30, top = 34, maxH = floor - top;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "나이대별 고용률을 문 높이로 그린 그림" }, box), pts = [];
+    s("rect", { x: 0, y: 0, width: W, height: floor, fill: "var(--wall)" }, v);
+    for (let x = 0; x < W; x += 34) s("line", { x1: x, x2: x, y1: 0, y2: floor, stroke: "var(--wall2)", "stroke-width": 1 }, v);
+    s("rect", { x: 0, y: floor, width: W, height: H - floor, fill: "var(--floor)" }, v);
+    s("line", { x1: 0, x2: W, y1: top, y2: top, stroke: "var(--axis)", "stroke-dasharray": "4 4" }, v); tx(v, 4, top - 6, "100%", "tk", 11.5, "start");
+    const n = AG.length, gw = W / n, dw = Math.min(narrow ? 20 : 36, gw / 2 - (narrow ? 6 : 10));
+    const doors = [];
+    AG.forEach((a, i) => {
+      const cx = i * gw + gw / 2, bold = a === "15~64세";
+      if (bold) s("rect", { x: i * gw + 2, y: 6, width: gw - 4, height: floor - 6, fill: "var(--card)", opacity: .35 }, v);
+      [["dis", -1], ["all", 1]].forEach(([k, sd]) => {
+        const x = cx + sd * (dw / 2 + (narrow ? 2 : 4)) - dw / 2;
+        const op = s("rect", { x, width: dw, fill: "var(--light)" }, v);
+        const leaf = s("path", { fill: `var(--${k})`, opacity: .85 }, v), knob = s("circle", { r: narrow ? 1.6 : 2.2, fill: "var(--card)" }, v);
+        const fr = s("path", { fill: "none", stroke: `var(--${k})`, "stroke-width": narrow ? 3 : 4, "stroke-linejoin": "round" }, v);
+        const lintel = s("rect", { x: x - (narrow ? 3 : 5), width: dw + (narrow ? 6 : 10), height: narrow ? 4 : 6, rx: 1.5, fill: `var(--${k})` }, v);
+        const lab = tx(v, x + dw / 2, 0, "", "vl", narrow ? 11.5 : 13, "middle", { style: `fill:${k === "dis" ? "var(--dis-ink)" : "var(--all)"}` });
+        doors.push({ a, k, x, op, fr, lab, leaf, knob, lintel });
+      });
+      tx(v, cx, H - 10, AGN[a], bold ? "vl" : "lb", narrow ? 11.5 : 12.5, "middle", { style: "fill:var(--ink)" });
+      pts.push({ x: cx, y: floor - maxH * .5, r: gw / 2, fn: () => { const d = DATA.age[yr]; return [`${AGN[a]} · ${yr}년 5월`, [[pc(d.dis[a]), "장애인", "var(--dis)"], [pc(d.all[a]), "전체 인구", "var(--all)"], [`${f1(d.all[a] - d.dis[a])}%p`, "차이"]]]; } });
+    });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 나이대를 옮겨 볼 수 있다");
+    cur1 = { doors, floor, maxH, narrow };
+    draw1(Object.fromEntries(doors.map((d) => [d.a + d.k, DATA.age[yr][d.k][d.a]])));
+  }
+  function draw1(vals) {
+    const { doors, floor, maxH, narrow } = cur1;
+    doors.forEach((d) => {
+      const p = vals[d.a + d.k], h = maxH * p / 100, y = floor - h, w = +d.op.getAttribute("width");
+      d.op.setAttribute("y", y); d.op.setAttribute("height", h);
+      d.fr.setAttribute("d", `M${d.x},${floor} L${d.x},${y} L${d.x + w},${y} L${d.x + w},${floor}`);
+      // a door leaf swung half open against the hinge side, so each bar reads as a doorway you walk through
+      const lw = w * .38, sk = Math.min(10, h * .06);
+      d.leaf.setAttribute("d", `M${d.x},${y} L${d.x + lw},${y + sk} L${d.x + lw},${floor - sk * .4} L${d.x},${floor} Z`);
+      d.knob.setAttribute("cx", d.x + lw - 3.5); d.knob.setAttribute("cy", y + h * .55);
+      d.lintel.setAttribute("y", y - (narrow ? 4 : 6));
+      d.lab.setAttribute("y", y - (narrow ? 9 : 12)); d.lab.textContent = narrow ? Math.round(p) : f1(p);
+    });
+    cur1.vals = vals;
+  }
+  function animate1() {
+    cancelAnimationFrame(raf1);
+    const from = cur1.vals, to = Object.fromEntries(cur1.doors.map((d) => [d.a + d.k, DATA.age[yr][d.k][d.a]]));
+    if (reduce) return draw1(to);
+    const t0 = performance.now(); const step = (now) => { const t = Math.min(1, (now - t0) / 800), e = ease(t); draw1(Object.fromEntries(Object.keys(to).map((k) => [k, from[k] + (to[k] - from[k]) * e]))); if (t < 1) raf1 = requestAnimationFrame(step); }; raf1 = requestAnimationFrame(step);
+  }
+  table("t1", ["나이", "장애인 2015", "전체 2015", "장애인 2025", "전체 2025"], AG.map((a) => [AGN[a], pc(DATA.age["2015"].dis[a]), pc(DATA.age["2015"].all[a]), pc(DATA.age["2025"].dis[a]), pc(DATA.age["2025"].all[a])]));
+
+  /* ---------- 2. the widening gap ---------- */
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const S = DATA.ser, W = Math.max(300, box.clientWidth), H = Math.min(300, Math.max(230, W * .4)), l = 40, r = 96, top = 14, bot = 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "15–64세 고용률 장애인과 전체 2015–2025" }, box);
+    const sx = (y) => l + (y - 2015) / 10 * (W - l - r), sy = (p) => top + (1 - (p - 40) / 35) * (H - top - bot);
+    [40, 50, 60, 70].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: "gl" }, v); tx(v, l - 6, sy(t) + 4, `${t}%`, "tk", 11.5, "end"); });
+    [2015, 2018, 2021, 2025].forEach((y) => tx(v, sx(y), H - 6, String(y), "tk", 11.5, "middle"));
+    const gap = s("path", { d: "M" + S.map((p) => `${sx(p[0])},${sy(p[4])}`).join("L") + "L" + [...S].reverse().map((p) => `${sx(p[0])},${sy(p[2])}`).join("L") + "Z", fill: "var(--dis)", opacity: .14 }, v);
+    const lines = [[4, "var(--all)", "전체"], [2, "var(--dis)", "장애인"]].map(([i, col, nm]) => {
+      const pth = s("path", { d: "M" + S.map((p) => `${sx(p[0]).toFixed(1)},${sy(p[i]).toFixed(1)}`).join("L"), fill: "none", stroke: col, "stroke-width": 3, "stroke-linejoin": "round" }, v);
+      S.forEach((p) => s("circle", { cx: sx(p[0]), cy: sy(p[i]), r: 3, fill: col }, v));
+      const last = S[S.length - 1]; tx(v, sx(2025) + 8, sy(last[i]) + 4, `${nm} ${f1(last[i])}%`, "vl halo", 12.5, "start", { style: `fill:${i === 2 ? "var(--dis-ink)" : "var(--all)"}`, "stroke-width": 4 });
+      return pth;
+    });
+    const L = S[S.length - 1], F = S[0];
+    tx(v, sx(2025) + 8, (sy(L[4]) + sy(L[2])) / 2 + 4, `차이 ${f1(L[4] - L[2])}%p`, "mt", 12, "start");
+    tx(v, sx(2015) + 6, (sy(F[4]) + sy(F[2])) / 2 + 4, `${f1(F[4] - F[2])}%p`, "mt", 12, "start");
+    timeLayer(v, tipFor(fig), S.length, (i) => sx(S[i][0]), top, H - bot, (i) => [`${S[i][0]}년 5월`, [[pc(S[i][4]), "전체 15–64세", "var(--all)"], [pc(S[i][2]), "장애인 15–64세", "var(--dis)"], [`${f1(S[i][4] - S[i][2])}%p`, "차이"]]], "좌우 화살표로 해를 옮겨 볼 수 있다");
+    if (!reduce) {
+      lines.forEach((pth) => { const len = pth.getTotalLength(); pth.style.strokeDasharray = len; pth.style.strokeDashoffset = len; });
+      gap.style.opacity = 0;
+      const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); lines.forEach((pth) => { pth.style.transition = "stroke-dashoffset 1.4s ease-out"; pth.style.strokeDashoffset = 0; }); gap.style.transition = "opacity .8s 1.2s"; gap.style.opacity = .14; }, { threshold: .3 });
+      io.observe(box);
+    }
+  }
+  table("t2", ["연도", "장애인 15세 이상", "장애인 15–64세", "전체 15세 이상", "전체 15–64세"], DATA.ser.map((p) => [p[0], pc(p[1]), pc(p[2]), pc(p[3]), pc(p[4])]));
+
+  /* ---------- 3. by type ---------- */
+  const T = DATA.typ, MENT = T.find((t) => t[0] === "정신적 장애" && t[1] === "소계"), DEV = T.find((t) => t[1] === "발달 장애");
+  const TYP = [["지체", T[1]], ["지체 외(뇌병변·안면)", T[2]], ["시각", T[3]], ["시각 외(청각·언어)", T[4]], ["발달(지적·자폐성)", DEV], ["정신", [0, 0, MENT[2] - DEV[2], MENT[3] - DEV[3]]], ["신체내부", T[7]]].map(([n, r]) => ({ n, pop: r[2], emp: r[3], p: r[3] / r[2] * 100 })).sort((a, b) => b.p - a.p);
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, l = narrow ? 118 : 170, r = 52, rowH = 30, top = 18, H = top + TYP.length * rowH + 4;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "장애 유형별 고용률" }, box), pts = [];
+    const sx = (p) => l + p / 70 * (W - l - r);
+    [0, 20, 40, 60].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top - 4, y2: H - 2, class: t ? "gl" : "ax" }, v); tx(v, sx(t), top - 6, `${t}%`, "tk", 11.5, "middle"); });
+    s("line", { x1: sx(63.8), x2: sx(63.8), y1: top - 4, y2: H - 2, stroke: "var(--all)", "stroke-dasharray": "3 3" }, v);
+    TYP.forEach((t, i) => {
+      const y = top + i * rowH + 6;
+      const lab = tx(v, l - 8, y + 12, t.n, "lb", 12.5, "end"); if (!narrow) { const sp = s("tspan", { class: "mt", dx: 4, "font-size": 11.5 }, lab); sp.textContent = `(${man(t.pop)})`; }
+      s("rect", { x: l, y, width: sx(t.p) - l, height: 16, rx: 3, fill: "var(--dis)" }, v);
+      tx(v, sx(t.p) + 6, y + 12, pc(t.p), "vl", 12.5, "start", { style: "fill:var(--dis-ink)" });
+      pts.push({ x: sx(t.p), y: y + 8, r: 8, fn: () => [t.n, [[pc(t.p), "고용률"], [fmt(t.emp) + "명", "취업자"], [fmt(t.pop) + "명", "15세 이상"]]] });
+    });
+    tx(v, sx(63.8) - 4, H - 6, "전체 인구 63.8%", "tk", 11, "end", { style: "fill:var(--all)" });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 유형을 옮겨 볼 수 있다");
+  }
+  table("t3", ["장애 유형", "15세 이상", "취업자", "고용률"], TYP.map((t) => [t.n, fmt(t.pop), fmt(t.emp), pc(t.p)]));
+
+  /* ---------- 4. a street of 228 doors ---------- */
+  const D = DATA.dist.map(([name, f, w, q, e]) => ({ name, f, w, q, e, a: e / q }));
+  const BINS = [[1e5, 1e9, "근로자 10만 명 이상"], [5e4, 1e5, "5만–10만 명"], [2e4, 5e4, "2만–5만 명"], [5e3, 2e4, "5천–2만 명"], [0, 5e3, "5천 명 미만"]];
+  let doorsShown = false;
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, dw = narrow ? 13 : 17, dh = narrow ? 24 : 30, gx = narrow ? 3 : 5, gy = 8, per = Math.floor((W + gx) / (dw + gx));
+    let y = 0; const rows = BINS.map(([lo, hi, lab]) => { const us = D.filter((d) => d.w >= lo && d.w < hi).sort((a, b) => a.a - b.a); const lines = Math.ceil(us.length / per); const r = { lab, us, y, lines }; y += 26 + lines * (dh + gy) + 10; return r; });
+    const H = y;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "시군구 228곳의 의무고용 달성 정도를 여닫이 문으로 그린 그림" }, box), pts = [], leaves = [];
+    rows.forEach((r) => {
+      const e = r.us.reduce((a, d) => a + d.e, 0), q = r.us.reduce((a, d) => a + d.q, 0), sh = r.us.filter((d) => d.a < 1).length;
+      const t = tx(v, 0, r.y + 16, r.lab, "vl", 13, "start");
+      const sp = s("tspan", { class: "mt", dx: 6, "font-size": 12 }, t); sp.textContent = `${r.us.length}곳 · 미달 ${sh}곳 · 달성 ${Math.round(e / q * 100)}%`;
+      r.us.forEach((d, k) => {
+        const x = (k % per) * (dw + gx), yy = r.y + 26 + Math.floor(k / per) * (dh + gy), met = d.a >= 1;
+        s("rect", { x: x - 1.5, y: yy - 1.5, width: dw + 3, height: dh + 1.5, fill: "var(--frame)", rx: 1.5 }, v);
+        s("rect", { x, y: yy, width: dw, height: dh, fill: "var(--light)" }, v);
+        const leaf = s("path", { fill: met ? "var(--leaf-met)" : "var(--leaf-short)" }, v);
+        const open = Math.max(0, Math.min(1, (d.a - .6) / 1));
+        leaves.push({ leaf, x, yy, open });
+        pts.push({ x: x + dw / 2, y: yy + dh / 2, r: dw / 2, fn: () => [d.name, [[pc(d.a * 100), "의무고용 인원 대비"], [`${fmt(d.e)} / ${fmt(d.q)}명`, "고용 / 의무 인원"], [fmt(d.w) + "명", `근로자 · 사업체 ${fmt(d.f)}곳`]]] });
+      });
+    });
+    // the leaf is hinged on the left; as it opens it narrows and its free edge tilts, like a door seen from the front
+    const setLeaf = (L, o) => { const w = dw * (1 - .82 * o), sk = dh * .12 * o; L.leaf.setAttribute("d", `M${L.x},${L.yy} L${L.x + w},${L.yy + sk} L${L.x + w},${L.yy + dh - sk} L${L.x},${L.yy + dh} Z`); };
+    leaves.forEach((L) => setLeaf(L, doorsShown || reduce ? L.open : 0));
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 문을 하나씩 옮겨 볼 수 있다");
+    if (!doorsShown && !reduce) {
+      const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); doorsShown = true;
+        const t0 = performance.now(); const step = (now) => { let done = true; leaves.forEach((L, i) => { const t = Math.min(1, Math.max(0, (now - t0 - i * 6) / 900)); if (t < 1) done = false; setLeaf(L, L.open * ease(t)); }); if (!done) requestAnimationFrame(step); }; requestAnimationFrame(step); }, { threshold: .15 });
+      io.observe(box);
+    }
+  }
+  table("t4", ["시군구", "근로자", "의무고용 인원", "장애인 고용인원", "달성"], [...D].sort((a, b) => a.a - b.a).map((d) => [d.name, fmt(d.w), fmt(d.q), fmt(d.e), pc(d.a * 100)]));
+
+  const all = () => { c1(); c2(); c3(); c4(); };
+  all(); onResize(all);
+})();
+</script>

@@ -1,0 +1,460 @@
+<title>웨딩 케이크</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a 56-tier wedding cake, one tier per year 1970–2025, tier width = marriages that year (switches to divorces).
+   Then a grid of rings — husband age across, wife age up, ring size = couples — played 1990→2025 with the
+   average couple's path; arrows of age-specific marriage rates 2022→2025; and a ring map of 229 places
+   coloured by how far marriages have come back. */
+:root {
+  --paper: #f5f1ea; --card: #fdfbf7; --ink: #2f2a28; --ink2: #4c433e; --muted: #5f5853; --line: #e4dbd0; --grid: #ece4da; --axis: #b6a392;
+  --accent: #953a4c; --intl: #953a4c; --hi-ink: #953a4c; --board: #4c433e; --board-ink: #f5f1ea; --sea: #fdfbf7;
+  --cake1: #ebdac0; --cake2: #e2ccb5; --cake-edge: #b6a392; --cake-hi: #d6b0a7; --cake-hi-edge: #953a4c; --frost: #fdfbf7;
+  --div: #abbdc9; --div-edge: #3e6f90; --ring: #b87b68; --ring-hi: #953a4c; --trail: #3e6f90;
+  --up2: #9b3737; --up1: #d56b41; --flat: #a7a8a3; --dn1: #689daf; --dn2: #3e6f90;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1e1b1a; --card: #282423; --ink: #efe9e3; --ink2: #e2ccb5; --muted: #b6a392; --line: #3d3634; --grid: #322d2b; --axis: #67605a;
+  --accent: #d6b0a7; --intl: #d6b0a7; --hi-ink: #e7b9b0; --board: #e2ccb5; --board-ink: #1e1b1a; --sea: #282423;
+  --cake1: #6e655e; --cake2: #5f5853; --cake-edge: #928a7f; --cake-hi: #903a43; --cake-hi-edge: #e7cdc0; --frost: #928a7f;
+  --div: #3e6f90; --div-edge: #abbdc9; --ring: #d8b29b; --ring-hi: #f0a8a0; --trail: #8eabc9;
+  --up2: #e59a7e; --up1: #b87b68; --flat: #6e6862; --dn1: #689daf; --dn2: #a9c3dc; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1e1b1a; --card: #282423; --ink: #efe9e3; --ink2: #e2ccb5; --muted: #b6a392; --line: #3d3634; --grid: #322d2b; --axis: #67605a;
+  --accent: #d6b0a7; --intl: #d6b0a7; --hi-ink: #e7b9b0; --board: #e2ccb5; --board-ink: #1e1b1a; --sea: #282423;
+  --cake1: #6e655e; --cake2: #5f5853; --cake-edge: #928a7f; --cake-hi: #903a43; --cake-hi-edge: #e7cdc0; --frost: #928a7f;
+  --div: #3e6f90; --div-edge: #abbdc9; --ring: #d8b29b; --ring-hi: #f0a8a0; --trail: #8eabc9;
+  --up2: #e59a7e; --up1: #b87b68; --flat: #6e6862; --dn1: #689daf; --dn2: #a9c3dc; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.tier, .rg { transform-box: fill-box; transform-origin: center }
+.hi { fill: var(--hi-ink) }
+::selection { background: var(--cake-hi); color: var(--ink) }
+</style>
+
+<main class="page">
+  <header>
+    <h1>결혼은 계속 줄고 있을까<span>아니다. 2022년 19만 1,690건으로 바닥을 친 혼인은 3년 연속 늘어 2025년 24만 326건, 2019년 수준으로 돌아왔다. 늘어난 결혼은 30대에 몰렸고, 결혼할 나이의 인구가 늘어서가 아니라 같은 나이에서 결혼하는 사람이 많아졌다. 다만 군 지역은 아직 2019년보다 15% 적다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 32</dd>
+      <dt>한 줄</dt><dd>국가데이터처 인구동향조사로 보면 혼인은 1996년 43만 4,911건에서 2022년 19만 1,690건까지 줄었다(1970년 이후 가장 적음). 그 뒤 2023년 19만 3,657건, 2024년 22만 2,412건(+14.8%), 2025년 24만 326건(+8.1%)으로 늘었고, 2026년 1–8월도 전년 같은 기간보다 5.2% 많다(잠정). 2022→2025년에 늘어난 4만 8,636건 중 62%는 남편이 30–34세인 결혼이다. 30–34세 여자 1천 명당 혼인은 41.1건에서 57.4건이 되어 2013년 이후 가장 높다. 2022년의 나이별 혼인율을 그대로 두면 인구 변화만으로는 늘지 않았다. 시군구 229곳 중 186곳이 늘었지만 2019년 수준을 넘은 곳은 79곳이다.</dd>
+      <dt>분류</dt><dd>인구·가족</dd>
+      <dt>본능</dt><dd>직선 본능 · "결혼은 해마다 줄기만 한다"는 한 방향의 선으로 앞날을 본다</dd>
+      <dt>그림 방식</dt><dd>웨딩 케이크 · 한 해가 케이크 한 층, 층의 너비는 그해 혼인 건수(1970–2025년 56층). 부부 나이 격자의 반지(1990–2025년 재생), 나이별 혼인율 화살표, 시군구 반지 지도</dd>
+      <dt>기간</dt><dd>1970–2025년 · 월별은 2026년 8월까지</dd>
+      <dt>엮은 데이터</dt><dd>5개 · 인구동태건수 추이 · 월간 인구동향 · 혼인부부의 연령별 혼인 · 시군구 인구동태 · 주민등록 5세별 인구</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2022년부터 2025년까지 혼인이 4만 8천 건 늘었다. 왜 늘었을까?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>1990년대 초반에 태어난 많은 사람이 30대가 되어서</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>절반은 인구가 늘어서, 절반은 결혼하는 비율이 올라서</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>인구 효과는 거의 없고, 같은 나이에서 결혼하는 비율이 올라서</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. 인구 효과는 <span class="n">−1,146건</span></span>
+      남자 20–49세의 혼인으로 계산했다. 2022년의 나이별 혼인율이 그대로였다면 2025년 혼인은 16만 1,550건으로 2022년(16만 2,696건)과 거의 같았다. 30대 초반 인구는 늘었지만 20대와 30대 후반 인구가 줄어 서로 지워졌다. 실제 2025년은 21만 980건이다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">56층 웨딩 케이크</h2>
+      <p>1970년부터 2025년까지 한 해를 케이크 한 층으로 쌓았다. 층이 넓을수록 그해 결혼한 부부가 많다. 가장 넓은 층은 1996년(43만 4,911건)이다. 그 뒤로 케이크는 위로 갈수록 좁아져, 2022년 층(19만 1,690건)은 1996년의 44%다. 1970년 이후 가장 좁은 층이다.</p>
+      <p>꼭대기 세 층은 다시 넓어진다. 2024년에 14.8%, 2025년에 8.1% 늘어 2025년 층(24만 326건)은 2019년 층(23만 9,159건)과 같은 너비가 됐다. 2026년에도 1–8월 혼인이 16만 5,874건으로 전년 같은 기간보다 5.2% 많다. 이혼을 누르면 같은 눈금으로 이혼 케이크를 쌓는다. 이혼은 2003년(16만 6,617건)이 가장 많았고 2025년(8만 8,130건)은 1996년 이후 가장 적다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">해마다 혼인 건수, 1970–2025년</p>
+      <p class="fs">층 하나 = 한 해. 층의 너비 = 그해 신고된 혼인(또는 이혼) 건수. 혼인과 이혼은 같은 눈금</p>
+      <div class="chips" id="chips1" role="group" aria-label="케이크 바꾸기"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>국가데이터처 「인구동향조사」 인구동태건수 및 동태율 추이(KOSIS 101 DT_1B8000F), 2026년 1–8월은 월간 인구동향(DT_1B8000G, 잠정).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">반지가 옮겨 간 자리</h2>
+      <p>그해 결혼한 부부를 남편 나이(가로)와 아내 나이(세로)로 나눠 반지를 놓았다. 반지가 클수록 그 나이 조합의 부부가 많다. 재생을 누르면 1990년부터 2025년까지 반지가 움직인다.</p>
+      <p>1996년에 가장 많은 부부는 남편 27세·아내 25세(1만 810쌍)였다. 2025년에는 30세 동갑(4,316쌍)이다. 반지 무리는 오른쪽 위로 옮겨 가며 작아졌고, 2023년부터 30대 초반 자리에서 다시 커진다. 아내가 남편보다 나이가 많은 부부는 1990년 8.9%에서 2025년 20.0%가 됐다. 2022→2025년에 늘어난 혼인 4만 8,636건 중 3만 301건(62%)은 남편이 30–34세다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">남편 나이와 아내 나이로 본 혼인</p>
+      <p class="fs">반지 하나 = 한 나이 조합. 반지 크기 = 부부 수(1996년 남 27·여 25세 1만 810쌍이 가장 큰 반지). 선 = 격자 안 부부의 평균 나이가 지나온 길</p>
+      <div class="player" id="p2"></div>
+      <p class="stat" id="st2" aria-live="polite"></p>
+      <div class="chart" id="c2"></div>
+      <figcaption>국가데이터처 「인구동향조사」 혼인부부의 연령별 혼인(KOSIS 101 DT_1B83A02). 남편 22–44세·아내 20–39세 칸만 그렸다(2025년 혼인의 83.3%, 1990년 91.3%). 재혼 부부도 들어 있다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">같은 나이, 더 많은 결혼</h2>
+      <p>결혼이 늘어난 까닭으로 흔히 1990년대 초반 출생자가 많다는 점을 꼽는다. 이들이 30대 초반이 되어 30–34세 남자 인구는 2022년 170만 7천 명에서 2025년 185만 1천 명으로 늘었다. 그러나 같은 사이 20대 후반과 30대 후반 인구는 줄었다. 2022년의 나이별 혼인율을 그대로 두고 인구만 2025년으로 바꾸면, 남자 20–49세 혼인은 16만 2,696건에서 16만 1,550건으로 오히려 조금 준다.</p>
+      <p>늘어난 것은 같은 나이에서 결혼하는 비율이다. 인구 1천 명당 혼인으로 보면 30–34세 여자는 41.1건에서 57.4건, 30–34세 남자는 40.1건에서 53.3건이 됐다. 둘 다 2019년보다 높고, 30–34세 여자는 2013년 이후 가장 높다. 30대 후반도 남녀 모두 2013년 이후 가장 높다. 20대 후반만은 아직 멀었다. 25–29세 여자는 44.2건으로 2019년(50.2건)에 못 미치고 2013년(79.4건)의 절반을 조금 넘는다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">나이별 인구 1천 명당 혼인, 2022→2025년</p>
+      <p class="fs">건(인구 1천 명당). 화살표 = 2022년에서 2025년으로. 회색 눈금 = 2019년, 빈 점 = 2013년</p>
+      <div class="legend" id="lg3"></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>혼인 건수는 「혼인부부의 연령별 혼인」(남편 나이·아내 나이), 인구는 행정안전부 주민등록 5세별 인구(KOSIS 101 DT_1B04005N)의 그해와 전년 12월 평균. 직접 계산해 공표된 연령별 혼인율과 조금 다를 수 있다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">반지 지도</h2>
+      <p>시군구 229곳(일반구는 시로 합침)에 2025년 혼인 건수만큼 큰 반지를 놓았다. 색은 2019년보다 얼마나 늘었거나 줄었는지다. 2022년과 견주면 229곳 중 186곳이 늘었다. 하지만 코로나 전인 2019년 수준을 넘은 곳은 79곳뿐이다.</p>
+      <p>회복은 도시에서 컸다. 광역시의 구는 2022년보다 34.0% 늘어 2019년보다 2.3% 많고, 시도 21.3% 늘어 2.0% 많다. 군은 10.1% 느는 데 그쳐 2019년보다 14.7% 적다. 시도로는 대전이 2022년보다 54.3%, 2019년보다 32.3% 늘어 가장 많이 늘었고, 제주는 2022년보다 2.4% 느는 데 그쳐 2019년보다 17.1% 적다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">시군구별 혼인, 2025년</p>
+      <p class="fs">반지 크기 = 2025년 혼인 건수. 반지 색 = 견준 해보다 늘거나 준 비율. 오른쪽(좁은 화면은 아래)은 서울을 크게 본 것</p>
+      <div class="chips" id="chips4" role="group" aria-label="견줄 해"></div>
+      <div class="legend" id="lg4"></div>
+      <p class="stat" id="st4" aria-live="polite"></p>
+      <div class="chart" id="c4"></div>
+      <figcaption>국가데이터처 「인구동향조사」 시군구 인구동태건수(KOSIS 101 DT_1B8000I). 지역은 혼인신고서의 주소지 기준이다. 국외에서 신고된 혼인(2025년 4,217건)은 지도에 없다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 결혼은 계속 줄고 있을까</h2>
+      <p>아니다. 30년 가까이 줄던 결혼은 2022년을 바닥으로 3년째 늘고 있고, 2025년에는 코로나 전 2019년 수준으로 돌아왔다. 늘어난 결혼은 30대에 몰렸고, 인구가 많은 세대가 30대가 되어서라기보다 같은 나이에서 결혼하는 사람이 늘어서다. 다만 이것이 1990년대의 결혼으로 돌아간다는 뜻은 아니다. 2025년 혼인은 1996년의 55%이고, 20대 후반의 결혼은 2019년에도 못 미친다. 회복도 도시에 쏠려 군 지역은 아직 2019년보다 적다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>혼인 건수는 그해 신고된 혼인이다. 결혼식을 올린 해와 신고한 해가 다를 수 있고, 코로나 시기에 미뤄진 신고가 2023–2024년에 몰렸을 수 있다.</li>
+      <li>2026년 월별 숫자는 잠정치라 확정 때 바뀔 수 있다.</li>
+      <li>재혼과 외국인과의 혼인이 함께 들어 있다. 첫 결혼만 보면 숫자가 다르다.</li>
+      <li>나이별 혼인율은 주민등록 인구로 직접 나눈 값이다. 주민등록 인구에는 외국인이 없고, 공표된 연령별 혼인율과는 분모가 조금 다르다.</li>
+      <li>지역은 혼인신고서의 주소지 기준이라 결혼한 뒤 실제로 사는 곳과 다를 수 있다.</li>
+      <li>공공데이터포털의 「SGIS 혼인 및 이혼율 현황」(15140452)은 PDF 보고서 링크뿐이어서, 같은 원자료인 KOSIS 인구동향조사 표를 썼다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1B8000F" target="_blank" rel="noopener">인구동태건수 및 동태율 추이</a> (KOSIS 101 DT_1B8000F)</td><td>국가데이터처</td><td>전국 혼인·이혼 건수, 조혼인율</td><td>1970–2025</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1B8000G" target="_blank" rel="noopener">월·분기·연간 인구동향</a> (KOSIS 101 DT_1B8000G)</td><td>국가데이터처</td><td>월별 혼인 건수</td><td>2015.1–2026.8</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1B83A02" target="_blank" rel="noopener">혼인부부의 연령별 혼인</a> (KOSIS 101 DT_1B83A02)</td><td>국가데이터처</td><td>남편 나이 × 아내 나이 혼인 건수</td><td>1990–2025</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1B8000I" target="_blank" rel="noopener">시군구 인구동태건수 및 동태율</a> (KOSIS 101 DT_1B8000I, 포털 15140452와 같은 원자료)</td><td>국가데이터처</td><td>시군구 혼인 건수, 조혼인율</td><td>2019·2022·2025</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1B04005N" target="_blank" rel="noopener">5세별 주민등록인구</a> (KOSIS 101 DT_1B04005N)</td><td>행정안전부</td><td>성·5세 나이별 인구(12월)</td><td>2012–2025</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>전국 56개 연도 · 월별 140개월 · 남편 36 × 아내 36 나이 칸 × 36개 연도 · 시군구 282곳 × 26개 연도 · 성·나이별 인구 14개 시점</dd>
+      <dt>도구</dt><dd>Python(집계) · SVG 웨딩 케이크, 반지 격자, 화살표, 반지 지도(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>나이별 혼인율(인구 1천 명당) · 2022년 나이별 혼인율을 고정하고 인구만 바꾼 가상 계산 · 2019·2022년 대비 시군구 변화</dd>
+      <dt>검증</dt><dd>시군구 229곳의 합 + 국외 신고가 전국과 같다(2025년 23만 6,109 + 4,217 = 24만 326건). 나이 표의 합계(24만 326건)와 연도 표가 같다. 월별 2025년 12개월 합이 연간 24만 326건과 같다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>결혼이 늘면 아기도 늘까</h3><p>출생은 2024년부터 다시 늘었다. 결혼 몇 년 뒤 첫째가 태어나는지, 혼인 반등이 출생으로 이어지는지 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1B8000I" target="_blank" rel="noopener">시군구 인구동태건수(출생·혼인)</a> · 국가데이터처</li></ul></div>
+      <div class="q"><h3>외국인과의 결혼은 다시 늘었을까</h3><p>시도·시군구별 외국인과의 혼인과 상대 국적으로, 반등에서 국제결혼이 차지하는 몫을 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1B83A24" target="_blank" rel="noopener">시도/시군구별 외국인과의 혼인</a> · 국가데이터처</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.6</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const L = DATA.long, NL = L.y.length, MAXM = Math.max(...L.m);
+  const sgn = (v, d = 1) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toLocaleString("ko-KR", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const man1 = (n) => (n / 1e4).toLocaleString("ko-KR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "만";
+  const once = (el, fn, th = .25) => { if (reduce) return false; const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); fn(); }, { threshold: th }); io.observe(el); return true; };
+
+  /* ---------- 1. wedding cake ---------- */
+  let mode1 = "m", lay1 = null, cur1 = L.m.slice(), seen1 = false;
+  chips("chips1", [["m", "혼인"], ["d", "이혼"]], mode1, (k) => { if (k === mode1) return; const from = cur1.slice(), to = k === "m" ? L.m : L.d; mode1 = k; morph1(from, to); });
+  const KEY = { m: [1970, 1980, 1996, 2010, 2022, 2025], d: [1970, 1990, 2003, 2025] };
+  function build1() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, labW = narrow ? 104 : 170, th = narrow ? 6 : 8, gap = narrow ? 1 : 1.4, top = narrow ? 64 : 76;
+    const H = top + NL * (th + gap) + 34, cx = (W - labW) / 2, maxW = W - labW - 12;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "1970년부터 2025년까지 해마다 혼인 건수를 층 너비로 쌓은 웨딩 케이크. 1996년이 가장 넓고 2022년이 가장 좁으며 꼭대기 세 층이 다시 넓어진다" }, box);
+    const base = top + NL * (th + gap);
+    s("ellipse", { cx, cy: base + 8, rx: maxW * .5, ry: 6, fill: "none", stroke: "var(--axis)", "stroke-width": 1.4 }, v);
+    const tiers = [], pts = [];
+    for (let i = 0; i < NL; i++) {
+      const y = top + (NL - 1 - i) * (th + gap), g = s("g", { class: "tier" }, v);
+      const r = s("rect", { y, height: th, rx: Math.min(2.5, th / 3), "stroke-width": .7 }, g);
+      const fr = th >= 7 ? s("line", { y1: y + 1.3, y2: y + 1.3, stroke: "var(--frost)", "stroke-width": 1.1, "stroke-linecap": "round" }, g) : null;
+      tiers.push({ g, r, fr, y, i }); pts.push({ x: cx, y: y + th / 2, r: 8, fn: () => tipTier(i) });
+    }
+    const topper = s("g", {}, v), labels = s("g", {}, v);
+    lay1 = { W, narrow, labW, th, gap, top, cx, maxW, tiers, pts, topper, labels, v };
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 한 해씩 옮겨 볼 수 있다");
+    apply1(cur1); labels1();
+  }
+  function tipTier(i) {
+    const y = L.y[i], rows = [[fmt(L.m[i]) + "건", "혼인"], [f1(L.mr[i]) + "건", "인구 1천 명당 혼인"], [fmt(L.d[i]) + "건", "이혼"]];
+    if (i > 0) rows.push([sgn((L.m[i] / L.m[i - 1] - 1) * 100) + "%", "혼인, 전년보다"]);
+    return [`${y}년`, rows];
+  }
+  function fillOf(i) {
+    if (mode1 === "d") return ["var(--div)", "var(--div-edge)"];
+    if (L.y[i] >= 2023) return ["var(--cake-hi)", "var(--cake-hi-edge)"];
+    return [Math.floor(L.y[i] / 10) % 2 ? "var(--cake1)" : "var(--cake2)", "var(--cake-edge)"];
+  }
+  function apply1(vals) {
+    const { tiers, cx, maxW, pts } = lay1; cur1 = vals.slice();
+    tiers.forEach((t) => { const w = Math.max(2, vals[t.i] / MAXM * maxW), [f, e] = fillOf(t.i);
+      t.r.setAttribute("x", cx - w / 2); t.r.setAttribute("width", w); t.r.setAttribute("fill", f); t.r.setAttribute("stroke", e);
+      if (t.fr) { t.fr.setAttribute("x1", cx - w / 2 + 3); t.fr.setAttribute("x2", cx + w / 2 - 3); }
+      pts[t.i].r = Math.max(8, w / 2); });
+    drawTopper(vals);
+  }
+  function drawTopper(vals) {
+    const { topper, tiers, cx, th, narrow } = lay1; topper.replaceChildren();
+    const y0 = tiers[NL - 1].y, k = narrow ? .8 : 1;
+    // two figures standing on the top tier
+    const fig = (x, dress) => {
+      s("circle", { cx: x, cy: y0 - 34 * k, r: 5.5 * k, fill: "var(--ink)" }, topper);
+      if (dress) s("path", { d: `M${x},${y0 - 28 * k} L${x + 9 * k},${y0 - 1} L${x - 9 * k},${y0 - 1} Z`, fill: "var(--card)", stroke: "var(--ink)", "stroke-width": 1.2 }, topper);
+      else s("rect", { x: x - 5.5 * k, y: y0 - 28 * k, width: 11 * k, height: 27 * k, rx: 2, fill: "var(--ink)" }, topper);
+    };
+    fig(cx - 9 * k, false); fig(cx + 9 * k, true);
+    s("path", { d: `M${cx - 4 * k},${y0 - 22 * k} Q${cx},${y0 - 18 * k} ${cx + 4 * k},${y0 - 22 * k}`, fill: "none", stroke: "var(--ink)", "stroke-width": 1.4 }, topper);
+  }
+  function labels1() {
+    const { labels, tiers, cx, maxW, W, labW, th, narrow } = lay1; labels.replaceChildren();
+    const lx = W - labW + 10, vals = mode1 === "m" ? L.m : L.d;
+    KEY[mode1].forEach((y) => {
+      const i = y - 1970, t = tiers[i], w = Math.max(2, vals[i] / MAXM * maxW), yy = t.y + th / 2, hi = y >= 2022 || y === 1996 || y === 2003;
+      s("line", { x1: cx + w / 2 + 3, x2: lx - 4, y1: yy, y2: yy, stroke: "var(--axis)", "stroke-width": .8, "stroke-dasharray": "2 2" }, labels);
+      tx(labels, lx, yy + 4, `${y}`, "tk", narrow ? 11 : 12, "start");
+      tx(labels, lx + (narrow ? 32 : 38), yy + 4, narrow ? man1(vals[i]) : fmt(vals[i]) + "건", hi ? "vl hi" : "vl", narrow ? 11.5 : 13, "start");
+    });
+    if (mode1 === "m") {
+      const yy = tiers[NL - 1].y - (narrow ? 30 : 36);
+      tx(labels, lx, yy, "2026년 1–8월", "mt", narrow ? 11 : 12, "start");
+      tx(labels, lx, yy + (narrow ? 15 : 17), `${sgn((DATA.mon.ja[2026] / DATA.mon.ja[2025] - 1) * 100)}% (잠정)`, "vl hi", narrow ? 11.5 : 13, "start");
+    }
+  }
+  function morph1(from, to) {
+    if (reduce) { apply1(to); labels1(); return; }
+    lay1.labels.replaceChildren(); const t0 = performance.now(), D = 700;
+    const step = (now) => { const t = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - t, 3); apply1(from.map((a, i) => a + (to[i] - a) * e)); if (t < 1) requestAnimationFrame(step); else labels1(); };
+    requestAnimationFrame(step);
+  }
+  function c1() {
+    build1();
+    if (seen1 || reduce) return;
+    lay1.tiers.forEach((t) => { t.g.style.opacity = 0; t.g.style.transform = "translateY(-36px)"; }); lay1.topper.style.opacity = 0; lay1.labels.style.opacity = 0;
+    once(document.getElementById("c1"), () => { seen1 = true;
+      lay1.tiers.forEach((t) => { t.g.style.transition = `transform .45s cubic-bezier(.3,1.4,.6,1) ${t.i * 32}ms, opacity .25s ${t.i * 32}ms`; requestAnimationFrame(() => { t.g.style.opacity = 1; t.g.style.transform = "none"; }); });
+      const d = NL * 32 + 300; lay1.topper.style.transition = `opacity .5s ${d}ms`; lay1.labels.style.transition = `opacity .5s ${d}ms`;
+      requestAnimationFrame(() => { lay1.topper.style.opacity = 1; lay1.labels.style.opacity = 1; }); });
+  }
+  c1(); onResize(() => { seen1 = true; build1(); });
+  table("t1", ["연도", "혼인", "인구 1천 명당", "이혼"], L.y.map((y, i) => [String(y), fmt(L.m[i]), f1(L.mr[i]), fmt(L.d[i])]).reverse());
+
+  /* ---------- 2. ring grid ---------- */
+  const G = DATA.grid, NY = G.y.length, NH = G.h.length, NW = G.w.length;
+  const VMAX = Math.max(...G.v.map((V) => Math.max(...V.map((r) => Math.max(...r)))));
+  const MEAN = G.v.map((V) => { let s0 = 0, sh = 0, sw = 0; V.forEach((r, a) => r.forEach((x, b) => { s0 += x; sh += x * G.h[a]; sw += x * G.w[b]; })); return [sh / s0, sw / s0]; });
+  const TOP = G.v.map((V) => { let best = [0, 0, 0]; V.forEach((r, a) => r.forEach((x, b) => { if (x > best[0]) best = [x, G.h[a], G.w[b]]; })); return best; });
+  const OLDER = G.v.map((V) => { let s0 = 0, o = 0; V.forEach((r, a) => r.forEach((x, b) => { s0 += x; if (G.w[b] > G.h[a]) o += x; })); return o / s0 * 100; });
+  let lay2 = null, grow2 = 1;
+  function build2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, left = narrow ? 28 : 46, right = 8, top = 22, bottom = 40;
+    // narrow screens keep husband 24–42 and wife 22–38 so the rings stay legible
+    const AI = G.h.map((_, i) => i).filter((i) => !narrow || (G.h[i] >= 24 && G.h[i] <= 42)), BI = G.w.map((_, i) => i).filter((i) => !narrow || (G.w[i] >= 22 && G.w[i] <= 38));
+    const HH = AI.map((i) => G.h[i]), WW = BI.map((i) => G.w[i]);
+    const cs = Math.min(30, (W - left - right) / HH.length), gw = cs * HH.length, gh = cs * WW.length, H = top + gh + bottom;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "남편 나이와 아내 나이 조합마다 부부 수를 반지 크기로 그린 격자. 1996년엔 남편 27세 아내 25세가 가장 많았고 2025년엔 30세 동갑이 가장 많다" }, box);
+    const X = (a) => left + (a - HH[0] + .5) * cs, Y = (b) => top + gh - (b - WW[0] + .5) * cs;
+    HH.forEach((a) => { if (a % (narrow ? 3 : 2) === 0) { s("line", { x1: X(a), x2: X(a), y1: top, y2: top + gh, class: "gl" }, v); tx(v, X(a), top + gh + 15, String(a), "tk", 11, "middle"); } });
+    WW.forEach((b) => { if (b % (narrow ? 4 : 2) === 0) { s("line", { x1: left, x2: left + gw, y1: Y(b), y2: Y(b), class: "gl" }, v); tx(v, left - 6, Y(b) + 4, String(b), "tk", 11, "end"); } });
+    tx(v, left + gw, top + gh + 33, "남편 나이 →", "mt", 12, "end"); tx(v, left, top - 8, "↑ 아내 나이", "mt", 12, "start");
+    // same-age diagonal
+    const d0 = Math.max(HH[0], WW[0]), d1 = Math.min(HH[HH.length - 1], WW[WW.length - 1]);
+    s("line", { x1: X(d0) - cs / 2, y1: Y(d0) + cs / 2, x2: X(d1) + cs / 2, y2: Y(d1) - cs / 2, stroke: "var(--axis)", "stroke-width": 1.2, "stroke-dasharray": "4 3" }, v);
+    tx(v, X(d1) - cs / 2 - 4, Y(d1) - cs / 2 + 4, "동갑", "mt halo", 11.5, "end", { "stroke-width": 3 });
+    tx(v, X(d0 + 1), Y(d1 - 3), "아내가 연상", "mt", 11.5, "start");
+    tx(v, X(HH[HH.length - 1]) + cs / 2, Y(WW[0] + 1), "남편이 연상", "mt", 11.5, "end");
+    const rings = [], pts = [];
+    for (const a of AI) for (const b of BI) {
+      const c = s("circle", { cx: X(G.h[a]), cy: Y(G.w[b]), r: 0, fill: "none", stroke: "var(--ring)" }, v); rings.push({ c, a, b });
+      pts.push({ x: X(G.h[a]), y: Y(G.w[b]), r: cs / 2 - 1, fn: () => tipCell(a, b) });
+    }
+    const trail = s("path", { fill: "none", stroke: "var(--trail)", "stroke-width": 2.2, "stroke-linecap": "round", "stroke-linejoin": "round" }, v);
+    const dot = s("circle", { r: 5, fill: "var(--trail)", stroke: "var(--card)", "stroke-width": 2 }, v);
+    lay2 = { W, cs, rings, trail, dot, X, Y, pts, k: NY - 1 };
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 나이 칸을 옮겨 볼 수 있다");
+  }
+  function tipCell(a, b) {
+    const k = lay2.k, x = G.v[k][G.h.indexOf(G.h[a])][b], k22 = G.y.indexOf(2022), x22 = G.v[k22][a][b];
+    const rows = [[fmt(x) + "쌍", `${G.y[k]}년`]]; if (G.y[k] > 2022 && x22) rows.push([sgn((x / x22 - 1) * 100, 0) + "%", "2022년보다"]);
+    rows.push([fmt(G.v[G.y.indexOf(1996)][a][b]) + "쌍", "1996년"]);
+    return [`남편 ${G.h[a]}세 · 아내 ${G.w[b]}세`, rows];
+  }
+  function draw2(pos) {
+    if (!lay2 || Math.abs(lay2.W - Math.max(300, document.getElementById("c2").clientWidth)) > 1) build2();
+    const k = Math.min(NY - 1, Math.floor(pos + 1e-6)), f = Math.max(0, pos - k), k2 = Math.min(NY - 1, k + 1), { cs, rings, X, Y } = lay2; lay2.k = k;
+    const kr = k, T = TOP[kr];
+    rings.forEach(({ c, a, b }) => {
+      const x = G.v[k][a][b] + (G.v[k2][a][b] - G.v[k][a][b]) * f, R = cs * .5 * Math.sqrt(x / VMAX) * grow2, sw = Math.max(.9, R * .3);
+      c.setAttribute("r", Math.max(0, R - sw / 2)); c.setAttribute("stroke-width", sw); c.setAttribute("opacity", R < .5 ? 0 : 1);
+      c.setAttribute("stroke", G.h[a] === T[1] && G.w[b] === T[2] ? "var(--ring-hi)" : "var(--ring)");
+    });
+    const P = []; for (let i = 0; i <= k; i++) P.push(MEAN[i]); if (f > 0) P.push([MEAN[k][0] + (MEAN[k2][0] - MEAN[k][0]) * f, MEAN[k][1] + (MEAN[k2][1] - MEAN[k][1]) * f]);
+    const px = (m) => X(G.h[0]) + (m[0] - G.h[0]) * cs, py = (m) => Y(G.w[0]) - (m[1] - G.w[0]) * cs;
+    lay2.trail.setAttribute("d", P.map((m, i) => `${i ? "L" : "M"}${px(m).toFixed(1)},${py(m).toFixed(1)}`).join(""));
+    const last = P[P.length - 1]; lay2.dot.setAttribute("cx", px(last)); lay2.dot.setAttribute("cy", py(last));
+    const st = document.getElementById("st2"); st.replaceChildren();
+    st.append(`${G.y[kr]}년 혼인 `, bEl(fmt(G.tot[kr]) + "건"), " · 가장 많은 부부 ", bEl(`남 ${T[1]}·여 ${T[2]}세`), ` (${fmt(T[0])}쌍) · 아내가 연상 `, bEl(f1(OLDER[kr]) + "%"));
+  }
+  const p2 = Player("p2", "부부 나이 반지", (p) => draw2(p), NY, (i) => String(G.y[i]), 12);
+  p2.render();
+  if (once(document.getElementById("c2"), () => { const t0 = performance.now(); const st = (now) => { grow2 = Math.min(1, (now - t0) / 900); grow2 = 1 - Math.pow(1 - grow2, 3); draw2(p2.pos); if (grow2 < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); })) { grow2 = 0; draw2(p2.pos); }
+  onResize(() => draw2(p2.pos));
+  table("t2", ["연도", "혼인", "가장 많은 부부", "그 부부 수", "아내가 연상(격자 안)", "격자 안 평균 나이(남/여)"], G.y.map((y, i) => [String(y), fmt(G.tot[i]), `남 ${TOP[i][1]}·여 ${TOP[i][2]}세`, fmt(TOP[i][0]), pc(OLDER[i]), `${f1(MEAN[i][0])} / ${f1(MEAN[i][1])}`]).reverse());
+
+  /* ---------- 3. rate arrows ---------- */
+  const RT = DATA.rate, RY = RT.y, iy = (y) => RY.indexOf(y);
+  const ROWS = [["f", 25, "여자 25–29세"], ["f", 30, "여자 30–34세"], ["f", 35, "여자 35–39세"], ["m", 25, "남자 25–29세"], ["m", 30, "남자 30–34세"], ["m", 35, "남자 35–39세"]];
+  {
+    const lg = document.getElementById("lg3");
+    const sw = (html, label) => { const sp = document.createElement("span"); const v = s("svg", { width: 22, height: 12, viewBox: "0 0 22 12", "aria-hidden": "true" }); html(v); sp.append(v, label); lg.append(sp); };
+    sw((v) => s("circle", { cx: 11, cy: 6, r: 4, fill: "none", stroke: "var(--muted)", "stroke-width": 1.4 }, v), "2013년");
+    sw((v) => s("line", { x1: 11, x2: 11, y1: 0, y2: 12, stroke: "var(--muted)", "stroke-width": 2.4 }, v), "2019년");
+    sw((v) => { s("line", { x1: 2, x2: 16, y1: 6, y2: 6, stroke: "var(--accent)", "stroke-width": 2.4 }, v); s("path", { d: "M14,2 L20,6 L14,10 Z", fill: "var(--accent)" }, v); }, "2022 → 2025년");
+  }
+  let seen3 = false;
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, left = narrow ? 4 : 120, right = narrow ? 8 : 112, rowH = narrow ? 56 : 46, top = narrow ? 46 : 26;
+    const D = DATA.decomp, barTop = top + ROWS.length * rowH + (narrow ? 50 : 40), barH = narrow ? 18 : 20, H = barTop + 3 * (barH + (narrow ? 34 : 22)) + 10, bl = narrow ? 0 : 150;
+    const XM = 85, sx = (x) => left + x / XM * (W - left - right);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "나이별 인구 1천 명당 혼인이 2022년에서 2025년으로 오른 화살표. 30대는 2019년보다 높아졌고 20대 후반은 아직 낮다. 아래 막대는 인구만 바뀌었다면 혼인이 늘지 않았음을 보여 준다" }, box), pts = [];
+    for (let x = 0; x <= 80; x += 20) { s("line", { x1: sx(x), x2: sx(x), y1: top - 6, y2: top + ROWS.length * rowH - 10, class: "gl" }, v); tx(v, sx(x), top - 10, String(x), "tk", 11, "middle"); }
+    const arrows = [];
+    ROWS.forEach(([sex, lo, name], i) => {
+      const y = top + i * rowH + rowH / 2 - 6, A = RT[sex][lo], a13 = A[iy(2013)], a19 = A[iy(2019)], a22 = A[iy(2022)], a25 = A[iy(2025)];
+      if (i === 3) s("line", { x1: 0, x2: W, y1: y - rowH / 2 - 2, y2: y - rowH / 2 - 2, stroke: "var(--line)" }, v);
+      if (narrow) { tx(v, 0, y - 16, name, "lb", 12.5, "start"); tx(v, W - 40, y - 16, `${f1(a22)} →`, "tk", 11.5, "end"); tx(v, W, y - 16, f1(a25), "vl hi", 12.5, "end"); }
+      else { tx(v, 0, y + 4, name, "lb", 13, "start"); tx(v, W - 46, y + 4, `${f1(a22)} →`, "tk", 12, "end"); tx(v, W, y + 4, f1(a25), "vl hi", 13.5, "end"); }
+      s("line", { x1: sx(0), x2: sx(XM), y1: y, y2: y, stroke: "var(--grid)", "stroke-width": 6, "stroke-linecap": "round" }, v);
+      s("circle", { cx: sx(a13), cy: y, r: 4.5, fill: "var(--card)", stroke: "var(--muted)", "stroke-width": 1.4 }, v);
+      s("line", { x1: sx(a19), x2: sx(a19), y1: y - 7, y2: y + 7, stroke: "var(--muted)", "stroke-width": 2.4 }, v);
+      const g = s("g", {}, v), ln = s("line", { x1: sx(a22), x2: sx(a22), y1: y, y2: y, stroke: "var(--accent)", "stroke-width": 3, "stroke-linecap": "round" }, g), hd = s("path", { fill: "var(--accent)" }, g);
+      const lab = s("g", {}, v);
+      arrows.push({ ln, hd, y, x0: sx(a22), x1: sx(a25), lab });
+      pts.push({ x: sx(a25), y, r: 10, fn: () => [name, [[f1(a25) + "건", "2025년"], [f1(a22) + "건", "2022년"], [f1(a19) + "건", "2019년"], [f1(a13) + "건", "2013년"]]] });
+    });
+    // decomposition bars
+    tx(v, 0, barTop - (narrow ? 30 : 14), "남자 20–49세의 혼인", "vl", 13.5, "start");
+    const bmax = D.a25, b0 = narrow ? 0 : bl, bx = (x) => b0 + x / bmax * (W - b0 - right - 64);
+    [["2022년 실제", D.a22, "var(--axis)"], ["인구만 2025년이라면", D.cf, "var(--flat)"], ["2025년 실제", D.a25, "var(--accent)"]].forEach(([name, val, col], i) => {
+      const y = barTop + i * (barH + (narrow ? 34 : 22));
+      if (narrow) tx(v, 0, y - 6, name, "lb", 12, "start"); else tx(v, 0, y + barH / 2 + 4, name, "lb", 13, "start");
+      if (i === 1) s("rect", { x: b0 + .75, y: y + .75, width: bx(val) - b0 - 1.5, height: barH - 1.5, rx: 3, fill: "none", stroke: "var(--ink2)", "stroke-width": 1.5, "stroke-dasharray": "5 3" }, v);
+      else s("rect", { x: b0, y, width: bx(val) - b0, height: barH, rx: 3, fill: col }, v);
+      tx(v, bx(val) + 6, y + barH / 2 + 4, man1(val) + "건", i === 2 ? "vl hi" : "vl", 12.5, "start");
+      pts.push({ x: bx(val), y: y + barH / 2, r: 10, fn: () => [name, [[fmt(val) + "건", "남자 20–49세 혼인"]]] });
+    });
+    const setA = (t) => arrows.forEach((a) => { const x = a.x0 + (a.x1 - a.x0) * t, dir = Math.sign(a.x1 - a.x0) || 1; a.ln.setAttribute("x2", x - dir * 6); a.hd.setAttribute("d", `M${x - dir * 8},${a.y - 6} L${x + dir * 2},${a.y} L${x - dir * 8},${a.y + 6} Z`); a.lab.setAttribute("opacity", t > .95 ? 1 : 0); });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 줄을 옮겨 볼 수 있다");
+    if (seen3 || reduce) { setA(1); return; }
+    setA(0);
+    once(box, () => { seen3 = true; const t0 = performance.now(); const st = (now) => { const t = Math.min(1, (now - t0) / 1100), e = 1 - Math.pow(1 - t, 3); setA(e); if (t < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); }, .4);
+  }
+  c3(); onResize(() => { seen3 = true; c3(); });
+  table("t3", ["연도", ...ROWS.map((r) => r[2])], RY.map((y, i) => [String(y), ...ROWS.map(([sex, lo]) => f1(RT[sex][lo][i]))]).reverse());
+
+  /* ---------- 4. ring map ---------- */
+  const PL = DATA.places, MAXP = Math.max(...PL.map((p) => p[6]));
+  let base4 = "19", seen4 = false;
+  const chg = (p) => (p[6] / (base4 === "19" ? p[4] : p[5]) - 1) * 100;
+  const BINS = [[-Infinity, -20, "var(--dn2)", "20% 넘게 줄어"], [-20, -5, "var(--dn1)", "5–20% 줄어"], [-5, 5, "var(--flat)", "±5% 안"], [5, 20, "var(--up1)", "5–20% 늘어"], [20, Infinity, "var(--up2)", "20% 넘게 늘어"]];
+  const colOf = (c) => BINS.find((b) => c >= b[0] && c < b[1])[2];
+  chips("chips4", [["19", "2019년보다"], ["22", "2022년보다"]], base4, (k) => { base4 = k; seen4 = true; c4(); });
+  {
+    const lg = document.getElementById("lg4");
+    BINS.forEach(([, , col, name]) => { const sp = document.createElement("span"); const v = s("svg", { width: 14, height: 14, viewBox: "0 0 14 14", "aria-hidden": "true" }); s("circle", { cx: 7, cy: 7, r: 5, fill: "none", stroke: col, "stroke-width": 2.6 }, v); sp.append(v, name); lg.append(sp); });
+  }
+  const TYPE = { k: "광역시 구", s: "시", g: "군" };
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), wide = W >= 760;
+    const x0 = 62, x1 = 534, y0 = 92, y1 = 636, mw = wide ? Math.min(560, W * .55) : W, k = mw / (x1 - x0), mh = (y1 - y0) * k;
+    // Seoul inset: bounding box of Seoul places
+    const SE = PL.filter((p) => p[0] === "서울"), ix0 = Math.min(...SE.map((p) => p[2])) - 5, ix1 = Math.max(...SE.map((p) => p[2])) + 5, iy0 = Math.min(...SE.map((p) => p[3])) - 5, iy1 = Math.max(...SE.map((p) => p[3])) + 5;
+    const iw = wide ? W - mw - 28 : W, ik = iw / (ix1 - ix0), ih = (iy1 - iy0) * ik, ox = wide ? mw + 28 : 0, oy = wide ? 30 : mh + 34;
+    const H = wide ? Math.max(mh, oy + ih + 10) : oy + ih + 10;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": `시군구 229곳의 2025년 혼인을 반지 크기로, ${base4 === "19" ? "2019" : "2022"}년 대비 변화를 색으로 그린 지도. 오른쪽은 서울을 크게 본 것` }, box), pts = [];
+    const gm = s("g", { transform: `translate(${-x0 * k},${-y0 * k}) scale(${k})` }, v);
+    DATA.sidoPaths.forEach((sp) => s("path", { d: sp.d, fill: "var(--sea)", stroke: "var(--axis)", "stroke-width": .8, "vector-effect": "non-scaling-stroke" }, gm));
+    s("rect", { x: (ix0 - x0) * k, y: (iy0 - y0) * k, width: (ix1 - ix0) * k, height: (iy1 - iy0) * k, fill: "none", stroke: "var(--ink2)", "stroke-width": 1, "stroke-dasharray": "3 2" }, v);
+    // inset frame
+    const clipId = "clip4"; const cp = s("clipPath", { id: clipId }, v); s("rect", { x: ox, y: oy, width: iw, height: ih }, cp);
+    s("rect", { x: ox, y: oy, width: iw, height: ih, fill: "var(--card)", stroke: "var(--line)" }, v);
+    const gi = s("g", { "clip-path": `url(#${clipId})` }, v), gin = s("g", { transform: `translate(${ox - ix0 * ik},${oy - iy0 * ik}) scale(${ik})` }, gi);
+    DATA.sidoPaths.forEach((sp) => s("path", { d: sp.d, fill: "var(--sea)", stroke: "var(--axis)", "stroke-width": .8, "vector-effect": "non-scaling-stroke" }, gin));
+    tx(v, ox + 6, oy - 8, "서울 크게 보기", "mt", 12, "start");
+    const Rmax = wide ? 13 : 11, rings = [];
+    const ring = (g, x, y, p, i) => { const c = chg(p), r = Math.max(2, Rmax * Math.sqrt(p[6] / MAXP)), col = colOf(c);
+      const el = s("circle", { cx: x, cy: y, r, fill: col, "fill-opacity": .14, stroke: col, "stroke-width": r < 4 ? 1.6 : 2.2, class: "rg" }, g); rings.push({ el, i }); return r; };
+    const tipP = (p) => { const c19 = (p[6] / p[4] - 1) * 100, c22 = (p[6] / p[5] - 1) * 100; return [`${p[0]} ${p[1]}`, [[fmt(p[6]) + "건", "2025년 혼인"], [sgn(c22) + "%", `2022년보다 (${fmt(p[5])}건)`], [sgn(c19) + "%", `2019년보다 (${fmt(p[4])}건)`], [f1(p[7]) + "건", "인구 1천 명당(2025)"], [TYPE[p[8]], "구분"]]]; };
+    const gr = s("g", {}, v);
+    PL.forEach((p, i) => { const x = (p[2] - x0) * k, y = (p[3] - y0) * k, r = ring(gr, x, y, p, i); pts.push({ x, y, r, fn: () => tipP(p) }); });
+    const gr2 = s("g", { "clip-path": `url(#${clipId})` }, v);
+    // gu names under each ring; flip above when two names would collide, drop when neither fits (the tooltip still names it)
+    const boxes = [], hit = (bx) => boxes.some((o) => bx.x0 < o.x1 && bx.x1 > o.x0 && bx.y0 < o.y1 && bx.y1 > o.y0);
+    SE.forEach((p) => { const x = ox + (p[2] - ix0) * ik, y = oy + (p[3] - iy0) * ik, r = ring(gr2, x, y, p, PL.indexOf(p)); pts.push({ x, y, r, fn: () => tipP(p) });
+      const w = p[1].length * 11 + 2;
+      for (const ty of [y + r + 11, y - r - 4]) { const bx = { x0: x - w / 2, x1: x + w / 2, y0: ty - 10, y1: ty + 2 }; if (hit(bx)) continue; boxes.push(bx); tx(v, x, ty, p[1], "mt halo", 11, "middle", { "stroke-width": 3 }); break; } });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 시군구를 옮겨 볼 수 있다");
+    const st = document.getElementById("st4"); st.replaceChildren();
+    const up = PL.filter((p) => chg(p) > 0).length, agg = {}; PL.forEach((p) => { const a = agg[p[8]] ||= [0, 0]; a[0] += base4 === "19" ? p[4] : p[5]; a[1] += p[6]; });
+    st.append(`${base4 === "19" ? "2019" : "2022"}년보다 늘어난 곳 `, bEl(`${up}곳`), ` / 229곳 · 광역시 구 `, bEl(sgn((agg.k[1] / agg.k[0] - 1) * 100) + "%"), " · 시 ", bEl(sgn((agg.s[1] / agg.s[0] - 1) * 100) + "%"), " · 군 ", bEl(sgn((agg.g[1] / agg.g[0] - 1) * 100) + "%"));
+    if (seen4 || reduce) return;
+    rings.forEach(({ el }) => { el.style.transform = "scale(0)"; el.style.opacity = 0; });
+    once(box, () => { seen4 = true; rings.forEach(({ el, i }) => { const d = (i * 37) % 900; el.style.transition = `transform .5s cubic-bezier(.3,1.5,.6,1) ${d}ms, opacity .2s ${d}ms`; requestAnimationFrame(() => { el.style.transform = "none"; el.style.opacity = 1; }); }); }, .2);
+  }
+  c4(); onResize(() => { seen4 = true; c4(); });
+  table("t4", ["시도", "시군구", "2019", "2022", "2025", "2022년보다", "2019년보다", "1천 명당(2025)"], [...PL].sort((a, b) => b[6] - a[6]).map((p) => [p[0], p[1], fmt(p[4]), fmt(p[5]), fmt(p[6]), sgn((p[6] / p[5] - 1) * 100) + "%", sgn((p[6] / p[4] - 1) * 100) + "%", f1(p[7])]));
+})();
+</script>

@@ -1,0 +1,145 @@
+<title>그림 이름 두세 낱말</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: 이 페이지의 그림을 한두 문장으로 적는다. 무엇이 무엇 하나를 뜻하는지, 언제 움직이는지. */
+:root {
+  /* 바탕·글자 토큰: common.css가 이 이름들을 쓴다(paper, card, ink, ink2, muted, line, grid, axis, intl, sans, mono). */
+  --paper: #f3f1ec; --card: #fdfcf9; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #dbe1dd; --grid: #e8e7e3; --axis: #a7a8a3;
+  --accent: #d56b41; --intl: #d56b41;
+  /* 데이터 색: design/palette.json 43색에서 고른다. 이름은 뜻으로 짓는다(--fall, --ill 처럼). */
+  --a: #3e6f90; --b: #d56b41; --c: #80a15a; --other: #bcbbb6;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --accent: #dc8c67; --intl: #dc8c67; --a: #8eabc9; --b: #dc8c67; --c: #abc07b; --other: #5f6062; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --accent: #dc8c67; --intl: #dc8c67; --a: #8eabc9; --b: #dc8c67; --c: #abc07b; --other: #5f6062; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+</style>
+
+<main class="page">
+  <header>
+    <h1>질문 문장<span>한 줄 답. "아니다." "그렇다." "절반만 맞다."로 시작하고 핵심 숫자 두세 개를 넣는다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 NN</dd>
+      <dt>한 줄</dt><dd>어떤 자료로 무엇을 셌더니 숫자가 어떻다. 반전과 단서까지 서너 문장</dd>
+      <dt>분류</dt><dd>주제 칸(인구·가족, 주거·일·경제 …)</dd>
+      <dt>본능</dt><dd>일반화 본능 · 이 질문에서 그 본능이 어떻게 작동하는지 한 줄</dd>
+      <dt>그림 방식</dt><dd>그림 이름 · 무엇 하나가 무엇을 뜻하는지</dd>
+      <dt>기간</dt><dd>YYYY–YYYY</dd>
+      <dt>엮은 데이터</dt><dd>N개 · 자료 이름 · 자료 이름</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">숫자로 답할 수 있는 문제. 흔한 생각이 오답이 되게</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>흔한 생각</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>그럴듯한 다른 답</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>정답</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. <span class="n">숫자</span>, 비율</span>
+      왜 그런지 한두 문장.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">그림의 제목(사물 이름)</h2>
+      <p>그림을 어떻게 읽는지 먼저 말하고, 가장 큰 숫자, 그다음 반전을 말한다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">차트 제목</p>
+      <p class="fs">단위. 표시 하나 = 무엇 몇 개</p>
+      <div class="chips" id="chips1" role="group" aria-label="보기 바꾸기"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>기관 「자료 이름」(목록키). 분류·단서.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <!-- 본문 섹션은 2~4개. 그다음 아래 다섯 섹션을 이 순서로 둔다. -->
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">그래서, 질문 문장</h2>
+      <p>답을 한 문단으로 다시 말한다. 무엇을 보면 되는지, 무엇은 이 자료로 말할 수 없는지.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>자료가 세는 대상과 세지 않는 대상.</li>
+      <li>분류·제도가 바뀐 해, 2차 자료를 쓴 곳.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/00000000/fileData.do" target="_blank" rel="noopener">자료 이름</a> (목록키)</td><td>기관</td><td>쓴 열</td><td>기간</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>행 수 · 기간 · 단위</dd>
+      <dt>도구</dt><dd>Python(집계) · SVG 그림 이름(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>무엇을 무엇으로 나눴는지</dd>
+      <dt>검증</dt><dd>합계가 공표 숫자와 같은지 등 실제로 확인한 것</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 (AI 이름)가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>이어지는 질문</h3><p>어떤 자료로 무엇을 볼 수 있는지.</p>
+        <ul><li><a href="https://www.data.go.kr/data/00000000/fileData.do" target="_blank" rel="noopener">자료 이름</a> · 기관</li></ul></div>
+      <div class="q"><h3>이어지는 질문</h3><p>어떤 자료로 무엇을 볼 수 있는지.</p></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 YYYY.M.D</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  /* common.js가 주는 것: s, tx, fmt, f1, pc, man, lerp, reduce, table, tipFor, pointLayer, timeLayer, Player, chips, onResize.
+     같은 이름(특히 reduce)을 다시 선언하면 SyntaxError로 페이지 전체가 멈춘다. */
+
+  /* ---------- 1. 그림 ---------- */
+  let shown = false;
+  function c1() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, H = 360;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "그림이 보여 주는 것을 한 문장으로" }, box), pts = [];
+    // ... 표시를 그리고, 표시마다 pts.push({ x, y, r, fn: () => ["제목", [["값", "이름"], ...]] })
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 항목을 옮겨 볼 수 있다");
+    if (reduce || shown) return;
+    const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); shown = true; /* 등장 애니메이션 */ }, { threshold: .25 });
+    io.observe(box);
+  }
+  c1(); onResize(c1);
+  table("t1", ["항목", "값"], [/* [이름, fmt(값)] */]);
+})();
+</script>

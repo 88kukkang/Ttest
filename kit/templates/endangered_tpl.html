@@ -1,0 +1,672 @@
+<title>멸종위기종은 호랑이·곰 같은 동물일까</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* Layout: a picture-book field guide. Warm paper, rounded lettering, sticker-like creatures.
+   A forest scene opens the page, then the 282-sticker field guide, a creature bar chart, the "already gone" page
+   and the 2017 -> 2022 changes. Every creature is drawn once as an SVG symbol and reused. */
+:root {
+  --paper: #fbf5ea; --card: #fffaf2; --ink: #3a3125; --ink2: #5e5240; --muted: #6e604c; --line: #ecdfc9; --line2: #d9c8aa;
+  --eye: #3a3125; --blush: #f2a5a0; --snout: #f6e3cb; --beak: #f0b43c; --star: #f2b830; --white: #ffffff;
+  --sky: #dcefff; --hill: #cfe6b5; --hill2: #b7d99a; --pond: #a9d8e6; --ground: #e8d7b5;
+  --t-mammal: #c98a5a; --t-bird: #5fa3d9; --t-amph: #57b89c; --t-fish: #3f8fb6; --t-insect: #e5a23a;
+  --t-inv: #c27aae; --t-plant: #7bb04b; --t-algae: #3e8a72; --t-fungi: #dc6a5a; --t-petal: #e58aa8;
+  --display: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --body: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d221d; --card: #252b25; --ink: #f3ecdf; --ink2: #d8ceb9; --muted: #a99c84; --line: #343b33; --line2: #4a5247;
+  --eye: #2b241b; --blush: #e48f8a; --snout: #f1dcc1; --beak: #e9ab32; --star: #f0c04a; --white: #fffaf0;
+  --sky: #233340; --hill: #2f4a2c; --hill2: #3b5a35; --pond: #2b5260; --ground: #4a3f2d;
+  --t-mammal: #d39a6b; --t-bird: #6fb0e2; --t-amph: #63c4a8; --t-fish: #57a6cb; --t-insect: #ecb14d;
+  --t-inv: #cf8cbc; --t-plant: #8fc25c; --t-algae: #57a68c; --t-fungi: #e57d6d; --t-petal: #ec9cb6; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d221d; --card: #252b25; --ink: #f3ecdf; --ink2: #d8ceb9; --muted: #a99c84; --line: #343b33; --line2: #4a5247;
+  --eye: #2b241b; --blush: #e48f8a; --snout: #f1dcc1; --beak: #e9ab32; --star: #f0c04a; --white: #fffaf0;
+  --sky: #233340; --hill: #2f4a2c; --hill2: #3b5a35; --pond: #2b5260; --ground: #4a3f2d;
+  --t-mammal: #d39a6b; --t-bird: #6fb0e2; --t-amph: #63c4a8; --t-fish: #57a6cb; --t-insect: #ecb14d;
+  --t-inv: #cf8cbc; --t-plant: #8fc25c; --t-algae: #57a68c; --t-fungi: #e57d6d; --t-petal: #ec9cb6; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 17px/1.8 var(--body); word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 80px }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--line2) }
+:focus-visible { outline: 3px solid var(--t-bird); outline-offset: 3px; border-radius: 6px }
+.page { max-width: 1040px; margin: 0 auto; display: grid; gap: 64px }
+.prose { max-width: 660px; display: grid; gap: 14px; min-width: 0 }
+.prose p { margin: 0 }
+.n { font-family: var(--display); font-weight: 400; font-variant-numeric: tabular-nums; letter-spacing: .01em }
+b { font-weight: 700 }
+
+header { display: grid; gap: 20px }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(34px, 6vw, 56px); line-height: 1.2; margin: 0; text-wrap: balance; letter-spacing: -.01em }
+h1 span { display: block; font-size: .5em; color: var(--ink2); margin-top: 8px; line-height: 1.4 }
+.herowrap { border-radius: 24px; display: grid; gap: 8px }
+.herohint { margin: 0; font-size: 14px; color: var(--muted); text-align: center }
+.nw { white-space: nowrap; font-style: normal }
+.hero { width: 100%; height: auto; display: block; border-radius: 24px; background: var(--sky) }
+.sheet, .method { display: grid; grid-template-columns: 110px minmax(0, 1fr); border-top: 2px solid var(--ink); font-size: 15px; margin: 0 }
+.sheet dt, .sheet dd, .method dt, .method dd { margin: 0; padding: 10px 0; border-bottom: 1px dashed var(--line2) }
+.sheet dt, .method dt { font-family: var(--display); color: var(--muted); font-size: 15px }
+.sheet dd, .method dd { color: var(--ink2) }
+@media (max-width: 560px) { .sheet, .method { grid-template-columns: 84px minmax(0, 1fr) } }
+
+.quiz { background: var(--card); border: 2px solid var(--line); border-radius: 22px; padding: 24px; display: grid; gap: 14px; position: relative; overflow: hidden }
+.quiz .tag { font-family: var(--display); color: var(--ink2); font-size: 16px; margin: 0 }
+.quiz h2 { font-family: var(--display); font-weight: 400; font-size: 23px; line-height: 1.45; margin: 0; text-wrap: balance; max-width: 34ch }
+.opts { display: flex; flex-wrap: wrap; gap: 10px }
+.opt { font: 20px var(--display); color: var(--ink); background: var(--paper); border: 2px solid var(--line2); border-radius: 999px; padding: 8px 22px; cursor: pointer; min-height: 48px }
+.opt:hover { transform: translateY(-1px) }
+.opt[data-state="right"] { background: var(--t-plant); border-color: var(--t-plant); color: var(--eye) }
+.opt[data-state="wrong"] { opacity: .65 }
+.opt[data-state="wrong"][aria-pressed="true"] { opacity: 1; border-style: dashed; text-decoration: line-through }
+.reveal { font-size: 16px; color: var(--ink2); border-top: 2px dashed var(--line2); padding-top: 14px }
+.reveal .big { font: 28px/1.3 var(--display); color: var(--ink); display: block }
+.quiz .peek { position: absolute; right: 14px; bottom: -10px; width: 120px; height: 120px; opacity: .95 }
+@media (max-width: 600px) { .quiz .peek { display: none } }
+
+section.s { display: grid; gap: 22px }
+h2.h { font-family: var(--display); font-weight: 400; font-size: clamp(25px, 3.6vw, 32px); line-height: 1.35; margin: 0; text-wrap: balance }
+figure { margin: 0; background: var(--card); border: 2px solid var(--line); border-radius: 22px; padding: 22px; display: grid; gap: 12px; position: relative; min-width: 0 }
+.ft { font-family: var(--display); font-size: 19px; margin: 0; line-height: 1.4 }
+.fs { font-size: 14px; color: var(--muted); margin: -8px 0 0; line-height: 1.6 }
+.chart svg { display: block; width: 100%; height: auto }
+figcaption { font-size: 13px; color: var(--muted); line-height: 1.65; border-top: 2px dashed var(--line); padding-top: 10px }
+details { font-size: 14px }
+summary { cursor: pointer; color: var(--ink2); width: max-content; font-family: var(--display); padding: 6px 0 }
+.tw { overflow-x: auto; margin-top: 6px; max-height: 380px }
+table { border-collapse: collapse; font-size: 13.5px; min-width: 100% }
+th, td { padding: 5px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap }
+th { font-family: var(--display); font-weight: 400; color: var(--ink2); position: sticky; top: 0; background: var(--card) }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px }
+.chip { font: 16px var(--display); color: var(--ink); background: var(--paper); border: 2px solid var(--line2); border-radius: 999px; padding: 6px 16px; min-height: 42px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink) }
+.chip svg { width: 20px; height: 20px }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; color: var(--ink2) }
+.legend span { display: inline-flex; align-items: center; gap: 4px }
+.legend svg { width: 26px; height: 26px }
+.lab { font: 17px var(--display); fill: var(--ink) }
+.lab2 { font: 14px var(--body); fill: var(--muted) }
+.labs { font: 15px var(--display); fill: var(--ink) }
+.pick { margin: 0; min-height: 30px; font-size: 15px; color: var(--ink2); background: var(--paper); border: 1px dashed var(--line2); border-radius: 12px; padding: 6px 12px }
+.pick b { font-family: var(--display); font-weight: 400; font-size: 17px; color: var(--ink) }
+.chipinfo { margin: 0; font-size: 14.5px; color: var(--ink2); line-height: 1.7 }
+.chipinfo:empty { display: none }
+.num { font: 17px var(--display); fill: var(--ink) }
+.tk { font: 13px var(--body); fill: var(--muted) }
+.gl { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 3 5 }
+
+.gone { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px }
+.gcard { border: 2px dashed var(--line2); border-radius: 18px; padding: 14px; display: grid; justify-items: center; gap: 4px; text-align: center; background: var(--card) }
+.gcard svg { width: 76px; height: 76px; filter: grayscale(1); opacity: .55 }
+.gcard b { font-family: var(--display); font-weight: 400; font-size: 19px }
+.gcard span { font-size: 13px; color: var(--muted) }
+.changes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px }
+.cbox { background: var(--card); border: 2px solid var(--line); border-radius: 22px; padding: 18px; display: grid; gap: 10px; align-content: start }
+.cbox h3 { font-family: var(--display); font-weight: 400; font-size: 20px; margin: 0; display: flex; align-items: baseline; gap: 8px }
+.cbox h3 .n { font-size: 30px }
+.cbox ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px }
+.cbox li { display: inline-flex; align-items: center; gap: 4px; background: var(--paper); border-radius: 999px; padding: 2px 10px 2px 4px; font-size: 14.5px; border: 1px solid var(--line) }
+.cbox li svg { width: 24px; height: 24px }
+.cbox li .st { color: var(--ink2); font-size: 12px }
+.cbox p { margin: 0; font-size: 14px; color: var(--muted) }
+
+.tip { position: absolute; pointer-events: none; background: var(--card); border: 2px solid var(--line2); border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(60,40,10,.15); padding: 8px 12px; font-size: 14px; line-height: 1.5; min-width: 150px; max-width: 260px; z-index: 5 }
+.tip .tt { font: 18px var(--display) }
+.tip .ts { color: var(--muted); font-size: 13px }
+.tip .tr { color: var(--ink2) }
+.ring { fill: none; stroke: var(--ink); stroke-width: 3; pointer-events: none }
+svg[tabindex]:focus { outline: none }
+.chart:has(svg[tabindex]:focus-visible) { outline: 3px solid var(--t-bird); outline-offset: 4px; border-radius: 12px }
+
+.note { background: var(--card); border: 2px dashed var(--line2); border-radius: 18px; padding: 14px 18px; color: var(--ink2); font-size: 15.5px }
+ul.care-list { margin: 0; padding-left: 20px; display: grid; gap: 8px; font-size: 15px; color: var(--ink2) }
+.dt { overflow-x: auto; border-top: 2px solid var(--ink) }
+.dt td, .dt th { white-space: normal; vertical-align: top; padding: 8px 10px 8px 0; position: static }
+.next { display: grid; border-top: 2px solid var(--ink) }
+.q { padding: 14px 0; border-bottom: 1px dashed var(--line2); display: grid; gap: 4px }
+.q h3 { font-family: var(--display); font-weight: 400; font-size: 19px; margin: 0 }
+.q p { margin: 0; font-size: 15px; color: var(--ink2) }
+.q ul { margin: 0; padding-left: 18px; font-size: 14.5px }
+footer { font-size: 13px; color: var(--muted); border-top: 1px dashed var(--line2); padding-top: 14px }
+@media (prefers-reduced-motion: reduce) { .opt:hover { transform: none } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- mammal: bear -->
+    <symbol id="ic-mammal" viewBox="0 0 40 40">
+      <circle cx="10.5" cy="11" r="6" fill="currentColor"/><circle cx="29.5" cy="11" r="6" fill="currentColor"/>
+      <circle cx="10.5" cy="11" r="2.8" fill="var(--snout)"/><circle cx="29.5" cy="11" r="2.8" fill="var(--snout)"/>
+      <circle cx="20" cy="22" r="13" fill="currentColor"/>
+      <ellipse cx="20" cy="27" rx="6.5" ry="4.8" fill="var(--snout)"/>
+      <ellipse cx="20" cy="25" rx="2.2" ry="1.5" fill="var(--eye)"/>
+      <circle cx="14.5" cy="19.5" r="1.7" fill="var(--eye)"/><circle cx="25.5" cy="19.5" r="1.7" fill="var(--eye)"/>
+      <circle cx="11" cy="25" r="2.2" fill="var(--blush)" opacity=".8"/><circle cx="29" cy="25" r="2.2" fill="var(--blush)" opacity=".8"/>
+    </symbol>
+    <!-- bird -->
+    <symbol id="ic-bird" viewBox="0 0 40 40">
+      <path d="M6,30 l-3,4 h6 z" fill="currentColor"/>
+      <circle cx="19" cy="21" r="12.5" fill="currentColor"/>
+      <ellipse cx="17" cy="26" rx="8" ry="5.5" fill="var(--white)" opacity=".55"/>
+      <path d="M10,18 q-2,8 7,9 q-3,-5 -7,-9 z" fill="var(--eye)" opacity=".18"/>
+      <path d="M30.5,18 l7,3 l-7,3 z" fill="var(--beak)"/>
+      <circle cx="25" cy="17" r="1.8" fill="var(--eye)"/>
+      <circle cx="26" cy="22.5" r="2" fill="var(--blush)" opacity=".85"/>
+      <path d="M16,33 v4 M21,33 v4" stroke="var(--beak)" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M17,8.5 q2,-4 5,-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <!-- amphibian & reptile: frog -->
+    <symbol id="ic-amph" viewBox="0 0 40 40">
+      <ellipse cx="20" cy="25" rx="15" ry="11" fill="currentColor"/>
+      <circle cx="11.5" cy="14" r="6" fill="currentColor"/><circle cx="28.5" cy="14" r="6" fill="currentColor"/>
+      <circle cx="11.5" cy="14" r="3.4" fill="var(--white)"/><circle cx="28.5" cy="14" r="3.4" fill="var(--white)"/>
+      <circle cx="12" cy="14.5" r="1.7" fill="var(--eye)"/><circle cx="28" cy="14.5" r="1.7" fill="var(--eye)"/>
+      <path d="M13.5,26 q6.5,5 13,0" fill="none" stroke="var(--eye)" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="9.5" cy="25" r="2.3" fill="var(--blush)" opacity=".85"/><circle cx="30.5" cy="25" r="2.3" fill="var(--blush)" opacity=".85"/>
+    </symbol>
+    <!-- fish -->
+    <symbol id="ic-fish" viewBox="0 0 40 40">
+      <path d="M28,20 l9,-8 q-2,8 0,16 z" fill="currentColor"/>
+      <ellipse cx="17" cy="20" rx="13" ry="9.5" fill="currentColor"/>
+      <path d="M14,11 q4,-5 8,1" fill="currentColor"/>
+      <path d="M17,13 q4,7 0,14" fill="none" stroke="var(--white)" stroke-width="1.6" opacity=".6"/>
+      <circle cx="10" cy="18" r="2.6" fill="var(--white)"/><circle cx="10.4" cy="18.3" r="1.4" fill="var(--eye)"/>
+      <circle cx="10" cy="23.5" r="2" fill="var(--blush)" opacity=".8"/>
+      <circle cx="3" cy="11" r="1.6" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="5.5" cy="6.5" r="1.1" fill="none" stroke="currentColor" stroke-width="1"/>
+    </symbol>
+    <!-- insect: butterfly -->
+    <symbol id="ic-insect" viewBox="0 0 40 40">
+      <ellipse cx="11" cy="14" rx="8.5" ry="8" fill="currentColor"/><ellipse cx="29" cy="14" rx="8.5" ry="8" fill="currentColor"/>
+      <ellipse cx="12.5" cy="27" rx="6.5" ry="6" fill="currentColor" opacity=".8"/><ellipse cx="27.5" cy="27" rx="6.5" ry="6" fill="currentColor" opacity=".8"/>
+      <circle cx="10" cy="13" r="2.6" fill="var(--white)" opacity=".7"/><circle cx="30" cy="13" r="2.6" fill="var(--white)" opacity=".7"/>
+      <rect x="17.5" y="9" width="5" height="25" rx="2.5" fill="var(--eye)"/>
+      <path d="M18.5,9 q-3,-6 -6,-6 M21.5,9 q3,-6 6,-6" fill="none" stroke="var(--eye)" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="12.5" cy="3" r="1.3" fill="var(--eye)"/><circle cx="27.5" cy="3" r="1.3" fill="var(--eye)"/>
+    </symbol>
+    <!-- invertebrate: snail -->
+    <symbol id="ic-inv" viewBox="0 0 40 40">
+      <path d="M3,33 q0,-6 8,-6 h22 q4,0 4,3 v3 z" fill="var(--snout)"/>
+      <path d="M33,27 v-9 M37,27 v-8" stroke="var(--snout)" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="33" cy="17.5" r="1.8" fill="var(--eye)"/><circle cx="37" cy="18.5" r="1.8" fill="var(--eye)"/>
+      <circle cx="19" cy="18" r="12" fill="currentColor"/>
+      <path d="M19,18 m0,-1 a2,2 0 1 1 -2,2 a4.5,4.5 0 1 1 5,-5 a7.5,7.5 0 1 1 -9,8" fill="none" stroke="var(--white)" stroke-width="1.8" stroke-linecap="round" opacity=".7"/>
+      <circle cx="31" cy="30" r="1.6" fill="var(--blush)"/>
+    </symbol>
+    <!-- plant: flower -->
+    <symbol id="ic-plant" viewBox="0 0 40 40">
+      <path d="M20,22 v15" stroke="var(--t-plant)" stroke-width="2.4" stroke-linecap="round"/>
+      <ellipse cx="13" cy="31" rx="6" ry="3" transform="rotate(-30 13 31)" fill="var(--t-plant)"/>
+      <ellipse cx="27" cy="29" rx="6" ry="3" transform="rotate(30 27 29)" fill="var(--t-plant)"/>
+      <g fill="currentColor">
+        <circle cx="20" cy="7" r="5.5"/><circle cx="28.5" cy="13" r="5.5"/><circle cx="25.5" cy="22.5" r="5.5"/><circle cx="14.5" cy="22.5" r="5.5"/><circle cx="11.5" cy="13" r="5.5"/>
+      </g>
+      <circle cx="20" cy="15" r="6" fill="var(--beak)"/>
+      <circle cx="18" cy="14.5" r="1.1" fill="var(--eye)"/><circle cx="22" cy="14.5" r="1.1" fill="var(--eye)"/>
+      <path d="M18.2,17 q1.8,1.4 3.6,0" fill="none" stroke="var(--eye)" stroke-width="1.1" stroke-linecap="round"/>
+    </symbol>
+    <!-- algae: seaweed -->
+    <symbol id="ic-algae" viewBox="0 0 40 40">
+      <path d="M12,38 q-6,-8 0,-15 q6,-7 0,-15 q8,6 3,15 q-4,7 2,15 z" fill="currentColor"/>
+      <path d="M22,38 q-4,-10 3,-17 q6,-6 2,-14 q8,7 2,16 q-5,7 -2,15 z" fill="currentColor" opacity=".8"/>
+      <path d="M29,38 q-2,-6 2,-10 q3,-4 1,-8 q5,4 2,9 q-2,4 -1,9 z" fill="currentColor" opacity=".6"/>
+      <circle cx="30" cy="8" r="2" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="34" cy="3.5" r="1.3" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="15" cy="22" r="1.1" fill="var(--eye)"/><circle cx="19" cy="22" r="1.1" fill="var(--eye)"/>
+    </symbol>
+    <!-- fungi: mushroom -->
+    <symbol id="ic-fungi" viewBox="0 0 40 40">
+      <rect x="13" y="20" width="14" height="17" rx="6" fill="var(--snout)"/>
+      <path d="M3,22 a17,15 0 0 1 34,0 q0,2 -3,2 h-28 q-3,0 -3,-2 z" fill="currentColor"/>
+      <circle cx="13" cy="13" r="2.6" fill="var(--white)"/><circle cx="24" cy="10" r="3.2" fill="var(--white)"/><circle cx="30" cy="17" r="2" fill="var(--white)"/>
+      <circle cx="17" cy="29" r="1.3" fill="var(--eye)"/><circle cx="23" cy="29" r="1.3" fill="var(--eye)"/>
+      <circle cx="15" cy="32" r="1.6" fill="var(--blush)" opacity=".8"/><circle cx="25" cy="32" r="1.6" fill="var(--blush)" opacity=".8"/>
+    </symbol>
+    <!-- big cats, wolf, deer, dung beetle: only for the "already gone" cards -->
+    <symbol id="ic-catbase" viewBox="0 0 40 40">
+      <path d="M7,17 L8,4 L17,10 Z M33,17 L32,4 L23,10 Z" fill="currentColor"/>
+      <path d="M9.5,13 L10,7.5 L14,10 Z M30.5,13 L30,7.5 L26,10 Z" fill="var(--snout)"/>
+      <circle cx="20" cy="22" r="13.5" fill="currentColor"/>
+      <ellipse cx="20" cy="28" rx="7.5" ry="5" fill="var(--snout)"/>
+      <path d="M18,25.5 h4 l-2,2.4 z" fill="var(--eye)"/>
+      <path d="M20,28 q-2,2.6 -4,1.2 M20,28 q2,2.6 4,1.2" fill="none" stroke="var(--eye)" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="14.5" cy="20" r="1.8" fill="var(--eye)"/><circle cx="25.5" cy="20" r="1.8" fill="var(--eye)"/>
+      <path d="M11,27 h-6 M11,29 l-5,2 M29,27 h6 M29,29 l5,2" stroke="var(--eye)" stroke-width=".9" stroke-linecap="round" opacity=".6"/>
+    </symbol>
+    <symbol id="ic-tiger" viewBox="0 0 40 40">
+      <use href="#ic-catbase"/>
+      <path d="M20,9 v5 M15.5,10 l1.6,4 M24.5,10 l-1.6,4 M7,19 h4.5 M7.5,23 h4 M33,19 h-4.5 M32.5,23 h-4" stroke="var(--eye)" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="ic-leopard" viewBox="0 0 40 40">
+      <use href="#ic-catbase"/>
+      <g fill="none" stroke="var(--eye)" stroke-width="1.3"><circle cx="20" cy="12" r="1.6"/><circle cx="14" cy="13.5" r="1.4"/><circle cx="26" cy="13.5" r="1.4"/><circle cx="10" cy="22" r="1.5"/><circle cx="30" cy="22" r="1.5"/><circle cx="11.5" cy="16.5" r="1.1"/><circle cx="28.5" cy="16.5" r="1.1"/></g>
+    </symbol>
+    <symbol id="ic-lynx" viewBox="0 0 40 40">
+      <path d="M8,4.5 v-4 M32,4.5 v-4" stroke="var(--eye)" stroke-width="2" stroke-linecap="round"/>
+      <use href="#ic-catbase"/>
+      <path d="M7,25 l-3,6 l6,-2 l1,5 l4,-4 M33,25 l3,6 l-6,-2 l-1,5 l-4,-4" fill="currentColor"/>
+      <path d="M17,13 l3,3 l3,-3" fill="none" stroke="var(--eye)" stroke-width="1.2" opacity=".6"/>
+    </symbol>
+    <symbol id="ic-wolf" viewBox="0 0 40 40">
+      <path d="M8,18 L9,2 L18,11 Z M32,18 L31,2 L22,11 Z" fill="currentColor"/>
+      <path d="M10.5,14 L11,6 L15.5,10.5 Z M29.5,14 L29,6 L24.5,10.5 Z" fill="var(--snout)"/>
+      <path d="M7,18 Q7,9 20,9 Q33,9 33,18 Q33,26 26,30 L20,37 L14,30 Q7,26 7,18 Z" fill="currentColor"/>
+      <path d="M13,24 Q20,21 27,24 L20,36 Z" fill="var(--snout)"/>
+      <ellipse cx="20" cy="33" rx="2.6" ry="1.8" fill="var(--eye)"/>
+      <circle cx="14.5" cy="18.5" r="1.8" fill="var(--eye)"/><circle cx="25.5" cy="18.5" r="1.8" fill="var(--eye)"/>
+    </symbol>
+    <symbol id="ic-deer" viewBox="0 0 40 40">
+      <path d="M13,10 L10,3 M10,3 L7,5 M10,3 L11,0.5 M27,10 L30,3 M30,3 L33,5 M30,3 L29,0.5" stroke="var(--snout)" stroke-width="2.2" stroke-linecap="round"/>
+      <ellipse cx="7" cy="15" rx="6" ry="3" transform="rotate(-20 7 15)" fill="currentColor"/><ellipse cx="33" cy="15" rx="6" ry="3" transform="rotate(20 33 15)" fill="currentColor"/>
+      <ellipse cx="20" cy="22" rx="11" ry="13" fill="currentColor"/>
+      <ellipse cx="20" cy="30" rx="6" ry="4.5" fill="var(--snout)"/>
+      <ellipse cx="20" cy="28.5" rx="2.2" ry="1.5" fill="var(--eye)"/>
+      <circle cx="15" cy="19" r="1.8" fill="var(--eye)"/><circle cx="25" cy="19" r="1.8" fill="var(--eye)"/>
+      <circle cx="18" cy="12" r="1.1" fill="var(--white)" opacity=".7"/><circle cx="22.5" cy="13.5" r="1.1" fill="var(--white)" opacity=".7"/>
+    </symbol>
+    <symbol id="ic-beetle" viewBox="0 0 40 40">
+      <circle cx="31" cy="27" r="7" fill="var(--ground)" stroke="var(--eye)" stroke-width="1" opacity=".9"/>
+      <path d="M8,18 l-5,-3 M8,24 l-6,0 M10,30 l-4,4 M20,18 l4,-3 M20,25 l5,0 M18,30 l4,4" stroke="var(--eye)" stroke-width="1.6" stroke-linecap="round"/>
+      <ellipse cx="14" cy="25" rx="9" ry="8" fill="currentColor"/>
+      <path d="M14,17 v16" stroke="var(--eye)" stroke-width="1" opacity=".5"/>
+      <circle cx="14" cy="14.5" r="4.5" fill="var(--eye)"/>
+      <circle cx="12.5" cy="13.5" r="1" fill="var(--white)"/><circle cx="15.5" cy="13.5" r="1" fill="var(--white)"/>
+    </symbol>
+    <symbol id="star" viewBox="0 0 20 20"><path d="M10,1.5 l2.6,5.4 5.9,.8 -4.3,4.1 1,5.9 -5.2,-2.8 -5.2,2.8 1,-5.9 -4.3,-4.1 5.9,-.8 z" fill="var(--star)" stroke="var(--card)" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<main class="page">
+  <header>
+    <h1>멸종위기종은 <em class="nw">호랑이·곰</em> 같은 동물일까<span>법으로 지정한 282종을 스티커 도감으로 모두 붙여 봤다</span></h1>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="tag">먼저, 문제 하나</p>
+    <h2 id="qz">우리나라 멸종위기 야생생물 282종 가운데 포유류는 몇 종일까?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-ans="20">20종</button>
+      <button class="opt" type="button" aria-pressed="false" data-ans="69">69종</button>
+      <button class="opt" type="button" aria-pressed="false" data-ans="92">92종</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big" id="revbig">20종, 열네 종 중 한 종꼴</span>
+      69종은 새(조류), 92종은 식물이다. 멸종위기종 명단에서 가장 큰 무리는 꽃과 풀이다.
+    </div></div>
+    <svg class="peek" viewBox="0 0 40 40" aria-hidden="true" style="color:var(--t-petal)"><use href="#ic-plant"/></svg>
+  </section>
+
+  <section class="s" aria-label="숲 그림과 요약">
+    <div class="herowrap"><svg class="hero" id="hero" viewBox="0 0 1000 330" role="img" aria-label="숲과 연못 그림. 퀴즈에 답하면 분류군마다 멸종위기종 수가 말풍선에 나타난다"></svg><p class="herohint" id="herohint">위 퀴즈에 답하면 말풍선에 숫자가 나타나요</p></div>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 03</dd>
+      <dt>한 줄</dt><dd>법으로 지정한 멸종위기 야생생물 282종 중 포유류는 20종(7%)이다. 가장 많은 것은 식물 92종, 다음이 새 69종이다. 이름이 잘 알려진 호랑이·표범·늑대·스라소니는 이미 우리나라 야생에서 사라진 것으로 평가됐다.</dd>
+      <dt>분류</dt><dd>환경</dd>
+      <dt>본능</dt><dd>일반화 본능 · "멸종위기 동물"이라는 말에 떠오르는 몇몇 큰 동물로 전체를 상상한다</dd>
+      <dt>그림 방식</dt><dd>282칸 스티커 도감 · 종 하나를 스티커 하나로 그려 분류군별로 붙인다</dd>
+      <dt>기간</dt><dd>2017년 목록(267종) → 2022년 개정 목록(282종)</dd>
+      <dt>엮은 데이터</dt><dd>3개 · 한국의 멸종위기종(국립생물자원관) · 멸종위기 야생생물 개정 목록(국립생태원) · 개정 보도자료(환경부)</dd>
+    </dl>
+  </section>
+
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">282종을 스티커로 붙이면</h2>
+      <p>스티커 하나가 한 종이다. 별이 붙은 것은 가장 위급한 I급(68종)이다. 호랑이와 반달가슴곰이 든 포유류 줄은 짧고, 꽃과 새 줄은 길다. 달팽이·조개 같은 무척추동물(32종)과 곤충(29종)도 포유류보다 많다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">멸종위기 야생생물 282종 도감</p>
+      <p class="fs">2022년 12월 개정 목록. 스티커를 누르거나(키보드는 화살표) 버튼으로 골라 보면 이름이 나온다</p>
+      <div class="chips" role="group" aria-label="강조해서 보기" id="chips"></div>
+      <p class="chipinfo" id="chipinfo" aria-live="polite"></p>
+      <p class="pick" id="pick" aria-live="polite">스티커를 누르면 여기에 이름이 나와요</p>
+      <div class="chart" id="grid"></div>
+      <figcaption>국립생태원 「멸종위기 야생생물 개정 목록」(2022.12.9 시행)의 282종. "이미 사라졌다고 평가"는 국립생물자원관 「한국의 멸종위기종」 파일의 국가적색목록 지역절멸(RE, 우리나라 야생에서 사라졌다고 판단된 종) 표기를 따랐다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">수로는 꽃이 1등, 위급함으로는 포유류가 1등</h2>
+      <p>종 수로 줄을 세우면 식물 <span class="n">92</span>종, 조류 <span class="n">69</span>종, 무척추동물 <span class="n">32</span>종 순이고 포유류 <span class="n">20</span>종은 여섯 번째다. 그런데 가장 위급한 I급의 비율로 보면 순서가 뒤집힌다. 포유류는 20종 중 <span class="n">14</span>종(70%)이 I급이고, 식물은 92종 중 <span class="n">13</span>종(14%)뿐이다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">분류군별로 가장 위급한 I급의 비율</p>
+      <p class="fs">막대 길이가 그 분류군 안에서 I급이 차지하는 비율. 오른쪽 숫자는 I급 수 / 전체 수</p>
+      <div class="chart" id="bars"></div>
+      <figcaption>국립생태원 개정 목록(2022)에서 셌다. 분류군·등급별 종수는 환경부 보도자료 「멸종위기 야생생물, 267종에서 282종으로 개정」(2022.12.9)의 표와 같다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">호랑이는 명단에 있지만, 이미 사라졌다고 평가된 종이다</h2>
+      <p>멸종위기종 하면 떠오르는 호랑이·표범·늑대·스라소니는 모두 명단에 있다. 그런데 국가적색목록은 이들을 "지역절멸(RE)"로 적었다. 우리나라 야생에서는 이미 사라진 것으로 본다는 뜻이다. 우리가 떠올리는 멸종위기종은 지키는 중인 종이 아니라 잃어버린 종에 가깝다.</p>
+    </div>
+    <div class="gone" id="gone"></div>
+    <p class="note">따오기는 2019년부터 복원한 개체를 자연에 풀어 주고 있다. 이 표기는 2017년 목록 파일 기준이라, 그 뒤의 복원 상황은 반영되지 않았다.</p>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">명단은 5년마다 바뀐다</h2>
+      <p>2017년 267종이던 명단은 2022년 개정으로 282종이 됐다. 새로 들어온 19종 중 포유류는 하나도 없다. 새·물고기·곤충·풀이다. 다음 개정은 2027년 12월로 예정돼 있다.</p>
+    </div>
+    <div class="changes" id="changes"></div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 멸종위기종은 어떤 생물일까</h2>
+      <p>"호랑이·곰 같은 동물"이라는 그림은 틀렸다. 282종 중 포유류는 7%이고, 셋 중 하나는 식물이다. 조개·달팽이·곤충·물고기·버섯과 바닷말까지 더하면, 우리가 이름을 처음 듣는 생물이 대부분이다. 그리고 가장 유명한 몇몇은 이미 우리 숲에 없다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>공공데이터포털의 「한국의 멸종위기종」 파일은 수정일이 2025년이지만, 내용은 2017년 목록(267종)이다. 이 페이지는 국립생태원의 2022년 개정 목록 원문으로 다시 셌다.</li>
+      <li>국가적색목록(RE 등)과 고유종 정보는 2017년 파일에만 있어, 2022년 목록과 이름이 같거나 이름만 바뀐 종(7종)에 이어 붙였다. 새로 지정된 19종은 이 정보가 비어 있다.</li>
+      <li>멸종위기 야생생물은 법으로 지정한 "보호 대상" 명단이다. 우리나라에 사는 모든 위기종의 목록은 아니며, 분류군마다 조사된 정도가 다르다.</li>
+      <li>그림 속 생물은 분류군을 나타내는 상징이다. 실제 종의 생김새가 아니다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/3071040/fileData.do" target="_blank" rel="noopener">한국의 멸종위기종</a> (3071040)</td><td>국립생물자원관</td><td>국가적색목록·고유종 표기 (파일명 「멸종위기야생생물267종_20171229」)</td><td>2017</td></tr>
+        <tr><td><a href="https://www.nie.re.kr/nie/bbs/BMSR00028/view.do?boardId=695962914&amp;menuNo=200097" target="_blank" rel="noopener">멸종위기 야생생물 개정 목록</a></td><td>국립생태원</td><td>282종 국명·학명·분류군·등급</td><td>2022</td></tr>
+        <tr><td><a href="https://www.korea.kr/briefing/pressReleaseView.do?newsId=156541526" target="_blank" rel="noopener">멸종위기 야생생물, 267종에서 282종으로 개정</a></td><td>환경부</td><td>분류군별 종수 표, 신규·상향·해제 종 (대조용)</td><td>2022</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>3개 · 국립생물자원관, 국립생태원, 환경부 · 2017, 2022</dd>
+      <dt>도구</dt><dd>Python(한글 문서 표 읽기, 목록 대조) · SVG 일러스트(JavaScript)</dd>
+      <dt>검증</dt><dd>개정 목록에서 센 분류군·등급별 종수가 보도자료 표(I급 68, II급 214, 계 282)와 모두 같다. 2017년 목록과 견주어 찾은 신규 19종, 해제 4종, 등급 변경 9종도 보도자료 명단과 같다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 찾기, 계산, 그림, 본문 초안은 Claude가 맡았다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>멸종위기 식물은 어디에 몰려 있을까</h3><p>92종이 제주·섬·고산에 몰려 있는지, 지역 목록과 엮어 본다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15045333/fileData.do" target="_blank" rel="noopener">멸종위기야생식물현황</a> · 제주특별자치도</li><li><a href="https://www.data.go.kr/data/15126882/fileData.do" target="_blank" rel="noopener">멸종위기 야생동식물 목록</a> · 울산광역시</li></ul></div>
+      <div class="q"><h3>한약재로 쓰이는 멸종위기종은 얼마나 될까</h3>
+        <ul><li><a href="https://www.data.go.kr/data/15076338/openapi.do" target="_blank" rel="noopener">한약재로 사용되는 멸종위기 동식물종 정보</a> · 식품의약품안전평가원</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.4</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const s = (tag, a = {}, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  const tx = (p, x, y, str, cls, anchor = "start", extra = {}) => { const t = s("text", { x, y, class: cls, "text-anchor": anchor, ...extra }, p); t.textContent = str; return t; };
+  const TAX = [
+    { k: "식물", nick: "꽃·풀", ic: "plant", col: "var(--t-plant)", icol: "var(--t-petal)" }, { k: "조류", nick: "새", ic: "bird", col: "var(--t-bird)" },
+    { k: "무척추동물", nick: "달팽이·조개", ic: "inv", col: "var(--t-inv)" }, { k: "어류", nick: "물고기", ic: "fish", col: "var(--t-fish)" },
+    { k: "곤충류", nick: "곤충", ic: "insect", col: "var(--t-insect)" }, { k: "포유류", nick: "털 짐승", ic: "mammal", col: "var(--t-mammal)" },
+    { k: "양서·파충류", nick: "개구리·뱀", ic: "amph", col: "var(--t-amph)" }, { k: "해조류", nick: "바닷말", ic: "algae", col: "var(--t-algae)" },
+    { k: "고등균류", nick: "버섯", ic: "fungi", col: "var(--t-fungi)" },
+  ];
+  const TX = Object.fromEntries(TAX.map((t) => [t.k, t]));
+  const L = DATA.list;
+  const use = (p, ic, x, y, w, col, extra = {}) => { const u = s("use", { href: "#ic-" + ic, x, y, width: w, height: w, ...extra }, p); u.style.color = col; return u; };
+  const RED = { RE: "지역절멸", CR: "위급", EN: "위기", VU: "취약", NT: "준위협", LC: "관심대상", NE: "미평가", NA: "적용 제외" };
+
+  function tipFor(fig) {
+    const tip = fig.querySelector(".tip");
+    return {
+      show(ev, title, sub, lines) {
+        tip.replaceChildren();
+        const a = document.createElement("div"); a.className = "tt"; a.textContent = title; tip.append(a);
+        if (sub) { const b = document.createElement("div"); b.className = "ts"; b.textContent = sub; tip.append(b); }
+        lines.forEach((l) => { const c = document.createElement("div"); c.className = "tr"; c.textContent = l; tip.append(c); });
+        tip.hidden = false;
+        const fr = fig.getBoundingClientRect(); let x, y;
+        if (ev.type !== "focus") { x = ev.clientX - fr.left + 14; y = ev.clientY - fr.top + 14; } else { const r = ev.target.getBoundingClientRect(); x = r.left - fr.left + r.width / 2; y = r.bottom - fr.top + 6; }
+        const tw = tip.offsetWidth, th = tip.offsetHeight;
+        if (x + tw > fr.width - 8) x = Math.max(8, x - tw - 28);
+        if (y + th > fr.height - 8) y = Math.max(8, y - th - 28);
+        tip.style.left = x + "px"; tip.style.top = y + "px";
+      },
+      hide() { tip.hidden = true; },
+    };
+  }
+  function pointLayer(v, tip, pts, label, onPick) {
+    const ring = s("rect", { width: 46, height: 46, rx: 14, class: "ring", opacity: 0 }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0"); v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => { idx = i; const p = pts[i]; ring.setAttribute("x", p.x - p.w / 2 - 3); ring.setAttribute("y", p.y - p.w / 2 - 3); ring.setAttribute("width", p.w + 6); ring.setAttribute("height", p.w + 6); ring.setAttribute("opacity", 1); const [t, sub, lines] = p.fn(); tip.show(ev || { type: "focus", target: ring }, t, sub, lines); if (onPick) onPick(t, sub, lines); };
+    const hide = () => { tip.hide(); ring.setAttribute("opacity", 0); };
+    const nearest = (e) => {
+      const r = v.getBoundingClientRect(), k = v.viewBox.baseVal.width / r.width;
+      const x = (e.clientX - r.left) * k, y = (e.clientY - r.top) * k;
+      let best = -1, bd = Infinity;
+      pts.forEach((p, i) => { const d = (p.x - x) ** 2 + (p.y - y) ** 2, reach = Math.max(p.w / 2 + 4, 24 * k); if (d < reach * reach && d < bd) { bd = d; best = i; } });
+      return best;
+    };
+    v.addEventListener("pointermove", (e) => { if (e.pointerType === "touch") return; const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    // a tap (touch or pen) picks the nearest mark; the tooltip stays until the next tap
+    v.addEventListener("pointerdown", (e) => { const b = nearest(e); if (b >= 0) show(b, e); else hide(); });
+    v.addEventListener("pointerleave", (e) => { if (e.pointerType !== "touch") hide(); });
+    v.addEventListener("focus", () => { if (pts.length) show(idx < 0 ? 0 : idx); }); v.addEventListener("blur", hide);
+    // left/right step through the list; up/down jump to the closest mark on the row above or below
+    const vert = (dir) => { const c = pts[Math.max(idx, 0)]; let best = -1, bd = Infinity; pts.forEach((p, i) => { const dy = (p.y - c.y) * dir; if (dy <= 1) return; const d = dy * 4 + Math.abs(p.x - c.x); if (d < bd) { bd = d; best = i; } }); return best < 0 ? Math.max(idx, 0) : best; };
+    v.addEventListener("keydown", (e) => {
+      if (!pts.length) return;
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); const st = e.key === "ArrowRight" ? 1 : -1; show((Math.max(idx, 0) + st + pts.length) % pts.length); }
+      else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); show(vert(e.key === "ArrowDown" ? 1 : -1)); }
+      else if (e.key === "Escape") hide();
+    });
+  }
+  function table(id, head, rows, right = []) {
+    const t = document.createElement("table"), th = document.createElement("thead"), tr = document.createElement("tr");
+    head.forEach((h, i) => { const c = document.createElement("th"); c.textContent = h; if (right.includes(i)) c.className = "r"; tr.append(c); }); th.append(tr); t.append(th);
+    const tb = document.createElement("tbody");
+    rows.forEach((r) => { const row = document.createElement("tr"); r.forEach((v, i) => { const c = document.createElement("td"); c.textContent = v; if (right.includes(i)) c.className = "r"; row.append(c); }); tb.append(row); });
+    t.append(tb); document.getElementById(id).replaceChildren(t);
+  }
+  const count = (k, g) => L.filter((o) => o.tax === k && (!g || o.grade === g)).length;
+
+  /* hero: a cute forest and pond. Flowers outnumber everything, the bear only peeks out.
+     Wide (1000x330) and phone (400x560) layouts; bubbles show "?" until the quiz is answered. */
+  let revealed = false;
+  function hero() {
+    const v = document.getElementById("hero"); v.replaceChildren();
+    const narrow = document.querySelector(".page").clientWidth < 600;
+    const W = narrow ? 400 : 1000, H = narrow ? 560 : 330;
+    v.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    const put = (ic, x, y, w, col) => use(v, ic, x, y, w, col);
+    const cloud = (x, y) => { const g = s("g", { fill: "var(--white)", opacity: .75 }, v); s("ellipse", { cx: x, cy: y, rx: 38, ry: 14 }, g); s("ellipse", { cx: x + 22, cy: y - 8, rx: 22, ry: 13 }, g); s("ellipse", { cx: x - 20, cy: y - 4, rx: 18, ry: 11 }, g); };
+    const PET = ["var(--t-petal)", "var(--t-fungi)", "var(--t-inv)", "var(--t-insect)", "var(--t-plant)"];
+    const carpet = (x0, x1, y0, rows, step) => { let k = 0; for (let r = 0; r < rows; r++) for (let x = x0 + (r % 2) * step / 2; x < x1; x += step) { const j = ((k * 37) % 11) - 5, w = 26 + ((k * 13) % 4) * 4; put("plant", x + j, y0 + r * 24 + ((k * 7) % 5), w, PET[k % PET.length]); k++; } };
+    const bub = (x, y, label, n, tail) => { const g = s("g", {}, v); const full = `${label} ${n}`, w = 18 + full.length * 15; s("path", { d: tail, fill: "var(--card)", stroke: "var(--ink)", "stroke-width": 2, "stroke-linejoin": "round" }, g); s("rect", { x, y, width: w, height: 34, rx: 17, fill: "var(--card)", stroke: "var(--ink)", "stroke-width": 2 }, g); s("path", { d: tail, fill: "var(--card)" }, g); tx(g, x + w / 2, y + 24, revealed ? full : `${label} ?`, "lab", "middle"); };
+    s("rect", { width: W, height: H, fill: "var(--sky)" }, v);
+    if (!narrow) {
+      s("circle", { cx: 880, cy: 70, r: 34, fill: "var(--beak)", opacity: .55 }, v);
+      [[150, 50], [420, 40], [720, 80]].forEach(([x, y]) => cloud(x, y));
+      s("path", { d: "M0,210 Q160,120 330,190 T700,170 T1000,190 V330 H0 Z", fill: "var(--hill)" }, v);
+      put("mammal", 262, 148, 50, "var(--t-mammal)");
+      s("path", { d: "M222,212 Q290,168 372,210 Z", fill: "var(--hill)" }, v);
+      s("path", { d: "M0,250 Q220,200 420,250 T1000,240 V330 H0 Z", fill: "var(--hill2)" }, v);
+      s("ellipse", { cx: 760, cy: 290, rx: 200, ry: 46, fill: "var(--pond)" }, v);
+      s("path", { d: "M600,282 q20,-6 40,0 M820,300 q20,-6 40,0", stroke: "var(--white)", "stroke-width": 3, fill: "none", opacity: .6, "stroke-linecap": "round" }, v);
+      s("ellipse", { cx: 880, cy: 285, rx: 34, ry: 10, fill: "var(--t-amph)", opacity: .6 }, v);
+      [[470, 64, 46], [530, 98, 36], [588, 54, 32], [630, 96, 28], [418, 100, 28]].forEach(([x, y, w]) => put("bird", x, y, w, "var(--t-bird)"));
+      put("insect", 190, 118, 40, "var(--t-insect)");
+      carpet(10, 420, 222, 4, 30);
+      put("fungi", 450, 232, 44, "var(--t-fungi)"); put("inv", 500, 240, 58, "var(--t-inv)");
+      put("fish", 650, 268, 52, "var(--t-fish)"); put("fish", 730, 286, 36, "var(--t-fish)");
+      put("algae", 790, 250, 54, "var(--t-algae)"); put("amph", 858, 244, 46, "var(--t-amph)");
+      bub(24, 168, "식물", 92, "M64,200 l6,16 l10,-16"); bub(120, 66, "곤충", 29, "M190,100 l8,16 l6,-16");
+      bub(240, 96, "포유류", 20, "M280,130 l4,18 l10,-18"); bub(492, 16, "새", 69, "M520,48 l2,14 l8,-14");
+      bub(380, 180, "버섯", 1, "M440,214 l14,20 l2,-20"); bub(536, 192, "달팽이·조개", 32, "M556,224 l-10,16 l24,-16");
+      bub(668, 236, "물고기", 29, "M692,268 l-4,12 l16,-12"); bub(770, 198, "바닷말", 2, "M796,232 l6,14 l8,-14");
+      bub(872, 190, "개구리·뱀", 8, "M896,222 l-6,18 l14,-18");
+    } else {
+      s("circle", { cx: 340, cy: 60, r: 28, fill: "var(--beak)", opacity: .55 }, v);
+      cloud(90, 44); cloud(250, 96);
+      s("path", { d: "M0,260 Q120,200 240,240 T400,230 V560 H0 Z", fill: "var(--hill)" }, v);
+      put("mammal", 252, 202, 46, "var(--t-mammal)");
+      s("path", { d: "M222,256 Q276,218 334,256 Z", fill: "var(--hill)" }, v);
+      s("path", { d: "M0,330 Q150,290 300,330 T400,320 V560 H0 Z", fill: "var(--hill2)" }, v);
+      s("ellipse", { cx: 200, cy: 510, rx: 196, ry: 50, fill: "var(--pond)" }, v);
+      s("ellipse", { cx: 322, cy: 512, rx: 28, ry: 8, fill: "var(--t-amph)", opacity: .6 }, v);
+      [[60, 92, 40], [118, 68, 30], [168, 104, 26], [24, 64, 24]].forEach(([x, y, w]) => put("bird", x, y, w, "var(--t-bird)"));
+      put("insect", 38, 196, 36, "var(--t-insect)");
+      carpet(6, 240, 336, 3, 28);
+      put("fungi", 298, 300, 36, "var(--t-fungi)"); put("inv", 338, 306, 48, "var(--t-inv)");
+      put("fish", 64, 488, 44, "var(--t-fish)"); put("fish", 136, 508, 30, "var(--t-fish)");
+      put("algae", 214, 470, 46, "var(--t-algae)"); put("amph", 302, 482, 42, "var(--t-amph)");
+      bub(150, 18, "새", 69, "M176,52 l-12,14 l20,-14"); bub(8, 130, "곤충", 29, "M48,164 l4,26 l10,-26");
+      bub(222, 140, "포유류", 20, "M262,174 l4,26 l10,-26"); bub(240, 250, "버섯", 1, "M296,284 l8,16 l8,-16");
+      bub(20, 282, "식물", 92, "M60,316 l4,18 l10,-18"); bub(246, 364, "달팽이·조개", 32, "M350,364 l6,-12 l10,12");
+      bub(14, 440, "물고기", 29, "M56,474 l4,14 l10,-14"); bub(138, 424, "바닷말", 2, "M200,458 l6,14 l8,-14");
+      bub(262, 420, "개구리·뱀", 8, "M312,454 l2,26 l12,-26");
+    }
+    v.setAttribute("aria-label", revealed ? "숲과 연못 그림. 분류군마다 멸종위기종 수: 식물 92, 조류 69, 무척추동물 32, 어류 29, 곤충류 29, 포유류 20, 양서·파충류 8, 해조류 2, 고등균류 1" : "숲과 연못 그림. 퀴즈에 답하면 분류군마다 멸종위기종 수가 말풍선에 나타난다");
+  }
+
+  /* quiz */
+  document.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".opt").forEach((o) => { o.setAttribute("aria-pressed", o === b); o.dataset.state = o.dataset.ans === "20" ? "right" : "wrong"; });
+    document.getElementById("revbig").textContent = b.dataset.ans === "20" ? "맞아요! 20종, 열네 종 중 한 종꼴" : `아쉬워요. 정답은 20종, 열네 종 중 한 종꼴`;
+    document.getElementById("reveal").hidden = false;
+    revealed = true; hero(); document.getElementById("herohint").textContent = "말풍선의 숫자가 분류군별 멸종위기종 수예요";
+  }));
+
+  /* 282-sticker field guide */
+  const MODES = [
+    { id: "all", name: "모두" },
+    { id: "I", name: "I급만", f: (o) => o.grade === "I" },
+    { id: "new", name: "2022년에 새로 들어온 종", f: (o) => o.new },
+    { id: "re", name: "이미 사라졌다고 평가된 종", f: (o) => o.red === "RE" },
+    { id: "endemic", name: "우리나라에만 사는 종", f: (o) => o.endemic },
+  ];
+  let mode = "all";
+  function drawGrid() {
+    const box = document.getElementById("grid"), fig = document.getElementById("f1");
+    box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), cell = W < 520 ? 34 : 44, gap = 4, labH = 38;
+    const cols = Math.max(6, Math.floor((W + gap) / (cell + gap)));
+    let y = 0; const pts = [], parts = [];
+    TAX.forEach((t) => {
+      const items = L.filter((o) => o.tax === t.k).sort((a, b) => (a.grade === b.grade ? 0 : a.grade === "I" ? -1 : 1));
+      parts.push({ t, items, y }); y += labH + Math.ceil(items.length / cols) * (cell + gap) + 14;
+    });
+    const H = y;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "group", "aria-label": "멸종위기 야생생물 282종 스티커 도감" }, box);
+    const M = MODES.find((m) => m.id === mode);
+    parts.forEach(({ t, items, y: y0 }) => {
+      use(v, t.ic, 0, y0 + 2, 30, t.icol || t.col);
+      const hits = M.f ? items.filter(M.f).length : 0;
+      const lt = tx(v, 38, y0 + 24, t.k, "lab"); const sp = s("tspan", { class: "lab2", dx: 8 }, lt); sp.textContent = M.f ? `${t.nick} · ${items.length}종 중 ${hits}종` : `${t.nick} · ${items.length}종 · I급 ${items.filter((o) => o.grade === "I").length}`;
+      items.forEach((o, i) => {
+        const cx = (i % cols) * (cell + gap) + cell / 2, cy = y0 + labH + Math.floor(i / cols) * (cell + gap) + cell / 2;
+        const on = !M.f || M.f(o);
+        const g = s("g", { opacity: on ? 1 : .16 }, v);
+        const bg = s("rect", { x: cx - cell / 2, y: cy - cell / 2, width: cell, height: cell, rx: cell * .3, fill: t.col, "fill-opacity": .16, stroke: t.col, "stroke-opacity": .35, "stroke-width": 1.5 }, g);
+        if (o.red === "RE" && mode === "re") bg.setAttribute("stroke-dasharray", "4 3");
+        use(g, t.ic, cx - cell * .38, cy - cell * .38, cell * .76, t.icol || t.col);
+        if (o.grade === "I") s("use", { href: "#star", x: cx + cell / 2 - 13, y: cy - cell / 2 - 3, width: 15, height: 15 }, g);
+        if (on) pts.push({ x: cx, y: cy, w: cell, fn: () => [o.name, o.sci, [`${o.tax} · 멸종위기 ${o.grade === "I" ? "I" : "II"}급`, o.red ? `국가적색목록(2017): ${RED[o.red] || o.red}` : o.new ? "2022년 새로 지정" : "국가적색목록 표기 없음", ...(o.endemic ? ["우리나라 고유종"] : [])]] });
+      });
+    });
+    const pick = document.getElementById("pick");
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 종을 하나씩 볼 수 있음", (t, sub, lines) => { pick.replaceChildren(); const b = document.createElement("b"); b.textContent = t; pick.append(b, document.createTextNode(` ${sub} · ${lines.join(" · ")}`)); });
+  }
+  const chipBox = document.getElementById("chips");
+  MODES.forEach((m) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.setAttribute("aria-pressed", m.id === mode);
+    const n = L.filter((o) => !m.f || m.f(o)).length;
+    b.textContent = `${m.name} ${n}`;
+    if (m.id === "I") { const st = s("svg", { viewBox: "0 0 20 20", "aria-hidden": "true" }); s("use", { href: "#star", width: 20, height: 20 }, st); b.prepend(st); }
+    b.addEventListener("click", () => {
+      mode = m.id; chipBox.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === b)); drawGrid();
+      const info = document.getElementById("chipinfo"); info.replaceChildren();
+      if (m.f) { const hit = L.filter(m.f); const b2 = document.createElement("b"); b2.textContent = `${m.name} ${hit.length}종: `; info.append(b2, document.createTextNode(hit.map((o) => o.name).join(" · "))); }
+    });
+    chipBox.append(b);
+  });
+  table("t1", ["분류군", "국명", "학명", "등급", "국가적색목록(2017)", "고유종", "2022 신규"], L.map((o) => [o.tax, o.name, o.sci, o.grade === "I" ? "I급" : "II급", o.red ? RED[o.red] || o.red : "", o.endemic ? "고유종" : "", o.new ? "신규" : ""]));
+
+  /* share of each taxon that is grade I (the fact the sticker grid cannot show at a glance) */
+  function drawBars() {
+    const box = document.getElementById("bars"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 520, rowH = narrow ? 46 : 52, l = narrow ? 128 : 176, r = narrow ? 86 : 104, top = 6, bot = 28;
+    const rows = TAX.map((t) => ({ t, n: count(t.k), n1: count(t.k, "I") })).map((d) => ({ ...d, p: d.n1 / d.n * 100 })).sort((a, b) => b.p - a.p || b.n - a.n);
+    const H = top + rowH * rows.length + bot;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "group", "aria-label": "분류군별 I급 비율 막대그래프" }, box);
+    const sx = (p) => l + p / 100 * (W - l - r);
+    [0, 25, 50, 75, 100].forEach((p) => { s("line", { x1: sx(p), x2: sx(p), y1: top, y2: H - bot + 4, class: "gl" }, v); tx(v, sx(p), H - 6, p + "%", "tk", "middle"); });
+    const pts = [];
+    rows.forEach(({ t, n, n1, p }, i) => {
+      const y = top + i * rowH, bh = narrow ? 18 : 22, by = y + (rowH - bh) / 2, ic = narrow ? 30 : 38;
+      use(v, t.ic, 0, y + (rowH - ic) / 2, ic, t.icol || t.col);
+      tx(v, ic + 6, by + bh - 4, t.k, narrow ? "labs" : "lab");
+      s("rect", { x: l, y: by, width: sx(100) - l, height: bh, rx: bh / 2, fill: t.col, "fill-opacity": .16 }, v);
+      if (n1) s("rect", { x: l, y: by, width: Math.max(bh, sx(p) - l), height: bh, rx: bh / 2, fill: t.col }, v);
+      tx(v, sx(100) + 10, by + bh - 4, `${Math.round(p)}% · ${n1}/${n}`, "num");
+      pts.push({ x: (l + sx(100)) / 2, y: by + bh / 2, w: rowH - 6, fn: () => [t.k, null, [`I급 ${n1}종 / 전체 ${n}종 (${p.toFixed(1)}%)`, `II급 ${n - n1}종`]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 분류군을 하나씩 볼 수 있음");
+    table("t2", ["분류군", "I급", "II급", "계", "I급 비율", "282종 중 비율"], rows.map(({ t, n, n1, p }) => [t.k, String(n1), String(n - n1), String(n), p.toFixed(1) + "%", (n / L.length * 100).toFixed(1) + "%"]).concat([["합계", String(L.filter((o) => o.grade === "I").length), String(L.filter((o) => o.grade === "II").length), String(L.length), (L.filter((o) => o.grade === "I").length / L.length * 100).toFixed(1) + "%", "100%"]]), [1, 2, 3, 4, 5]);
+  }
+
+  /* already gone */
+  (function gone() {
+    const box = document.getElementById("gone");
+    L.filter((o) => o.red === "RE").forEach((o) => {
+      const t = TX[o.tax]; const c = document.createElement("div"); c.className = "gcard";
+      const GI = { 호랑이: "tiger", 표범: "leopard", 스라소니: "lynx", 늑대: "wolf", 대륙사슴: "deer", 소똥구리: "beetle" };
+      const sv = s("svg", { viewBox: "0 0 40 40", "aria-hidden": "true" }); use(sv, GI[o.name] || t.ic, 0, 0, 40, t.col);
+      const b = document.createElement("b"); b.textContent = o.name;
+      const sp = document.createElement("span"); sp.textContent = `${o.tax} · 지역절멸(RE)`;
+      c.append(sv, b, sp); box.append(c);
+    });
+  })();
+
+  /* changes 2017 -> 2022 */
+  (function changes() {
+    const box = document.getElementById("changes");
+    const card = (title, n, items, note) => {
+      const d = document.createElement("div"); d.className = "cbox";
+      const h = document.createElement("h3"); const nn = document.createElement("span"); nn.className = "n"; nn.textContent = n; h.append(document.createTextNode(title + " "), nn, document.createTextNode("종"));
+      const ul = document.createElement("ul");
+      items.forEach(([name, tax, star]) => { const li = document.createElement("li"); const sv = s("svg", { viewBox: "0 0 40 40", "aria-hidden": "true" }); const t = TX[tax]; use(sv, t.ic, 0, 0, 40, t.icol || t.col); li.append(sv, document.createTextNode(name)); if (star) { const st = document.createElement("span"); st.className = "st"; st.textContent = "★I급"; li.append(st); } ul.append(li); });
+      d.append(h, ul); if (note) { const p = document.createElement("p"); p.textContent = note; d.append(p); }
+      box.append(d);
+    };
+    const icol = (tax) => TX[tax].icol || TX[tax].col;
+    card("새로 들어온", DATA.changes.added.length, DATA.changes.added.map((x) => [x.name, x.tax, x.grade === "I"]), "포유류는 없다. 새 6, 물고기 3, 곤충 3, 풀 7");
+    card("II급에서 I급으로", DATA.changes.up.length, DATA.changes.up.map((x) => [x.name, x.tax, false]), "매는 반대로 I급에서 II급으로 내려갔다");
+    card("명단에서 빠진", DATA.changes.removed.length, DATA.changes.removed.map((x) => [x.name, x.tax, false]), "백조어는 해제 뒤 관찰종으로 옮겨 계속 지켜본다");
+  })();
+
+  hero(); drawGrid(); drawBars();
+  let lastW = 0, rt;
+  new ResizeObserver(() => { const w = document.querySelector(".page").clientWidth; if (Math.abs(w - lastW) < 2) return; lastW = w; clearTimeout(rt); rt = setTimeout(() => { hero(); drawGrid(); drawBars(); }, 80); }).observe(document.querySelector(".page"));
+})();
+</script>

@@ -1,0 +1,340 @@
+<title>쉬었음 소파</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: one long sofa per age group, a seated figure per 20,000 people who are "just resting" (not working, not looking),
+   played year by year 2003–2026. Then two office floors of 100 desks (2005 vs now) for one age group, speech bubbles of the
+   reasons the young and the old give, and lines of resting per 100 people that end in a reclining figure. */
+:root {
+  --paper: #f2f0ec; --card: #fbfaf7; --ink: #2c2b2c; --ink2: #494747; --muted: #5d5a59; --line: #e0dbd4; --grid: #e9e5df; --axis: #a7a8a3;
+  --accent: #4e6aa9; --intl: #4e6aa9; --hi-ink: #3f5a96; --board: #2c2b2c; --board-ink: #f2f0ec; --sea: #fbfaf7;
+  --sofa: #b87b68; --sofa-dark: #8b4d3e; --cushion: #dabea9; --young: #4e6aa9; --mid: #8eabc9; --old: #928a7f; --teen: #abbdc9; --floor: #d8cfc4;
+  --work: #416e59; --seek: #d56b41; --rest: #4e6aa9; --other: #c9c4bd; --desk: #e2d9cc;
+  --bub: #e6ecf5; --bub-edge: #4e6aa9; --bub2: #efe6dc; --bub2-edge: #8b4d3e;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1c1b1c; --card: #262526; --ink: #eeebe7; --ink2: #dfd8cf; --muted: #a9a39b; --line: #3b3939; --grid: #302e2e; --axis: #625f5d;
+  --accent: #8eabc9; --intl: #8eabc9; --hi-ink: #a9c3dc; --board: #dfd8cf; --board-ink: #1c1b1c; --sea: #262526;
+  --sofa: #8b4d3e; --sofa-dark: #cd9886; --cushion: #67453c; --young: #8eabc9; --mid: #4e6aa9; --old: #928a7f; --teen: #5f6e7a; --floor: #3b3939;
+  --work: #91b0a1; --seek: #dc8c67; --rest: #8eabc9; --other: #5a5551; --desk: #3b3939;
+  --bub: #26303f; --bub-edge: #8eabc9; --bub2: #3a2f2a; --bub2-edge: #cd9886; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1c1b1c; --card: #262526; --ink: #eeebe7; --ink2: #dfd8cf; --muted: #a9a39b; --line: #3b3939; --grid: #302e2e; --axis: #625f5d;
+  --accent: #8eabc9; --intl: #8eabc9; --hi-ink: #a9c3dc; --board: #dfd8cf; --board-ink: #1c1b1c; --sea: #262526;
+  --sofa: #8b4d3e; --sofa-dark: #cd9886; --cushion: #67453c; --young: #8eabc9; --mid: #4e6aa9; --old: #928a7f; --teen: #5f6e7a; --floor: #3b3939;
+  --work: #91b0a1; --seek: #dc8c67; --rest: #8eabc9; --other: #5a5551; --desk: #3b3939;
+  --bub: #26303f; --bub-edge: #8eabc9; --bub2: #3a2f2a; --bub2-edge: #cd9886; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.hi { fill: var(--hi-ink) }
+::selection { background: var(--mid); color: #1c1b1c }
+.pop { transform-box: fill-box; transform-origin: 50% 100% }
+</style>
+
+<main class="page">
+  <header>
+    <h1>일도 구직도 안 하는 청년은 늘었을까<span>늘었다. "쉬었음"이라고 답한 20대는 2003년 19만 7천 명에서 2026년 38만 명으로, 20대 100명 중 2.7명에서 6.9명이 됐다. 30대는 더 빨리 늘어 2.6배다. 다만 청년만의 일은 아니다. 쉬는 사람 255만 명 가운데 절반(48%)은 60세 이상이고, 20대에서 일하는 사람의 비율은 20년 전과 거의 같다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 37</dd>
+      <dt>한 줄</dt><dd>국가데이터처 경제활동인구조사에서 일도 구직도 하지 않으면서 "그냥 쉬었다"고 답한 사람은 2003년 90만 9천 명에서 2026년(1–10월 평균) 255만 1천 명으로 2.8배가 됐다. 20대는 19만 7천 명→38만 명(인구 100명당 2.7→6.9명), 30대는 11만 5천 명→29만 8천 명(1.3→4.3명), 60세 이상은 22만 8천 명→121만 5천 명(3.9→8.0명)이다. 20대 쉬었음은 2020년 41만 5천 명이 가장 많았다. 2026년 8월 쉬는 이유로 15–29세는 "원하는 일자리를 찾기 어려워서"(35%)를, 60세 이상은 "몸이 좋지 않아서"(38%)와 "퇴사·정년 뒤 계속"(35%)을 가장 많이 꼽았다.</dd>
+      <dt>분류</dt><dd>주거·일·경제</dd>
+      <dt>본능</dt><dd>비난 본능 · "요즘 청년은 일할 생각이 없다"는 한 사람의 탓으로 숫자를 읽는다</dd>
+      <dt>그림 방식</dt><dd>쉬었음 소파 · 나이대마다 긴 소파 하나, 앉은 사람 하나가 쉬었음 2만 명(2003–2026년 재생). 100명의 책상, 쉬는 이유 말풍선, 100명당 쉬었음 선</dd>
+      <dt>기간</dt><dd>2003년 1월–2026년 10월</dd>
+      <dt>엮은 데이터</dt><dd>3개 · 연령/활동상태별(쉬었음) 비경제활동인구 · 연령별 경제활동인구 총괄 · 연령별 쉬었음의 주된 이유(비경제활동인구 부가조사)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2026년, 일도 구직도 하지 않고 "쉬었음"이라고 답한 255만 명. 가장 많은 나이대는?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>20대</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>50대</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>60세 이상</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. <span class="n">121만 5천 명</span>, 48%</span>
+      20대는 38만 명(15%), 50대는 37만 3천 명(15%), 30대는 29만 8천 명(12%)이다. 2003년에는 60세 이상이 25%, 20·30대가 34%였다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">나이대별 소파</h2>
+      <p>나이대마다 긴 소파를 하나씩 놓고, "쉬었음"이라고 답한 사람 2만 명에 한 명씩 앉혔다. 쉬었음은 일하지 않고 일자리도 찾지 않는 사람 가운데, 육아·가사·학업·질병 같은 까닭 없이 그냥 쉬었다고 답한 사람이다.</p>
+      <p>재생을 누르면 2003년부터 자리가 찬다. 20대 소파는 10명에서 19명으로, 30대 소파는 6명에서 15명으로 늘었다. 20대는 코로나가 닥친 2020년(41만 5천 명)이 가장 많았고 그 뒤로도 36만–41만 명에 머문다. 가장 길어진 소파는 맨 아래 60세 이상이다. 11명에서 61명이 됐다. 인구가 늘어난 데다 100명당 쉬는 사람도 3.9명에서 8.0명으로 늘었다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">나이대별 쉬었음 인구</p>
+      <p class="fs">앉은 사람 하나 = 2만 명(반올림). 오른쪽 숫자 = 그해 평균(만 명)과 그 나이 인구 100명당</p>
+      <div class="player" id="p1"></div>
+      <p class="stat" id="st1" aria-live="polite"></p>
+      <div class="chart" id="c1"></div>
+      <figcaption>국가데이터처 「경제활동인구조사」 연령/활동상태별(쉬었음) 비경제활동인구, 연령별 경제활동인구 총괄(KOSIS 101 DT_1DA7147S, DT_1DA7002S). 월별 값의 연평균이고 2026년은 1–10월 평균이다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">100명의 책상</h2>
+      <p>그 나이 인구를 100명으로 줄여 사무실 한 층에 앉혔다. 왼쪽이 2005년, 오른쪽이 2026년이다. 20대에서 일하는 사람은 61명에서 59명으로 거의 그대로다. 일자리를 찾는 실업자는 5명에서 4명으로 줄었다. 쉬었음만 4명에서 7명으로 늘었다. 학업·육아·가사 같은 그 밖의 비경제활동은 30명으로 같다.</p>
+      <p>30대는 그림이 다르다. 일하는 사람이 72명에서 81명으로 늘었다. 육아·가사 같은 그 밖의 비경제활동 자리(24명→12명)가 일하는 자리로 바뀐 것이다. 그 사이에서 쉬었음은 2명에서 4명이 됐다. 60세 이상도 일하는 사람이 37명에서 47명으로 늘었고, 쉬었음은 6명에서 8명이 됐다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">그 나이 100명이 하는 일, 2005년과 2026년</p>
+      <p class="fs">자리 하나 = 그 나이 인구의 1%(반올림). 2026년은 1–10월 평균</p>
+      <div class="chips" id="chips2" role="group" aria-label="나이대"></div>
+      <div class="legend" id="lg2"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>국가데이터처 「경제활동인구조사」 연령별 경제활동인구 총괄(DT_1DA7002S)과 연령별 쉬었음(DT_1DA7147S). 그 밖의 비경제활동 = 비경제활동인구에서 쉬었음을 뺀 수(학업, 육아, 가사, 연로, 취업 준비 등).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">쉬는 이유 말풍선</h2>
+      <p>해마다 8월 조사에서는 쉬는 이유를 묻는다. 2026년 8월 15–29세의 가장 큰 말풍선은 "원하는 일자리를 찾기 어려워서"(35%)다. "다음 일을 준비하느라"(21%), "몸이 좋지 않아서"(14%), "일자리가 없어서"(11%)가 뒤를 잇는다. 일할 뜻이 없다는 답이 아니라, 맞는 자리를 못 찾았다는 답이 가장 많다.</p>
+      <p>60세 이상의 말풍선은 다르다. "몸이 좋지 않아서"(38%)와 "퇴사·정년 뒤 계속 쉬고 있어서"(35%)를 합치면 73%다. 같은 "쉬었음"이라는 이름 아래 서로 다른 사정이 들어 있다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">쉬었음의 주된 이유, 2026년 8월</p>
+      <p class="fs">말풍선 넓이 = 그 나이 쉬었음 인구에서의 몫(%)</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>국가데이터처 「경제활동인구조사 비경제활동인구 부가조사」 연령별 쉬었음의 주된 이유(KOSIS 101 DT_1DE5052S, 2026년 8월). 이유 이름은 줄여 썼다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">100명당 쉬는 사람</h2>
+      <p>인구가 달라지는 것을 빼고 보려고 그 나이 인구 100명당 쉬었음을 선으로 그렸다. 가장 가파르게 오른 선은 30대다. 2003년 1.3명에서 2026년 4.3명으로 3.3배다. 20대는 2.7명에서 6.9명으로 2.6배다. 두 선 모두 2020년에 크게 뛰었다. 30대는 그 뒤로도 내려오지 않았고, 20대는 잠시 내려왔다가 2025년(7.1명)에 가장 높아졌다.</p>
+      <p>50대만 23년 동안 4–5명대로 거의 그대로다. 40대는 1.9명에서 3.5명이 됐다. 쉬었음은 한 나이대가 아니라 거의 모든 나이대에서 늘었다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">그 나이 인구 100명당 쉬었음, 2003–2026년</p>
+      <p class="fs">명(인구 100명당). 연평균, 2026년은 1–10월</p>
+      <div class="chart" id="c4"></div>
+      <figcaption>국가데이터처 「경제활동인구조사」(DT_1DA7147S, DT_1DA7002S). 15–19세는 뺐다(100명당 1명 안팎).</figcaption>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 일도 구직도 안 하는 청년은 늘었을까</h2>
+      <p>늘었다. 20대와 30대에서 "쉬었음"은 수로도, 인구 대비로도 두세 배가 됐다. 하지만 청년이 일을 덜 하게 된 것은 아니다. 20대에서 일하는 사람의 비율은 그대로이고 30대는 오히려 늘었다. 줄어든 것은 일자리를 찾는 실업자와 육아·가사 쪽이고, 그 자리 일부가 쉬었음으로 옮겨 왔다. 청년이 꼽는 가장 큰 이유도 "원하는 일자리를 찾기 어려워서"다. 그리고 쉬는 사람의 절반은 60세 이상이다. 쉬었음을 청년의 태도 문제로만 읽으면 숫자의 절반 넘게를 놓친다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>"쉬었음"은 조사 주간에 무엇을 했느냐는 물음에 대한 본인의 답이다. 취업 준비 중이라고 답하면 쉬었음에 들어가지 않는다. 같은 사람도 달마다 답이 달라질 수 있다.</li>
+      <li>2026년 값은 1–10월 평균이라 한 해 평균과 조금 다를 수 있다. 쉬었음은 겨울에 더 많은 계절성이 있다.</li>
+      <li>쉬는 이유는 해마다 8월 부가조사에서만 묻고, 나이대별 표는 2022년부터 있다. 표본이 작은 칸(15–29세의 "휴업·폐업" 등)은 값이 비어 있다.</li>
+      <li>이유 조사의 15–29세와 본조사의 20대는 나이 구간이 다르다.</li>
+      <li>2026년 8월 쉬었음의 80%는 남자다(203만 6천 명). 왜 남자가 많은지는 이 자료로 알 수 없다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1DA7147S" target="_blank" rel="noopener">연령/활동상태별(쉬었음) 비경제활동인구</a> (KOSIS 101 DT_1DA7147S)</td><td>국가데이터처</td><td>나이대별 쉬었음 인구(월)</td><td>2003.1–2026.10</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1DA7002S" target="_blank" rel="noopener">연령별 경제활동인구 총괄</a> (KOSIS 101 DT_1DA7002S)</td><td>국가데이터처</td><td>나이대별 인구, 취업자, 실업자, 비경제활동인구(월)</td><td>2003.1–2026.10</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1DE5052S" target="_blank" rel="noopener">연령별 '쉬었음'의 주된 이유</a>·<a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1DE5011S" target="_blank" rel="noopener">성별 이유</a> (KOSIS 101)</td><td>국가데이터처</td><td>쉬는 이유(8월 부가조사), 남녀 수</td><td>2016–2026(나이별 2022–)</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>286개월 × 나이대 13개(쉬었음) · 286개월 × 나이대 26개 × 4개 항목(인구·취업·실업·비경제활동) · 이유 9가지 × 나이 6개 × 5개 연도</dd>
+      <dt>도구</dt><dd>Python(수집·집계) · SVG 소파와 앉은 사람, 100명의 책상, 말풍선, 선(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>월별 값의 연평균 · 인구 100명당 비율 · 그 나이 인구를 100명으로 본 활동 상태 구성</dd>
+      <dt>검증</dt><dd>나이대별 쉬었음의 합이 전체와 반올림 차이(1천 명) 안으로 같다(2026년 10월 251만 1천 명). 취업자 + 실업자 + 비경제활동인구 = 인구(20대 2026년 평균 553만 2천 명).</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>쉬었음은 지역마다 다를까</h3><p>시도별 활동상태별 비경제활동인구로 쉬었음이 많은 지역을 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1DA7146S" target="_blank" rel="noopener">행정구역(시도)/활동상태별 비경제활동인구</a> · 국가데이터처</li></ul></div>
+      <div class="q"><h3>취업 준비생은 줄었을까</h3><p>활동상태별 비경제활동인구의 "취업 준비"와 "쉬었음"을 나란히 보면 둘 사이의 이동을 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1DA7145S" target="_blank" rel="noopener">성/활동상태별 비경제활동인구</a> · 국가데이터처</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.16</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const once = (el, fn, th = .25) => { if (reduce) return false; const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); fn(); }, { threshold: th }); io.observe(el); return true; };
+  const Y = DATA.yrs, NY = Y.length, A = DATA.ann, AG = DATA.ages;
+  const NAME = { "15 - 19세": "15–19세", "20 - 29세": "20대", "30 - 39세": "30대", "40 - 49세": "40대", "50 - 59세": "50대", "60세이상": "60세 이상" };
+  const COL = { "15 - 19세": "var(--teen)", "20 - 29세": "var(--young)", "30 - 39세": "var(--young)", "40 - 49세": "var(--mid)", "50 - 59세": "var(--mid)", "60세이상": "var(--old)" };
+  const man10 = (k) => (k / 10).toLocaleString("ko-KR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "만";
+  const rate = (a, i) => A.rest[a][i] / A.pop[a][i] * 100;
+
+  /* ---------- 1. sofas ---------- */
+  function sitter(g, x, y, w, col) {
+    // seated, slouched figure: head, torso leaning back, legs forward
+    s("circle", { cx: x - w * .08, cy: y - w * 1.12, r: w * .27, fill: col }, g);
+    s("path", { d: `M${x - w * .34},${y - w * .78} Q${x - w * .38},${y - w * .1} ${x - w * .1},${y} L${x + w * .42},${y} L${x + w * .42},${y - w * .26} L${x + w * .08},${y - w * .3} Q${x + w * .12},${y - w * .8} ${x - w * .1},${y - w * .84} Z`, fill: col }, g);
+  }
+  let lay1 = null, grow1 = 1;
+  function draw1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1");
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, lab = narrow ? 0 : 84, right = narrow ? 0 : 150, pw = narrow ? 15 : 23, per = Math.floor((W - lab - right - 16) / pw), lineH = pw * 2.05;
+    const k = Math.min(NY - 1, Math.floor(pos + 1e-6));
+    const maxN = (a) => Math.max(...A.rest[a].map((v) => Math.round(v / 20))), linesOf = (a) => Math.ceil(maxN(a) / per);
+    box.replaceChildren();
+    let y = 6; const v = s("svg", { viewBox: `0 0 ${W} 10`, role: "img", tabindex: 0, "aria-label": `${Y[k]}년 나이대별 쉬었음 인구를 소파에 앉은 사람으로 그린 그림. 사람 하나가 2만 명이다` }, box), pts = [];
+    AG.forEach((a) => {
+      const val = A.rest[a][k], n = Math.round(val / 20 * grow1), L = linesOf(a), col = COL[a];
+      if (narrow) { tx(v, 0, y + 14, NAME[a], "lb", 13, "start"); tx(v, W, y + 14, `${man10(val)} 명 · 100명당 ${f1(rate(a, k))}명`, a === "20 - 29세" || a === "30 - 39세" ? "vl hi" : "vl", 12, "end"); y += 22; }
+      const top = y, sw = Math.min(per, Math.max(maxN(a), 4)) * pw + 16;
+      for (let l = 0; l < Math.max(1, Math.ceil(n / per)); l++) { const sy = y + l * lineH, seat = sy + lineH - 9;   // room is kept for the fullest year, sofas drawn only as needed
+        s("rect", { x: lab, y: sy + lineH * .3, width: sw, height: lineH * .7 - 9, rx: 8, fill: "var(--sofa)" }, v);        // backrest
+        s("rect", { x: lab - 5, y: seat - 9, width: 10, height: 15, rx: 4, fill: "var(--sofa-dark)" }, v); s("rect", { x: lab + sw - 5, y: seat - 9, width: 10, height: 15, rx: 4, fill: "var(--sofa-dark)" }, v);
+        s("rect", { x: lab + 3, y: seat, width: sw - 6, height: 6, rx: 3, fill: "var(--cushion)" }, v);                      // seat cushion
+        for (let i = l * per; i < Math.min(n, (l + 1) * per); i++) sitter(v, lab + 8 + (i - l * per) * pw + pw / 2, seat, pw * .92, col); }
+      y += L * lineH;
+      if (!narrow) { tx(v, 0, (top + y) / 2 + 2, NAME[a], "lb", 14, "start"); tx(v, W, (top + y) / 2 - 4, `${man10(val)} 명`, a === "20 - 29세" || a === "30 - 39세" ? "vl hi" : "vl", 15, "end"); tx(v, W, (top + y) / 2 + 13, `100명당 ${f1(rate(a, k))}명`, "mt", 12, "end"); }
+      pts.push({ x: lab + sw / 2, y: (top + y) / 2, r: Math.max(18, (y - top) / 2), fn: () => [`${NAME[a]} · ${Y[k]}년`, [[fmt(val * 1000) + "명", "쉬었음"], [f1(rate(a, k)) + "명", "인구 100명당"], [fmt(A.pop[a][k] * 1000) + "명", "그 나이 인구"], [fmt(A.rest[a][0] * 1000) + "명", "2003년 쉬었음"]]] });
+      y += narrow ? 12 : 10;
+    });
+    s("rect", { x: 0, y: y - 4, width: W, height: 4, fill: "var(--floor)" }, v);
+    v.setAttribute("viewBox", `0 0 ${W} ${y + 2}`);
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 나이대를 옮겨 볼 수 있다");
+    const st = document.getElementById("st1"), tot = A.rest["계"][k]; st.replaceChildren();
+    st.append(`${Y[k]}년 쉬었음 `, bEl(`${man10(tot)} 명`), " · 20·30대 ", bEl(pc((A.rest["20 - 29세"][k] + A.rest["30 - 39세"][k]) / tot * 100)), " · 60세 이상 ", bEl(pc(A.rest["60세이상"][k] / tot * 100)));
+  }
+  const p1 = Player("p1", "쉬었음 소파", (p) => draw1(p), NY, (i) => String(Y[i]), 10);
+  p1.render();
+  if (once(document.getElementById("c1"), () => { const t0 = performance.now(); let last = -1; const st = (now) => { const t = Math.min(1, (now - t0) / 1600); grow1 = t; const q = Math.round(t * 30); if (q !== last) { last = q; draw1(p1.pos); } if (t < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); })) { grow1 = 0; draw1(p1.pos); }
+  onResize(() => draw1(p1.pos));
+  table("t1", ["연도", "전체", ...AG.map((a) => NAME[a]), "20대 100명당", "30대 100명당", "60세 이상 100명당"], Y.map((y, i) => [String(y), fmt(A.rest["계"][i] * 1000), ...AG.map((a) => fmt(A.rest[a][i] * 1000)), f1(rate("20 - 29세", i)), f1(rate("30 - 39세", i)), f1(rate("60세이상", i))]).reverse());
+
+  /* ---------- 2. 100 desks ---------- */
+  const KIND = [["emp", "일하는 사람", "var(--work)"], ["unemp", "일자리를 찾는 사람(실업)", "var(--seek)"], ["rest", "쉬었음", "var(--rest)"], ["other", "그 밖의 비경제활동", "var(--other)"]];
+  const comp = (a, i) => { const p = A.pop[a][i], r = { emp: A.emp[a][i] / p * 100, unemp: A.unemp[a][i] / p * 100, rest: A.rest[a][i] / p * 100 }; r.other = 100 - r.emp - r.unemp - r.rest; return r; };
+  const to100 = (c) => { const raw = KIND.map(([k]) => c[k]), fl = raw.map(Math.floor); let left = 100 - fl.reduce((a, b) => a + b, 0); raw.map((x, j) => [x - fl[j], j]).sort((a, b) => b[0] - a[0]).forEach(([, j]) => { if (left > 0) { fl[j]++; left--; } }); return fl; };
+  function seat(g, x, y, c, kind) {
+    const col = KIND[kind][2];
+    if (kind === 0) { s("rect", { x: x - c * .36, y: y - c * .06, width: c * .72, height: c * .16, rx: 1.5, fill: "var(--desk)" }, g); s("rect", { x: x - c * .16, y: y - c * .36, width: c * .32, height: c * .26, rx: 1.5, fill: col }, g); s("circle", { cx: x, cy: y + c * .28, r: c * .15, fill: col }, g); }
+    else if (kind === 1) { s("circle", { cx: x, cy: y - c * .2, r: c * .15, fill: col }, g); s("rect", { x: x - c * .13, y: y - c * .03, width: c * .26, height: c * .38, rx: c * .1, fill: col }, g); s("rect", { x: x + c * .14, y: y - c * .02, width: c * .16, height: c * .2, rx: 1, fill: "none", stroke: col, "stroke-width": 1.2 }, g); }
+    else if (kind === 2) { s("path", { d: `M${x - c * .38},${y + c * .3} Q${x - c * .42},${y - c * .12} ${x - c * .1},${y - c * .08} L${x + c * .36},${y + c * .12} L${x + c * .36},${y + c * .3} Z`, fill: col }, g); s("circle", { cx: x - c * .2, cy: y - c * .22, r: c * .14, fill: col }, g); }
+    else { s("circle", { cx: x, cy: y - c * .08, r: c * .13, fill: col }, g); s("rect", { x: x - c * .11, y: y + c * .08, width: c * .22, height: c * .26, rx: c * .08, fill: col }, g); }
+  }
+  { const lg = document.getElementById("lg2"); KIND.forEach(([, name], j) => { const sp = document.createElement("span"); const v = s("svg", { width: 20, height: 20, viewBox: "0 0 20 20", "aria-hidden": "true" }); seat(v, 10, 10, 20, j); sp.append(v, name); lg.append(sp); }); }
+  let age2 = "20 - 29세", seen2 = false;
+  chips("chips2", [["20 - 29세", "20대"], ["30 - 39세", "30대"], ["60세이상", "60세 이상"]], age2, (k) => { age2 = k; seen2 = true; c2(); });
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, gap = narrow ? 14 : 44, fw = (W - gap) / 2, c = Math.min(34, (fw - 12) / 10), fh = c * 10 + 12, H = fh + 78;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": `${NAME[age2]} 100명이 하는 일을 2005년과 2026년 사무실 자리로 견준 그림` }, box), pts = [], seats = [];
+    [[Y.indexOf(2005), 0], [NY - 1, fw + gap]].forEach(([i, ox], side) => {
+      const cm = comp(age2, i), n = to100(cm), gx = ox + (fw - c * 10) / 2;
+      tx(v, ox + fw / 2, 20, `${Y[i]}년`, "vl", 16, "middle");
+      s("rect", { x: gx - 6, y: 30, width: c * 10 + 12, height: fh, rx: 8, fill: "var(--card)", stroke: "var(--axis)", "stroke-width": 1.2 }, v);
+      let q = 0; KIND.forEach(([key], j) => { for (let m = 0; m < n[j]; m++, q++) { const g = s("g", { class: "pop" }, v); seat(g, gx + (q % 10) * c + c / 2, 36 + Math.floor(q / 10) * c + c / 2, c, j); seats.push({ g, q, side }); } });
+      const ly = 30 + fh + 20;
+      if (narrow) { tx(v, ox + fw / 2, ly, `일 ${n[0]} · 구직 ${n[1]}`, "mt", 12, "middle"); tx(v, ox + fw / 2, ly + 17, "", "mt", 12, "middle").append(Object.assign(s("tspan", { class: "vl hi" }), { textContent: `쉬었음 ${n[2]}` }), ` · 그 밖 ${n[3]}`); }
+      else { tx(v, ox + fw / 2, ly, `일 ${n[0]} · 구직 ${n[1]} · `, "mt", 13, "middle").append(Object.assign(s("tspan", { class: "vl hi" }), { textContent: `쉬었음 ${n[2]}` }), ` · 그 밖 ${n[3]}`); tx(v, ox + fw / 2, ly + 18, `쉬었음 ${f1(cm.rest)}%`, "tk", 11.5, "middle"); }
+      pts.push({ x: ox + fw / 2, y: 30 + fh / 2, r: fw / 2, fn: () => [`${NAME[age2]} · ${Y[i]}년`, [...KIND.map(([key, name, col]) => [pc(cm[key]), name, col]), [fmt(A.pop[age2][i] * 1000) + "명", "그 나이 인구"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 두 해를 옮겨 볼 수 있다");
+    if (seen2 || reduce) return;
+    seats.forEach(({ g }) => { g.style.opacity = 0; g.style.transform = "scale(.3)"; });
+    once(box, () => { seen2 = true; seats.forEach(({ g, q, side }) => { const d = side * 500 + q * 9; g.style.transition = `transform .35s cubic-bezier(.3,1.5,.6,1) ${d}ms, opacity .2s ${d}ms`; requestAnimationFrame(() => { g.style.opacity = 1; g.style.transform = "none"; }); }); });
+  }
+  c2(); onResize(() => { seen2 = true; c2(); });
+  table("t2", ["나이대", "연도", ...KIND.map((k) => k[1]), "인구(천 명)"], ["20 - 29세", "30 - 39세", "40 - 49세", "50 - 59세", "60세이상"].flatMap((a) => [Y.indexOf(2005), Y.indexOf(2015), NY - 1].map((i) => { const cm = comp(a, i); return [NAME[a], String(Y[i]), ...KIND.map(([k]) => pc(cm[k])), fmt(A.pop[a][i])]; })));
+
+  /* ---------- 3. reason bubbles ---------- */
+  const WHY = DATA.whyAge, RS = [["몸이 좋지 않아 쉬고 있음", "몸이 좋지 않아서"], ["퇴사(정년 퇴직)후 계속 쉬고 있음", "퇴사·정년 뒤 계속"], ["일의 완료, 고용계약이 만료되어 쉬고 있음", "일·계약이 끝나서"], ["직장의 휴업·폐업으로 쉬고 있음", "휴업·폐업으로"], ["원하는 일자리(일거리)를 찾기 어려워 쉬고 있음", "원하는 일자리를 찾기 어려워서"], ["일자리(일거리)가 없어서 쉬고 있음", "일자리가 없어서"], ["다음 일 준비를 위해 쉬고 있음", "다음 일을 준비하느라"], ["기타", "기타"]];
+  const WM = "2026.08", share = (ag) => { const tot = WHY[`계|${ag}|계`][WM]; return RS.map(([k, short]) => ({ short, v: WHY[`계|${ag}|${k}`][WM], p: (WHY[`계|${ag}|${k}`][WM] || 0) / tot * 100 })).filter((r) => r.v).sort((a, b) => b.p - a.p); };
+  let seen3 = false;
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 700, cols = narrow ? 1 : 2, cw = W / cols, ph = narrow ? 380 : 400, H = ph * (narrow ? 2 : 1);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "15–29세와 60세 이상이 꼽은 쉬는 이유를 말풍선 크기로 그린 그림. 청년은 원하는 일자리를 찾기 어려워서, 60세 이상은 몸이 좋지 않아서와 퇴사·정년 뒤가 가장 크다" }, box), pts = [], bubs = [];
+    [["15~29세", "15–29세", "var(--bub)", "var(--bub-edge)", "var(--young)"], ["60세이상", "60세 이상", "var(--bub2)", "var(--bub2-edge)", "var(--old)"]].forEach(([ag, name, fill, edge, pcol], gi) => {
+      const ox = narrow ? 0 : gi * cw, oy = narrow ? gi * ph : 0, rows = share(ag), R = (p) => Math.sqrt(p / 40) * Math.min(78, cw * .17);
+      tx(v, ox + 12, oy + 24, name, "vl", 16, "start"); tx(v, ox + 12, oy + 42, `쉬었음 ${man10(WHY[`계|${ag}|계`][WM])} 명`, "mt", 12, "start");
+      // greedy packing above the figure: biggest in the middle, the rest spiralling out
+      const cx = ox + cw / 2, cy = oy + ph * .44, placed = [];
+      rows.forEach((r, j) => { const rad = Math.max(13, R(r.p)); let best = null;
+        for (let ring = 0; ring < 140 && !best; ring++) for (let a = 0; a < 24; a++) { const ang = a / 24 * Math.PI * 2 + ring * .4, d = ring * 5, x = cx + Math.cos(ang) * d * 1.6, y = cy + Math.sin(ang) * d * .7;
+          if (x - rad < ox + 6 || x + rad > ox + cw - 6 || y - rad < oy + 50 || y + rad > oy + ph - 64) continue;
+          if (placed.every((q) => Math.hypot(q.x - x, q.y - y) > q.r + rad + 5)) { best = { x, y, r: rad }; break; } }
+        best = best || { x: cx, y: cy, r: rad }; placed.push(best);
+        const g = s("g", { class: "pop" }, v); s("circle", { cx: best.x, cy: best.y, r: rad, fill, stroke: edge, "stroke-width": 1.6 }, g);
+        if (rad > 42) { const words = r.short.split(" "), half = Math.ceil(words.length / 2), l1 = words.slice(0, half).join(" "), l2 = words.slice(half).join(" "), fs = Math.max(11.5, Math.min(15, rad / 3.6));
+          tx(g, best.x, best.y - (l2 ? fs * .9 : fs * .2), l1, "lb", fs, "middle"); if (l2) tx(g, best.x, best.y + fs * .3, l2, "lb", fs, "middle"); tx(g, best.x, best.y + fs * (l2 ? 1.7 : 1.3), `${Math.round(r.p)}%`, "vl", fs * 1.15, "middle"); }
+        else if (rad > 17) tx(g, best.x, best.y + 4, `${Math.round(r.p)}%`, "vl", 11.5, "middle");
+        bubs.push({ g, j }); pts.push({ x: best.x, y: best.y, r: rad, fn: () => [`${name} · ${r.short}`, [[pc(r.p), "몫"], [fmt(r.v * 1000) + "명", "사람 수"]]] }); });
+      // reclining figure under the bubbles
+      const fx = ox + cw / 2, fy = oy + ph - 18, u = 26;
+      s("rect", { x: fx - u * 2.6, y: fy - u * .2, width: u * 5.2, height: u * .34, rx: 5, fill: "var(--sofa)" }, v);
+      s("circle", { cx: fx - u * 1.7, cy: fy - u * .62, r: u * .34, fill: pcol }, v);
+      s("path", { d: `M${fx - u * 1.3},${fy - u * .2} Q${fx - u * .9},${fy - u * .95} ${fx - u * .1},${fy - u * .5} L${fx + u * 2},${fy - u * .46} L${fx + u * 2},${fy - u * .2} Z`, fill: pcol }, v);
+      [0, 1, 2].forEach((d) => s("circle", { cx: fx - u * 1.3 + d * 9, cy: fy - u * 1.15 - d * 9, r: 2.5 + d, fill, stroke: edge, "stroke-width": 1 }, v));
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 말풍선을 옮겨 볼 수 있다");
+    if (seen3 || reduce) return;
+    bubs.forEach(({ g }) => { g.style.opacity = 0; g.style.transform = "scale(.2)"; });
+    once(box, () => { seen3 = true; bubs.forEach(({ g, j }) => { g.style.transition = `transform .5s cubic-bezier(.3,1.5,.6,1) ${j * 130}ms, opacity .3s ${j * 130}ms`; requestAnimationFrame(() => { g.style.opacity = 1; g.style.transform = "none"; }); }); });
+  }
+  c3(); onResize(() => { seen3 = true; c3(); });
+  const WAG = [["15~29세", "15–29세"], ["30~39세", "30대"], ["40~49세", "40대"], ["50~59세", "50대"], ["60세이상", "60세 이상"]];
+  table("t3", ["이유", ...WAG.map((a) => a[1])], [...RS.map(([k, short]) => [short, ...WAG.map(([ag]) => { const x = WHY[`계|${ag}|${k}`][WM], tot = WHY[`계|${ag}|계`][WM]; return x == null ? "–" : pc(x / tot * 100); })]), ["쉬었음 인구(천 명)", ...WAG.map(([ag]) => fmt(WHY[`계|${ag}|계`][WM]))]]);
+
+  /* ---------- 4. rate lines ---------- */
+  let seen4 = false;
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, left = 30, right = narrow ? 92 : 118, top = 14, H = narrow ? 320 : 400, bot = 28, ch = H - top - bot, YM = 9;
+    const sx = (i) => left + i / (NY - 1) * (W - left - right), sy = (p) => top + ch - p / YM * ch, LA = AG.slice(1);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", tabindex: 0, "aria-label": "2003년부터 2026년까지 나이대별 인구 100명당 쉬었음. 30대와 20대가 가장 가파르게 올랐고 50대는 거의 그대로다" }, box);
+    for (let t = 0; t <= 8; t += 2) { s("line", { x1: left, x2: W - right, y1: sy(t), y2: sy(t), class: "gl" }, v); tx(v, left - 5, sy(t) + 4, String(t), "tk", 11, "end"); }
+    Y.forEach((y, i) => { if (y % (narrow ? 6 : 3) === 0 || i === NY - 1) tx(v, sx(i), H - 8, String(y), "tk", 11, "middle"); });
+    const ends = LA.map((a) => ({ a, y: sy(rate(a, NY - 1)) })).sort((p, q) => p.y - q.y); for (let j = 1; j < ends.length; j++) if (ends[j].y - ends[j - 1].y < 26) ends[j].y = ends[j - 1].y + 26;
+    const paths = [];
+    LA.forEach((a) => { const hi = a === "20 - 29세" || a === "30 - 39세", col = COL[a], d = Y.map((_, i) => `${i ? "L" : "M"}${sx(i).toFixed(1)},${sy(rate(a, i)).toFixed(1)}`).join("");
+      const pth = s("path", { d, fill: "none", stroke: col, "stroke-width": hi ? 3.4 : 2.2, "stroke-linejoin": "round", "stroke-linecap": "round", "stroke-dasharray": a === "50 - 59세" ? "5 4" : a === "30 - 39세" ? "1 0" : null, opacity: hi ? 1 : .9 }, v); paths.push(pth);
+      if (a === "30 - 39세") s("path", { d, fill: "none", stroke: "var(--card)", "stroke-width": 1, "stroke-dasharray": "2 5", "stroke-linecap": "round" }, v);
+      const e = ends.find((q) => q.a === a), ex = sx(NY - 1), u = narrow ? 9 : 11;
+      s("line", { x1: ex + 2, x2: ex + 8, y1: sy(rate(a, NY - 1)), y2: e.y, stroke: col, "stroke-width": 1 }, v);
+      s("circle", { cx: ex + 14, cy: e.y - u * .5, r: u * .34, fill: col }, v); s("path", { d: `M${ex + 16},${e.y} Q${ex + 20},${e.y - u * .9} ${ex + 28},${e.y - u * .45} L${ex + 28 + u * 1.2},${e.y - u * .4} L${ex + 28 + u * 1.2},${e.y} Z`, fill: col }, v);
+      tx(v, ex + 34 + u * 1.2, e.y - 1, NAME[a], hi ? "vl hi" : "lb", narrow ? 11.5 : 13, "start"); if (!narrow) tx(v, ex + 34 + u * 1.2, e.y + 13, `${f1(rate(a, 0))} → ${f1(rate(a, NY - 1))}명`, "tk", 11, "start"); });
+    timeLayer(v, tipFor(fig), NY, sx, top, top + ch, (i) => [`${Y[i]}년, 인구 100명당`, LA.map((a) => [f1(rate(a, i)) + "명", NAME[a], COL[a]]).sort((p, q) => parseFloat(q[0]) - parseFloat(p[0]))], "좌우 화살표로 해를 옮겨 볼 수 있다");
+    if (seen4 || reduce) return;
+    paths.forEach((p) => { const L = p.getTotalLength(), keep = p.getAttribute("stroke-dasharray"); p.dataset.keep = keep || ""; p.style.strokeDasharray = L; p.style.strokeDashoffset = L; });
+    once(box, () => { seen4 = true; paths.forEach((p, j) => { p.style.transition = `stroke-dashoffset 1.6s ease-out ${j * 120}ms`; requestAnimationFrame(() => { p.style.strokeDashoffset = 0; }); setTimeout(() => { p.style.transition = ""; p.style.strokeDasharray = ""; p.style.strokeDashoffset = ""; }, 2600); }); }, .3);
+  }
+  c4(); onResize(() => { seen4 = true; c4(); });
+})();
+</script>

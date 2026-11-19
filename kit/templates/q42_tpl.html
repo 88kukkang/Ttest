@@ -1,0 +1,346 @@
+<title>소방관의 헬멧</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: the reader first ranks five kinds of work by how many firefighters they injure. Then helmets, one per ten
+   injured firefighters, coloured by what they were doing (played 2016-2025); three ladder trucks whose ladders switch
+   between "how many were hurt" and "how many per 10,000 call-outs"; a quiet row of 33 helmets for those who died on
+   duty; and a map of pies by fire headquarters. */
+:root {
+  --paper: #f4f2ec; --card: #fcfbf7; --ink: #2c2c2a; --ink2: #494843; --muted: #5d5b55; --line: #e1ddd3; --grid: #eae7de; --axis: #a7a8a3;
+  --accent: #9b3737; --intl: #9b3737; --board: #2c2c2a; --board-ink: #f4f2ec; --sea: #fcfbf7;
+  --a0: #9b3737; --a1: #d56b41; --a2: #3e6f90; --a3: #80a15a; --a4: #939594;
+  --a0-ink: #8a2f2f; --a1-ink: #a8451f; --a2-ink: #2f5a77; --a3-ink: #4d6a2f; --a4-ink: #5d5b55;
+  --truck: #9b3737; --steel: #939594; --tyre: #2c2c2a; --land: #efece4; --rank: #2c2c2a;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1c1a1a; --card: #262323; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3b3737; --grid: #302d2d; --axis: #62635d;
+  --accent: #e0908a; --intl: #e0908a; --board: #dcd9cf; --board-ink: #1c1a1a; --sea: #262323;
+  --a0: #d0605c; --a1: #dc8c67; --a2: #8ab5bb; --a3: #abc07b; --a4: #a7a8a3;
+  --a0-ink: #eaa6a0; --a1-ink: #e7a08a; --a2-ink: #a7c4c2; --a3-ink: #c4d39c; --a4-ink: #bcbbb6;
+  --truck: #b24a48; --steel: #a7a8a3; --tyre: #0f0e0e; --land: #2d2a2a; --rank: #eeede8; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1c1a1a; --card: #262323; --ink: #eeede8; --ink2: #dcd9cf; --muted: #a8a59b; --line: #3b3737; --grid: #302d2d; --axis: #62635d;
+  --accent: #e0908a; --intl: #e0908a; --board: #dcd9cf; --board-ink: #1c1a1a; --sea: #262323;
+  --a0: #d0605c; --a1: #dc8c67; --a2: #8ab5bb; --a3: #abc07b; --a4: #a7a8a3;
+  --a0-ink: #eaa6a0; --a1-ink: #e7a08a; --a2-ink: #a7c4c2; --a3-ink: #c4d39c; --a4-ink: #bcbbb6;
+  --truck: #b24a48; --steel: #a7a8a3; --tyre: #0f0e0e; --land: #2d2a2a; --rank: #eeede8; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.i0 { fill: var(--a0-ink) } .i1 { fill: var(--a1-ink) } .i2 { fill: var(--a2-ink) } .i3 { fill: var(--a3-ink) } .i4 { fill: var(--a4-ink) }
+::selection { background: var(--a1); color: #1c1a1a }
+.btn { font: inherit; font-size: 15px; font-weight: 600; color: var(--paper); background: var(--ink); border: 0; border-radius: 10px; padding: 10px 18px; min-height: 46px; cursor: pointer }
+.btn:hover { background: var(--intl) } .btn[disabled] { opacity: .45; cursor: default }
+.btn.ghost { color: var(--ink); background: var(--paper); border: 1px solid var(--axis) } .btn.ghost:hover { background: var(--grid) }
+/* ranking game */
+.rank { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none }
+.rk { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; text-align: left; font: inherit; font-size: 15.5px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px 8px 8px; min-height: 52px; cursor: pointer; position: relative; overflow: hidden }
+.rk .no { width: 36px; height: 36px; border-radius: 50%; border: 1.5px dashed var(--axis); display: grid; place-items: center; font: 600 16px var(--mono); color: var(--muted) }
+.rk[data-pick] .no { border: 0; background: var(--rank); color: var(--paper) }
+.rk small { color: var(--muted); font-size: 13px; display: block; line-height: 1.4 }
+.rk .res { font: 600 14px var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; position: relative }
+.rk .bar { position: absolute; left: 0; top: 0; bottom: 0; background: var(--grid); width: 0; transition: width .9s cubic-bezier(.3, .8, .3, 1) }
+.rk > :not(.bar) { position: relative }
+.rk[data-ok="1"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink) }
+.rkrow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center } .rkrow .hint { font-size: 13.5px; color: var(--muted); flex: 1 1 200px }
+@media (prefers-reduced-motion: reduce) { .rk .bar { transition: none } }
+.mapwrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 22px; align-items: start }
+@media (max-width: 800px) { .mapwrap { grid-template-columns: minmax(0, 1fr) } }
+</style>
+
+<main class="page">
+  <header>
+    <h1>소방관은 불 끄다 가장 많이 다칠까<span>아니다. 2016–2025년 공무 중 다친 소방관 9,876명 가운데 화재 현장에서 다친 사람은 1,969명(20%)이다. 구급 활동 중이 2,111명(21%)으로 더 많고, 절반 가까운 4,711명(48%)은 지원·예방 활동, 체력단련, 출퇴근 같은 "그 밖의 일"에서 다쳤다. 하지만 한 번 나갈 때의 위험은 화재가 압도적이다. 화재 1만 건에 47명이 다치고, 구급 출동 1만 건에는 0.7명이 다친다. 순직한 33명 가운데 13명도 화재 현장이었다.</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 42</dd>
+      <dt>한 줄</dt><dd>소방청 순직·공상자 현황으로 보면 공상자는 2016년 511명에서 2024년 1,445명으로 2.8배가 됐다. 2024년 공상 1,445명은 그 밖의 일 790명, 구급 287명, 화재 215명, 구조 94명, 생활안전 59명이다. 화재 1건당 다치는 소방관은 2016년보다 2.6배 많아졌다.</dd>
+      <dt>분류</dt><dd>안전</dd>
+      <dt>본능</dt><dd>공포 본능 · 불길 속의 소방관이 가장 선명하게 떠올라서, 훨씬 자주 나가는 구급 출동과 일상 업무에서 다치는 사람을 세지 않는다</dd>
+      <dt>그림 방식</dt><dd>소방관의 헬멧 · 독자가 다섯 가지 일의 순서를 먼저 맞혀 본다. 공상자 10명에 헬멧 하나(2016–2025년 재생), "다친 사람 수"와 "1만 건당"을 오가는 사다리차, 순직자 33명의 헬멧, 소방본부별 지도</dd>
+      <dt>기간</dt><dd>2016–2025년(출동 건수는 2024년까지)</dd>
+      <dt>엮은 데이터</dt><dd>4개 · 연도별 소방공무원 순직 및 공상자 현황 · 119 구급 운영 현황 · 구조활동 총괄 · 연간화재통계</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">소방관은 어떤 일을 하다가 가장 많이 다칠까? 다친 사람이 많을 것 같은 순서대로 눌러 보자.</h2>
+    <ol class="rank" id="rank"></ol>
+    <div class="rkrow">
+      <span class="hint" id="rkhint" aria-live="polite">1위부터 차례로 누른다. 잘못 눌렀으면 "다시"를 누른다.</span>
+      <button class="btn" type="button" id="rkgo" disabled>확인</button>
+      <button class="btn ghost" type="button" id="rkre">다시</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="rkreveal" hidden>
+      <span class="big">1위는 <span class="n">"그 밖의 일"</span>, 화재는 3위</span>
+      <span id="rkmsg"></span> 2016–2025년 열 해 동안 다친 9,876명을 더한 순서다. 그 밖의 일(지원·예방 활동, 체력단련, 출퇴근 등) 4,711명, 구급 2,111명, 화재 1,969명, 구조 763명, 생활안전 322명.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">헬멧 하나에 열 명</h2>
+      <p>그해 공무 중에 다친 소방관 10명을 헬멧 하나로 놓고, 다칠 때 하던 일로 색을 칠했다. 빨강이 화재, 주황이 구조, 파랑이 구급, 초록이 생활안전, 회색이 그 밖의 일이다. 2016년에는 헬멧이 51개였다. 2024년에는 145개다.</p>
+      <p>재생을 누르면 헬멧이 해마다 늘어난다. 가장 많이 늘어난 것은 회색이다. 그 밖의 일에서 다친 사람은 225명에서 790명이 됐다. 파란 헬멧(구급)은 134명에서 287명, 빨간 헬멧(화재)은 97명에서 215명이 됐다. 열 해 가운데 여섯 해는 구급 중에 다친 사람이 화재 현장에서 다친 사람보다 많았다. 2025년에는 화재가 264명으로 다시 구급(236명)을 앞섰다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">공무 중 다친 소방관, 하던 일별</p>
+      <p class="fs">헬멧 하나 = 10명(반올림). 빨강 = 화재, 주황 = 구조, 파랑 = 구급, 초록 = 생활안전, 회색 = 그 밖의 일</p>
+      <div class="player" id="p1"></div>
+      <p class="stat" id="st1" aria-live="polite"></p>
+      <div class="chart" id="c1"></div>
+      <figcaption>소방청 「연도별 소방공무원 순직 및 공상자 현황」(공공데이터포털 15131241). 공상 = 공무 중 부상. "그 밖의 일"은 원자료의 기타로, 주석에 지원활동, 예방활동, 체력단련, 출퇴근 등이라고 적혀 있다. 시도 소방본부가 모은 숫자라 공무원연금공단 자료와 다를 수 있다고 원자료에 적혀 있다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">사다리를 바꿔 세우면</h2>
+      <p>다친 사람 수만 보면 구급이 화재보다 위험해 보인다. 하지만 구급차는 화재보다 훨씬 자주 나간다. 2024년 구급 출동은 332만 건, 구조 출동은 132만 건이고, 불이 난 것은 3만 7,614건이다.</p>
+      <p><b>1만 건당</b>을 누르면 사다리가 바뀐다. 2016–2024년을 합쳐 화재 1만 건에 소방관 47.2명이 다쳤다. 구조 출동 1만 건에는 0.71명, 구급 출동 1만 건에는 0.68명이다. 한 번 나갈 때 다칠 위험은 화재가 구급의 70배쯤 된다. 그리고 이 숫자는 커지고 있다. 화재 1만 건당 다친 소방관은 2016년 22.3명에서 2024년 57.2명이 됐다. 불은 줄었는데 다친 사람은 늘었다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">화재·구조·구급 중 다친 소방관, 2016–2024년</p>
+      <p class="fs" id="fs2"></p>
+      <div class="chips" id="k2" role="group" aria-label="세는 방법"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>공상자: 소방청 「연도별 소방공무원 순직 및 공상자 현황」. 화재 건수: 소방청 「연간화재통계」(15060386). 구조 출동: 「구조활동 총괄」(KOSIS 156 TX_15602_A004). 구급 출동: 「119 구급 운영 현황」(KOSIS 156 TX_15602_A018). 화재는 불이 난 건수이고 잘못 알고 나간 출동은 빠져 있어, 출동 건수로 나누면 이보다 낮아진다. 생활안전 출동 건수는 구하지 못해 뺐다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">돌아오지 못한 서른세 명</h2>
+      <p>2016년부터 2024년까지 순직한 소방관은 33명이다. 헬멧 하나가 한 사람이다. 화재 현장이 13명으로 가장 많고, 구조 6명, 구급 6명, 생활안전 4명, 그 밖의 일 4명이다. 다친 사람 가운데 화재는 다섯에 하나였지만, 순직자 가운데서는 열에 넷이다.</p>
+      <p>2019년에는 9명이 순직했고 그중 5명이 구급 활동 중이었다. 2025년 칸은 원자료에 비어 있어 그리지 않았다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">순직한 소방관, 2016–2024년</p>
+      <p class="fs">헬멧 하나 = 1명. 색은 순직 당시 하던 일</p>
+      <div class="chart" id="c3"></div>
+      <figcaption>소방청 「연도별 소방공무원 순직 및 공상자 현황」(15131241). 2025년 순직 칸은 원자료에 값이 적혀 있지 않다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">본부마다 다른 원</h2>
+      <p>소방본부마다 다친 사람 수만큼 원을 그리고 하던 일로 나눴다. 2024년에는 경기가 390명으로 가장 많고 서울 182명, 강원 103명, 부산 95명 순이다. 소방관이 많은 곳에서 다친 사람도 많다. 본부별 소방관 수는 이 자료에 없어서 비율로 견주지는 못했다.</p>
+      <p>원 안의 색은 본부마다 다르다. 2024년 경기는 구급 중 부상이 110명으로 화재(59명)의 두 배 가까이 된다. 서울은 구급이 18명뿐이고 그 밖의 일이 116명(64%)이다. 같은 일을 본부마다 다르게 분류했을 수 있다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">소방본부별 공상자</p>
+      <p class="fs">원의 넓이 = 다친 소방관 수, 조각 = 하던 일. 창원은 경남과 따로 집계하는 본부다</p>
+      <div class="chips" id="k4" role="group" aria-label="연도"></div>
+      <div class="mapwrap">
+        <div class="chart" id="c4"></div>
+        <div class="chart" id="c4b"></div>
+      </div>
+      <figcaption>소방청 「소방공무원 순직·공상자 현황(2024년, 2025년)」(15131241). 소방청, 중앙소방학교, 중앙119구조본부, 국립소방연구원은 지도 밖 막대에만 그렸다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 소방관은 불 끄다 가장 많이 다칠까</h2>
+      <p>수로 보면 아니다. 다친 소방관 다섯 가운데 한 명만 화재 현장에서 다쳤다. 구급 활동 중에 다친 사람이 조금 더 많고, 가장 많은 것은 훈련과 체력단련, 출퇴근, 지원 업무 같은 일이다. 소방관의 부상을 줄이려면 불길 밖의 일을 봐야 한다.</p>
+      <p>위험으로 보면 맞다. 한 번 나갈 때 다칠 가능성은 화재가 구급의 70배이고, 순직자 열에 넷이 화재 현장에서 나왔다. "가장 많이 다치는 일"과 "가장 위험한 일"은 다른 질문이다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>"그 밖의 일"이 절반인데 그 안을 나눌 수 없다. 원자료 주석에는 지원활동, 예방활동, 체력단련, 출퇴근 등이라고만 적혀 있다. 훈련 중 부상과 출퇴근 사고가 각각 얼마인지는 이 자료로 알 수 없다.</li>
+      <li>공상자가 2.8배가 된 것이 다치는 일이 늘어서인지, 소방관 수가 늘고 공상 신청과 인정이 늘어서인지는 가를 수 없다. 소방관 수를 이 장에서 쓰지 않았다.</li>
+      <li>1만 건당 숫자의 분모는 서로 다르다. 화재는 불이 난 건수, 구조와 구급은 출동 건수다. 한 번 출동에 나가는 사람 수와 현장에 머무는 시간도 다르다. 순서를 견주는 데는 쓸 수 있지만 배수를 그대로 믿기는 어렵다.</li>
+      <li>공상은 부상의 크기를 가리지 않는다. 가벼운 부상과 큰 부상이 한 명으로 같이 세어진다.</li>
+      <li>구급 중 부상에 폭행 피해가 얼마나 들어 있는지는 이 자료에 없다.</li>
+      <li>시도 소방본부가 모아 낸 숫자다. 본부마다 "그 밖의 일"의 몫이 36%에서 64%까지 달라, 분류 기준이 같지 않을 수 있다.</li>
+      <li>2025년 숫자는 원자료에 적힌 그대로이고, 순직 칸은 비어 있다. 출동 건수는 구조가 2024년까지만 있어 1만 건당 계산은 2016–2024년으로 했다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15131241/fileData.do" target="_blank" rel="noopener">연도별 소방공무원 순직 및 공상자 현황</a> (15131241, 한글 문서 2개)</td><td>소방청</td><td>연도별·본부별 순직자와 공상자, 하던 일 5가지</td><td>2016–2025</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=156&amp;tblId=TX_15602_A018" target="_blank" rel="noopener">119 구급 운영 현황</a> (KOSIS 156 TX_15602_A018)</td><td>소방청</td><td>구급 출동 건수</td><td>2016–2025</td></tr>
+        <tr><td><a href="https://kosis.kr/statHtml/statHtml.do?orgId=156&amp;tblId=TX_15602_A004" target="_blank" rel="noopener">구조활동 총괄</a> (KOSIS 156 TX_15602_A004)</td><td>소방청</td><td>구조 출동 건수</td><td>2016–2024</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15060386/fileData.do" target="_blank" rel="noopener">연간화재통계</a> (15060386)</td><td>소방청</td><td>연도별 화재 건수</td><td>2016–2024</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>10개 연도 × 순직·공상 × 하던 일 5가지 · 소방본부 22곳 × 2개 연도 · 화재·구조·구급 건수</dd>
+      <dt>도구</dt><dd>Python(한글 문서의 표 읽기, 집계) · SVG 헬멧, 사다리차, 지도 위 원(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>하던 일별 비중 · 공상자 ÷ 화재 건수(또는 출동 건수) × 1만 · 2016–2024년 합산</dd>
+      <dt>검증</dt><dd>하던 일 5가지의 합 = 공상 소계(10개 연도 모두), 순직 + 공상 = 합계(2016–2024년). 본부별 공상자의 합이 전국 합계(2024년 1,445명, 2025년 1,271명)와 같다. 한글 문서는 빈칸까지 칸 수를 세어 열이 밀리지 않게 읽었다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>구급차는 무슨 일로 가장 많이 나갈까</h3><p>구급 출동 332만 건 가운데 실제로 환자를 옮긴 것은 얼마이고, 어떤 환자가 많은지 볼 수 있다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=156&amp;tblId=TX_15602_A018" target="_blank" rel="noopener">119 구급 운영 현황</a> · 소방청</li></ul></div>
+      <div class="q"><h3>119는 사람을 구하러 가장 많이 나갈까</h3><p>구조 출동을 사고 종류별로 나누면 벌집 제거나 동물 포획 같은 출동의 몫이 보인다.</p>
+        <ul><li><a href="https://kosis.kr/statHtml/statHtml.do?orgId=156&amp;tblId=DT_A15602_A007_2" target="_blank" rel="noopener">사고종별 구조건수 현황</a> · 소방청</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.16</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const once = (el, fn, th = .25) => { if (reduce) return false; const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); fn(); }, { threshold: th }); io.observe(el); return true; };
+  const f2 = (n) => n.toLocaleString("ko-KR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const Y = DATA.Y, NY = Y.length, AN = ["화재", "구조", "구급", "생활안전", "그 밖의 일"], AC = [0, 1, 2, 3, 4].map((k) => `var(--a${k})`);
+  const TOT = [0, 1, 2, 3, 4].map((j) => Y.reduce((a, r) => a + r.injBy[j], 0)), ALL = TOT.reduce((a, b) => a + b, 0);
+  function helmet(g, x, y, u, col, extra = {}) {
+    // side view: dome, brim sweeping to the back, front shield, crest
+    s("path", { d: `M${x - u * .46},${y + u * .12} Q${x - u * .48},${y - u * .5} ${x},${y - u * .5} Q${x + u * .42},${y - u * .5} ${x + u * .46},${y + u * .08} L${x + u * .7},${y + u * .3} Q${x + u * .2},${y + u * .2} ${x - u * .58},${y + u * .3} Z`, fill: col, ...extra }, g);
+    s("path", { d: `M${x - u * .1},${y - u * .5} Q${x + u * .06},${y - u * .62} ${x + u * .2},${y - u * .46}`, fill: "none", stroke: col, "stroke-width": u * .1, "stroke-linecap": "round" }, g);
+    s("rect", { x: x - u * .4, y: y - u * .12, width: u * .22, height: u * .22, rx: u * .04, fill: "var(--card)", opacity: .75 }, g);
+  }
+
+  /* ---------- 0. ranking game ---------- */
+  const RK = [["화재 진압", "불이 난 현장", 0], ["구조", "사고·재난 현장에서 사람을 구하는 일", 1], ["구급", "환자를 살피고 병원으로 옮기는 일", 2], ["생활안전", "생활 속 위험을 없애 달라는 신고에 나가는 일", 3], ["그 밖의 일", "지원·예방 활동, 체력단련, 출퇴근 등", 4]];
+  const TRUE = [0, 1, 2, 3, 4].sort((a, b) => TOT[b] - TOT[a]); let picks = [], rkDone = false;
+  const rankBox = document.getElementById("rank"), btns = RK.map(([name, desc, j]) => {
+    const li = document.createElement("li"), b = document.createElement("button"); b.type = "button"; b.className = "rk";
+    const bar = document.createElement("span"); bar.className = "bar"; const no = document.createElement("span"); no.className = "no"; no.textContent = "?";
+    const lab = document.createElement("span"); lab.append(name); const sm = document.createElement("small"); sm.textContent = desc; lab.append(sm);
+    const res = document.createElement("span"); res.className = "res"; b.append(bar, no, lab, res); li.append(b); rankBox.append(li);
+    b.addEventListener("click", () => { if (rkDone || picks.includes(j)) return; picks.push(j); updRank(); });
+    return { b, no, res, bar, j, name };
+  });
+  function updRank() {
+    btns.forEach((o) => { const k = picks.indexOf(o.j); if (k >= 0) { o.b.dataset.pick = k + 1; o.no.textContent = k + 1; o.b.setAttribute("aria-label", `${o.name}, 내가 고른 순위 ${k + 1}위`); } else { delete o.b.dataset.pick; o.no.textContent = "?"; o.b.setAttribute("aria-label", `${o.name}, 아직 고르지 않음`); } });
+    document.getElementById("rkgo").disabled = picks.length < 5 || rkDone;
+    if (!rkDone) document.getElementById("rkhint").textContent = picks.length === 0 ? "1위부터 차례로 누른다. 잘못 눌렀으면 \"다시\"를 누른다." : picks.length < 5 ? `${picks.length + 1}위를 고른다.` : "다 골랐다. 확인을 누른다.";
+  }
+  document.getElementById("rkre").addEventListener("click", () => { if (rkDone) return; picks = []; updRank(); });
+  document.getElementById("rkgo").addEventListener("click", () => {
+    rkDone = true; let ok = 0;
+    btns.forEach((o) => { const real = TRUE.indexOf(o.j), mine = picks.indexOf(o.j); if (real === mine) { ok++; o.b.dataset.ok = "1"; } o.res.textContent = `실제 ${real + 1}위 · ${fmt(TOT[o.j])}명`; o.bar.style.width = (TOT[o.j] / TOT[TRUE[0]] * 100) + "%"; o.bar.style.background = `color-mix(in oklab, ${AC[o.j]} 26%, transparent)`; o.b.style.cursor = "default"; o.b.setAttribute("aria-label", `${o.name}, 실제 ${real + 1}위 ${fmt(TOT[o.j])}명, 내가 고른 순위 ${mine + 1}위`); });
+    const mineFire = picks.indexOf(0) + 1;
+    document.getElementById("rkmsg").textContent = `다섯 가운데 ${ok}개의 순위를 맞혔다. 화재를 ${mineFire}위로 골랐다.`;
+    document.getElementById("rkhint").textContent = "막대 길이가 실제로 다친 사람 수다. 테두리가 진한 줄이 맞힌 순위다.";
+    document.getElementById("rkgo").disabled = true; document.getElementById("rkre").disabled = true; document.getElementById("rkreveal").hidden = false;
+  });
+  updRank();
+
+  /* ---------- 1. helmets ---------- */
+  const HM = Y.map((r) => r.injBy.map((v) => Math.round(v / 10))), HMAX = Math.max(...HM.map((a) => a.reduce((p, q) => p + q, 0)));
+  function draw1(pos) {
+    const box = document.getElementById("c1"), k = Math.min(NY - 1, Math.floor(pos + 1e-6)), r = Y[k], hm = HM[k], n = hm.reduce((a, b) => a + b, 0);
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, per = narrow ? 11 : 25, rows = Math.ceil(HMAX / per), cw = Math.min(40, W / per), u = cw * .72, rh = cw * .84, H = rows * rh + 10, x0 = (W - per * cw) / 2;
+    box.replaceChildren();
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${r.y}년 공상 ${fmt(r.inj)}명을 헬멧 ${n}개로 그린 그림. ` + AN.map((a, j) => `${a} ${r.injBy[j]}명`).join(", ") }, box);
+    let i = 0; hm.forEach((cnt, j) => { for (let q = 0; q < cnt; q++, i++) helmet(v, x0 + (i % per) * cw + cw / 2, 6 + Math.floor(i / per) * rh + rh * .56, u, AC[j]); });
+    const st = document.getElementById("st1"); st.replaceChildren(`${r.y}년 · 공상 `, bEl(`${fmt(r.inj)}명`), " · " + AN.map((a, j) => `${a} ${fmt(r.injBy[j])}`).join(" · ") + ` · 화재의 몫 `, bEl(pc(r.injBy[0] / r.inj * 100)));
+  }
+  const pl1 = Player("p1", "공상자 수", draw1, NY, (k) => String(Y[k].y), 9);
+  table("t1", ["연도", "공상", ...AN, "화재 비중", "순직"], Y.map((r) => [r.y, fmt(r.inj), ...r.injBy.map(fmt), pc(r.injBy[0] / r.inj * 100), r.deadBlank ? "–" : r.dead]));
+
+  /* ---------- 2. ladder trucks: count <-> per 10,000 ---------- */
+  const Y9 = Y.filter((r) => r.fire && r.res && r.ems), CNT = [0, 1, 2].map((j) => Y9.reduce((a, r) => a + r.injBy[j], 0)), DEN = [Y9.reduce((a, r) => a + r.fire, 0), Y9.reduce((a, r) => a + r.res, 0), Y9.reduce((a, r) => a + r.ems, 0)], PER = CNT.map((c, j) => c / DEN[j] * 1e4);
+  let mode2 = 0, t2 = 0, raf2 = 0;
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, H = narrow ? 360 : 420, base = H - 74, top = 44, gw = W / 3, e = t2 < .5 ? 2 * t2 * t2 : 1 - Math.pow(-2 * t2 + 2, 2) / 2, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": mode2 ? `화재·구조·구급 1만 건당 다친 소방관. 화재 ${f1(PER[0])}명, 구조 ${f2(PER[1])}명, 구급 ${f2(PER[2])}명` : `화재·구조·구급 중 다친 소방관 수. 화재 ${fmt(CNT[0])}명, 구조 ${fmt(CNT[1])}명, 구급 ${fmt(CNT[2])}명` }, box);
+    s("line", { x1: 0, x2: W, y1: base + 30, y2: base + 30, class: "ax" }, v);
+    [0, 1, 2].forEach((j) => {
+      const cx = gw * j + gw / 2, hc = CNT[j] / Math.max(...CNT), hp = PER[j] / Math.max(...PER), h = Math.max(3, (base - top) * (hc + (hp - hc) * e)), lw = narrow ? 20 : 26, tw = narrow ? 74 : 104;
+      // truck
+      s("rect", { x: cx - tw / 2, y: base + 2, width: tw, height: 20, rx: 3, fill: AC[j] }, v); s("rect", { x: cx + tw / 2 - tw * .3, y: base - 8, width: tw * .3, height: 12, rx: 2, fill: AC[j] }, v); s("rect", { x: cx + tw / 2 - tw * .24, y: base - 5, width: tw * .16, height: 7, fill: "var(--card)", opacity: .7 }, v);
+      [cx - tw * .3, cx + tw * .3].forEach((wx) => { s("circle", { cx: wx, cy: base + 24, r: 7, fill: "var(--tyre)" }, v); s("circle", { cx: wx, cy: base + 24, r: 2.5, fill: "var(--steel)" }, v); });
+      // ladder
+      s("line", { x1: cx - lw / 2, x2: cx - lw / 2, y1: base + 2, y2: base - h, stroke: "var(--steel)", "stroke-width": 3, "stroke-linecap": "round" }, v); s("line", { x1: cx + lw / 2, x2: cx + lw / 2, y1: base + 2, y2: base - h, stroke: "var(--steel)", "stroke-width": 3, "stroke-linecap": "round" }, v);
+      for (let ry = base - 6; ry > base - h + 2; ry -= 11) s("line", { x1: cx - lw / 2, x2: cx + lw / 2, y1: ry, y2: ry, stroke: "var(--steel)", "stroke-width": 2 }, v);
+      helmet(v, cx, base - h - 10, narrow ? 22 : 26, AC[j]);
+      const val = mode2 ? PER[j] : CNT[j]; if (t2 === mode2) tx(v, cx, base - h - 30, mode2 ? (val >= 10 ? f1(val) : f2(val)) + "명" : fmt(val) + "명", "vl i" + j, narrow ? 15 : 17, "middle");
+      tx(v, cx, base + 50, AN[j], "lb", 14.5, "middle"); tx(v, cx, base + 66, ["화재", "구조 출동", "구급 출동"][j] + " " + (DEN[j] >= 1e6 ? fmt(DEN[j] / 1e4) + "만 건" : fmt(DEN[j] / 1e4) + "만 건"), "tk", 11.5, "middle");
+      pts.push({ x: cx, y: base - h / 2, r: Math.max(20, h / 2), fn: () => [AN[j], [[`${fmt(CNT[j])}명`, "다친 소방관(2016–2024)"], [`${fmt(DEN[j])}건`, ["화재 건수", "구조 출동", "구급 출동"][j]], [`${f2(PER[j])}명`, "1만 건당"]]] });
+    });
+    document.getElementById("fs2").textContent = mode2 ? "사다리 높이 = 화재(또는 출동) 1만 건당 다친 소방관 수" : "사다리 높이 = 다친 소방관 수(명)";
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 옮겨 볼 수 있다");
+  }
+  function go2(to) { mode2 = to; cancelAnimationFrame(raf2); if (reduce) { t2 = to; c2(); return; } const from = t2, t0 = performance.now(); const tick = (now) => { const k = Math.min(1, (now - t0) / 1000); t2 = from + (to - from) * k; c2(); if (k < 1) raf2 = requestAnimationFrame(tick); }; raf2 = requestAnimationFrame(tick); }
+  chips("k2", [[0, "다친 사람 수"], [1, "1만 건당"]], 0, go2);
+  table("t2", ["연도", "화재 공상", "화재 건수", "화재 1만 건당", "구조 공상", "구조 출동", "구조 1만 건당", "구급 공상", "구급 출동", "구급 1만 건당"], Y9.map((r) => [r.y, r.injBy[0], fmt(r.fire), f1(r.per[0]), r.injBy[1], fmt(r.res), f2(r.per[1]), r.injBy[2], fmt(r.ems), f2(r.per[2])]).concat([["2016–2024", fmt(CNT[0]), fmt(DEN[0]), f1(PER[0]), fmt(CNT[1]), fmt(DEN[1]), f2(PER[1]), fmt(CNT[2]), fmt(DEN[2]), f2(PER[2])]]));
+
+  /* ---------- 3. the 33 ---------- */
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const YD = Y.filter((r) => !r.deadBlank), W = Math.max(300, box.clientWidth), narrow = W < 560, gw = W / YD.length, u = Math.min(narrow ? 24 : 34, gw * .8), rh = u * .9, maxN = Math.max(...YD.map((r) => r.dead)), H = maxN * rh + 54, base = H - 34, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "2016–2024년 순직한 소방관 33명을 헬멧으로 그린 그림. " + YD.map((r) => `${r.y}년 ${r.dead}명`).join(", ") }, box);
+    s("line", { x1: 0, x2: W, y1: base + 4, y2: base + 4, class: "ax" }, v);
+    YD.forEach((r, k) => {
+      const cx = gw * k + gw / 2; let i = 0;
+      r.deadBy.forEach((cnt, j) => { for (let q = 0; q < cnt; q++, i++) { const y = base - i * rh - rh * .4; helmet(v, cx, y, u, AC[j]); pts.push({ x: cx, y, r: u / 2, fn: () => [`${r.y}년`, [[AN[j], "순직 당시 하던 일", AC[j]], [`${r.dead}명`, "그해 순직"]]] }); } });
+      tx(v, cx, base + 20, narrow ? "'" + String(r.y).slice(2) : r.y, "tk", 11.5, "middle"); tx(v, cx, base - r.dead * rh - 8, r.dead, "vl", 13, "middle");
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 옮겨 볼 수 있다");
+  }
+  table("t3", ["연도", "순직", ...AN], Y.map((r) => r.deadBlank ? [r.y, "–", "–", "–", "–", "–", "–"] : [r.y, r.dead, ...r.deadBy]));
+
+  /* ---------- 4. map of pies ---------- */
+  const G = DATA.geo, OFF = { 경기: [34, 36], 인천: [-24, 2], 세종: [-2, -14], 전남: [-6, 24], 경남: [-26, -8], 창원: [6, 20], 부산: [14, 12], 울산: [14, -6], 대전: [10, 10], 광주: [-16, -4] };
+  let yr4 = "2024";
+  const arc = (cx, cy, r, a0, a1) => { const p = (a) => [cx + r * Math.sin(a), cy - r * Math.cos(a)], [x0, y0] = p(a0), [x1, y1] = p(a1); return `M${cx},${cy} L${x0},${y0} A${r},${r} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1},${y1} Z`; };
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const rows = DATA.SIDO[yr4].slice(1), [bx0, by0, bx1, by1] = G.box, W = Math.max(280, box.clientWidth), sc = W / (bx1 - bx0), H = (by1 - by0) * sc, pts = [];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${yr4}년 소방본부별 공상자를 원으로 그린 지도` }, box);
+    const g = s("g", { transform: `translate(${-bx0 * sc},${-by0 * sc}) scale(${sc})` }, v);
+    G.paths.forEach((p) => s("path", { d: p.d, fill: "var(--land)", stroke: "var(--axis)", "stroke-width": .8 / sc }, g));
+    const K = (W < 400 ? 1.45 : 1.8) / Math.sqrt(sc);
+    rows.filter((r) => G.cen[r.n] && r.inj).sort((a, b) => b.inj - a.inj).forEach((r) => {
+      const [x, y] = G.cen[r.n], o = OFF[r.n] || [0, 0], cx = x + o[0], cy = y + o[1], R = Math.sqrt(r.inj) * K; let a = 0;
+      if (o[0] || o[1]) s("line", { x1: x, y1: y, x2: cx, y2: cy, stroke: "var(--axis)", "stroke-width": .8 / sc }, g);
+      r.injBy.forEach((val, j) => { if (!val) return; const a1 = a + val / r.inj * Math.PI * 2; if (val === r.inj) s("circle", { cx, cy, r: R, fill: AC[j] }, g); else s("path", { d: arc(cx, cy, R, a, a1), fill: AC[j] }, g); a = a1; });
+      s("circle", { cx, cy, r: R, fill: "none", stroke: "var(--card)", "stroke-width": 1 / sc }, g);
+      if (R * sc > 13) tx(g, cx, cy + 4 / sc, r.n, "lb halo", 12.5 / sc, "middle", { "stroke-width": 3 / sc });
+      pts.push({ x: (cx - bx0) * sc, y: (cy - by0) * sc, r: Math.max(8, R * sc), fn: () => [`${r.n} · ${yr4}년`, [[`${fmt(r.inj)}명`, "공상"], ...r.injBy.map((val, j) => [`${val}명`, AN[j], AC[j]])] ] });
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 본부를 옮겨 볼 수 있다");
+    // stacked bars
+    const b2 = document.getElementById("c4b"); b2.replaceChildren();
+    const list = rows.filter((r) => r.inj).sort((a, b) => b.inj - a.inj), W2 = Math.max(260, b2.clientWidth), rh = 22, l = 122, rr = 44, H2 = list.length * rh + 6, mx = list[0].inj;
+    const v2 = s("svg", { viewBox: `0 0 ${W2} ${H2}`, role: "img", "aria-label": `${yr4}년 소방본부별 공상자 막대. ` + list.slice(0, 5).map((r) => `${r.n} ${r.inj}명`).join(", ") }, b2);
+    list.forEach((r, k) => { const y = 4 + k * rh; tx(v2, l - 8, y + 14, r.n, "lb", 13, "end"); let x = l; r.injBy.forEach((val, j) => { const w = (W2 - l - rr) * val / mx; if (w > 0) s("rect", { x, y: y + 3, width: w, height: rh - 8, fill: AC[j] }, v2); x += w; }); tx(v2, x + 6, y + 14, r.inj, "vl", 12.5); });
+  }
+  chips("k4", [["2024", "2024년"], ["2025", "2025년"]], "2024", (k) => { yr4 = k; c4(); });
+  table("t4", ["본부", "2024 공상", ...AN.map((a) => "2024 " + a), "2025 공상", ...AN.map((a) => "2025 " + a)], DATA.SIDO["2024"].map((r, i) => { const q = DATA.SIDO["2025"][i]; return [r.n, r.inj, ...r.injBy, q.inj, ...q.injBy]; }));
+
+  /* ---------- first view + resize ---------- */
+  pl1.render(); c2(); c3(); c4();
+  onResize(() => { pl1.render(); c2(); c3(); c4(); });
+})();
+</script>

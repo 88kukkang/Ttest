@@ -1,0 +1,303 @@
+<title>집값 경주 트랙</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a running track. All 17 regions leave the same start line (Jan 2006 = 100) and run 248 months;
+   each lane keeps a flag at the runner's personal best, so a runner behind its flag is below its peak. */
+:root {
+  --paper: #f4f1ec; --card: #fdfbf8; --ink: #1c1a19; --ink2: #44403c; --muted: #6c665f; --line: #e0dad2; --grid: #ece7e0; --axis: #bab2a7;
+  --ghost: #c6bfb6; --board: #1c1a19; --board-ink: #ffd166; --accent: #c8553d;
+  --track: #c8553d; --track2: #b84a33; --lane: #fdf6ee; --field: #2f7d4f;
+  --up: #c8553d; --up2: #e9a089; --down: #2c6fa8; --down2: #93bde0; --flat: #ece7e0;
+  --cap: #c8553d; --metro: #6a4fb3; --prov: #2f7d4f;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --display: "Do Hyeon", "IBM Plex Sans KR", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #121110; --card: #1a1817; --ink: #efebe6; --ink2: #cbc5bd; --muted: #9a938a; --line: #2c2926; --grid: #24211f; --axis: #45403b;
+  --ghost: #4d4843; --board: #050505; --board-ink: #ffd166; --accent: #f07a5f;
+  --track: #8e3a2a; --track2: #7c3223; --lane: #f3e6da; --field: #2a6b45;
+  --up: #f07a5f; --up2: #7a3a2c; --down: #5aa0dc; --down2: #23415e; --flat: #24211f;
+  --cap: #f07a5f; --metro: #a48cf0; --prov: #4fbf82; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #121110; --card: #1a1817; --ink: #efebe6; --ink2: #cbc5bd; --muted: #9a938a; --line: #2c2926; --grid: #24211f; --axis: #45403b;
+  --ghost: #4d4843; --board: #050505; --board-ink: #ffd166; --accent: #f07a5f;
+  --track: #8e3a2a; --track2: #7c3223; --lane: #f3e6da; --field: #2a6b45;
+  --up: #f07a5f; --up2: #7a3a2c; --down: #5aa0dc; --down2: #23415e; --flat: #24211f;
+  --cap: #f07a5f; --metro: #a48cf0; --prov: #4fbf82; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h, .ft { font-family: var(--display); font-weight: 400 }
+h1 { font-size: clamp(36px, 6.4vw, 62px); letter-spacing: -.01em }
+h1 span { font-family: var(--sans); font-weight: 500 }
+h2.h { letter-spacing: 0; font-size: clamp(25px, 3.6vw, 32px) }
+.ft { font-size: 21px; line-height: 1.35 }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.ln { fill: #fff; font-family: var(--sans); font-weight: 600 }
+.lnv { fill: #fff; font-family: var(--mono); font-weight: 600 }
+.thalo { paint-order: stroke; stroke: var(--track2); stroke-linejoin: round }
+.ramp6 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font: 12px/1.4 var(--mono); color: var(--muted) }
+.ramp6 i { display: inline-block; width: 140px; height: 10px; border-radius: 5px; background: linear-gradient(90deg, var(--down), var(--down2), var(--flat), var(--up2), var(--up)) }
+</style>
+
+<main class="page">
+  <header>
+    <h1>집값은 전국이 함께 오르내릴까<span>같은 출발선을 떠난 17개 시도는 20년 동안 따로 달렸다. 함께 뛴 것은 2021년 무렵 한 번뿐이다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 08</dd>
+      <dt>한 줄</dt><dd>2007년부터 2026년 8월까지 236개월 가운데 17개 시도의 아파트 실거래가가 1년 전보다 모두 오른 달은 21개월, 모두 내린 달은 8개월뿐이다. 2008–2013년 서울이 6.0% 내리는 동안 부산은 55.7% 올랐다. 14개 시도는 2021–2022년에 꼭대기를 함께 찍었지만, 경남·경북은 2015년에 먼저 찍었고 서울은 2026년 8월 지금이 꼭대기다.</dd>
+      <dt>분류</dt><dd>주거·일·경제</dd>
+      <dt>본능</dt><dd>일반화 본능 · 뉴스에 나오는 "집값"(대개 서울)을 전국의 움직임으로 여긴다</dd>
+      <dt>그림 방식</dt><dd>경주 트랙 · 2006년 1월을 100으로 놓은 출발선에서 17개 시도가 248개월을 달린다. 각 레인에는 그때까지의 최고 기록에 깃발이 꽂힌다</dd>
+      <dt>기간</dt><dd>2006년 1월–2026년 8월 (월별 248개월)</dd>
+      <dt>엮은 데이터</dt><dd>1개 · 한국부동산원 공동주택 실거래가격지수(아파트, 월별 지역별 매매)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2008년 1월부터 2013년 1월까지 서울 아파트 실거래가는 6.0% 내렸다. 같은 5년 동안 부산은 어땠을까?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>서울처럼 조금 내렸다</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>10% 남짓 올랐다</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>50% 넘게 올랐다</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. <span class="n">55.7%</span> 올랐다</span>
+      경남도 44.7% 올랐다. 2010–2011년에는 부산·경남이 해마다 15% 넘게 오르는 동안 서울은 3% 안팎 내렸다. 거꾸로 2017–2019년에는 서울이 해마다 10–18% 오를 때 경남은 해마다 내렸다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">같은 출발선, 다른 레인</h2>
+      <p>17개 시도의 아파트 실거래가를 모두 2006년 1월 = 100에서 출발시켰다. 오른쪽으로 갈수록 그때보다 비싸다. 레인의 하얀 깃발은 그 시도가 그때까지 세운 최고 기록이다. 주자가 깃발보다 뒤에 있으면 꼭대기에서 내려온 상태다.</p>
+      <p>재생하면 2008–2011년에는 부산·경남이 앞서 나가고 서울이 제자리걸음을 한다. 2014년부터 서울이 치고 나가 2026년 8월 <span class="n">355</span>(3.55배)로 맨 앞에 있다. 충남(<span class="n">137</span>)·경북(<span class="n">147</span>)·경남(<span class="n">154</span>)은 맨 뒤다. 대구는 2021년 7월 219에서 158로 깃발과의 거리가 가장 멀다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">아파트 실거래가 경주, 2006년 1월 = 100</p>
+      <p class="fs">원은 지금 위치, 깃발은 그때까지의 최고 기록. 레인은 2026년 8월 순위대로</p>
+      <div class="legend" aria-hidden="true"><span><i class="sw dot" style="background:#ffd166;box-shadow:0 0 0 1.5px var(--track)"></i>수도권</span><span><i class="sw dot" style="background:#1c1a19;box-shadow:0 0 0 1.5px var(--track)"></i>광역시·세종</span><span><i class="sw dot" style="background:#8fe0b0;box-shadow:0 0 0 1.5px var(--track)"></i>도</span></div>
+      <div class="player" id="p1"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>한국부동산원 「공동주택 실거래가격지수」 아파트 월별 지역별 매매(부동산통계정보시스템 R-ONE). 원자료의 기준(2026년 6월 = 100)을 2006년 1월 = 100으로 바꿨다. 세종은 2012년 출범 전 옛 연기군 지역의 거래다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">네 번의 시기, 네 번의 다른 지도</h2>
+      <p>서울과 부산, 경남, 대구를 한 그래프에 겹쳤다. 2008–2013년은 지방의 시간이었다. 2014–2021년에는 서울이 오르는 동안 경남은 2015년 꼭대기에서 내려와 4년을 미끄러졌다. 2021–2022년에는 모두 함께 올랐다가 함께 떨어졌다. 2023년 이후에는 서울만 다시 올라 지난 꼭대기를 넘었다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">서울·부산·대구·경남의 아파트 실거래가</p>
+      <p class="fs">2006년 1월 = 100. 배경의 띠는 시기 구분</p>
+      <div class="player" id="p2"></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>한국부동산원 「공동주택 실거래가격지수」. 시기 구분은 이 페이지에서 그래프 모양을 보고 나눈 것이다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">전국이 한 색으로 물든 때는 두 번뿐</h2>
+      <p>한 칸이 한 시도의 한 달이다. 1년 전보다 올랐으면 붉게, 내렸으면 푸르게 칠했다. 맨 아래 줄은 1년 전보다 오른 시도의 수다. 17개 시도가 모두 붉었던 것은 2009–2010년과 2020–2021년 무렵 <span class="n">21</span>개월, 모두 푸르렀던 것은 2022년 12월–2023년 7월 <span class="n">8</span>개월이다. 나머지 207개월은 오르는 곳과 내리는 곳이 섞여 있었다.</p>
+      <p>서울의 1년 변동률과 함께 움직이는 정도(상관계수)는 경기 0.83, 인천 0.69이지만, 경남 0.05, 제주 0.04, 경북 0.10으로 거의 따로 움직였다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">1년 전 대비 아파트 실거래가 변동률, 2007–2026년</p>
+      <div class="ramp6" aria-hidden="true"><span>−20%</span><i></i><span>+20%</span></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>한국부동산원 「공동주택 실거래가격지수」에서 같은 달 1년 전과 견준 변동률.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">꼭대기는 언제였고, 지금은 얼마나 내려왔나</h2>
+      <p>시도마다 248개월 가운데 가장 높았던 달에 점을 찍었다. 14곳이 2021년 6월–2022년 7월 사이에 몰려 있다. 경북(2015년 8월)과 경남(2015년 10월)은 6년 먼저 꼭대기를 찍었고 다음 파도에서도 그 높이를 넘지 못했다. 서울은 2026년 8월, 바로 지금이 꼭대기다. 대구는 꼭대기보다 <span class="n">27.8%</span>, 세종은 <span class="n">24.2%</span> 아래에 있다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">시도별 꼭대기 시점과 지금의 거리</p>
+      <p class="fs">점: 최고점 달. 오른쪽 숫자: 2026년 8월 값이 최고점보다 낮은 정도</p>
+      <div class="chart" id="c4"></div>
+      <figcaption>한국부동산원 「공동주택 실거래가격지수」.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">그래서, 집값은 전국이 함께 오르내릴까</h2>
+      <p>대체로 아니다. 20년 가운데 17개 시도가 함께 오르거나 함께 내린 것은 2년 반 정도다. 2021년의 큰 파도는 거의 모든 곳을 한꺼번에 들어 올렸다가 내려놓았지만, 그 앞뒤로는 서울이 오를 때 지방이 내리고 지방이 오를 때 서울이 쉬는 일이 되풀이됐다. "집값이 올랐다"는 뉴스를 들으면 어디 이야기인지부터 물어야 한다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>실거래가격지수는 실제 신고된 거래를 같은 아파트의 이전 거래와 짝지어(반복매매) 가격 변화를 잰다. 시도 사이의 가격 수준이 아니라 각자의 변화율을 비교하는 지수다. 서울 355와 경북 147은 "서울이 더 비싸다"가 아니라 "2006년보다 서울이 더 많이 올랐다"는 뜻이다.</li>
+      <li>거래가 적은 달과 지역(세종 초기, 제주 등)은 지수가 크게 출렁일 수 있다.</li>
+      <li>물가는 빼지 않은 명목 지수다. 2006–2026년 소비자물가 상승분을 빼면 실질 상승폭은 더 작다.</li>
+      <li>공공데이터포털의 같은 자료(15044283) 파일은 내려받으면 비어 있어, 원 출처인 한국부동산원 R-ONE 통계표(A_2024_00178)에서 받았다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.reb.or.kr/r-one/portal/stat/easyStatPage/A_2024_00178.do" target="_blank" rel="noopener">(월) 지역별 매매지수_아파트</a> (R-ONE, 공공데이터포털 15044283과 같은 통계)</td><td>한국부동산원</td><td>전국·수도권·지방, 17개 시도, 서울 5개 권역 월별 지수</td><td>2006.1–2026.8</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>1개 통계표 · 29개 지역 × 248개월</dd>
+      <dt>도구</dt><dd>Python(집계) · SVG 그림과 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>재기준화(2006.1 = 100) · 누적 최고점 · 전년 동월 대비 변동률 · 상관계수</dd>
+      <dt>검증</dt><dd>R-ONE 공개 API에서 따로 받은 2006–2026년 전국·수도권·광주·전남·서울 도심권 값과 통계표 값이 소수 첫째 자리까지 같다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>전세는 매매를 따라 움직일까</h3><p>같은 지수의 전세 계열과 겹치면, 전세가 먼저 움직이는 시기와 따로 노는 시기가 보인다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15130327/fileData.do" target="_blank" rel="noopener">공동주택 실거래가격지수 아파트 월별 지역별 전세</a> · 한국부동산원</li></ul></div>
+      <div class="q"><h3>서울 안에서도 함께 오르내릴까</h3><p>서울 5개 생활권역의 지수로 강남과 강북의 순서를 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15044284/fileData.do" target="_blank" rel="noopener">아파트 분기별 시군구별 매매</a> · 한국부동산원</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const M = DATA.months, NM = M.length, SD = DATA.sido;
+  const mLabel = (i) => `${M[i].slice(0, 4)}.${M[i].slice(4)}`;
+  const R = {}; Object.keys(DATA.S).forEach((k) => { const s = DATA.S[k]; R[k] = s.map((v) => v / s[0] * 100); });
+  const GRP = (k) => (["서울", "경기", "인천"].includes(k) ? "cap" : ["부산", "대구", "광주", "대전", "울산", "세종"].includes(k) ? "metro" : "prov");
+  const GC = { cap: "var(--cap)", metro: "var(--metro)", prov: "var(--prov)" };
+  const best = (k, i) => { let m = -Infinity, at = 0; for (let j = 0; j <= i; j++) if (R[k][j] > m) { m = R[k][j]; at = j; } return [m, at]; };
+
+  /* ---------- 1. the race track ---------- */
+  const RC = { cap: "#ffd166", metro: "#1c1a19", prov: "#8fe0b0" }; // runner colours that read on the red track
+  const LANES = [...SD].sort((a, b) => R[b][NM - 1] - R[a][NM - 1]);
+  function c1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, l = narrow ? 52 : 70, r = narrow ? 44 : 58, top = 26, laneH = narrow ? 24 : 27, H = top + laneH * LANES.length + 34;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${mLabel(Math.round(pos))} 시도별 아파트 실거래가 경주` }, box);
+    const x0 = 60, x1 = 380, sx = (val) => l + (val - x0) / (x1 - x0) * (W - l - r);
+    s("rect", { x: 0, y: top - 6, width: W, height: laneH * LANES.length + 12, rx: 14, fill: "var(--track)" }, v);
+    LANES.forEach((k, j) => { if (j) s("line", { x1: 4, x2: W - 4, y1: top + j * laneH, y2: top + j * laneH, stroke: "var(--lane)", "stroke-width": 1, opacity: .55 }, v); });
+    [100, 150, 200, 250, 300, 350].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top - 6, y2: top + laneH * LANES.length + 6, stroke: "var(--lane)", "stroke-width": t === 100 ? 3 : 1, "stroke-dasharray": t === 100 ? "none" : "2 5", opacity: t === 100 ? .95 : .35 }, v); tx(v, sx(t), H - 10, t === 100 && !narrow ? "출발 100" : t, "tk", 11.5, "middle"); });
+    tx(v, sx(100), top - 12, "2006.01", "tk", 11, "middle");
+    const i = Math.min(NM - 1, pos), k0 = Math.floor(i), pts = [];
+    LANES.forEach((k, j) => {
+      const cy = top + j * laneH + laneH / 2, val = lerp(R[k], i), [bv, bi] = best(k, k0), bx = sx(Math.max(bv, val));
+      // trail: from start line to the runner
+      s("line", { x1: sx(100), x2: sx(val), y1: cy, y2: cy, stroke: "#fff", "stroke-width": 2, opacity: .28 }, v);
+      // personal-best flag
+      s("line", { x1: bx, x2: bx, y1: cy - laneH * .42, y2: cy + laneH * .32, stroke: "#fff", "stroke-width": 1.4 }, v);
+      s("path", { d: `M${bx},${cy - laneH * .42} l${narrow ? 8 : 10},${laneH * .14} l${narrow ? -8 : -10},${laneH * .14}Z`, fill: "#fff" }, v);
+      if (bv - val > 4) s("line", { x1: sx(val) + 6, x2: bx - 2, y1: cy, y2: cy, stroke: "#fff", "stroke-width": 1, "stroke-dasharray": "2 2", opacity: .8 }, v);
+      s("circle", { cx: sx(val), cy, r: narrow ? 6.5 : 7.5, fill: RC[GRP(k)], stroke: "#fff", "stroke-width": 2 }, v);
+      tx(v, l - 8, cy + 4.5, k, "ln thalo", narrow ? 12 : 13.5, "end", { "stroke-width": 3 });
+      tx(v, W - 6, cy + 4.5, Math.round(val), "lnv thalo", narrow ? 11 : 12.5, "end", { "stroke-width": 3 });
+      pts.push({ x: sx(val), y: cy, r: 8, fn: () => { const [bb, bj] = best(k, Math.floor(i)); return [`${k} · ${mLabel(Math.round(i))}`, [[f1(val), "2006.01 = 100"], [f1(bb), `최고 기록 (${mLabel(bj)})`], [pc((val / bb - 1) * 100), "최고 기록 대비"]]]; } });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 레인을 옮겨 볼 수 있다");
+  }
+  table("t1", ["월", ...LANES], M.map((m, i) => [mLabel(i), ...LANES.map((k) => f1(R[k][i]))]).filter((_, i) => i % 6 === 0 || i === NM - 1));
+
+  /* ---------- 2. four eras ---------- */
+  const ERAS = [["200801", "201301", "지방의 시간"], ["201401", "202106", "서울의 시간"], ["202106", "202307", "함께 오르내림"], ["202307", "202608", "서울만 다시"]];
+  const L2 = [["서울", "var(--cap)", 3], ["부산", "var(--metro)", 2.4], ["대구", "#b07cd8", 2], ["경남", "var(--prov)", 2.4]];
+  function c2(pos) {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), H = Math.min(420, Math.max(300, W * .48)), l = 40, r = 74, top = 34, bot = 28;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "서울·부산·대구·경남 아파트 실거래가 2006–2026" }, box);
+    const sx = (i) => l + i / (NM - 1) * (W - l - r), sy = (val) => top + (1 - (val - 80) / 300) * (H - top - bot);
+    ERAS.forEach(([a, b, name], j) => { const xa = sx(M.indexOf(a)), xb = sx(M.indexOf(b)); s("rect", { x: xa, y: top - 22, width: xb - xa, height: H - top - bot + 22, fill: j % 2 ? "var(--grid)" : "transparent", opacity: .9 }, v); if (W >= 560 || j !== 2) tx(v, xa + 4, top - 8, name, "mt", 11.5); });
+    [100, 200, 300].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t === 100 ? "ax" : "gl" }, v); tx(v, l - 6, sy(t) + 4, t, "tk", 11.5, "end"); });
+    M.forEach((m, i) => { if (m.endsWith("01") && +m.slice(0, 4) % (W < 560 ? 10 : 5) === 0) tx(v, sx(i), H - 8, m.slice(0, 4), "tk", 11.5, "middle"); });
+    const k = Math.floor(pos), f = pos - k, ends = [];
+    L2.forEach(([nm, col, w]) => { const P = []; for (let i = 0; i <= k; i++) P.push([sx(i), sy(R[nm][i])]); if (k + 1 < NM && f > 0) P.push([sx(k + f), sy(lerp(R[nm], pos))]); s("path", { d: "M" + P.map((p) => p[0].toFixed(1) + "," + p[1].toFixed(1)).join("L"), fill: "none", stroke: col, "stroke-width": w, "stroke-linejoin": "round" }, v); const e = P[P.length - 1]; s("circle", { cx: e[0], cy: e[1], r: 4, fill: col }, v); ends.push({ y: e[1], x: e[0], nm, col }); });
+    ends.sort((a, b) => a.y - b.y); for (let a = 1; a < ends.length; a++) if (ends[a].y - ends[a - 1].y < 15) ends[a].y = ends[a - 1].y + 15;
+    ends.forEach((e) => tx(v, e.x + 8, e.y + 4, `${e.nm} ${Math.round(lerp(R[e.nm], pos))}`, "vl halo", 12.5, "start", { "stroke-width": 4, style: `fill:${e.col}` }));
+    timeLayer(v, tipFor(fig), k + 1, sx, top, H - bot, (i) => [mLabel(i), L2.map(([nm, col]) => [f1(R[nm][i]), nm, col])], "좌우 화살표로 달마다 볼 수 있다");
+  }
+  table("t2", ["월", ...L2.map((x) => x[0])], M.map((m, i) => [mLabel(i), ...L2.map(([nm]) => f1(R[nm][i]))]).filter((_, i) => i % 3 === 0 || i === NM - 1));
+
+  /* ---------- 3. heat stripes of year-on-year change ---------- */
+  const YOY = {}; SD.forEach((k) => (YOY[k] = M.map((_, i) => (i < 12 ? null : (DATA.S[k][i] / DATA.S[k][i - 12] - 1) * 100))));
+  const UPN = M.map((_, i) => (i < 12 ? null : SD.filter((k) => YOY[k][i] > 0).length));
+  const hc = (p) => { const t = Math.max(-1, Math.min(1, p / 20)); return t >= 0 ? `color-mix(in oklab, var(--up) ${Math.round(t * 100)}%, var(--flat))` : `color-mix(in oklab, var(--down) ${Math.round(-t * 100)}%, var(--flat))`; };
+  const ROWS = [...SD];
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, l = narrow ? 34 : 44, r = 6, top = 6, rowH = narrow ? 13 : 16, gap = 12, barH = 46, H = top + rowH * ROWS.length + gap + barH + 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "시도별 1년 전 대비 변동률 줄무늬, 2007–2026" }, box);
+    const n = NM - 12, cw = (W - l - r) / n, sx = (i) => l + (i - 12) * cw;
+    ROWS.forEach((k, j) => { const y = top + j * rowH; for (let i = 12; i < NM; i++) s("rect", { x: sx(i).toFixed(2), y, width: (cw + .4).toFixed(2), height: rowH - 1, fill: hc(YOY[k][i]) }, v); tx(v, l - 5, y + rowH * .72, k, "lb", narrow ? 10.5 : 12, "end"); });
+    const by = top + rowH * ROWS.length + gap;
+    for (let i = 12; i < NM; i++) { const u_ = UPN[i], h = u_ / 17 * barH; s("rect", { x: sx(i).toFixed(2), y: by + barH - h, width: (cw + .4).toFixed(2), height: h, fill: u_ === 17 ? "var(--up)" : u_ === 0 ? "var(--down)" : "var(--ghost)" }, v); }
+    tx(v, l - 5, by + barH * .6, "오른 곳", "mt", narrow ? 10 : 11.5, "end");
+    s("line", { x1: l, x2: W - r, y1: by + barH, y2: by + barH, class: "ax" }, v);
+    M.forEach((m, i) => { if (i >= 12 && m.endsWith("01") && +m.slice(0, 4) % (narrow ? 5 : 2) === 0) tx(v, sx(i), H - 8, m.slice(0, 4), "tk", 11, "middle"); });
+    // pointer: pick a month column, list the extremes
+    timeLayer(v, tipFor(fig), NM, (i) => sx(Math.max(12, i)) + cw / 2, top, by + barH, (i) => { i = Math.max(12, i); const L = SD.map((k) => [k, YOY[k][i]]).sort((a, b) => b[1] - a[1]); return [`${mLabel(i)} · 오른 시도 ${UPN[i]}곳`, [...L.slice(0, 3), ...L.slice(-3)].map(([k, p]) => [(p > 0 ? "+" : "") + f1(p) + "%", k])]; }, "좌우 화살표로 달마다 볼 수 있다");
+  }
+  table("t3", ["월", "오른 시도 수", ...SD], M.map((m, i) => i < 12 ? null : [mLabel(i), String(UPN[i]), ...SD.map((k) => f1(YOY[k][i]))]).filter(Boolean));
+
+  /* ---------- 4. peak timing and distance from it ---------- */
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, l = narrow ? 40 : 52, r = narrow ? 76 : 96, top = 10, rowH = 24;
+    const P = SD.map((k) => { let m = -Infinity, at = 0; R[k].forEach((v_, i) => { if (v_ > m) { m = v_; at = i; } }); return { k, at, dd: (R[k][NM - 1] / m - 1) * 100 }; }).sort((a, b) => a.at - b.at);
+    const H = top + rowH * P.length + 30;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "시도별 최고점 시점과 최고점 대비 현재" }, box);
+    const i0 = M.indexOf("201301"), sx = (i) => l + (i - i0) / (NM - 1 - i0) * (W - l - r);
+    const a = M.indexOf("202106"), b = M.indexOf("202207");
+    s("rect", { x: sx(a), y: top - 4, width: sx(b) - sx(a), height: rowH * P.length + 8, fill: "var(--up)", opacity: .12 }, v);
+    M.forEach((m, i) => { if (i >= i0 && m.endsWith("01") && +m.slice(0, 4) % (narrow ? 4 : 2) === 1) { s("line", { x1: sx(i), x2: sx(i), y1: top, y2: top + rowH * P.length, class: "gl" }, v); tx(v, sx(i), H - 8, m.slice(0, 4), "tk", 11, "middle"); } });
+    const pts = [];
+    P.forEach((p, j) => {
+      const y = top + j * rowH + rowH / 2, x = sx(p.at), now = sx(NM - 1);
+      s("line", { x1: x, x2: now, y1: y, y2: y, stroke: "var(--axis)", "stroke-width": 1.2, "stroke-dasharray": "2 3" }, v);
+      s("circle", { cx: x, cy: y, r: 6, fill: GC[GRP(p.k)] }, v);
+      tx(v, l - 6, y + 4, p.k, "lb", 12, "end");
+      tx(v, W - 4, y + 4, p.dd > -0.05 ? "지금 최고" : f1(p.dd) + "%", p.dd < -15 ? "vl" : "tk", 12, "end", p.dd < -15 ? { style: "fill:var(--down)" } : {});
+      pts.push({ x, y, r: 6, fn: () => [`${p.k} · 최고점 ${mLabel(p.at)}`, [[f1(R[p.k][p.at]), "최고점 (2006.01 = 100)"], [f1(R[p.k][NM - 1]), "2026.08"], [pc(p.dd), "최고점 대비"]]] });
+    });
+    if (!narrow) tx(v, (sx(a) + sx(b)) / 2, top + rowH * P.length + 2 - rowH * P.length - 0, "", "mt", 11);
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 시도를 옮겨 볼 수 있다");
+    table("t4", ["시도", "최고점 달", "최고점(2006.01=100)", "2026.08", "최고점 대비"], P.map((p) => [p.k, mLabel(p.at), f1(R[p.k][p.at]), f1(R[p.k][NM - 1]), pc(p.dd)]));
+  }
+
+  const p1 = Player("p1", "경주", c1, NM, mLabel, 16);
+  const p2 = Player("p2", "네 번의 시기", c2, NM, mLabel, 12);
+  const all = () => { p1.render(); p2.render(); c3(); c4(); };
+  all(); onResize(all);
+})();
+</script>

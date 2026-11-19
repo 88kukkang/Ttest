@@ -1,0 +1,276 @@
+<title>동전 탑 지도</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: the map of Korea tilted back like a table top, with a tower of coins standing on every 시군구 —
+   one coin per 5% of older people who receive the basic pension. The towers replay 2015–2026.
+   Then rows of ten envelopes (out of ten older people, how many get one) and a scatter against living alone. */
+:root {
+  --paper: #f4f1ea; --card: #fdfbf7; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #e2ccb5; --grid: #ece6dc; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --accent: #8b4d3e; --land: #e2ccb5; --land2: #d8b29b; --sea: #dbe1dd; --coin: #d8b29b; --coin-hi: #ebdac0; --coin-lo: #8b4d3e; --coin-edge: #67453c;
+  --t-gu: #3e6f90; --t-si: #80a15a; --t-gun: #d56b41; --env: #b87b68; --env-off: #e2ccb5; --hi-ink: #8b4d3e;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --serif: "Gowun Batang", serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #d8b29b; --land: #4c433e; --land2: #5a5551; --sea: #2f3234; --coin: #b6a392; --coin-hi: #ebdac0; --coin-lo: #67453c; --coin-edge: #2f3133;
+  --t-gu: #8eabc9; --t-si: #abc07b; --t-gun: #dc8c67; --env: #d8b29b; --env-off: #4c433e; --hi-ink: #d8b29b; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1d1e1f; --card: #262829; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #2f3234; --axis: #5f6062;
+  --ghost: #5a5551; --accent: #d8b29b; --land: #4c433e; --land2: #5a5551; --sea: #2f3234; --coin: #b6a392; --coin-hi: #ebdac0; --coin-lo: #67453c; --coin-edge: #2f3133;
+  --t-gu: #8eabc9; --t-si: #abc07b; --t-gun: #dc8c67; --env: #d8b29b; --env-off: #4c433e; --hi-ink: #d8b29b; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--serif); font-weight: 700; letter-spacing: -.02em }
+h1 span { font-family: var(--sans) }
+.ft { font-weight: 700; font-size: 17px }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.yr { background-image: none; font-family: var(--serif); font-size: 26px }
+</style>
+
+<main class="page">
+  <header>
+    <h1>기초연금은 시골 노인이 더 받을까<span>대체로 그렇다. 군 지역 노인은 넷 중 셋이 받는다. 그런데 부산 동구·대구 서구 같은 오래된 도심도 시골만큼 받고, 서초·강남은 넷 중 하나만 받는다. 수급률을 가장 잘 설명하는 것은 "혼자 사는 노인이 얼마나 많은가"다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 18</dd>
+      <dt>한 줄</dt><dd>2026년 9월 65세 이상 1,128만 7,255명 가운데 734만 5,038명(65.1%)이 기초연금을 받는다. 시군구별로는 전남 고흥군 85.2%에서 서울 서초구 23.3%까지 3.7배 차이다. 군 82곳의 중앙값은 76.2%, 광역시 구 69곳은 65.9%다. 하지만 대구 서구(81.7%)·부산 동구(80.7%)는 웬만한 군보다 높고, 경기 양평군(56.8%)은 낮다. 시군구 229곳에서 수급률과 혼자 사는 노인 가구 비율(2024년)의 상관계수는 0.80이다.</dd>
+      <dt>분류</dt><dd>건강·복지·교육</dd>
+      <dt>본능</dt><dd>일반화 본능 · "도시 = 부유, 시골 = 가난"이라는 두 칸으로 노인의 형편을 나눈다</dd>
+      <dt>그림 방식</dt><dd>동전 탑 지도 · 지도를 탁자처럼 눕히고 시군구마다 동전을 쌓았다. 동전 하나가 수급률 5%p다. 2015–2026년을 재생한다. 노인 10명이 받는 기초연금 봉투로 양 끝을 견줬다</dd>
+      <dt>기간</dt><dd>2015년 9월 – 2026년 9월(해마다 9월)</dd>
+      <dt>엮은 데이터</dt><dd>3개 · 한국사회보장정보원 기초연금 인구대비 수급률(월별 시군구) · 통계청 SGIS 65세 이상 1인 가구(2024) · 행정안전부 주민등록 65세 이상 인구(2024)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">서울 서초구에 사는 65세 이상 노인 가운데 기초연금을 받는 사람은? (전국 평균은 65.1%)</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>절반쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>B</i>넷 중 하나쯤</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>열에 하나도 안 된다</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">B. <span class="n">23.3%</span></span>
+      전국에서 가장 낮다. 강남구 24.2%, 과천시 27.8%가 뒤를 잇는다. 가장 높은 전남 고흥군(85.2%)의 3.7분의 1이다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">시군구마다 쌓은 동전</h2>
+      <p>지도를 탁자처럼 눕히고, 시군구마다 그곳 노인의 기초연금 수급률만큼 동전을 쌓았다. 동전 하나가 5%p다. 남해안과 경북 내륙의 탑이 가장 높다(17개 안팎). 서울 한가운데 강남·서초 쪽에는 동전 네댓 개뿐인 낮은 탑이 있다. 그런데 부산과 대구의 원도심에도 군 지역만큼 높은 탑이 서 있다.</p>
+      <p>재생하면 11년 동안 전국 수급률은 65–68% 사이에서 거의 그대로다. 그 사이 부산 기장군(−24.5%p)·인천 연수구(−10.6%p)·세종처럼 새 아파트로 젊은 노인이 들어온 곳의 탑은 낮아졌고, 부산 중구(+8.9%p)·서울 강북구(+7.2%p) 같은 오래된 동네의 탑은 높아졌다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">시군구별 기초연금 수급률</p>
+      <p class="fs">동전 하나 = 65세 이상 인구 중 수급자 5%p(반올림). 땅 색이 짙을수록 수급률이 높다</p>
+      <div class="player" id="p1"></div>
+      <p class="stat" id="st1" aria-live="polite"></p>
+      <div class="chart" id="c1"></div>
+      <figcaption>한국사회보장정보원 「기초연금 인구대비 수급률」(복지로 사회보장통계, 해마다 9월. 2025년은 9월 자료가 비어 8월). 지도는 통계청 SGIS 시군구 경계를 단순화했다. 일반구가 있는 시는 시 전체의 값을 구마다 똑같이 칠했고, 2026년 개편된 인천 중·동·서구 지역은 하나의 값으로 칠했다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">노인 열 명의 봉투</h2>
+      <p>노인 열 명 가운데 기초연금 봉투를 받는 사람을 세었다. 가장 많이 받는 여덟 곳 중 일곱이 전남·경북의 군이지만, 대구 서구가 다섯 번째에 끼어 있다. 가장 적게 받는 여덟 곳은 서울 서초·강남·송파·용산 같은 비싼 동네와 경기 과천시다. 서초구에서는 열 명 중 두세 명만 봉투를 받는다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">노인 10명 가운데 기초연금을 받는 사람, 2026년 9월</p>
+      <p class="fs">봉투 하나 = 65세 이상 노인 1명. 색칠한 봉투 = 기초연금 수급자(소수점은 봉투 일부)</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>한국사회보장정보원 기초연금 인구대비 수급률(2026년 9월).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">시골이냐 도시냐보다, 혼자 사느냐</h2>
+      <p>시군구 229곳을 점으로 찍었다(일반구는 시로 합쳤다). 가로는 65세 이상 인구 대비 혼자 사는 노인 가구의 비율(2024년), 세로는 기초연금 수급률이다. 점이 오른쪽 위로 가지런히 늘어선다(상관계수 0.80). 혼자 사는 노인이 많은 곳일수록 수급률이 높다. 주황(군)이 오른쪽 위에 많지만, 파랑(광역시 구) 가운데 부산·대구 원도심이 그 사이에 섞여 있다. 왼쪽 아래 끝은 서초·강남·과천이다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">혼자 사는 노인 비율과 기초연금 수급률</p>
+      <p class="fs">점 하나 = 시군구 하나. 색 = 군·시·광역시 구</p>
+      <div class="legend"><span><i class="sw dot" style="background:var(--t-gun)"></i>군</span><span><i class="sw dot" style="background:var(--t-si)"></i>시</span><span><i class="sw dot" style="background:var(--t-gu)"></i>광역시·특별시 구</span></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>가로: 통계청 SGIS 65세 이상 1인 가구 ÷ 행정안전부 65세 이상 주민등록 인구(2024년, 질문 4에서 쓴 자료). 세로: 기초연금 수급률(2026년 9월). 가구 수를 사람 수로 나눈 값이라 "혼자 사는 노인의 비율"과 비슷하지만 같지는 않다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">그래서, 기초연금은 시골 노인이 더 받을까</h2>
+      <p>대체로 그렇다. 군의 노인은 넷 중 셋이 받고 광역시 구는 셋 중 둘이 받는다. 그러나 "시골"보다 더 정확한 말은 "혼자 사는 노인이 많고, 집과 재산이 적은 동네"다. 오래된 도심의 노인도 시골 노인만큼 받고, 수도권 근교 군(양평·가평)의 노인은 덜 받는다. 기초연금은 소득과 재산을 따져 아래 70%에게 주므로, 이 지도는 노인의 형편이 어디에 몰려 있는지를 보여 주는 지도이기도 하다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>기초연금은 신청해야 받는다. 받을 수 있는데 신청하지 않은 노인이 있어, 수급률은 형편 그대로가 아니다.</li>
+      <li>수급률은 주소지 기준이다. 자녀 집이나 요양시설로 주소를 옮긴 노인은 옮긴 곳에서 센다.</li>
+      <li>혼자 사는 노인 비율은 2024년 값이고 수급률은 2026년 값이다. 상관관계는 한쪽이 다른 쪽의 원인이라는 뜻이 아니다. 둘 다 동네의 소득·재산·나이 구성과 얽혀 있다.</li>
+      <li>복지로 통계에서 2023년 3월, 2025년 9월, 2026년 1월은 65세 이상 인구가 비어 있어 쓰지 않았다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15048209/fileData.do" target="_blank" rel="noopener">기초연금 인구대비 수급률</a> (15048209, 복지로 사회보장통계 파일)</td><td>한국사회보장정보원</td><td>시군구별 수급자 수, 65세 이상 인구, 수급비율</td><td>2015.9–2026.9</td></tr>
+        <tr><td><a href="https://www.data.go.kr/data/15140446/openapi.do" target="_blank" rel="noopener">SGIS 65세 이상 1인 가구</a> (15140446)</td><td>통계청</td><td>시군구별 65세 이상 1인 가구</td><td>2024</td></tr>
+        <tr><td><a href="https://jumin.mois.go.kr/ageStatMonth.do" target="_blank" rel="noopener">연령별 인구현황</a></td><td>행정안전부</td><td>시군구별 65세 이상 인구</td><td>2024</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>월별 파일 133개 · 시군구 약 230곳 · 지도 조각 250개</dd>
+      <dt>도구</dt><dd>Python(이름 맞추기·집계) · 기울인 SVG 지도와 동전 탑, 봉투, 산점도(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>시군구 수급률 · 군·시·구 중앙값 · 혼자 사는 노인 비율과의 상관계수</dd>
+      <dt>검증</dt><dd>시군구를 모두 더한 수급자 수(734만 5,038명)와 65세 이상 인구(1,128만 7,255명)로 전국 수급률 65.07%를 다시 계산했다. 2018년 남구→미추홀구, 2023년 군위군의 대구 편입, 2026년 전남광주통합·인천 구 개편을 이름 맞추기로 이었다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>기초연금을 받을 수 있는데 안 받는 노인은 얼마나 될까</h3><p>선정기준액과 노인 가구 소득 분포를 견주면 신청하지 않은 노인의 규모를 가늠할 수 있다.</p></div>
+      <div class="q"><h3>새 아파트 동네의 노인은 덜 받을까</h3><p>시군구 안 읍면동의 아파트 비율과 수급률을 견주면 기장·연수·세종의 변화를 설명할 수 있다.</p></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.6</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const Y = DATA.Y, NY = Y.length, U = DATA.U.map(([code, sido, name, d, c, r, h, hp]) => ({ code, sido, name, d, c, r, h, hp }));
+  const METRO = ["서울", "부산", "대구", "인천", "광주", "대전", "울산"];
+  const typ = (u) => u.name.endsWith("군") ? "gun" : METRO.includes(u.sido) ? "gu" : "si";
+  const TN = { gun: "군", si: "시", gu: "광역시 구" };
+  const label = (u) => (u.sido === "세종" ? "세종시" : `${u.sido} ${u.name}`);
+  const at = (u, pos) => { const k = Math.floor(pos), f = pos - k, a = u.r[k], b = u.r[Math.min(NY - 1, k + 1)]; return a == null ? b : b == null ? a : a + (b - a) * f; };
+  const shade = (r) => `color-mix(in oklab, var(--land2) ${Math.round(Math.max(0, Math.min(1, (r - 20) / 65)) * 100)}%, var(--land))`;
+
+  /* ---------- 1. tilted map with coin towers ---------- */
+  let lay1 = null;
+  function build1() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560;
+    // tilt: X = x + k·y, Y = s·y (north stays up, the map leans back like a table top)
+    // fit the tilted map to the land actually drawn (centroid extent plus a margin), not to the whole source canvas
+    // on phones the far islands (옹진·울릉) are left outside the frame so the mainland can be drawn larger and less tilted
+    const fitU = narrow ? U.filter((u) => u.name !== "옹진군" && u.name !== "울릉군") : U;
+    const xs = fitU.map((u) => u.c[0]), ys = fitU.map((u) => u.c[1]), m = 18, x0 = Math.min(...xs) - m, x1 = Math.max(...xs) + m, y0 = Math.min(...ys) - m, y1 = Math.max(...ys) + m;
+    const K = narrow ? .14 : .32, SY = narrow ? .74 : .52, mw = (x1 - x0) + K * (y1 - y0), sc = W / mw, top = narrow ? 64 : 96, H = (y1 - y0) * SY * sc + top + 14;
+    const P = (x, y) => [(x - x0 + K * (y - y0)) * sc, (y - y0) * SY * sc + top];
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "시군구별 기초연금 수급률 동전 탑 지도" }, box), pts = [];
+    const g = s("g", { transform: `matrix(${sc},0,${K * sc},${SY * sc},${(-x0 - K * y0) * sc},${top - y0 * SY * sc})` }, v);
+    const polys = U.map((u) => s("path", { d: u.d, fill: "var(--land)", stroke: "var(--card)", "stroke-width": .6, "vector-effect": "non-scaling-stroke" }, g));
+    (DATA.sidoPaths || []).forEach((sp) => s("path", { d: sp.d, fill: "none", stroke: "var(--axis)", "stroke-width": .9, "vector-effect": "non-scaling-stroke" }, g));
+    const cw = narrow ? 3 : 5.2, ch = narrow ? 1.5 : 2.5, step = narrow ? 2.2 : 3.4;
+    const order = U.map((u, i) => i).sort((a, b) => U[a].c[1] - U[b].c[1]);
+    const towers = order.map((i) => { const u = U[i], [x, y] = P(u.c[0], u.c[1]); const gg = s("g", {}, v); return { u, i, x, y, g: gg }; });
+    towers.forEach((t) => pts.push({ x: t.x, y: t.y - 10, r: 6, fn: () => { const r = at(t.u, lay1.pos); return [label(t.u), [[r == null ? "–" : pc(r), `기초연금 수급률 · ${Y[Math.round(lay1.pos)]}년`], [t.u.r[0] == null ? "–" : pc(t.u.r[0]), "2015년"], [t.u.h == null ? "–" : pc(t.u.h), "혼자 사는 노인 가구 비율(2024)"]]]; } }));
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 시군구를 옮겨 볼 수 있다");
+    lay1 = { W, polys, towers, cw, ch, step, pos: NY - 1 };
+  }
+  function c1(pos, grow = 1) {
+    if (!lay1 || Math.abs(lay1.W - Math.max(300, document.getElementById("c1").clientWidth)) > 1) build1();
+    lay1.pos = pos; const { cw, ch, step } = lay1;
+    U.forEach((u, i) => { const r = at(u, pos); lay1.polys[i].setAttribute("fill", r == null ? "var(--sea)" : shade(r)); });
+    lay1.towers.forEach((t) => {
+      t.g.replaceChildren(); const r = at(t.u, pos); if (r == null) return;
+      const n = Math.max(1, Math.round(r / 5 * grow));
+      for (let k = 0; k < n; k++) { const y = t.y - k * step; s("ellipse", { cx: t.x, cy: y, rx: cw, ry: ch, fill: k === n - 1 ? "var(--coin-hi)" : r >= 75 ? "var(--coin-lo)" : "var(--coin)", stroke: "var(--coin-edge)", "stroke-width": .5 }, t.g); }
+    });
+    const k = Math.min(NY - 1, Math.round(pos)), st = document.getElementById("st1"); st.replaceChildren();
+    st.append(`${Y[k]}년 9월 전국 `, bEl(pc(DATA.nat[k])), " · 가장 높은 곳 ", bEl(top1(k, 1)), " · 가장 낮은 곳 ", bEl(top1(k, -1)));
+  }
+  const top1 = (k, d) => { const us = U.filter((u) => u.r[k] != null).sort((a, b) => d * (b.r[k] - a.r[k])); return `${label(us[0])} ${pc(us[0].r[k])}`; };
+  const p1 = Player("p1", "동전 탑 지도", (p) => c1(p), NY, (i) => String(Y[i]), 11);
+  // the towers grow coin by coin the first time the map scrolls into view
+  if (!reduce) { let done = false; const io = new IntersectionObserver((e) => { if (done || !e.some((x) => x.isIntersecting)) return; done = true; io.disconnect(); const t0 = performance.now(); const step = (now) => { const t = Math.min(1, (now - t0) / 1600); c1(NY - 1, t); if (t < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); }, { threshold: .2 }); io.observe(document.getElementById("c1")); }
+  table("t1", ["시도", "시군구", "2015", "2020", "2026", "변화(%p)"], [...U].filter((u) => u.r[NY - 1] != null).sort((a, b) => b.r[NY - 1] - a.r[NY - 1]).map((u) => [u.sido, u.name, u.r[0] == null ? "–" : f1(u.r[0]), u.r[5] == null ? "–" : f1(u.r[5]), f1(u.r[NY - 1]), u.r[0] == null ? "–" : f1(u.r[NY - 1] - u.r[0])]));
+
+  /* ---------- 2. ten envelopes ---------- */
+  // unique places (일반구 polygons of one city share a value, so keep one per city)
+  const uniq = []; { const seen = new Set(); U.forEach((u) => { const r = u.r[NY - 1]; if (r == null) return; const key = u.sido + r; if (seen.has(key)) return; seen.add(key); uniq.push(u); }); }
+  const HI = [...uniq].sort((a, b) => b.r[NY - 1] - a.r[NY - 1]).slice(0, 8), LO = [...uniq].sort((a, b) => a.r[NY - 1] - b.r[NY - 1]).slice(0, 8);
+  function envelope(g, x, y, w, frac, idx) {
+    const h = w * .66, id = `ev${idx}`;
+    s("rect", { x, y, width: w, height: h, rx: 1.5, fill: "var(--env-off)" }, g);
+    if (frac > 0) { const cp = s("clipPath", { id }, g); s("rect", { x, y, width: w * frac, height: h }, cp); s("rect", { x, y, width: w, height: h, rx: 1.5, fill: "var(--env)", "clip-path": `url(#${id})` }, g); }
+    s("path", { d: `M${x},${y} L${x + w / 2},${y + h * .55} L${x + w},${y}`, fill: "none", stroke: "var(--card)", "stroke-width": 1.2 }, g);
+  }
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), two = W >= 760, colW = two ? (W - 30) / 2 : W, ew = Math.min(two ? 24 : 22, (colW - (two ? 150 : 0)) / 11.5), rowH = two ? 30 : 46;
+    const H = two ? 30 + 8 * rowH : 2 * (30 + 8 * rowH) + 16;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "노인 10명 가운데 기초연금을 받는 사람, 높은 곳과 낮은 곳 8곳씩" }, box), pts = [];
+    let n = 0;
+    [["가장 많이 받는 곳", HI, 0, 0], ["가장 적게 받는 곳", LO, two ? colW + 30 : 0, two ? 0 : 30 + 8 * rowH + 16]].forEach(([title, list, ox, oy]) => {
+      tx(v, ox, oy + 16, title, "vl", 14, "start");
+      list.forEach((u, i) => {
+        const y = oy + 30 + i * rowH, r = u.r[NY - 1], lx = two ? ox + 150 : ox;
+        tx(v, ox, y + (two ? ew * .5 : 12), label(u), "lb", 12.5, "start");
+        if (!two) tx(v, colW, y + 12, pc(r), "vl", 12.5, "end", { style: "fill:var(--hi-ink)" });
+        const ey = two ? y : y + 18;
+        for (let k = 0; k < 10; k++) envelope(v, lx + k * ew * 1.12, ey, ew, Math.max(0, Math.min(1, r / 10 - k)), n++);
+        if (two) tx(v, lx + 10 * ew * 1.12 + 6, y + ew * .5, pc(r), "vl", 12.5, "start", { style: "fill:var(--hi-ink)" });
+        pts.push({ x: lx + 5 * ew * 1.12, y: ey + ew * .33, r: ew * 5, fn: () => [label(u), [[pc(r), "기초연금 수급률"], [`${f1(r / 10)}명`, "노인 10명 중"]]] });
+      });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 시군구를 옮겨 볼 수 있다");
+  }
+  table("t2", ["순위", "많이 받는 곳", "수급률", "적게 받는 곳", "수급률"], HI.map((u, i) => [i + 1, label(u), pc(u.r[NY - 1]), label(LO[i]), pc(LO[i].r[NY - 1])]));
+
+  /* ---------- 3. scatter vs living alone ---------- */
+  const PLACES = (() => { const m = new Map(); U.forEach((u) => { if (u.r[NY - 1] == null) return; const cm = u.name.match(/^(.+?시)(.+구)$/); const key = u.sido + "|" + (cm && !METRO.includes(u.sido) ? cm[1] : u.name); const g = m.get(key) || { ...u, name: cm && !METRO.includes(u.sido) ? cm[1] : u.name, hh: 0, pp: 0 }; g.hh += u.hp[0]; g.pp += u.hp[1]; m.set(key, g); }); return [...m.values()].map((g) => ({ ...g, h: g.hh / g.pp * 100 })); })();
+  let shown3 = false;
+  function c3() {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), H = Math.min(460, Math.max(320, W * .6)), l = 40, r = 12, top = 14, bot = 34;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "혼자 사는 노인 가구 비율과 기초연금 수급률" }, box), pts = [];
+    const sx = (p) => l + (p - 10) / 30 * (W - l - r), sy = (p) => top + (1 - (p - 20) / 70) * (H - top - bot);
+    [10, 20, 30, 40].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top, y2: H - bot, class: "gl" }, v); tx(v, sx(t), H - bot + 16, `${t}%`, "tk", 11.5, "middle"); });
+    [20, 40, 60, 80].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: "gl" }, v); tx(v, l - 6, sy(t) + 4, `${t}%`, "tk", 11.5, "end"); });
+    tx(v, W - r, H - 4, "혼자 사는 노인 가구 비율 →", "mt", 12, "end"); tx(v, l + 4, top + 12, "↑ 기초연금 수급률", "mt", 12, "start");
+    // one point per place: the 일반구 of a city share the city's pension rate, so their households and older people are summed
+    const D = PLACES;
+    const dots = D.map((u) => { const c = s("circle", { cx: sx(u.h), cy: sy(u.r[NY - 1]), r: 3.6, fill: `var(--t-${typ(u)})`, "fill-opacity": .8, stroke: "var(--card)", "stroke-width": .8 }, v); pts.push({ x: sx(u.h), y: sy(u.r[NY - 1]), r: 3.6, fn: () => [label(u), [[pc(u.r[NY - 1]), "기초연금 수급률(2026.9)"], [pc(u.h), "혼자 사는 노인 가구 비율(2024)"], [TN[typ(u)], ""]]] }); return c; });
+    const LAB = ["서초구", "강남구", "과천시", "고흥군", "양평군"], labs = s("g", {}, v);
+    D.filter((u) => LAB.includes(u.name) || (u.sido === "대구" && u.name === "서구") || (u.sido === "부산" && u.name === "동구")).forEach((u) => { const right = sx(u.h) < W * .75; tx(labs, sx(u.h) + (right ? 6 : -6), sy(u.r[NY - 1]) + 4, label(u), "lb halo", 12, right ? "start" : "end", { "stroke-width": 4 }); });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 시군구를 하나씩 옮겨 볼 수 있다");
+    if (!shown3 && !reduce) {
+      labs.setAttribute("opacity", 0); dots.forEach((c) => { c.dataset.y = c.getAttribute("cy"); c.setAttribute("cy", H - bot); });
+      const io = new IntersectionObserver((e) => { if (!e.some((x) => x.isIntersecting)) return; io.disconnect(); shown3 = true; const t0 = performance.now(); const step = (now) => { let done = true; dots.forEach((c, i) => { const t = Math.min(1, Math.max(0, (now - t0 - i * 4) / 700)); if (t < 1) done = false; const e2 = 1 - Math.pow(1 - t, 3); c.setAttribute("cy", (H - bot) + (c.dataset.y - (H - bot)) * e2); }); if (done) labs.setAttribute("opacity", 1); else requestAnimationFrame(step); }; requestAnimationFrame(step); }, { threshold: .3 });
+      io.observe(box);
+    }
+  }
+  table("t3", ["시군구", "구분", "혼자 사는 노인 가구 비율(2024)", "수급률(2026.9)"], [...PLACES].sort((a, b) => b.h - a.h).map((u) => [label(u), TN[typ(u)], pc(u.h), pc(u.r[NY - 1])]));
+
+  const all = () => { p1.render(); c2(); c3(); };
+  all(); onResize(all);
+})();
+</script>

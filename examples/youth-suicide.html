@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>한국은 청년 자살이 가장 심할까</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one agenda page of a quiet data catalog. Meta sheet, a quiz, then claim sections; each chart sits on its own
+   "stage" card with source + table view. The signature figure lines up 38 OECD countries per age band. */
+:root {
+  --bg: #fafafa; --card: #ffffff; --fg: #0b0b0c; --fg2: #3f3f45; --muted: #6b6b70; --line: #e3e3e6; --line2: #c9c9ce;
+  --grid: #ececef; --axis: #c3c3c8;
+  --youth: #2a78d6; --elder: #eb6834; --mid: #a3a3aa; --dot: #b9b9c0; --oecd: #6b6b70; --jpn: #9a9aa2; --kr: #0b0b0c;
+  --care: #f0f0f2;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0c0c0d; --card: #131315; --fg: #f2f2f3; --fg2: #c9c9ce; --muted: #9a9aa2; --line: #232326; --line2: #3a3a3f;
+  --grid: #1f1f22; --axis: #3a3a3f;
+  --youth: #3987e5; --elder: #d95926; --mid: #6a6a72; --dot: #55555c; --oecd: #a9a9b0; --jpn: #7a7a82; --kr: #f2f2f3;
+  --care: #1a1a1d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0c0c0d; --card: #131315; --fg: #f2f2f3; --fg2: #c9c9ce; --muted: #9a9aa2; --line: #232326; --line2: #3a3a3f;
+  --grid: #1f1f22; --axis: #3a3a3f;
+  --youth: #3987e5; --elder: #d95926; --mid: #6a6a72; --dot: #55555c; --oecd: #a9a9b0; --jpn: #7a7a82; --kr: #f2f2f3;
+  --care: #1a1a1d; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font: 16px/1.75 var(--sans); letter-spacing: -0.005em; word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 36px 80px }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--line2) }
+a:hover { text-decoration-color: currentColor }
+:focus-visible { outline: 2px solid var(--youth); outline-offset: 2px }
+.page { max-width: 960px; margin: 0 auto; display: grid; gap: 64px }
+.prose { max-width: 660px; display: grid; gap: 16px; min-width: 0 }
+.prose p { margin: 0 }
+.label { font: 500 11px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 }
+.n { font-weight: 600; font-variant-numeric: tabular-nums }
+b { font-weight: 600 }
+
+/* head */
+header { display: grid; gap: 22px }
+.agno { display: flex; gap: 12px; align-items: baseline }
+h1 { font-weight: 700; font-size: clamp(30px, 5.4vw, 48px); line-height: 1.22; margin: 0; text-wrap: balance; letter-spacing: -.02em }
+h1 span { display: block; color: var(--muted); font-weight: 500; font-size: .6em; line-height: 1.4; margin-top: 10px; letter-spacing: -.01em }
+.sheet { display: grid; grid-template-columns: 110px minmax(0, 1fr); border-top: 1px solid var(--fg); font-size: 14.5px; margin: 0 }
+.sheet dt, .sheet dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line) }
+.sheet dt { font: 500 11px/2.2 var(--mono); letter-spacing: .08em; color: var(--muted) }
+.sheet dd { color: var(--fg2) }
+.care { background: var(--care); border-radius: 8px; padding: 12px 16px; font-size: 14px; color: var(--fg2) }
+.care b { color: var(--fg) }
+
+/* quiz */
+.quiz { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 22px; display: grid; gap: 14px }
+.quiz h2 { font-size: 19px; line-height: 1.5; margin: 0; font-weight: 600; text-wrap: balance }
+.opts { display: grid; gap: 8px }
+.opt { display: flex; gap: 12px; align-items: center; text-align: left; font: inherit; font-size: 15px; color: var(--fg); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; cursor: pointer }
+.opt:hover { border-color: var(--line2) }
+.opt i { font: 500 12px var(--mono); color: var(--muted); font-style: normal; width: 14px }
+.opt[data-state="right"] { border-color: var(--fg); box-shadow: inset 0 0 0 1px var(--fg) }
+.opt[data-state="wrong"] { opacity: .5 }
+.opt .r { margin-left: auto; font: 500 12px var(--mono); color: var(--muted) }
+.reveal { font-size: 15px; color: var(--fg2); border-top: 1px solid var(--line); padding-top: 14px }
+.reveal .big { font-size: 28px; font-weight: 700; color: var(--fg); display: block; line-height: 1.3 }
+
+/* sections */
+section.s { display: grid; gap: 22px }
+h2.h { font-size: clamp(22px, 3.2vw, 28px); line-height: 1.35; margin: 2px 0 0; font-weight: 700; letter-spacing: -.015em; text-wrap: balance }
+.note { border-left: 1px solid var(--fg); padding: 2px 0 2px 16px; color: var(--fg2); font-size: 15px }
+
+/* stage */
+figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: grid; gap: 12px; position: relative; min-width: 0 }
+.ft { font-weight: 600; font-size: 15.5px; margin: 0; line-height: 1.5 }
+.fs { font-size: 13px; color: var(--muted); margin: -8px 0 0; line-height: 1.6 }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--fg2) }
+.legend span { display: inline-flex; align-items: center; gap: 6px }
+.sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block }
+.sw.dot { border-radius: 50% }
+.sw.line { height: 2px; width: 14px; border-radius: 1px }
+.chart { width: 100%; min-width: 0 }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible }
+figcaption { font-size: 12px; color: var(--muted); line-height: 1.65; border-top: 1px solid var(--grid); padding-top: 10px }
+details { font-size: 13px }
+summary { cursor: pointer; color: var(--fg2); width: max-content; font: 500 12px/2 var(--mono); letter-spacing: .06em; padding: 6px 0 }
+.tw { overflow-x: auto; margin-top: 6px; max-height: 360px }
+table { border-collapse: collapse; font-size: 12.5px; min-width: 100% }
+th, td { padding: 5px 10px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums }
+th:first-child, td:first-child { text-align: left }
+th { font-weight: 600; color: var(--fg2); position: sticky; top: 0; background: var(--card) }
+.multi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 22px }
+@media (max-width: 600px) { .multi { grid-template-columns: minmax(0, 1fr) } }
+.multi .p { display: grid; gap: 2px; min-width: 0 }
+.multi .pt { font-size: 13.5px; font-weight: 600 }
+
+/* svg text */
+.tk { fill: var(--muted); font: 12px var(--mono); font-variant-numeric: tabular-nums }
+.lb { fill: var(--fg); font: 13px var(--sans) }
+.vl { fill: var(--fg); font: 600 12.5px var(--sans); font-variant-numeric: tabular-nums }
+.mt { fill: var(--muted); font: 11.5px var(--sans) }
+.hd { fill: var(--fg2); font: 600 12px var(--sans) }
+.gl { stroke: var(--grid); stroke-width: 1 }
+.ax { stroke: var(--axis); stroke-width: 1 }
+.hit { fill: transparent }
+.hit:focus { outline: none }
+.hit:focus-visible { stroke: var(--fg); stroke-width: 2 }
+svg[tabindex]:focus { outline: none }
+.chart:has(svg[tabindex]:focus-visible) { outline: 2px solid var(--youth); outline-offset: 4px; border-radius: 4px }
+.ring { fill: none; stroke: var(--fg); stroke-width: 2; pointer-events: none }
+.hl { fill: var(--fg); opacity: 0 }
+.hl.on { opacity: .045 }
+.tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--line2); border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.12); padding: 8px 10px; font-size: 12.5px; line-height: 1.5; min-width: 140px; max-width: 240px; z-index: 3 }
+.tip .tn { color: var(--muted) }
+.tip .tr { display: flex; align-items: center; gap: 6px; color: var(--fg2) }
+.tip .tr i { width: 12px; height: 2px; border-radius: 1px; display: inline-block; flex: none }
+.tip .tv { font-weight: 600; font-size: 14px; color: var(--fg) }
+
+/* end matter */
+.hope { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; display: grid; gap: 8px; font-size: 15.5px }
+ul.care-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; color: var(--fg2) }
+.dt { overflow-x: auto; border-top: 1px solid var(--fg) }
+.dt table { font-size: 13px }
+.dt td, .dt th { white-space: normal; text-align: left; vertical-align: top; padding: 8px 10px 8px 0 }
+.dt th { position: static }
+.method { display: grid; grid-template-columns: 110px minmax(0, 1fr); font-size: 14px; border-top: 1px solid var(--fg); margin: 0 }
+.method dt, .method dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--line) }
+.method dt { font: 500 11px/2.2 var(--mono); letter-spacing: .08em; color: var(--muted) }
+.method dd { color: var(--fg2) }
+.next { display: grid; border-top: 1px solid var(--fg) }
+.q { padding: 14px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px }
+.q h3 { font-size: 16px; margin: 0; font-weight: 600 }
+.q p { margin: 0; font-size: 14px; color: var(--fg2) }
+.q ul { margin: 0; padding-left: 18px; font-size: 13.5px }
+.q .ty { font: 11px var(--mono); color: var(--muted); margin-left: 6px }
+footer { font-size: 12.5px; color: var(--muted); display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 16px }
+@media (max-width: 560px) { .sheet, .method { grid-template-columns: 84px minmax(0, 1fr) } }
+</style>
+
+<main class="page">
+  <header>
+    <h1>한국은 청년 자살이 가장 심할까<span>노인이 더 높지만, 25년 사이 두 배가 된 쪽은 청년이다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 01</dd>
+      <dt>한 줄</dt><dd>한국 20대 자살률은 OECD 38개국 중 1위지만 2위 일본과 8% 차이다. 80세 이상은 OECD 평균의 3.1배로 격차가 훨씬 크다. 다만 80세 이상은 2005년 정점의 절반 아래로 내려왔고, 20대는 2000년의 1.9배가 됐다.</dd>
+      <dt>분류</dt><dd>건강·복지</dd>
+      <dt>본능</dt><dd>크기 본능 · "사망 원인 1위"라는 비중을 위험의 크기로 착각한다</dd>
+      <dt>그림 방식</dt><dd>38개국 줄 세우기 · 연령대마다 OECD 38개국을 한 줄에 세워 한국이 몇 번째에, 얼마나 떨어져 서는지 본다</dd>
+      <dt>기간</dt><dd>2000–2025</dd>
+      <dt>엮은 데이터</dt><dd>4개 · 사망원인통계(국가데이터처) · WHO 사망 데이터베이스 · OECD 인구 통계 · OECD 노인 소득빈곤</dd>
+    </dl>
+    <div class="care">이 글은 자살 통계를 다룬다. 혼자 견디기 힘들다면 <b>자살예방상담전화 109</b>(24시간)에서 이야기할 수 있다.</div>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2025년 20대 사망자의 53.5%는 자살이었다. 그렇다면 인구 10만 명당 자살률이 가장 높은 연령대는?</h2>
+    <div class="opts" id="opts">
+      <button class="opt" type="button" aria-pressed="false" data-k="20대"><i>A</i>20대<span class="r"></span></button>
+      <button class="opt" type="button" aria-pressed="false" data-k="40대"><i>B</i>40대<span class="r"></span></button>
+      <button class="opt" type="button" aria-pressed="false" data-k="80세 이상"><i>C</i>80세 이상<span class="r"></span></button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. 80세 이상, <span class="n">52.6</span>명</span>
+      20대는 <span class="n">20.8</span>명, 40대는 <span class="n">34.3</span>명이다. 20대 사망의 절반이 자살인 것은 젊은 층이 다른 이유로 숨지는 일이 드물기 때문이다. 80세 이상에서 자살은 사망의 <span class="n">0.7%</span>에 불과하지만, 인구 대비로는 20대의 <span class="n">2.5</span>배다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">"사망 원인 1위"와 "가장 위험한 연령"은 다른 말이다</h2>
+      <p>그 연령에서 숨진 사람 중 몇 %가 자살인지(비중)와, 그 연령 인구 10만 명 중 몇 명이 자살로 숨지는지(비율)는 거꾸로 움직인다. 비중은 20대에서 가장 크고, 비율은 80세 이상에서 가장 크다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">연령별 자살: 사망 중 비중과 인구 대비 비율, 2025년</p>
+      <p class="fs">왼쪽 막대는 그 연령 사망자 중 자살의 비중(%), 오른쪽 막대는 인구 10만 명당 자살 사망자 수</p>
+      <div class="legend" aria-hidden="true"><span><i class="sw" style="background:var(--youth)"></i>청년층 10~30대</span><span><i class="sw" style="background:var(--mid)"></i>중장년 40~50대</span><span><i class="sw" style="background:var(--elder)"></i>노년층 60대 이상</span></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>국가데이터처 「2025년 사망원인통계」 표 12(성·연령별 자살률), 그림 4(연령별 5대 사망원인 구성비). 70대와 80세 이상의 비중은 5대 사인에 자살이 없어, 같은 그림의 암 사망률과 구성비로 연령 전체 사망률을 역산해 계산했다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">20대도 1위다. 다만 바로 뒤에 일본이 있다</h2>
+      <p>WHO 사망 데이터베이스 원자료로 OECD 38개국의 연령대별 자살률을 같은 방식으로 계산했다. 한국은 20대부터 80세 이상까지 모든 연령대에서 1위, 10대는 뉴질랜드에 이어 2위다.</p>
+      <p>줄을 세우면 간격이 다르게 보인다. 20대 한국(<span class="n">22.2</span>명)은 2위 일본(<span class="n">20.6</span>명), 3위 뉴질랜드(<span class="n">20.0</span>명)와 붙어 있다. 80세 이상 한국(<span class="n">59.4</span>명)은 2위 오스트리아(<span class="n">47.0</span>명)보다 27% 높고, OECD 평균(<span class="n">19.4</span>명)의 <span class="n">3.1</span>배다. 20대는 평균의 <span class="n">2.1</span>배다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">연령대별 자살률, OECD 38개국</p>
+      <p class="fs">인구 10만 명당. 점 하나가 한 나라, 나라별 최신 연도(한국 2023년). 세로 막대는 38개국 평균</p>
+      <div class="legend" aria-hidden="true"><span><i class="sw dot" style="background:var(--youth)"></i><i class="sw dot" style="background:var(--mid);margin-left:-3px"></i><i class="sw dot" style="background:var(--elder);margin-left:-3px"></i>한국</span><span><i class="sw dot" style="background:var(--dot)"></i>다른 OECD 국가</span><span><i class="sw" style="background:var(--oecd);width:2px;height:12px;border-radius:0"></i>38개국 평균</span></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>WHO Mortality Database 원자료(ICD-10 X60–X84 사망자 수, 2026년 2월 갱신본)를 나라별 인구로 나눠 계산. 미국·캐나다·칠레·멕시코·콜롬비아·에스토니아는 WHO 인구 자료가 없어 OECD 인구 통계(DF_POP_HIST)를 썼다. 최신 연도가 2021년 이전인 나라: 노르웨이 2016, 포르투갈 2018, 코스타리카·스위스 2019, 독일·뉴질랜드 2020.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">노인은 2000년 수준으로 돌아왔고, 청년은 두 배가 됐다</h2>
+      <p>80세 이상 자살률은 2000년 <span class="n">51.8</span>명에서 2005년 <span class="n">128.1</span>명까지 치솟았다가 2025년 <span class="n">52.6</span>명으로 내려왔다. 정점에서 59% 줄어 2000년과 거의 같은 수준이다. 반대로 20대는 <span class="n">11.2</span>명에서 <span class="n">20.8</span>명으로 1.9배, 10대는 <span class="n">3.8</span>명에서 <span class="n">8.6</span>명으로 2.3배가 됐다. 2025년에 자살률이 오른 연령대는 10대뿐이다.</p>
+      <p>일본과 나란히 놓으면 차이가 분명하다. 일본도 노인 자살률이 크게 줄었지만 2000년보다 낮은 수준까지 내려갔고, 청년층은 한국과 비슷한 높이에 있다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">한국과 일본의 연령대별 자살률, 2000–2025년</p>
+      <p class="fs">인구 10만 명당. 칸마다 세로 눈금이 다르다(청년층은 0–30, 노년층은 0–140)</p>
+      <div class="legend" aria-hidden="true"><span><i class="sw line" style="background:var(--youth)"></i><i class="sw line" style="background:var(--elder)"></i>한국</span><span><i class="sw line" style="background:var(--jpn)"></i>일본</span></div>
+      <div class="multi" id="c3"></div>
+      <figcaption>2000–2023년: WHO Mortality Database 원자료로 계산(한국 값은 국가데이터처 발표치와 소수 첫째 자리까지 일치). 2024–2025년 한국: 국가데이터처 「2025년 사망원인통계」 표 12. 일본은 2023년까지.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">노인 빈곤으로 나라 사이의 차이를 설명할 수 있을까</h2>
+      <p>한국의 76세 이상 상대빈곤율은 <span class="n">54.0%</span>로 OECD 평균(<span class="n">17.2%</span>)의 3배가 넘는다. 노인 빈곤도, 노인 자살도 1위라서 둘을 묶고 싶어진다. 38개국을 한 그림에 놓고 확인했다.</p>
+      <p>결과는 약하다. 76세 이상 빈곤율과 80세 이상 자살률의 상관계수는 <span class="n">0.29</span>, 한국을 빼면 <span class="n">0.05</span>다. 에스토니아와 뉴질랜드는 76세 이상 빈곤율이 45% 안팎으로 한국에 가깝지만, 80세 이상 자살률은 20.2명, 10.8명으로 OECD 평균(19.4명) 근처이거나 그 아래다. 오스트리아·헝가리·슬로베니아는 빈곤율이 15%를 밑돌지만 자살률은 40명대다. 한국만 오른쪽 위에 혼자 떨어져 있다.</p>
+    </div>
+    <figure id="f4">
+      <p class="ft">76세 이상 빈곤율과 80세 이상 자살률, OECD 38개국</p>
+      <p class="fs">가로: 76세 이상 상대빈곤율(처분가능소득 중위 50% 이하). 세로: 80세 이상 자살률(인구 10만 명당)</p>
+      <div class="chart" id="c4"></div>
+      <figcaption>빈곤율: OECD 「연금 한눈에 보기」 노인 소득·빈곤 자료(DF_IPOP, 나라별 최신 연도, 대부분 2022년). 자살률: 위와 같은 WHO 원자료 계산.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t4"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+    <div class="prose">
+      <p class="note">나라 단위에서 빈곤이 노인 자살을 설명하지 못한다고 해서, 한국 안에서 가난한 노인이 더 위험하지 않다는 뜻은 아니다. 그건 개인이나 지역 단위 자료로 따로 확인해야 하는 질문이다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <div class="prose">
+      <h2 class="h" id="s5">나이 구성을 맞춰도 1위, 2위와 6.7명 차이</h2>
+      <p>나라마다 노인 비율이 달라 국제 비교에는 OECD 표준인구로 맞춘 연령표준화 자살률을 쓴다. 한국은 <span class="n">24.8</span>명으로 38개국 평균 <span class="n">10.9</span>명의 2.3배다.</p>
+    </div>
+    <figure id="f5">
+      <p class="ft">연령표준화 자살률 상위 6개국과 38개국 평균</p>
+      <p class="fs">OECD 표준인구 10만 명당, 나라별 최신 연도(한국 2023년)</p>
+      <div class="chart" id="c5"></div>
+      <figcaption>OECD Health Statistics, 사망 원인(DF_COM, Intentional self-harm, 표준화율). 평균은 38개국 최신 값의 단순 평균으로 계산했고, 국가데이터처 발표의 OECD 평균 10.9명과 같다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t5"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <div class="prose">
+      <h2 class="h" id="s6">청년 자살은 심하다. 노인 자살은 더 심하다. 움직이는 방향은 반대다</h2>
+      <p>"한국은 청년 자살이 심하다"는 맞다. 20대는 OECD 평균의 2배이고 38개국 중 1위다. 하지만 "가장 심하다"면 그 자리는 80세 이상이다. 인구 대비 비율도, OECD 평균 대비 배수도 노인 쪽이 크다. 그리고 지금 나빠지고 있는 것은 청년이다. 노인 자살률이 정점의 절반 아래로 내려오는 동안 10대와 20대는 2000년의 두 배가 됐다.</p>
+      <p>노인 빈곤은 OECD 최고 수준이지만, 나라 사이의 노인 자살 차이를 설명해 주지는 않았다.</p>
+    </div>
+    <div class="hope">
+      <p class="label">좋아지려면</p>
+      <p style="margin:0">줄어든 적이 있다. 80세 이상 자살률은 2005년 <b>128.1명</b>에서 2025년 <b>52.6명</b>으로, 70대는 2011년 <b>84.4명</b>에서 <b>32.9명</b>으로 내려왔다. 같은 크기의 변화가 10대와 20대에서도 가능한지, 무엇이 노인 자살률을 낮췄는지가 다음 질문이다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:20px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>국제 비교는 나라마다 최신 연도가 다르다(2016–2024년). 한국은 2023년 값으로 비교했고, 2025년 한국 값(20대 20.8명, 80세 이상 52.6명)은 그보다 조금 낮다.</li>
+      <li>WHO 원자료는 나라마다 사망 신고와 사인 분류의 정확도가 다르다. 일부 나라는 자살이 사인 미상이나 사고로 분류돼 실제보다 적게 잡힐 수 있다.</li>
+      <li>38개국 평균은 나라마다 같은 무게를 준 단순 평균이다. 인구가 큰 나라의 영향이 커지는 가중 평균과는 다르다.</li>
+      <li>빈곤율은 76세 이상, 자살률은 80세 이상으로 연령 구간이 다르다. 상관계수는 나라 단위 상관일 뿐 원인 관계를 말하지 않는다.</li>
+      <li>이 페이지는 자살 보도 권고기준에 따라 방법이나 장소를 다루지 않는다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:20px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://mods.go.kr/boardDownload.es?bid=218&amp;list_no=447102&amp;seq=1" target="_blank" rel="noopener">2025년 사망원인통계 보도자료</a></td><td>국가데이터처</td><td>표 12 성·연령별 자살률, 그림 4 연령별 사망원인 구성비</td><td>2015, 2024–2025</td></tr>
+        <tr><td><a href="https://www.who.int/data/data-collection-tools/who-mortality-database" target="_blank" rel="noopener">WHO Mortality Database 원자료</a></td><td>WHO</td><td>ICD-10 X60–X84 연령·성별 사망자 수, 인구</td><td>2000–2024</td></tr>
+        <tr><td><a href="https://data-explorer.oecd.org/" target="_blank" rel="noopener">Historical population data (DF_POP_HIST)</a></td><td>OECD</td><td>WHO 인구가 없는 6개국의 5세 단위 인구</td><td>2021–2024</td></tr>
+        <tr><td><a href="https://data-explorer.oecd.org/" target="_blank" rel="noopener">Income and poverty of older people (DF_IPOP)</a></td><td>OECD</td><td>66세 이상·66–75세·76세 이상 상대빈곤율</td><td>2014–2022</td></tr>
+        <tr><td><a href="https://data-explorer.oecd.org/" target="_blank" rel="noopener">Causes of mortality (DF_COM)</a></td><td>OECD</td><td>자살 연령표준화 사망률</td><td>2016–2024</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s9">
+    <h2 class="h" id="s9" style="font-size:20px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>5개 표 · 국가데이터처, WHO, OECD · 2000–2025</dd>
+      <dt>도구</dt><dd>Python(원자료 계산) · OECD SDMX API · SVG 그림(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>연령대별 비율 계산 · 국가 간 순위와 배수 · 시계열 비교 · 국가 단위 상관</dd>
+      <dt>검증</dt><dd>WHO 원자료로 계산한 한국 값을 국가데이터처 발표와 대조했다. 2015년 8개 연령대, 2023년 연령대별 값과 2010년 80세 이상 123.3명이 모두 소수 첫째 자리까지 일치했다. 38개국 연령표준화 평균 10.9명도 국가데이터처 발표와 같다.</dd>
+      <dt>역할</dt><dd>질문과 방향은 사람이 정했다. 자료 찾기, 계산, 그림 코드, 본문 초안은 Claude가 맡았다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s10">
+    <h2 class="h" id="s10" style="font-size:20px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>10대 자살률 상승은 누구에게서 일어나고 있나</h3><p>2025년 10대 자살률은 여자(9.4명)가 남자(8.0명)보다 높다. 20대 이상은 모두 남자가 높다. 성별·지역별로 나눠 본다.</p></div>
+      <div class="q"><h3>노인 빈곤이 심한 지역일수록 노인 자살도 많을까</h3><p>나라 단위에서 약했던 관계를 시군구 단위로 다시 본다.</p>
+        <ul>
+          <li><a href="https://www.data.go.kr/data/15149448/openapi.do" target="_blank" rel="noopener">생활안전지도 자살발생통계</a><span class="ty">API · 행정안전부</span></li>
+          <li><a href="https://www.data.go.kr/data/15048209/fileData.do" target="_blank" rel="noopener">기초연금 인구대비 수급률(월간)</a><span class="ty">파일 · 한국사회보장정보원</span></li>
+          <li><a href="https://www.data.go.kr/data/15127847/fileData.do" target="_blank" rel="noopener">독거노인 수_연령별_시도별</a><span class="ty">파일 · 보건복지부</span></li>
+        </ul></div>
+      <div class="q"><h3>도움을 구하는 사람은 자살률을 따라 늘었나</h3>
+        <ul><li><a href="https://www.data.go.kr/data/15126375/fileData.do" target="_blank" rel="noopener">자살예방상담전화 전화상담 건수</a><span class="ty">파일 · 보건복지부</span></li></ul></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>자살예방상담전화 <b>109</b> · 24시간, 무료</span>
+    <span>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.2</span>
+  </footer>
+</main>
+
+<script>
+const DATA = {"kostat":{"r2015":[4.2,16.4,25.1,29.9,34.3,36.9,62.5,83.7],"r2024":[8.0,22.5,30.4,36.2,36.5,31.9,35.6,53.3],"r2025":[8.6,20.8,28.2,34.3,35.6,29.0,32.9,52.6],"share2025":[51.2,53.5,42.3,25.4,12.3,4.7,1.97,0.65],"rank2025":["1위","1위","1위","1위","2위","4위",null,null]},"kor":{"2000":[3.8,11.2,15.2,19.1,22.3,26.1,39.5,51.8],"2001":[3.4,11.2,15.5,18.5,23.9,30.7,44.4,62.8],"2002":[3.5,12.6,18.6,22.6,28.3,35.6,60.3,96.7],"2003":[4.5,15.3,22.0,28.2,34.9,48.7,72.4,114.4],"2004":[3.8,14.1,20.7,29.6,38.2,51.6,82.0,125.5],"2005":[4.3,17.9,21.8,28.4,34.7,54.6,80.5,128.1],"2006":[3.5,14.0,17.0,25.0,33.6,47.0,74.2,114.1],"2007":[4.6,21.3,22.5,26.5,31.3,47.9,78.7,118.2],"2008":[4.6,22.6,24.7,28.4,32.9,47.2,72.0,112.9],"2009":[6.5,25.3,31.4,32.8,41.1,51.8,79.0,127.7],"2010":[5.2,24.4,29.6,34.1,40.1,52.7,83.5,123.3],"2011":[5.5,24.3,30.5,34.0,41.2,50.1,84.4,116.9],"2012":[5.1,19.5,27.3,30.9,35.3,42.4,73.1,104.5],"2013":[4.9,18.0,28.4,32.7,38.1,40.7,66.9,94.7],"2014":[4.5,17.8,27.9,32.4,36.4,37.5,57.6,78.6],"2015":[4.2,16.4,25.1,29.9,34.3,36.9,62.5,83.7],"2016":[4.9,16.4,24.6,29.6,32.5,34.6,54.0,78.1],"2017":[4.7,16.4,24.5,27.9,30.8,30.2,48.8,70.0],"2018":[5.8,17.6,27.5,31.5,33.4,32.9,48.9,69.8],"2019":[5.9,19.2,26.9,31.0,33.3,33.7,46.2,67.4],"2020":[6.5,21.7,27.1,29.2,30.5,30.1,38.8,62.6],"2021":[7.1,23.5,27.3,28.2,30.1,28.4,41.8,61.3],"2022":[7.2,21.4,25.3,28.9,29.0,27.0,37.8,60.6],"2023":[7.9,22.2,26.4,31.6,32.5,30.7,39.0,59.4],"2024":[8.0,22.5,30.4,36.2,36.5,31.9,35.6,53.3],"2025":[8.6,20.8,28.2,34.3,35.6,29.0,32.9,52.6]},"jpn":{"2000":[3.9,17.1,20.8,27.4,41.1,35.9,30.7,43.8],"2001":[4.0,16.5,19.9,27.2,39.0,34.6,30.0,40.8],"2002":[3.4,16.3,20.8,28.6,41.4,35.0,28.1,37.6],"2003":[4.4,18.6,23.9,32.5,42.1,36.1,28.7,36.0],"2004":[4.3,18.8,22.3,30.4,38.8,32.3,27.9,34.6],"2005":[4.4,20.7,23.7,31.3,37.6,31.5,27.4,32.4],"2006":[4.7,21.3,22.5,30.2,35.6,31.2,28.1,31.2],"2007":[4.1,20.8,23.9,30.5,36.0,33.0,29.5,33.0],"2008":[4.7,22.4,24.8,29.4,34.3,31.8,27.8,29.9],"2009":[4.3,23.0,25.0,30.3,36.4,31.5,27.6,28.7],"2010":[4.3,22.3,23.8,28.8,34.2,30.4,26.6,27.7],"2011":[4.9,23.5,24.1,28.0,32.1,28.4,26.4,27.2],"2012":[5.0,22.2,21.2,25.2,28.6,25.8,25.5,25.7],"2013":[4.7,21.1,21.9,24.6,27.9,24.5,26.2,26.1],"2014":[4.6,20.9,20.8,22.6,26.3,22.9,23.7,24.3],"2015":[4.6,18.8,19.3,21.6,24.8,21.1,23.6,23.7],"2016":[4.4,18.0,18.0,19.4,23.2,18.7,20.5,20.7],"2017":[5.0,17.6,18.2,18.8,22.4,18.1,19.3,20.2],"2018":[5.4,17.7,17.8,18.4,21.6,17.3,18.9,19.7],"2019":[5.9,17.2,17.6,18.3,20.6,17.2,17.8,18.3],"2020":[7.0,20.4,18.5,19.1,20.3,17.3,17.8,19.1],"2021":[7.0,21.3,18.6,19.8,20.9,16.5,17.7,18.0],"2022":[7.3,20.4,18.9,21.0,23.1,18.2,17.9,19.7],"2023":[7.3,20.6,19.7,21.3,23.1,18.2,17.1,18.3]},"countries":[{"iso":"AUS","ko":"호주","year":2024,"r":[3.9,13.9,14.7,18.2,18.8,14.0,11.6,13.9],"pov76":27.0,"std":12.3,"stdYear":2024},{"iso":"AUT","ko":"오스트리아","year":2024,"r":[3.6,8.1,11.0,13.3,15.8,19.3,26.8,47.0],"pov76":11.7,"std":13.0,"stdYear":2024},{"iso":"BEL","ko":"벨기에","year":2022,"r":[3.4,9.1,15.3,21.5,25.6,20.2,20.0,24.2],"pov76":8.9,"std":14.7,"stdYear":2022},{"iso":"CAN","ko":"캐나다","year":2024,"r":[3.9,9.5,11.0,12.2,14.1,11.6,9.3,9.6],"pov76":9.6,"std":9.1,"stdYear":2024},{"iso":"CHL","ko":"칠레","year":2023,"r":[3.8,14.3,12.7,12.9,13.2,11.6,10.5,9.1],"pov76":17.0,"std":10.0,"stdYear":2023},{"iso":"COL","ko":"콜롬비아","year":2023,"r":[6.0,9.7,7.0,6.7,6.8,7.6,8.2,6.5],"pov76":0.0,"std":6.5,"stdYear":2023},{"iso":"CRI","ko":"코스타리카","year":2019,"r":[5.0,9.7,8.9,11.0,10.3,10.3,7.2,6.6],"pov76":28.3,"std":7.8,"stdYear":2023},{"iso":"CZE","ko":"체코","year":2024,"r":[5.1,12.4,16.1,15.7,20.1,15.4,20.3,29.3],"pov76":8.9,"std":13.7,"stdYear":2024},{"iso":"DNK","ko":"덴마크","year":2021,"r":[2.5,6.3,6.2,11.7,11.7,13.4,17.6,21.2],"pov76":6.4,"std":9.3,"stdYear":2022},{"iso":"EST","ko":"에스토니아","year":2024,"r":[6.4,9.6,16.0,17.6,13.0,14.2,18.8,20.2],"pov76":45.4,"std":12.1,"stdYear":2024},{"iso":"FIN","ko":"핀란드","year":2024,"r":[7.7,16.4,20.1,17.9,14.3,16.9,10.5,12.4],"pov76":5.7,"std":13.4,"stdYear":2024},{"iso":"FRA","ko":"프랑스","year":2022,"r":[2.4,8.7,12.5,17.4,20.9,18.6,19.5,31.8],"pov76":6.7,"std":12.1,"stdYear":2023},{"iso":"DEU","ko":"독일","year":2020,"r":[2.4,7.2,8.6,10.0,14.1,14.1,17.0,29.9],"pov76":11.0,"std":10.0,"stdYear":2022},{"iso":"GRC","ko":"그리스","year":2022,"r":[1.0,3.3,5.5,5.5,5.8,7.3,4.7,10.8],"pov76":11.5,"std":4.5,"stdYear":2022},{"iso":"HUN","ko":"헝가리","year":2024,"r":[3.4,9.6,13.7,17.0,23.0,21.2,31.5,41.6],"pov76":11.7,"std":15.4,"stdYear":2024},{"iso":"ISL","ko":"아이슬란드","year":2024,"r":[0.0,14.7,21.8,21.5,13.4,14.8,7.2,7.2],"pov76":1.1,"std":12.1,"stdYear":2024},{"iso":"IRL","ko":"아일랜드","year":2022,"r":[3.9,9.8,11.4,11.8,12.3,9.5,10.3,3.9],"pov76":11.9,"std":8.5,"stdYear":2022},{"iso":"ISR","ko":"이스라엘","year":2023,"r":[1.6,5.7,5.3,6.4,7.4,6.7,8.9,9.0],"pov76":17.4,"std":5.3,"stdYear":2023},{"iso":"ITA","ko":"이탈리아","year":2023,"r":[1.4,5.2,5.7,7.3,8.0,7.4,9.1,12.4],"pov76":12.7,"std":5.7,"stdYear":2023},{"iso":"JPN","ko":"일본","year":2023,"r":[7.3,20.6,19.7,21.3,23.1,18.2,17.1,18.3],"pov76":24.1,"std":16.3,"stdYear":2023},{"iso":"KOR","ko":"한국","year":2023,"r":[7.9,22.2,26.4,31.6,32.5,30.7,39.0,59.4],"pov76":54.0,"std":24.8,"stdYear":2023},{"iso":"LVA","ko":"라트비아","year":2024,"r":[2.5,11.7,10.9,16.4,21.7,14.9,16.5,29.2],"pov76":41.7,"std":12.6,"stdYear":2024},{"iso":"LTU","ko":"리투아니아","year":2024,"r":[5.2,13.9,18.4,22.5,27.4,23.8,28.3,40.5],"pov76":23.8,"std":18.1,"stdYear":2024},{"iso":"LUX","ko":"룩셈부르크","year":2024,"r":[4.2,7.8,5.5,8.0,16.1,7.0,4.5,18.7],"pov76":7.0,"std":7.5,"stdYear":2024},{"iso":"MEX","ko":"멕시코","year":2023,"r":[5.1,11.7,10.8,8.8,5.8,5.3,4.3,5.0],"pov76":22.8,"std":6.9,"stdYear":2023},{"iso":"NLD","ko":"네덜란드","year":2024,"r":[3.1,10.0,11.2,14.1,15.1,12.1,12.4,13.0],"pov76":6.5,"std":10.0,"stdYear":2024},{"iso":"NZL","ko":"뉴질랜드","year":2020,"r":[8.3,20.0,14.5,16.3,14.6,11.7,9.2,10.8],"pov76":44.7,"std":12.3,"stdYear":2020},{"iso":"NOR","ko":"노르웨이","year":2016,"r":[5.5,12.4,15.5,16.0,18.5,12.3,13.0,10.0],"pov76":5.2,"std":11.8,"stdYear":2016},{"iso":"POL","ko":"폴란드","year":2024,"r":[4.0,12.1,15.0,16.3,16.3,14.6,11.5,11.9],"pov76":12.1,"std":11.5,"stdYear":2024},{"iso":"PRT","ko":"포르투갈","year":2018,"r":[0.8,5.2,6.5,9.3,12.7,13.3,18.5,25.2],"pov76":11.9,"std":8.4,"stdYear":2022},{"iso":"SVK","ko":"슬로바키아","year":2024,"r":[1.6,4.5,6.1,7.6,10.8,9.3,9.7,10.2],"pov76":7.7,"std":6.3,"stdYear":2024},{"iso":"SVN","ko":"슬로베니아","year":2024,"r":[2.7,8.4,17.5,18.5,19.6,25.1,25.8,40.9],"pov76":13.8,"std":15.4,"stdYear":2024},{"iso":"ESP","ko":"스페인","year":2024,"r":[1.7,4.6,6.5,10.0,12.0,10.6,10.1,15.0],"pov76":15.1,"std":7.2,"stdYear":2024},{"iso":"SWE","ko":"스웨덴","year":2024,"r":[3.7,11.6,12.7,15.1,17.1,13.6,15.1,18.7],"pov76":8.6,"std":11.4,"stdYear":2024},{"iso":"CHE","ko":"스위스","year":2019,"r":[2.7,9.8,8.1,11.7,16.9,16.0,20.7,30.3],"pov76":22.4,"std":10.4,"stdYear":2023},{"iso":"TUR","ko":"튀르키예","year":2023,"r":[3.6,8.4,6.7,5.4,4.1,4.1,4.8,6.2],"pov76":15.2,"std":4.8,"stdYear":2023},{"iso":"GBR","ko":"영국","year":2024,"r":[2.9,10.0,12.5,14.0,15.2,10.4,7.5,7.3],"pov76":18.8,"std":9.3,"stdYear":2024},{"iso":"USA","ko":"미국","year":2023,"r":[6.2,17.3,19.1,19.3,19.3,16.7,16.3,20.8],"pov76":26.7,"std":14.9,"stdYear":2023}]};
+document.documentElement.lang = "ko";
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const AGES = ["10대", "20대", "30대", "40대", "50대", "60대", "70대", "80세 이상"];
+  const GRP = ["y", "y", "y", "m", "m", "o", "o", "o"];
+  const GCOL = { y: "var(--youth)", m: "var(--mid)", o: "var(--elder)" };
+  const GNAME = { y: "청년층", m: "중장년", o: "노년층" };
+  const K = DATA.kostat, C = DATA.countries;
+  const f1 = (n) => n.toLocaleString("ko-KR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const s = (tag, a = {}, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (p) p.append(e); return e; };
+  const tx = (p, x, y, str, cls, anchor = "start", extra = {}) => { const t = s("text", { x, y, class: cls, "text-anchor": anchor, ...extra }, p); t.textContent = str; return t; };
+  const hbar = (x0, x1, y, h) => { const w = Math.abs(x1 - x0), r = Math.min(4, w, h / 2), d = x1 >= x0 ? 1 : -1; if (w < .5) return ""; return `M${x0},${y}H${x1 - d * r}Q${x1},${y} ${x1},${y + r}V${y + h - r}Q${x1},${y + h} ${x1 - d * r},${y + h}H${x0}Z`; };
+  const root = (box, W, H, label) => { box.replaceChildren(); return s("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", role: "group", "aria-label": label }, box); };
+  function tipFor(fig) {
+    const tip = fig.querySelector(".tip");
+    return {
+      show(ev, title, rows, note) {
+        tip.replaceChildren();
+        const h = document.createElement("div"); h.className = "tn"; h.textContent = title; tip.append(h);
+        rows.forEach((r) => { const d = document.createElement("div"); d.className = "tr"; if (r.c) { const i = document.createElement("i"); i.style.background = r.c; d.append(i); } const b = document.createElement("span"); b.className = "tv"; b.textContent = r.v; const k = document.createElement("span"); k.textContent = r.k; d.append(b, k); tip.append(d); });
+        if (note) { const n = document.createElement("div"); n.className = "tn"; n.textContent = note; tip.append(n); }
+        tip.hidden = false;
+        const fr = fig.getBoundingClientRect(); let x, y;
+        if (ev.type !== "focus") { x = ev.clientX - fr.left + 14; y = ev.clientY - fr.top + 14; } else { const r = ev.target.getBoundingClientRect(); x = r.left - fr.left + r.width / 2; y = r.bottom - fr.top + 6; }
+        const tw = tip.offsetWidth, th = tip.offsetHeight;
+        if (x + tw > fr.width - 8) x = Math.max(8, x - tw - 28);
+        if (y + th > fr.height - 8) y = Math.max(8, y - th - 28);
+        tip.style.left = x + "px"; tip.style.top = y + "px";
+      },
+      hide() { tip.hidden = true; },
+    };
+  }
+  function bind(el, tip, fn, hl) {
+    el.setAttribute("tabindex", "0");
+    const on = (e) => { const [t, r, n] = fn(); tip.show(e, t, r, n); if (hl) hl.classList.add("on"); };
+    const off = () => { tip.hide(); if (hl) hl.classList.remove("on"); };
+    el.addEventListener("pointermove", on); el.addEventListener("pointerleave", off); el.addEventListener("focus", on); el.addEventListener("blur", off);
+  }
+  // One tab stop per dot chart: pointer picks the nearest point (24px reach), arrow keys step through points.
+  function pointLayer(v, tip, pts, label) {
+    const ring = s("circle", { r: 9, class: "ring", opacity: 0 }, v);
+    let idx = -1;
+    v.setAttribute("tabindex", "0");
+    v.setAttribute("aria-label", v.getAttribute("aria-label") + ". " + label);
+    const show = (i, ev) => {
+      idx = i; const p = pts[i];
+      ring.setAttribute("cx", p.x); ring.setAttribute("cy", p.y); ring.setAttribute("opacity", 1);
+      const [t, rows, note] = p.fn();
+      tip.show(ev || { type: "focus", target: ring }, t, rows, note);
+    };
+    const hide = () => { tip.hide(); ring.setAttribute("opacity", 0); };
+    v.addEventListener("pointermove", (e) => {
+      const r = v.getBoundingClientRect(), k = v.viewBox.baseVal.width / r.width;
+      const x = (e.clientX - r.left) * k, y = (e.clientY - r.top) * k;
+      let best = -1, bd = (24 * k) ** 2;
+      pts.forEach((p, i) => { const d = (p.x - x) ** 2 + (p.y - y) ** 2; if (d < bd) { bd = d; best = i; } });
+      if (best >= 0) show(best, e); else hide();
+    });
+    v.addEventListener("pointerleave", hide);
+    v.addEventListener("focus", () => show(idx < 0 ? 0 : idx));
+    v.addEventListener("blur", hide);
+    v.addEventListener("keydown", (e) => {
+      const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+      if (step) { e.preventDefault(); show((Math.max(idx, 0) + step + pts.length) % pts.length); }
+      else if (e.key === "Home") { e.preventDefault(); show(0); }
+      else if (e.key === "End") { e.preventDefault(); show(pts.length - 1); }
+      else if (e.key === "Escape") hide();
+    });
+  }
+  function table(id, head, rows) {
+    const t = document.createElement("table"), th = document.createElement("thead"), tr = document.createElement("tr");
+    head.forEach((h) => { const c = document.createElement("th"); c.textContent = h; tr.append(c); }); th.append(tr); t.append(th);
+    const tb = document.createElement("tbody");
+    rows.forEach((r) => { const row = document.createElement("tr"); r.forEach((v) => { const c = document.createElement("td"); c.textContent = v; row.append(c); }); tb.append(row); });
+    t.append(tb); document.getElementById(id).replaceChildren(t);
+  }
+
+  /* quiz */
+  document.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
+    const idx = AGES.indexOf(b.dataset.k);
+    document.querySelectorAll(".opt").forEach((o) => {
+      o.setAttribute("aria-pressed", o === b);
+      o.dataset.state = o.dataset.k === "80세 이상" ? "right" : "wrong";
+      o.querySelector(".r").textContent = f1(K.r2025[AGES.indexOf(o.dataset.k)]) + "명";
+    });
+    document.getElementById("reveal").hidden = false;
+  }));
+
+  /* 1. butterfly */
+  function c1() {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"), tip = tipFor(fig);
+    const W = Math.max(250, box.clientWidth), mid = W < 520 ? 66 : 84, top = 30, rowH = 34, bh = 16, pad = 40;
+    const H = top + rowH * 8 + 26, v = root(box, W, H, "연령별 사망 중 자살 비중과 자살률");
+    const half = (W - mid) / 2, lx = half, rx = half + mid, sx = (x) => (x / 60) * (half - pad);
+    tx(v, lx - 2, 14, "사망자 중 자살 비중 (%)", "hd", "end"); tx(v, rx + 2, 14, "자살률 (10만 명당)", "hd");
+    [0, 20, 40, 60].forEach((t) => {
+      s("line", { x1: lx - sx(t), x2: lx - sx(t), y1: top - 6, y2: H - 22, class: t ? "gl" : "ax" }, v);
+      s("line", { x1: rx + sx(t), x2: rx + sx(t), y1: top - 6, y2: H - 22, class: t ? "gl" : "ax" }, v);
+      tx(v, lx - sx(t), H - 6, String(t), "tk", "middle"); tx(v, rx + sx(t), H - 6, String(t), "tk", "middle");
+    });
+    AGES.forEach((a, i) => {
+      const y = top + i * rowH, by = y + (rowH - bh) / 2, c = GCOL[GRP[i]], sh = K.share2025[i], r = K.r2025[i];
+      const hl = s("rect", { x: 0, y, width: W, height: rowH, class: "hl" }, v);
+      tx(v, lx + mid / 2, by + bh - 3, a, "lb", "middle");
+      s("path", { d: hbar(lx, lx - sx(sh), by, bh), fill: c }, v);
+      tx(v, lx - sx(sh) - 6, by + bh - 3, f1(sh), "vl", "end");
+      s("path", { d: hbar(rx, rx + sx(r), by, bh), fill: c }, v);
+      tx(v, rx + sx(r) + 6, by + bh - 3, f1(r), "vl");
+      const hit = s("rect", { x: 0, y, width: W, height: rowH, class: "hit", "aria-label": `${a}: 사망 중 자살 ${sh}%, 자살률 ${r}명` }, v);
+      bind(hit, tip, () => [`${a} · 2025년`, [{ v: f1(sh) + "%", k: "사망자 중 자살", c }, { v: f1(r) + "명", k: "10만 명당 자살률", c }], K.rank2025[i] ? `사망 원인 중 자살 ${K.rank2025[i]}` : (i >= 6 ? "구성비는 역산한 값" : null)], hl);
+    });
+    table("t1", ["연령", "사망 중 자살 비중(%)", "자살률 2025", "자살률 2024", "자살률 2015"], AGES.map((a, i) => [a, f1(K.share2025[i]) + (i >= 6 ? " (계산)" : ""), f1(K.r2025[i]), f1(K.r2024[i]), f1(K.r2015[i])]));
+  }
+
+  /* 2. strip plot: 38 countries per age band */
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"), tip = tipFor(fig);
+    const W = Math.max(250, box.clientWidth), narrow = W < 560, lab = narrow ? 64 : 84, right = narrow ? 46 : 70, top = 22, rowH = narrow ? 46 : 50;
+    const H = top + rowH * 8 + 24, v = root(box, W, H, "연령대별 OECD 38개국 자살률 분포와 한국의 위치");
+    const x0 = lab, x1 = W - right - 10, max = 65, sx = (x) => x0 + (x / max) * (x1 - x0);
+    [0, 10, 20, 30, 40, 50, 60].forEach((t) => { if (narrow && t % 20) return; s("line", { x1: sx(t), x2: sx(t), y1: top - 8, y2: H - 22, class: t ? "gl" : "ax" }, v); tx(v, sx(t), H - 6, String(t), "tk", "middle"); });
+    tx(v, W - 2, 10, narrow ? "÷평균" : "평균의 몇 배", "hd", "end");
+    const pts = [];
+    AGES.forEach((a, i) => {
+      const y = top + i * rowH, cy = y + rowH / 2 + 3, c = GCOL[GRP[i]];
+      const vals = C.map((d) => ({ d, v: d.r[i] })).sort((p, q) => q.v - p.v);
+      const avg = vals.reduce((t, p) => t + p.v, 0) / vals.length;
+      const kr = vals.find((p) => p.d.iso === "KOR"), krRank = vals.indexOf(kr) + 1;
+      tx(v, 0, cy + 4, a, "lb");
+      s("line", { x1: sx(0), x2: x1, y1: cy, y2: cy, class: "gl" }, v);
+      // deterministic jitter so close dots don't sit on top of each other
+      const lanes = [0, -6, 6, -12, 12];
+      const placed = [];
+      vals.filter((p) => p.d.iso !== "KOR").forEach((p) => {
+        const x = sx(p.v); let lane = 0;
+        for (let L = 0; L < lanes.length; L++) { if (!placed.some((q) => q.l === L && Math.abs(q.x - x) < 7)) { lane = L; break; } lane = L; }
+        placed.push({ x, l: lane });
+        const cyy = cy + lanes[lane];
+        s("circle", { cx: x, cy: cyy, r: 3.5, fill: "var(--dot)" }, v);
+        pts.push({ x, y: cyy, row: i, fn: () => [`${p.d.ko} · ${a} · ${p.d.year}년`, [{ v: f1(p.v) + "명", k: "10만 명당", c: "var(--dot)" }], `38개국 중 ${vals.indexOf(p) + 1}위`] });
+      });
+      s("line", { x1: sx(avg), x2: sx(avg), y1: cy - 15, y2: cy + 15, stroke: "var(--oecd)", "stroke-width": 2 }, v);
+      // label the closest rival (1st if Korea is 2nd, 2nd otherwise)
+      const rival = krRank === 1 ? vals[1] : vals[0];
+      const rx = sx(rival.v);
+      tx(v, rx, cy - 11, rival.d.ko, "mt", "middle");
+      s("circle", { cx: sx(kr.v), cy, r: 8, fill: "var(--card)" }, v);
+      s("circle", { cx: sx(kr.v), cy, r: 6, fill: c }, v);
+      const kx = sx(kr.v);
+      const klab = `한국 ${f1(kr.v)}` + (krRank > 1 ? ` (${krRank}위)` : "");
+      if (kx + 80 < W - right) tx(v, kx + 12, cy + 4.5, klab, "vl"); else tx(v, kx, cy + 22, klab, "vl", "end");
+      tx(v, W - 2, cy + 4, (kr.v / avg).toFixed(1) + "배", "vl", "end");
+      pts.push({ x: kx, y: cy, row: i, fn: () => [`한국 · ${a} · 2023년`, [{ v: f1(kr.v) + "명", k: "10만 명당", c }, { v: f1(avg) + "명", k: "38개국 평균", c: "var(--oecd)" }, { v: f1(rival.v) + "명", k: rival.d.ko, c: "var(--dot)" }], `38개국 중 ${krRank}위 · 평균의 ${(kr.v / avg).toFixed(2)}배`] });
+    });
+    pointLayer(v, tip, pts.sort((p, q) => p.row - q.row || p.x - q.x), "화살표 키로 나라를 하나씩 볼 수 있음. 전체 값은 표로 보기");
+    const rows = C.slice().sort((p, q) => q.r[7] - p.r[7]).map((d) => [d.ko, String(d.year), ...d.r.map(f1)]);
+    const av = AGES.map((_, i) => C.reduce((t, d) => t + d.r[i], 0) / C.length);
+    rows.push(["38개국 평균", "", ...av.map(f1)]);
+    table("t2", ["나라", "연도", ...AGES], rows);
+  }
+
+  /* 3. small multiples Korea vs Japan */
+  function c3() {
+    const wrap = document.getElementById("c3"), fig = document.getElementById("f3"), tip = tipFor(fig);
+    wrap.replaceChildren();
+    const panels = [[0, 30, "y"], [1, 30, "y"], [6, 140, "o"], [7, 140, "o"]];
+    const kor = DATA.kor, jpn = DATA.jpn, years = []; for (let y = 2000; y <= 2025; y++) years.push(y);
+    const boxes = panels.map(([ai]) => {
+      const p = document.createElement("div"); p.className = "p";
+      const t = document.createElement("div"); t.className = "pt"; t.textContent = AGES[ai]; p.append(t);
+      const box = document.createElement("div"); box.className = "chart"; p.append(box); wrap.append(p); return box;
+    });
+    panels.forEach(([ai, ymax, g], pi) => {
+      const box = boxes[pi];
+      const W = Math.max(240, box.clientWidth || 300), H = 170, l = 30, r = 44, top = 10, bot = 20;
+      const v = root(box, W, H, `${AGES[ai]} 자살률 한국과 일본 2000–2025`);
+      const sx = (y) => l + ((y - 2000) / 25) * (W - l - r), sy = (x) => top + (1 - x / ymax) * (H - top - bot);
+      const ticks = ymax === 30 ? [0, 10, 20, 30] : [0, 35, 70, 105, 140];
+      ticks.forEach((tk) => { s("line", { x1: l, x2: W - r, y1: sy(tk), y2: sy(tk), class: tk ? "gl" : "ax" }, v); tx(v, l - 6, sy(tk) + 4, String(tk), "tk", "end"); });
+      [2000, 2010, 2020].forEach((y) => tx(v, sx(y), H - 4, String(y), "tk", "middle"));
+      const kpts = years.map((y) => [y, kor[y] ? kor[y][ai] : null]).filter((d) => d[1] != null);
+      const jpts = years.map((y) => [y, jpn[y] ? jpn[y][ai] : null]).filter((d) => d[1] != null);
+      const path = (pts) => pts.map(([x, y], i) => (i ? "L" : "M") + sx(x) + "," + sy(y)).join("");
+      s("path", { d: path(jpts), fill: "none", stroke: "var(--jpn)", "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }, v);
+      s("path", { d: path(kpts), fill: "none", stroke: GCOL[g], "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }, v);
+      const kl = kpts[kpts.length - 1], jl = jpts[jpts.length - 1];
+      s("circle", { cx: sx(kl[0]), cy: sy(kl[1]), r: 6, fill: "var(--card)" }, v); s("circle", { cx: sx(kl[0]), cy: sy(kl[1]), r: 4, fill: GCOL[g] }, v);
+      let ky = sy(kl[1]) + 4, jy = sy(jl[1]) + 4;
+      if (Math.abs(ky - jy) < 13) { if (ky <= jy) jy = ky + 13; else ky = jy + 13; }
+      tx(v, sx(kl[0]) + 8, ky, f1(kl[1]), "vl"); tx(v, sx(jl[0]) + 8 + (sx(2025) - sx(jl[0])), jy, f1(jl[1]), "mt");
+      // peak marker for elder panels
+      const pk = kpts.reduce((m, d) => (d[1] > m[1] ? d : m));
+      if (g === "o") tx(v, sx(pk[0]) + 6, sy(pk[1]) - 2, `${f1(pk[1])} (${pk[0]})`, "mt");
+      const cross = s("line", { y1: top, y2: H - bot, class: "ax", opacity: 0 }, v);
+      const hit = s("rect", { x: l, y: top, width: W - l - r, height: H - top - bot, class: "hit", "aria-label": `${AGES[ai]} 연도별 값` }, v);
+      const show = (e) => {
+        const bx = box.getBoundingClientRect(); let yr = 2000 + Math.round(((e.type === "focus" ? W - r : (e.clientX - bx.left) * (W / bx.width)) - l) / (W - l - r) * 25);
+        yr = Math.max(2000, Math.min(2025, yr));
+        cross.setAttribute("x1", sx(yr)); cross.setAttribute("x2", sx(yr)); cross.setAttribute("opacity", 1);
+        const rows = [{ v: kor[yr] ? f1(kor[yr][ai]) + "명" : "—", k: "한국", c: GCOL[g] }, { v: jpn[yr] ? f1(jpn[yr][ai]) + "명" : "자료 없음", k: "일본", c: "var(--jpn)" }];
+        tip.show(e, `${AGES[ai]} · ${yr}년`, rows);
+      };
+      hit.setAttribute("tabindex", "0");
+      hit.addEventListener("pointermove", show); hit.addEventListener("focus", show);
+      const hide = () => { tip.hide(); cross.setAttribute("opacity", 0); };
+      hit.addEventListener("pointerleave", hide); hit.addEventListener("blur", hide);
+    });
+    table("t3", ["연도", ...[0, 1, 6, 7].flatMap((i) => [`한국 ${AGES[i]}`, `일본 ${AGES[i]}`])], years.map((y) => [String(y), ...[0, 1, 6, 7].flatMap((i) => [kor[y] ? f1(kor[y][i]) : "—", jpn[y] ? f1(jpn[y][i]) : "—"])]));
+  }
+
+  /* 4. scatter: old-age poverty vs 80+ suicide */
+  function c4() {
+    const box = document.getElementById("c4"), fig = document.getElementById("f4"), tip = tipFor(fig);
+    const W = Math.max(250, box.clientWidth), H = Math.min(440, Math.max(300, W * 0.62)), l = 36, r = 16, top = 14, bot = 36;
+    const v = root(box, W, H, "76세 이상 빈곤율과 80세 이상 자살률 산점도");
+    const sx = (x) => l + (x / 60) * (W - l - r), sy = (y) => top + (1 - y / 65) * (H - top - bot);
+    [0, 20, 40, 60].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t ? "gl" : "ax" }, v); tx(v, l - 6, sy(t) + 4, String(t), "tk", "end"); });
+    [0, 10, 20, 30, 40, 50, 60].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top, y2: H - bot, class: t ? "gl" : "ax" }, v); tx(v, sx(t), H - bot + 15, t + "%", "tk", "middle"); });
+    tx(v, W - r, H - 4, "76세 이상 상대빈곤율 →", "mt", "end");
+    tx(v, l + 4, top + 10, "↑ 80세 이상 자살률", "mt");
+    const pts = C.filter((d) => d.pov76 != null), marks = [];
+    const LAB = { AUT: "오스트리아", HUN: "헝가리", EST: "에스토니아", NZL: "뉴질랜드", LVA: "라트비아", JPN: "일본", USA: "미국" };
+    pts.forEach((d) => {
+      const x = sx(d.pov76), y = sy(d.r[7]), kr = d.iso === "KOR";
+      if (kr) { s("circle", { cx: x, cy: y, r: 9, fill: "var(--card)" }, v); s("circle", { cx: x, cy: y, r: 7, fill: "var(--elder)" }, v); tx(v, x - 12, y + 4, `한국 ${f1(d.pov76)}%, ${f1(d.r[7])}명`, "vl", "end"); }
+      else { s("circle", { cx: x, cy: y, r: 4.5, fill: "var(--dot)" }, v); if (LAB[d.iso] && W > 420) tx(v, x + 7, y + 4, LAB[d.iso], "mt"); }
+      marks.push({ x, y, fn: () => [d.ko, [{ v: f1(d.pov76) + "%", k: "76세 이상 빈곤율", c: kr ? "var(--elder)" : "var(--dot)" }, { v: f1(d.r[7]) + "명", k: `80세 이상 자살률 (${d.year})`, c: kr ? "var(--elder)" : "var(--dot)" }]] });
+    });
+    pointLayer(v, tip, marks.sort((p, q) => p.x - q.x), "화살표 키로 나라를 하나씩 볼 수 있음. 전체 값은 표로 보기");
+    const corr = (arr) => { const n = arr.length, mx = arr.reduce((t, p) => t + p[0], 0) / n, my = arr.reduce((t, p) => t + p[1], 0) / n; let a = 0, b = 0, c = 0; arr.forEach(([x, y]) => { a += (x - mx) * (y - my); b += (x - mx) ** 2; c += (y - my) ** 2; }); return a / Math.sqrt(b * c); };
+    const all = pts.map((d) => [d.pov76, d.r[7]]), ex = pts.filter((d) => d.iso !== "KOR").map((d) => [d.pov76, d.r[7]]);
+    tx(v, W - r, top + 10, `상관계수 ${corr(all).toFixed(2)} · 한국 제외 ${corr(ex).toFixed(2)}`, "hd", "end");
+    table("t4", ["나라", "76세 이상 빈곤율(%)", "80세 이상 자살률", "자살률 연도"], pts.slice().sort((p, q) => q.pov76 - p.pov76).map((d) => [d.ko, f1(d.pov76), f1(d.r[7]), String(d.year)]));
+  }
+
+  /* 5. age-standardised ranking */
+  function c5() {
+    const box = document.getElementById("c5"), fig = document.getElementById("f5"), tip = tipFor(fig);
+    const top6 = C.filter((d) => d.std != null).sort((p, q) => q.std - p.std).slice(0, 6);
+    const avg = C.filter((d) => d.std != null).reduce((t, d) => t + d.std, 0) / C.filter((d) => d.std != null).length;
+    const rows = [...top6.map((d) => [d.ko, d.std, d.stdYear, d.iso === "KOR"]), ["38개국 평균", avg, null, false]];
+    const W = Math.max(250, box.clientWidth), lab = W < 520 ? 82 : 100, rowH = 32, bh = 16, H = rowH * rows.length + 24;
+    const v = root(box, W, H, "연령표준화 자살률 상위국");
+    const sx = (x) => lab + (x / 25) * (W - lab - 44);
+    [0, 5, 10, 15, 20, 25].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: 0, y2: H - 22, class: t ? "gl" : "ax" }, v); tx(v, sx(t), H - 6, String(t), "tk", "middle"); });
+    rows.forEach(([k, val, yr, kr], i) => {
+      const y = i * rowH, by = y + (rowH - bh) / 2;
+      const hl = s("rect", { x: 0, y, width: W, height: rowH, class: "hl" }, v);
+      tx(v, 0, by + bh - 3, k, "lb");
+      s("path", { d: hbar(sx(0), sx(val), by, bh), fill: kr ? "var(--kr)" : "var(--mid)", opacity: yr == null ? .55 : 1 }, v);
+      tx(v, sx(val) + 6, by + bh - 3, f1(val), "vl");
+      const hit = s("rect", { x: 0, y, width: W, height: rowH, class: "hit", "aria-label": `${k} ${f1(val)}` }, v);
+      bind(hit, tip, () => [k + (yr ? ` · ${yr}년` : ""), [{ v: f1(val) + "명", k: "연령표준화, 10만 명당", c: kr ? "var(--kr)" : "var(--mid)" }]], hl);
+    });
+    table("t5", ["나라", "연령표준화 자살률", "연도"], C.filter((d) => d.std != null).sort((p, q) => q.std - p.std).map((d) => [d.ko, f1(d.std), String(d.stdYear)]).concat([["38개국 평균", f1(avg), ""]]));
+  }
+
+  const all = [c1, c2, c3, c4, c5];
+  const draw = () => all.forEach((f) => { try { f(); } catch (e) { console.error(e); } });
+  draw();
+  let rt, lastW = 0;
+  new ResizeObserver(() => { const w = document.querySelector(".page").clientWidth; if (Math.abs(w - lastW) < 2) return; lastW = w; clearTimeout(rt); rt = setTimeout(draw, 80); }).observe(document.querySelector(".page"));
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+})();
+</script>
+
+</body>
+</html>

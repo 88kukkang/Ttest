@@ -1,0 +1,267 @@
+<title>킥보드 줄</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a city kerb in the supplied palette (slate, steel blue, terracotta). Each age group parks its own
+   row of e-scooters; one scooter = 10 crashes where that age group was the at-fault rider. */
+:root {
+  --paper: #eef1ef; --card: #fafbfa; --ink: #2f3133; --ink2: #4c4d50; --muted: #5a5c5f; --line: #dbe1dd; --grid: #e6eae7; --axis: #a7a8a3;
+  --ghost: #bcbbb6; --board: #2f3133; --board-ink: #ebdac0; --accent: #d56b41;
+  --kerb: #bcbbb6; --road: #5f6062; --deck: #5f6062; --stem: #4e6aa9; --wheel: #2f3133;
+  --a0: #d56b41; --a1: #dc8c67; --a2: #8eabc9; --a3: #689daf; --a4: #3e6f90; --a5: #4e6aa9; --a6: #953a4c; --a7: #a7a8a3; --death: #953a4c;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --display: "Black Han Sans", "IBM Plex Sans KR", sans-serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1f2122; --card: #2a2c2e; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #333638; --axis: #5f6062;
+  --ghost: #5a5551; --board: #141516; --board-ink: #ebdac0; --accent: #dc8c67;
+  --kerb: #5a5551; --road: #3a3c3e; --deck: #bcbbb6; --stem: #8eabc9; --wheel: #ebeeec;
+  --a0: #dc8c67; --a1: #ebcfa7; --a2: #8eabc9; --a3: #8ab5bb; --a4: #689daf; --a5: #abbdc9; --a6: #d6b0a7; --a7: #928a7f; --death: #d6b0a7; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #1f2122; --card: #2a2c2e; --ink: #ebeeec; --ink2: #dbe1dd; --muted: #a7a8a3; --line: #3a3d3f; --grid: #333638; --axis: #5f6062;
+  --ghost: #5a5551; --board: #141516; --board-ink: #ebdac0; --accent: #dc8c67;
+  --kerb: #5a5551; --road: #3a3c3e; --deck: #bcbbb6; --stem: #8eabc9; --wheel: #ebeeec;
+  --a0: #dc8c67; --a1: #ebcfa7; --a2: #8eabc9; --a3: #8ab5bb; --a4: #689daf; --a5: #abbdc9; --a6: #d6b0a7; --a7: #928a7f; --death: #d6b0a7; color-scheme: dark }
+/*COMMON_CSS*/
+h1, h2.h { font-family: var(--display); font-weight: 400; letter-spacing: 0 }
+h1 { font-size: clamp(36px, 6.4vw, 60px) }
+h1 span { font-family: var(--sans); font-weight: 500 }
+.ft { font-weight: 700; font-size: 17px }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.yr { background-image: none }
+</style>
+
+<main class="page">
+  <header>
+    <h1>킥보드 사고는 10대가 낼까<span>그렇다. 가해자의 절반 가까이가 19세 이하다. 다만 목숨을 잃는 사고는 나이 든 운전자 쪽에서 더 많이 난다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 13</dd>
+      <dt>한 줄</dt><dd>2025년 전동킥보드 같은 개인형이동장치(PM)가 가해 차량인 교통사고 1,915건 가운데 852건(44.5%)은 19세 이하가 냈다. 10–19세 인구 10만 명당 18.4건으로 20대(6.7건)의 2.7배다. 하지만 사고로 숨진 23명 가운데 9명은 65세 이상이 낸 사고에서 나왔다. 65세 이상의 사고 100건당 사망은 8.3명으로, 19세 이하(0.1명)의 70배다.</dd>
+      <dt>분류</dt><dd>안전</dd>
+      <dt>본능</dt><dd>비난 본능 · "킥보드 타는 10대"라는 한 무리에게 문제 전체를 돌린다</dd>
+      <dt>그림 방식</dt><dd>연령별 킥보드 줄 · 나이대마다 한 줄로 킥보드를 세우고(1대 = 사고 25건), 2025년 1월부터 12월까지 달마다 줄이 길어지게 재생한다</dd>
+      <dt>기간</dt><dd>2025년 1–12월 (월별)</dd>
+      <dt>엮은 데이터</dt><dd>2개 · 한국도로교통공단 개인형이동장치(PM) 교통사고 월별 가해자연령대별 통계 · 행정안전부 주민등록 연령별 인구</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">2025년 킥보드 같은 개인형이동장치가 낸 사고에서 숨진 사람 23명 가운데, 65세 이상 운전자가 낸 사고에서 숨진 사람은?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>1명</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>B</i>4명</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>C</i>9명</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">C. <span class="n">9명</span> (39%)</span>
+      65세 이상이 낸 사고는 108건(5.6%)뿐이다. 사고가 가장 많은 19세 이하(852건)에서는 1명이 숨졌다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <div class="prose">
+      <h2 class="h" id="s1">줄이 가장 긴 건 19세 이하</h2>
+      <p>나이대마다 킥보드를 한 줄로 세웠다. 킥보드 1대가 그 나이대 운전자가 가해자인 사고 25건이다. 재생하면 1월부터 줄이 늘어나는데, 19세 이하의 줄이 처음부터 가장 빠르게 길어진다. 연말에는 34대로 20대(16대)의 두 배가 넘는다. 사고는 4월부터 늘어 7·9월(각 222·223건)에 가장 많았고, 1–2월에 가장 적었다.</p>
+    </div>
+    <figure id="f1">
+      <p class="ft">가해자 나이대별 PM 사고, 2025년 누적</p>
+      <p class="fs">킥보드 1대 = 사고 25건(인구 10만 명당 보기에서는 0.5건). 붉은 꽃 = 그 나이대 운전자가 낸 사고의 사망자(12월에 나타남)</p>
+      <div class="chips" role="group" aria-label="세는 방법" id="chips1"></div>
+      <div class="player" id="p1"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>한국도로교통공단 「개인형이동장치(PM) 교통사고 월별 가해자연령대별 통계」(2025, 교통사고분석시스템 TAAS 기반). 경찰이 처리한 인명 피해 사고만 센다. 인구: 행정안전부 주민등록 인구(2025년 6월), 19세 이하는 10–19세로 나눴다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">사고는 10대가 많고, 큰 사고는 나이가 많을수록</h2>
+      <p>나이대별로 사고 100건마다 몇 명이 숨졌는지 셌다. 19세 이하 0.1명, 20대 0.3명에서 나이가 들수록 올라가 50대 4.0명, 65세 이상 8.3명이다. 넘어지거나 부딪혔을 때 다치는 정도가 나이에 따라 크게 다르기 때문으로 보인다. 숨진 사람이 운전자 본인인지 상대방인지는 이 자료로 나눌 수 없다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">사고 100건당 사망자와 중상자</p>
+      <p class="fs">가로 막대: 사고 100건당 중상자(3주 이상 치료). 점: 사고 100건당 사망자</p>
+      <div class="chart" id="c2"></div>
+      <figcaption>한국도로교통공단 PM 교통사고 통계(2025). 사망은 사고 뒤 30일 안에 숨진 경우다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">달마다 19세 이하의 몫</h2>
+      <p>19세 이하의 몫은 달마다 28%(12월)에서 55%(7월) 사이를 오갔다. 방학이 낀 7월(55%)과 1월(51%)에 높고, 새 학기가 시작되는 3월(33%)과 12월(28%)에 낮다. 방학과 관련이 있어 보이지만 이 자료만으로 원인을 가를 수는 없다. 사고 건수 자체는 날이 따뜻한 4–9월에 많다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">달마다 가해자 나이 구성, 2025년</p>
+      <p class="fs">막대 높이 = 그달 사고 건수, 색 = 가해자 나이대</p>
+      <div class="legend" id="lg3" aria-hidden="true"></div>
+      <div class="player" id="p3"></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>한국도로교통공단 PM 교통사고 통계(2025).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">그래서, 킥보드 사고는 10대가 낼까</h2>
+      <p>건수로는 그렇다. 2025년 PM 가해 사고의 44.5%가 19세 이하였고, 인구 대비로도 다른 나이대보다 훨씬 많다. 면허(16세 이상 원동기 면허)가 있어야 탈 수 있는 기기에서 10대 사고가 이만큼 많다는 것은 단속과 교육의 대상이 어디인지 보여 준다. 다만 "킥보드 사고 = 10대 문제"로 끝내면 놓치는 것이 있다. 목숨을 잃는 사고는 나이 든 운전자 쪽에서 훨씬 자주 난다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:22px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>2025년 한 해 자료다. 공공데이터포털 파일은 해마다 그해 자료로 바뀌어, 이전 연도와의 비교는 이 페이지에서 하지 않았다.</li>
+      <li>"가해자"는 경찰 조사에서 사고 책임이 더 큰 쪽(제1당사자)이다. PM끼리, 또는 PM이 보행자·자동차와 부딪힌 사고 가운데 PM 운전자가 가해자인 사고만 들어 있다.</li>
+      <li>사망자·부상자에는 운전자 본인과 상대방이 함께 들어 있다.</li>
+      <li>나이대별 이용자 수(누가 얼마나 많이 타는지)는 공개된 자료가 없어, 인구로 나눴다. 10대가 더 많이 타서 사고가 많은 것인지는 이 자료로 가를 수 없다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:22px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15087988/fileData.do" target="_blank" rel="noopener">개인형이동장치(PM) 교통사고 월별 가해자연령대별 통계</a> (15087988)</td><td>한국도로교통공단</td><td>월 × 가해자 나이대 사고 건수, 사망·중상·경상·부상신고자 수</td><td>2025</td></tr>
+        <tr><td><a href="https://jumin.mois.go.kr/ageStatMonth.do" target="_blank" rel="noopener">주민등록 연령별 인구통계</a></td><td>행정안전부</td><td>전국 5세 연령별 인구(2025년 6월)</td><td>2025</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:22px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>2개 자료 · 12개월 × 8개 나이대</dd>
+      <dt>도구</dt><dd>Python(집계) · SVG 일러스트와 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>누적 건수 · 인구 10만 명당 사고율 · 사고 100건당 사망·중상</dd>
+      <dt>검증</dt><dd>월별 행을 더한 연간 합계(사고 1,915건, 사망 23명, 부상 2,116명)를 원자료 행 수와 대조했다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:22px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>킥보드 사고는 어느 동네에서 날까</h3><p>공유 킥보드 주차구역·견인 자료와 사고 위치를 엮어 볼 수 있다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15100204/fileData.do" target="_blank" rel="noopener">전동킥보드 불법주정차 견인 단속 현황</a></li></ul></div>
+      <div class="q"><h3>자전거 사고도 나이 든 운전자가 더 크게 다칠까</h3></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const AG = ["19세이하", "20-29세", "30-39세", "40-49세", "50-59세", "60-64세", "65세이상"];
+  const LAB = { "19세이하": "19세 이하", "20-29세": "20대", "30-39세": "30대", "40-49세": "40대", "50-59세": "50대", "60-64세": "60–64세", "65세이상": "65세 이상", "불명": "불명" };
+  const AC = AG.map((_, i) => `var(--a${i})`);
+  const A = DATA.acc, MN = Array.from({ length: 12 }, (_, i) => `${i + 1}월`);
+  const cum = (a, pos) => { let t = 0; const k = Math.floor(pos), f = pos - k; for (let m = 0; m <= Math.min(11, k); m++) t += A[a][m]; if (k + 1 < 12) t += A[a][k + 1] * f; return t; };
+  const sumA = (a) => A[a].reduce((x, y) => x + y, 0);
+  let mode = "n";
+  chips("chips1", [["n", "사고 건수"], ["rate", "인구 10만 명당"]], mode, (k) => { mode = k; p1.render(); });
+
+  // one cartoon scooter, drawn facing right; ox/oy at the rear wheel's ground point
+  function scooter(g, ox, oy, sc, col) {
+    const gg = s("g", { transform: `translate(${ox} ${oy}) scale(${sc})` }, g);
+    s("path", { d: "M2,-7 H22 Q26,-7 27,-10 L33,-38", fill: "none", stroke: "var(--stem)", "stroke-width": 3.2, "stroke-linecap": "round", "stroke-linejoin": "round" }, gg);
+    s("path", { d: "M29,-38 H37", stroke: "var(--stem)", "stroke-width": 3.4, "stroke-linecap": "round" }, gg);
+    s("rect", { x: -1, y: -10, width: 25, height: 5, rx: 2.5, fill: col }, gg);
+    s("circle", { cx: 3, cy: -3, r: 3.6, fill: "var(--card)", stroke: "var(--wheel)", "stroke-width": 2.2 }, gg);
+    s("circle", { cx: 29, cy: -3, r: 3.6, fill: "var(--card)", stroke: "var(--wheel)", "stroke-width": 2.2 }, gg);
+  }
+  function flower(g, x, y, r) {
+    for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2; s("circle", { cx: x + Math.cos(a) * r * .55, cy: y + Math.sin(a) * r * .55, r: r * .45, fill: "var(--death)" }, g); }
+    s("circle", { cx: x, cy: y, r: r * .35, fill: "var(--card)" }, g);
+  }
+
+  /* ---------- 1. the kerb ---------- */
+  function c1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, l = narrow ? 62 : 92, r = narrow ? 52 : 84, top = 8;
+    const per = mode === "n" ? 25 : .5, sc = narrow ? .5 : .7, step = 38 * sc * .72, perRow = Math.floor((W - l - r) / step), rowsOf = (a) => Math.max(1, Math.ceil((mode === "n" ? sumA(a) : sumA(a) / DATA.pop[a] * 1e5) / per / perRow));
+    const rowHs = AG.map((a) => 20 + rowsOf(a) * 34 * sc + 8), H = top + rowHs.reduce((x, y) => x + y, 0) + 6;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `가해자 나이대별 PM 사고 누적, ${MN[Math.min(11, Math.round(pos))]}까지` }, box);
+    const unit = (a) => (mode === "n" ? cum(a, pos) : cum(a, pos) / DATA.pop[a] * 1e5);
+    const pts = [];
+    AG.forEach((a, j) => {
+      const y0 = top + rowHs.slice(0, j).reduce((x, y) => x + y, 0), base = y0 + rowHs[j] - 8, nr = rowsOf(a);
+      s("rect", { x: l - 6, y: base, width: W - l - r + 12, height: 5, rx: 2.5, fill: "var(--kerb)" }, v);
+      const val = unit(a), n = val / per, full = Math.floor(n), frac = n - full;
+      const at = (i) => { const rr = Math.floor(i / perRow), cc = i % perRow; return [l + cc * step, base - (nr - 1 - rr) * 34 * sc]; };
+      for (let i = 0; i < full; i++) { const [x, y] = at(i); scooter(v, x, y, sc, AC[j]); }
+      if (frac > .15) { const [x, y] = at(full); const gg = s("g", { opacity: .25 + frac * .6 }, v); scooter(gg, x, y, sc, AC[j]); }
+      tx(v, l - 10, y0 + 16, LAB[a], j === 0 ? "vl" : "lb", narrow ? 12 : 13.5, "end");
+      const shown = mode === "n" ? fmt(val) + "건" : f1(val);
+      tx(v, W - 4, y0 + 16, shown, j === 0 ? "vl" : "tk", narrow ? 11.5 : 13, "end");
+      // deaths so far
+      let dsum = 0; // deaths are annual; show them only at the end of the year
+      if (pos >= 11) { const dd = DATA.dead[a]; for (let i = 0; i < dd; i++) flower(v, W - r + 8 + (i % 5) * (narrow ? 8 : 10), y0 + 30 + Math.floor(i / 5) * (narrow ? 8 : 10), narrow ? 3.4 : 4.2); }
+      pts.push({ x: l + Math.min(full, perRow) * step / 2, y: base - 12, r: 14, fn: () => [`${LAB[a]} · 1–${Math.min(12, Math.floor(pos) + 1)}월`, [[fmt(cum(a, pos)) + "건", "사고"], [f1(cum(a, pos) / DATA.pop[a] * 1e5), "인구 10만 명당"], [fmt(DATA.dead[a]) + "명", "사망(연간)"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 나이대를 옮겨 볼 수 있다");
+  }
+  table("t1", ["나이대", ...MN, "합계", "인구 10만 명당", "사망", "중상"], [...AG, "불명"].map((a) => [LAB[a], ...A[a].map(String), fmt(sumA(a)), DATA.pop[a] ? f1(sumA(a) / DATA.pop[a] * 1e5) : "–", String(DATA.dead[a] || 0), String(DATA.sev[a] || 0)]));
+
+  /* ---------- 2. severity ---------- */
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), l = 74, r = 70, rowH = 30, top = 10, H = top + AG.length * rowH + 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "나이대별 사고 100건당 사망자와 중상자" }, box);
+    const sx = (p) => l + p / 40 * (W - l - r), pts = [];
+    [0, 10, 20, 30, 40].forEach((t) => { s("line", { x1: sx(t), x2: sx(t), y1: top, y2: H - 22, class: t ? "gl" : "ax" }, v); tx(v, sx(t), H - 6, t, "tk", 11.5, "middle"); });
+    AG.forEach((a, j) => {
+      const y = top + j * rowH + rowH / 2, n = sumA(a), sv = DATA.sev[a] / n * 100, dd = DATA.dead[a] / n * 100;
+      s("rect", { x: l, y: y - 8, width: sx(sv) - l, height: 16, rx: 3, fill: AC[j], opacity: .45 }, v);
+      s("circle", { cx: sx(dd), cy: y, r: 6.5, fill: "var(--death)", stroke: "var(--card)", "stroke-width": 1.5 }, v);
+      tx(v, l - 8, y + 4, LAB[a], "lb", 12.5, "end");
+      tx(v, W - 4, y + 4, `사망 ${f1(dd)}`, dd > 3 ? "vl" : "tk", 12, "end");
+      pts.push({ x: sx(dd), y, r: 7, fn: () => [`${LAB[a]} · 사고 ${fmt(n)}건`, [[f1(dd), "100건당 사망"], [f1(sv), "100건당 중상"], [`${DATA.dead[a]}명`, "사망자"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "위아래 화살표로 나이대를 옮겨 볼 수 있다");
+    table("t2", ["나이대", "사고", "사망", "중상", "100건당 사망", "100건당 중상"], AG.map((a) => [LAB[a], fmt(sumA(a)), String(DATA.dead[a]), String(DATA.sev[a]), f1(DATA.dead[a] / sumA(a) * 100), f1(DATA.sev[a] / sumA(a) * 100)]));
+  }
+
+  /* ---------- 3. monthly stacks ---------- */
+  const lg = document.getElementById("lg3"); AG.forEach((a, j) => { const sp = document.createElement("span"); const i = document.createElement("i"); i.className = "sw"; i.style.background = AC[j]; sp.append(i, LAB[a]); lg.append(sp); });
+  function c3(pos) {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), H = Math.min(320, Math.max(240, W * .42)), l = 34, r = 10, top = 24, bot = 26;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "달마다 PM 사고의 가해자 나이 구성 2025" }, box);
+    const bw = (W - l - r) / 12, sy = (n) => top + (1 - n / 240) * (H - top - bot), pts = [];
+    [0, 80, 160, 240].forEach((t) => { s("line", { x1: l, x2: W - r, y1: sy(t), y2: sy(t), class: t ? "gl" : "ax" }, v); tx(v, l - 6, sy(t) + 4, t, "tk", 11.5, "end"); });
+    for (let m = 0; m < 12; m++) {
+      const x = l + m * bw + bw * .14, w = bw * .72, grow = Math.max(0, Math.min(1, pos - m + 1));
+      let acc = 0; const tot = [...AG, "불명"].reduce((t, a) => t + A[a][m], 0);
+      AG.forEach((a, j) => { const h = A[a][m] * grow; s("rect", { x, y: sy(acc + h), width: w, height: sy(acc) - sy(acc + h), fill: AC[j] }, v); acc += h; });
+      tx(v, x + w / 2, H - 8, String(m + 1), "tk", 11.5, "middle");
+      if (grow >= 1) { tx(v, x + w / 2, sy(tot) - 6, W < 560 ? Math.round(A["19세이하"][m] / tot * 100) + "" : pc(A["19세이하"][m] / tot * 100), "tk", 11, "middle"); }
+      pts.push({ x: x + w / 2, y: sy(tot), r: w / 2, fn: () => [`2025년 ${m + 1}월 · ${tot}건`, AG.map((a, j) => [String(A[a][m]), LAB[a], AC[j]])] });
+    }
+    tx(v, l, 12, "막대 위 숫자 = 19세 이하의 몫(%)", "mt", 11.5);
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 달마다 볼 수 있다");
+  }
+  table("t3", ["월", ...AG.map((a) => LAB[a]), "불명", "합계", "19세 이하 몫"], MN.map((mn, m) => { const tot = [...AG, "불명"].reduce((t, a) => t + A[a][m], 0); return [mn, ...AG.map((a) => String(A[a][m])), String(A["불명"][m]), String(tot), pc(A["19세이하"][m] / tot * 100)]; }));
+
+  const p1 = Player("p1", "킥보드 줄", c1, 12, (i) => `2025.${String(i + 1).padStart(2, "0")}`, 8);
+  const p3 = Player("p3", "달마다 사고", c3, 12, (i) => `2025.${String(i + 1).padStart(2, "0")}`, 6);
+  const all = () => { p1.render(); c2(); p3.render(); };
+  all(); onResize(all);
+})();
+</script>

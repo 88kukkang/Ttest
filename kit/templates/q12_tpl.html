@@ -1,0 +1,277 @@
+<title>채소 가격 달력</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: a market stall drawn in the supplied palette (oat paper, leaf greens, terracotta, slate blue).
+   Six vegetable characters puff up and sweat in their dear months and relax in their cheap ones. */
+:root {
+  --paper: #f7f0e4; --card: #fffaf2; --ink: #4c433e; --ink2: #5a5551; --muted: #5f6062; --line: #e2ccb5; --grid: #efe3d2; --axis: #b8ac9c;
+  --ghost: #bcbbb6; --board: #4c433e; --board-ink: #ebdac0; --accent: #d56b41;
+  --cheap: #3e6f90; --cheap2: #8eabc9; --mid: #ebdac0; --dear: #d56b41; --dear2: #9b3737;
+  --leaf: #80a15a; --leaf2: #abc07b; --leaf3: #c4d39c; --leafd: #3e6f42; --root: #fbf6ec; --onion: #d8b29b; --onion2: #b87b68; --garlic: #e2ccb5; --garlic2: #cd9886; --chili: #9b3737;
+  --face: #4c433e; --blush: #d6b0a7; --sweat: #8eabc9; --awning: #d56b41; --stall: #b87b68;
+  --sans: "Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; --display: "Gamja Flower", "Gowun Dodum", sans-serif; --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #2a2622; --card: #342f2a; --ink: #ebdac0; --ink2: #e2ccb5; --muted: #b8ac9c; --line: #4c433e; --grid: #3c3530; --axis: #5a5551;
+  --ghost: #5a5551; --board: #1d1a17; --board-ink: #ebdac0; --accent: #dc8c67;
+  --cheap: #8eabc9; --cheap2: #3e6f90; --mid: #5a5551; --dear: #dc8c67; --dear2: #d56b41;
+  --root: #efe7d8; --face: #4c433e; --stall: #8b4d3e; --awning: #b87b68; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #2a2622; --card: #342f2a; --ink: #ebdac0; --ink2: #e2ccb5; --muted: #b8ac9c; --line: #4c433e; --grid: #3c3530; --axis: #5a5551;
+  --ghost: #5a5551; --board: #1d1a17; --board-ink: #ebdac0; --accent: #dc8c67;
+  --cheap: #8eabc9; --cheap2: #3e6f90; --mid: #5a5551; --dear: #dc8c67; --dear2: #d56b41;
+  --root: #efe7d8; --face: #4c433e; --stall: #8b4d3e; --awning: #b87b68; color-scheme: dark }
+/*COMMON_CSS*/
+body { font-size: 17px }
+h1, h2.h, .ft { font-family: var(--display); font-weight: 400 }
+h1 { font-size: clamp(42px, 7.4vw, 70px); line-height: 1.08; letter-spacing: 0 }
+h1 span { font-family: var(--sans); font-size: .36em }
+h2.h { font-size: clamp(30px, 4.4vw, 40px); letter-spacing: 0; line-height: 1.2 }
+.ft { font-size: 26px; line-height: 1.2 }
+.quiz, figure { border-radius: 22px; border-width: 2px }
+.play:hover { background: var(--accent) }
+.scrub { accent-color: var(--accent) }
+:focus-visible { outline-color: var(--accent) }
+.yr { background-image: none; border-radius: 12px; font-family: var(--display); font-size: 30px }
+.vn { fill: var(--ink); font-family: var(--display) }
+.vv { fill: var(--ink2); font-family: var(--mono); font-weight: 600 }
+.ramp { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font: 12px/1.4 var(--mono); color: var(--muted) }
+.ramp i { display: inline-block; width: 150px; height: 10px; border-radius: 5px; background: linear-gradient(90deg, var(--cheap), var(--cheap2), var(--mid), var(--dear), var(--dear2)) }
+</style>
+
+<main class="page">
+  <header>
+    <h1>채소는 겨울에 비쌀까<span>배추와 무는 겨울이 가장 싸다. 겨울에 비싼 건 대파와 양파고, 마늘과 고춧가루는 1년 내내 비슷하다</span></h1>
+    <dl class="sheet">
+      <dt>시리즈</dt><dd>공공데이터로 검증하는 질문 14</dd>
+      <dt>한 줄</dt><dd>지난 5년 평균(평년) 소매가격으로 보면 배추는 9월에 연평균의 165%로 가장 비싸고 12월(71%)에 가장 싸다. 무도 9월(151%)이 가장 비싸다. 겨울(12–2월)에 연평균보다 비싼 것은 대파(109%)와 양파(103%)뿐이다. 마늘은 1년 내내 ±5%, 건고추는 ±8% 안에서 움직인다. 품목마다 비싼 달이 다르다.</dd>
+      <dt>분류</dt><dd>주거·일·경제</dd>
+      <dt>본능</dt><dd>일반화 본능 · "채소"를 한 덩어리로 보고, 김장철 장바구니 기억으로 1년을 판단한다</dd>
+      <dt>그림 방식</dt><dd>채소 가격 달력 · 여섯 채소가 비싼 달에는 부풀어 오르며 땀을 흘리고 싼 달에는 웃는다. 1월부터 12월까지 재생한다</dd>
+      <dt>기간</dt><dd>평년 가격(지난 5년 평균, 열흘 단위) · 실제 가격 2025년 1월–2026년 6월(매일)</dd>
+      <dt>엮은 데이터</dt><dd>1개 · 한국농수산식품유통공사 주요 채소류 일일가격 현황(소매가격, 평년가격 포함)</dd>
+    </dl>
+  </header>
+
+  <section class="quiz" aria-labelledby="qz">
+    <p class="label">먼저, 문제 하나</p>
+    <h2 id="qz">평년 기준으로, 배추가 1년 중 가장 비싼 달은?</h2>
+    <div class="opts">
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>A</i>1월 (한겨울)</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="1"><i>B</i>9월 (늦여름)</button>
+      <button class="opt" type="button" aria-pressed="false" data-a="0"><i>C</i>11월 (김장철)</button>
+    </div>
+    <div aria-live="polite"><div class="reveal" id="reveal" hidden>
+      <span class="big">B. 9월, 연평균의 <span class="n">165%</span></span>
+      한여름 고랭지 배추가 끝나고 가을 배추가 나오기 전이다. 김장철인 11월(74%)과 12월(71%)은 오히려 1년 중 가장 싼 때다.
+    </div></div>
+  </section>
+
+  <section class="s" aria-labelledby="s1">
+    <figure id="f1">
+      <p class="ft">달마다 부풀고 웃는 채소들</p>
+      <p class="fs">크기 = 그달 평년 가격 ÷ 1년 평균. 100%보다 크면 비싸다. 땀방울은 120%를 넘을 때</p>
+      <div class="player" id="p1"></div>
+      <div class="chart" id="c1"></div>
+      <figcaption>한국농수산식품유통공사(aT) 「주요 채소류 일일가격 현황」의 소매 평년가격(지난 5년 같은 열흘의 평균)을 달마다 평균했다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t1"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+    <div class="prose">
+      <h2 class="h" id="s1">배추·무는 늦여름, 대파는 한겨울, 양파는 초봄</h2>
+      <p>재생 버튼을 누르면 1월부터 한 달씩 넘어간다. 배추와 무는 8–10월에 크게 부풀었다가 김장철이 되면 쪼그라든다. 대파는 9월(118%)과 1–2월(110–111%)에 비싸고 4월(75%)에 가장 싸다. 양파는 3–4월(116·113%)에 비싸다. 햇양파가 나오기 직전이다. 마늘과 건고추는 1년 내내 거의 그대로다. 오래 저장해 두고 파는 품목이라 계절을 덜 타는 것으로 보인다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s2">
+    <div class="prose">
+      <h2 class="h" id="s2">열흘 단위 가격 달력</h2>
+      <p>1년을 열흘씩 36칸으로 나눠 품목마다 색을 칠했다. 붉을수록 그 품목의 1년 평균보다 비싸고, 푸를수록 싸다. 왕관이 가장 비싼 열흘이다. 붉은 칸이 모인 때가 품목마다 다르다.</p>
+    </div>
+    <figure id="f2">
+      <p class="ft">평년 소매가격 달력</p>
+      <div class="ramp" aria-hidden="true"><span>1년 평균의 70%</span><i></i><span>130% 이상</span></div>
+      <div class="chart" id="c2"></div>
+      <figcaption>aT 「주요 채소류 일일가격 현황」 소매 평년순가격. 상순(1–10일)·중순(11–20일)·하순(21일–말일).</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t2"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s3">
+    <div class="prose">
+      <h2 class="h" id="s3">2025년은 평년대로 갔을까</h2>
+      <p>실제 2025년 1월부터 2026년 6월까지의 매일 소매가격을 평년 가격 곡선 위에 겹쳤다. 배추는 평년처럼 8월(평균 6,652원)에 가장 비쌌다. 무는 2025년 초 평년보다 크게 비싸 1–2월이 1년 중 가장 비쌌다. 평년 모양은 해마다 날씨와 작황에 따라 얼마든지 흔들린다.</p>
+    </div>
+    <figure id="f3">
+      <p class="ft">실제 가격과 평년 가격</p>
+      <p class="fs">원. 선 = 실제 소매가격(매일), 옅은 띠 = 같은 열흘의 평년 가격</p>
+      <div class="player" id="p3"></div>
+      <div class="chart" id="c3"></div>
+      <figcaption>aT 「주요 채소류 일일가격 현황」, 2025.1.1–2026.6.30 소매가격. 품목별 단위는 원자료 기준이다.</figcaption>
+      <details><summary>표로 보기</summary><div class="tw" id="t3"></div></details>
+      <div class="tip" hidden></div>
+    </figure>
+  </section>
+
+  <section class="s" aria-labelledby="s4">
+    <div class="prose">
+      <h2 class="h" id="s4">그래서, 채소는 겨울에 비쌀까</h2>
+      <p>품목마다 다르다. 겨울(12–2월)이 연평균보다 비싼 것은 대파와 양파 두 가지이고, 배추와 무는 오히려 겨울이 가장 싸다. 김장 채소가 비싼 때는 김장철이 아니라 그 전, 늦여름이다. 저장해 파는 마늘과 고춧가루는 계절을 거의 타지 않는다. "겨울 채소값"을 걱정한다면 대파부터 보면 된다.</p>
+    </div>
+  </section>
+
+  <section class="s" aria-labelledby="s5">
+    <h2 class="h" id="s5" style="font-size:30px">읽을 때 주의할 점</h2>
+    <ul class="care-list">
+      <li>평년가격은 aT가 그 전 5년 같은 열흘의 값을 평균한 것이다. 원자료의 2026년 행은 기준 기간이 한 해 뒤로 밀려 있어, 이 페이지는 2025년 행에 적힌 평년가격 36칸만 썼다.</li>
+      <li>여섯 품목만 들어 있다. 상추·오이·시금치 같은 다른 채소는 이 자료에 없다. 같은 기관의 「월별 소매 가격정보」(15087482)는 품목이 많지만, 연월 칸이 2025년 자료까지 모두 "2026-01…2026-12"로 적혀 있어 해를 가를 수 없어 쓰지 않았다.</li>
+      <li>소매가격은 전국 조사 지점의 평균이다. 품목별 단위(포기·개·kg 등)는 원자료 표기를 따랐으며, 품목끼리는 가격이 아니라 1년 평균 대비 비율로 견줬다.</li>
+      <li>주말·공휴일에는 가격이 조사되지 않아 매일 그래프의 빈 날은 앞뒤를 이었다.</li>
+    </ul>
+  </section>
+
+  <section class="s" aria-labelledby="s6">
+    <h2 class="h" id="s6" style="font-size:30px">엮은 공공데이터</h2>
+    <div class="dt"><table>
+      <thead><tr><th>데이터</th><th>기관</th><th>쓴 부분</th><th>기간</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.data.go.kr/data/15087352/fileData.do" target="_blank" rel="noopener">주요 채소류 일일가격 현황</a> (15087352)</td><td>한국농수산식품유통공사</td><td>배추·무·대파·양파·마늘·건고추의 매일 소매가격과 열흘 단위 평년가격</td><td>2025.1–2026.6 (평년 36순)</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="s" aria-labelledby="s7">
+    <h2 class="h" id="s7" style="font-size:30px">이 장을 만든 방법</h2>
+    <dl class="method">
+      <dt>데이터</dt><dd>1개 자료 · 6개 품목 × 545일, 평년 36순</dd>
+      <dt>도구</dt><dd>Python(집계) · 손그림 느낌의 SVG 캐릭터와 재생 애니메이션(JavaScript)</dd>
+      <dt>분석 기법</dt><dd>평년 가격의 계절 지수(연평균 = 100) · 실제 가격과 평년 비교</dd>
+      <dt>검증</dt><dd>2025년 행만으로 품목마다 평년 순가격 36칸이 빠짐없이 채워지는 것을 확인했다.</dd>
+      <dt>역할</dt><dd>질문은 사람이 골랐다. 자료 받기, 계산, 그림, 본문 초안은 Claude가 맡았다. 색은 사람이 고른 팔레트에서 썼다.</dd>
+    </dl>
+  </section>
+
+  <section class="s" aria-labelledby="s8">
+    <h2 class="h" id="s8" style="font-size:30px">다음에 검증할 질문</h2>
+    <div class="next">
+      <div class="q"><h3>배춧값이 뛰면 김치 수입이 늘까</h3><p>배추 가격과 김치 수입량을 달마다 겹쳐 볼 수 있다.</p></div>
+      <div class="q"><h3>도매가격이 내리면 소매가격도 바로 내릴까</h3><p>같은 자료의 도매가격과 소매가격의 시차를 재면 된다.</p>
+        <ul><li><a href="https://www.data.go.kr/data/15087352/fileData.do" target="_blank" rel="noopener">주요 채소류 일일가격 현황</a> · aT</li></ul></div>
+    </div>
+  </section>
+
+  <footer>모든 숫자는 공개된 원자료에서 스크립트로 계산했다 · 정리 2026.11.5</footer>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+document.documentElement.lang = "ko";
+(() => {
+/*COMMON_JS*/
+  const IT = DATA.items, NAME = { "배추": "배추", "무": "무", "대파": "대파", "양파": "양파", "마늘": "마늘", "건고추": "건고추" };
+  const avg = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+  const MR = {}; IT.forEach((k) => { const n = DATA.norm[k], m = avg(n); MR[k] = Array.from({ length: 12 }, (_, i) => avg(n.slice(i * 3, i * 3 + 3)) / m * 100); });
+  const MN = Array.from({ length: 12 }, (_, i) => `${i + 1}월`);
+  const heat = (r) => { const t = Math.max(-1, Math.min(1, (r - 100) / 30)); return t < 0 ? `color-mix(in oklab, var(--cheap) ${Math.round(-t * 85)}%, var(--mid))` : `color-mix(in oklab, var(--dear) ${Math.round(t * 85)}%, var(--mid))`; };
+
+  /* cute vegetables, drawn around (0,0) = bottom centre, about 90 tall at scale 1 */
+  const O = "var(--ink)", SW = 2.2;
+  const VEG = {
+    "배추": (g) => { s("path", { d: "M-24,0 C-30,-30 -26,-62 -14,-80 C-6,-90 6,-90 14,-80 C26,-62 30,-30 24,0 Z", fill: "var(--root)", stroke: O, "stroke-width": SW }, g); s("path", { d: "M-26,-38 C-36,-60 -26,-92 -6,-96 C-2,-84 0,-70 0,-56 C2,-74 10,-92 24,-90 C34,-70 30,-50 22,-36 C12,-46 -12,-48 -26,-38 Z", fill: "var(--leaf2)", stroke: O, "stroke-width": SW, "stroke-linejoin": "round" }, g); s("path", { d: "M0,-56 V-8 M-12,-40 L-6,-12 M12,-40 L6,-12", stroke: "var(--leaf)", "stroke-width": 1.6, fill: "none", opacity: .7 }, g); return -30; },
+    "무": (g) => { s("path", { d: "M-20,-58 C-24,-30 -12,-6 0,8 C12,-6 24,-30 20,-58 Z", fill: "var(--root)", stroke: O, "stroke-width": SW, "stroke-linejoin": "round" }, g); s("path", { d: "M-20,-58 C-18,-66 18,-66 20,-58 C14,-52 -14,-52 -20,-58 Z", fill: "var(--leaf3)", stroke: O, "stroke-width": 1.6 }, g); [[-24, -12], [0, 0], [24, 12]].forEach(([a, dx]) => s("ellipse", { cx: dx * .5, cy: -86, rx: 9, ry: 24, fill: "var(--leaf)", stroke: O, "stroke-width": 1.8, transform: `rotate(${a} 0 -62)` }, g)); s("path", { d: "M0,-62 V-100", stroke: "var(--leafd)", "stroke-width": 1.4, opacity: .6 }, g); return -36; },
+    "대파": (g) => { s("rect", { x: -10, y: -54, width: 20, height: 54, rx: 9, fill: "var(--root)", stroke: O, "stroke-width": SW }, g); s("path", { d: "M-10,-50 C-12,-80 -22,-100 -26,-112 C-14,-104 -6,-90 -2,-74 C0,-96 2,-108 8,-118 C10,-98 8,-80 6,-70 C12,-86 22,-100 30,-104 C22,-86 14,-66 10,-50 Z", fill: "var(--leaf)", stroke: O, "stroke-width": SW, "stroke-linejoin": "round" }, g); s("path", { d: "M-6,0 l-4,7 M0,0 l0,8 M6,0 l4,7", stroke: O, "stroke-width": 1.4 }, g); return -30; },
+    "양파": (g) => { s("path", { d: "M0,-74 C24,-60 34,-34 26,-14 C20,-2 -20,-2 -26,-14 C-34,-34 -24,-60 0,-74 Z", fill: "var(--onion)", stroke: O, "stroke-width": SW }, g); s("path", { d: "M0,-72 C10,-50 12,-22 6,-2 M0,-72 C-10,-50 -12,-22 -6,-2", stroke: "var(--onion2)", "stroke-width": 1.6, fill: "none" }, g); s("path", { d: "M0,-74 q-2,-12 6,-20 M0,-74 q2,-10 -6,-16", stroke: "var(--leaf)", "stroke-width": 2.6, fill: "none", "stroke-linecap": "round" }, g); s("path", { d: "M-8,-1 l-3,5 M0,-1 v6 M8,-1 l3,5", stroke: O, "stroke-width": 1.3 }, g); return -32; },
+    "마늘": (g) => { s("path", { d: "M0,-76 C6,-64 26,-50 28,-28 C30,-8 14,0 0,0 C-14,0 -30,-8 -28,-28 C-26,-50 -6,-64 0,-76 Z", fill: "var(--garlic)", stroke: O, "stroke-width": SW, "stroke-linejoin": "round" }, g); s("path", { d: "M0,-74 C-8,-50 -10,-24 -6,-2 M0,-74 C8,-50 10,-24 6,-2 M0,-70 V-2", stroke: "var(--garlic2)", "stroke-width": 1.5, fill: "none" }, g); return -30; },
+    "건고추": (g) => { s("path", { d: "M-6,-84 C10,-80 18,-60 16,-36 C14,-14 4,-2 -10,2 C-4,-12 0,-30 -2,-50 C-3,-64 -8,-74 -6,-84 Z", fill: "var(--chili)", stroke: O, "stroke-width": SW, "stroke-linejoin": "round" }, g); s("path", { d: "M-10,-84 C-4,-92 6,-92 10,-84 C4,-80 -4,-80 -10,-84 Z M0,-90 q2,-10 8,-12", fill: "var(--leafd)", stroke: O, "stroke-width": 1.8, "stroke-linecap": "round" }, g); return -48; },
+  };
+  function face(g, y, r, onDark) {
+    const ink = "var(--face)";
+    s("circle", { cx: -7, cy: y, r: 2.4, fill: ink }, g); s("circle", { cx: 7, cy: y, r: 2.4, fill: ink }, g);
+    s("ellipse", { cx: -12, cy: y + 6, rx: 3.6, ry: 2.2, fill: "var(--blush)", opacity: .9 }, g); s("ellipse", { cx: 12, cy: y + 6, rx: 3.6, ry: 2.2, fill: "var(--blush)", opacity: .9 }, g);
+    if (r < 92) s("path", { d: `M-5,${y + 6} Q0,${y + 11} 5,${y + 6}`, fill: "none", stroke: ink, "stroke-width": 1.8, "stroke-linecap": "round" }, g);
+    else if (r < 112) s("path", { d: `M-4,${y + 8} H4`, stroke: ink, "stroke-width": 1.8, "stroke-linecap": "round" }, g);
+    else s("ellipse", { cx: 0, cy: y + 8, rx: 3, ry: 3.6, fill: ink }, g);
+    if (r >= 120) s("path", { d: `M16,${y - 12} q4,6 0,9 q-4,-3 0,-9 Z`, fill: "var(--sweat)", stroke: ink, "stroke-width": 1 }, g);
+    if (r >= 140) s("path", { d: `M-18,${y - 16} q4,6 0,9 q-4,-3 0,-9 Z`, fill: "var(--sweat)", stroke: ink, "stroke-width": 1 }, g);
+  }
+
+  /* ---------- 1. the stall ---------- */
+  function c1(pos) {
+    const box = document.getElementById("c1"), fig = document.getElementById("f1"); box.replaceChildren();
+    const narrow = box.clientWidth < 620, cols = narrow ? 3 : 6, rows = 6 / cols, CW = 140, CH = narrow ? 230 : 220, top = 34;
+    const W = CW * cols, H = top + CH * rows + 8, mi = Math.min(11, Math.floor(pos)), f = pos - Math.floor(pos);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${mi + 1}월 채소 여섯 가지의 평년 가격 지수` }, box);
+    for (let i = 0; i < cols * 3; i++) s("path", { d: `M${i * W / (cols * 3)},0 h${W / (cols * 3)} v16 a${W / (cols * 6)} ${W / (cols * 12)} 0 0 1 ${-W / (cols * 3)} 0 Z`, fill: i % 2 ? "var(--card)" : "var(--awning)", stroke: "var(--ink)", "stroke-width": 1.2 }, v);
+    const pts = [];
+    IT.forEach((k, j) => {
+      const cx = (j % cols) * CW + CW / 2, by = top + Math.floor(j / cols) * CH + 150;
+      const r = MR[k][mi] + (mi < 11 ? (MR[k][mi + 1] - MR[k][mi]) * f : 0), sc = Math.max(.62, Math.min(1.25, .55 + r / 230));
+      s("rect", { x: cx - CW / 2 + 6, y: by + 2, width: CW - 12, height: 12, rx: 6, fill: "var(--stall)", stroke: "var(--ink)", "stroke-width": 1.4 }, v);
+      s("ellipse", { cx, cy: by + 2, rx: 30 * sc, ry: 5, fill: "var(--ink)", opacity: .15 }, v);
+      const g = s("g", { transform: `translate(${cx} ${by}) scale(${sc.toFixed(3)})` }, v);
+      const fy = VEG[k](g); face(g, fy, r);
+      const pk = MR[k].indexOf(Math.max(...MR[k]));
+      const TOP = { "배추": 98, "무": 112, "대파": 120, "양파": 96, "마늘": 78, "건고추": 104 };
+      if (mi === pk) s("path", { d: `M${cx - 12},${by - TOP[k] * sc - 6} l4,-12 l8,8 l8,-8 l4,12 Z`, fill: "#e9b949", stroke: "var(--ink)", "stroke-width": 1.4, "stroke-linejoin": "round" }, v);
+      tx(v, cx, by + 40, NAME[k], "vn", 26, "middle");
+      tx(v, cx, by + 62, `${Math.round(r)}%`, "vv", narrow ? 17 : 14, "middle", { style: `fill:${r >= 110 ? "var(--dear2)" : r <= 90 ? "var(--cheap)" : "var(--ink2)"}` });
+      pts.push({ x: cx, y: by - 50, r: 40, fn: () => [`${NAME[k]} · ${mi + 1}월`, [[pc(MR[k][mi]), "1년 평균 대비"], [`${pk + 1}월`, "가장 비싼 달"], [`${MR[k].indexOf(Math.min(...MR[k])) + 1}월`, "가장 싼 달"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "좌우 화살표로 채소를 하나씩 볼 수 있다");
+  }
+  table("t1", ["품목", ...MN], IT.map((k) => [k, ...MR[k].map((x) => Math.round(x) + "%")]));
+
+  /* ---------- 2. 36-cell calendar ---------- */
+  const SUN = ["상", "중", "하"];
+  function c2() {
+    const box = document.getElementById("c2"), fig = document.getElementById("f2"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 560, l = narrow ? 52 : 74, r = 6, top = 22, rowH = narrow ? 30 : 38, H = top + rowH * IT.length + 8;
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "품목별 열흘 단위 평년 소매가격 달력" }, box);
+    const cw = (W - l - r) / 36, pts = [];
+    for (let m = 0; m < 12; m++) if (!narrow || m % 2 === 0) tx(v, l + (m * 3 + 1.5) * cw, 14, `${m + 1}월`, "tk", 11.5, "middle");
+    IT.forEach((k, j) => {
+      const n = DATA.norm[k], mm = avg(n), y = top + j * rowH, pk = n.indexOf(Math.max(...n));
+      n.forEach((p, i) => { const rr = p / mm * 100; s("rect", { x: l + i * cw + .6, y: y + 2, width: cw - 1.2, height: rowH - 6, rx: Math.min(5, cw / 3), fill: heat(rr) }, v); pts.push({ x: l + i * cw + cw / 2, y: y + rowH / 2, r: cw / 2, fn: () => [`${k} · ${Math.floor(i / 3) + 1}월 ${SUN[i % 3]}순`, [[fmt(p) + "원", "평년 소매가격"], [pc(rr), "1년 평균 대비"]]] }); });
+      const px = l + pk * cw + cw / 2; s("path", { d: `M${px - 7},${y + 9} l2.4,-7 l4.6,4.6 l4.6,-4.6 l2.4,7 Z`, fill: "#e9b949", stroke: "var(--ink)", "stroke-width": 1 }, v);
+      tx(v, l - 8, y + rowH / 2 + 5, k, "vn", narrow ? 18 : 21, "end");
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 칸을 옮겨 볼 수 있다");
+  }
+  table("t2", ["품목", ...Array.from({ length: 36 }, (_, i) => `${Math.floor(i / 3) + 1}월${SUN[i % 3]}`)], IT.map((k) => [k, ...DATA.norm[k].map(fmt)]));
+
+  /* ---------- 3. actual vs normal, small multiples ---------- */
+  const D = DATA.days, ND = D.length;
+  const sunIdx = (d) => { const m = +d.slice(5, 7) - 1, dd = +d.slice(8, 10); return m * 3 + (dd <= 10 ? 0 : dd <= 20 ? 1 : 2); };
+  function c3(pos) {
+    const box = document.getElementById("c3"), fig = document.getElementById("f3"); box.replaceChildren();
+    const W = Math.max(300, box.clientWidth), narrow = W < 620, cols = narrow ? 1 : 2, cw = W / cols, ch = narrow ? 150 : 170, H = ch * Math.ceil(IT.length / cols);
+    const v = s("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "품목별 실제 소매가격과 평년 가격 2025–2026" }, box);
+    const upto = Math.min(ND - 1, Math.floor(pos)), pts = [];
+    IT.forEach((k, j) => {
+      const ox = (j % cols) * cw, oy = Math.floor(j / cols) * ch, l = ox + 46, r = ox + cw - 14, t = oy + 26, b = oy + ch - 24;
+      const act = DATA.daily[k], nor = D.map((d) => DATA.norm[k][sunIdx(d)]);
+      const vals = [...act.filter((x) => x != null), ...nor], lo = Math.min(...vals) * .9, hi = Math.max(...vals) * 1.05;
+      const sx = (i) => l + i / (ND - 1) * (r - l), sy = (p) => b - (p - lo) / (hi - lo) * (b - t);
+      tx(v, ox + 6, oy + 18, k, "vn", 20);
+      [lo, hi].forEach((p, q) => tx(v, l - 6, sy(p) + (q ? 10 : 0), fmt(Math.round(p / 100) * 100), "tk", 11.5, "end"));
+      ["2025-01", "2025-07", "2026-01", "2026-06"].forEach((m) => { const i = D.findIndex((d) => d.startsWith(m)); if (i >= 0) { s("line", { x1: sx(i), x2: sx(i), y1: t, y2: b, class: "gl" }, v); tx(v, sx(i), b + 15, m.replace("-", "."), "tk", 11.5, "middle"); } });
+      s("path", { d: "M" + nor.map((p, i) => `${sx(i).toFixed(1)},${sy(p).toFixed(1)}`).join("L"), fill: "none", stroke: "var(--ghost)", "stroke-width": 6, "stroke-linejoin": "round", opacity: .7 }, v);
+      let d = "", last = null; for (let i = 0; i <= upto; i++) { const p = act[i] != null ? act[i] : last; if (p == null) continue; d += (d ? "L" : "M") + sx(i).toFixed(1) + "," + sy(p).toFixed(1); last = p; }
+      s("path", { d, fill: "none", stroke: "var(--leafd)", "stroke-width": 1.8, "stroke-linejoin": "round" }, v);
+      if (last != null) { s("circle", { cx: sx(upto), cy: sy(last), r: 4, fill: "var(--dear)" }, v); }
+      for (let i = 0; i <= upto; i += 5) if (act[i] != null) pts.push({ x: sx(i), y: sy(act[i]), r: 3, fn: () => [`${k} · ${D[i]}`, [[fmt(act[i]) + "원", "실제 소매가격"], [fmt(nor[i]) + "원", "평년"]]] });
+    });
+    pointLayer(v, tipFor(fig), pts, "화살표 키로 날짜를 옮겨 볼 수 있다");
+  }
+  table("t3", ["날짜", ...IT], D.map((d, i) => [d, ...IT.map((k) => (DATA.daily[k][i] != null ? fmt(DATA.daily[k][i]) : "–"))]).filter((_, i) => i % 5 === 0));
+
+  const p1 = Player("p1", "채소 달력", c1, 12, (i) => MN[i], 9);
+  const p3 = Player("p3", "실제 가격", c3, ND, (i) => D[i].slice(2).replace(/-/g, "."), 12);
+  const all = () => { p1.render(); c2(); p3.render(); };
+  all(); onResize(all);
+})();
+</script>
