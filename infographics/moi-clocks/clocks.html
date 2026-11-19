@@ -1,0 +1,519 @@
+<title>보도자료의 시계</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 밤 상황실 벽에 걸린 시계 세 개. 머리글 → 계절 시계(원형 달력) → 사회재난 심전도(가로 띠) → 일주일 시계(요일×보도 방식 점판 + 24시 시계) → 자료와 방법.
+   한 가지 모습(어두운 상황실)만 쓴다. 데이터 색은 design/palette.json 팔레트에서 골랐다. */
+:root {
+  color-scheme: dark;
+  --ground: #121c24; --panel: #17242e; --panel-2: #1d2c37; --rule: #2b3c48; --grid: #22323d; --grid-2: #2f4250;
+  --ink: #eef0ea; --ink-2: #c3cbcd; --muted: #9aa6ab;
+  --rain: #689daf; --typhoon: #91b0a1; --heat: #ebcfa7; --fire: #d56b41; --quake: #b87b68; --snow: #dbe1dd; --drought: #abc07b;
+  --pulse: #e7cdc0; --hot: #d56b41;
+  --k-morning: #ebcfa7; --k-hour: #8eabc9; --k-now: #d56b41; --k-event: #abc07b; --k-evening: #b5c6ce; --k-ref: #b6a392;
+  --display: "Black Han Sans", "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html { background: var(--ground); }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 16px/1.7 var(--sans); word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 56px; }
+main { max-width: 1120px; margin: 0 auto; display: grid; gap: 56px; }
+a { color: var(--ink); text-underline-offset: 3px; text-decoration-color: var(--muted); }
+a:hover { text-decoration-color: var(--ink); }
+:focus-visible { outline: 2px solid var(--heat); outline-offset: 2px; }
+p { margin: 0; }
+h1, h2 { font-family: var(--display); font-weight: 400; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.num { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--mono); }
+.label { font: 500 12px/1.4 var(--mono); letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
+
+/* 머리글 */
+.mast { display: grid; gap: 18px; padding-top: 8px; }
+.mast h1 { font-size: clamp(44px, 9vw, 104px); line-height: 1; }
+.mast .lede { font-size: clamp(17px, 2.2vw, 20px); color: var(--ink-2); max-width: 40em; }
+.dials { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.dial { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; padding: 12px 14px; border: 1px solid var(--rule); background: var(--panel); color: inherit; text-decoration: none; min-width: 0; }
+.dial:hover { border-color: var(--grid-2); background: var(--panel-2); }
+.dial svg { width: 44px; height: 44px; flex: none; }
+.dial b { display: block; font-size: 15px; }
+.dial span { display: block; font-size: 13px; color: var(--muted); line-height: 1.5; }
+@media (max-width: 720px) { .dials { grid-template-columns: 1fr; } }
+
+/* 포스터 공통 */
+.poster { display: grid; gap: 20px; border-top: 2px solid var(--ink); padding-top: 18px; min-width: 0; }
+.poster h2 { font-size: clamp(30px, 5vw, 52px); line-height: 1.12; }
+.poster .claim { font-size: 17px; color: var(--ink-2); max-width: 44em; }
+.claim b, .read b { color: var(--ink); }
+.split { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+@media (max-width: 880px) { .split { grid-template-columns: 1fr; } }
+.chart { position: relative; min-width: 0; }
+.chart svg { display: block; width: 100%; height: auto; }
+.chart svg text { font-family: var(--sans); }
+.scroll { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-color: var(--grid-2) transparent; }
+.hint { font-size: 13px; color: var(--muted); }
+.readout { min-height: 6.2em; border-left: 3px solid var(--grid-2); padding: 4px 0 4px 14px; font-size: 14.5px; color: var(--ink-2); display: grid; gap: 4px; align-content: start; }
+.readout .r-meta { font: 500 12.5px/1.5 var(--mono); color: var(--muted); }
+.readout ul { margin: 0; padding-left: 1.1em; display: grid; gap: 3px; }
+.readout b { color: var(--ink); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 500 13px/1 var(--sans); color: var(--ink-2); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: 7px 12px 7px 9px; cursor: pointer; display: inline-flex; gap: 7px; align-items: center; min-height: 32px; }
+.chip i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.chip[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); background: var(--panel-2); }
+.chip:hover { border-color: var(--grid-2); color: var(--ink); }
+.foot-note { font-size: 13px; color: var(--muted); max-width: 60em; }
+
+/* 1. 계절 시계 옆: 종류별 열두 달 지문 */
+.prints { display: grid; gap: 10px; }
+.print { display: grid; grid-template-columns: 6.2em minmax(0, 1fr) 4.4em; gap: 10px; align-items: center; background: none; border: 0; padding: 4px 0; color: inherit; font: inherit; text-align: left; cursor: pointer; border-bottom: 1px solid var(--grid); }
+.print:hover .p-name, .print[aria-pressed="true"] .p-name { color: var(--ink); }
+.print .p-name { font-size: 14px; color: var(--ink-2); display: flex; gap: 7px; align-items: center; }
+.print .p-name i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.print svg { width: 100%; height: 30px; display: block; }
+.print .p-share { text-align: right; font: 500 14px/1.2 var(--mono); color: var(--ink); }
+.print .p-share small { display: block; font-size: 11px; color: var(--muted); font-weight: 400; }
+
+/* 2. 심전도 옆: 사건 목록 */
+.events { display: grid; gap: 2px; }
+.ev { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--grid); }
+.ev b { font-weight: 500; font-size: 15px; }
+.ev .ev-n { font: 500 15px var(--mono); }
+.ev .ev-when { grid-column: 1 / -1; font-size: 12.5px; color: var(--muted); }
+.ev .ev-bar { grid-column: 1 / -1; height: 5px; background: var(--hot); border-radius: 0 3px 3px 0; }
+.stat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 560px) { .stat-row { grid-template-columns: 1fr; } }
+.stat { border-top: 1px solid var(--rule); padding-top: 8px; display: grid; gap: 2px; }
+.stat strong { font: 400 clamp(30px, 4.4vw, 40px)/1.05 var(--display); }
+.stat span { font-size: 13.5px; color: var(--ink-2); }
+
+/* 3. 일주일 시계 */
+.week-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13.5px; color: var(--ink-2); }
+.week-legend span { display: inline-flex; gap: 7px; align-items: center; }
+.week-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.cell-hit { fill: transparent; cursor: pointer; }
+.cell-hit:hover, .cell-hit:focus { fill: rgba(238, 240, 234, 0.05); outline: none; }
+.cell-hit.on { fill: rgba(238, 240, 234, 0.08); stroke: var(--ink-2); stroke-width: 1; }
+.reveal { display: grid; gap: 8px; padding: 14px 16px; border: 1px dashed var(--grid-2); }
+.reveal button { justify-self: start; font: 500 14px var(--sans); color: var(--ground); background: var(--heat); border: 0; padding: 8px 14px; cursor: pointer; min-height: 38px; }
+.reveal .ans { color: var(--ink-2); font-size: 15px; }
+
+/* 자료와 방법 */
+.method { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); gap: 10px 20px; border-top: 2px solid var(--ink); padding-top: 18px; font-size: 14.5px; color: var(--ink-2); }
+.method dt { font: 500 12px/2 var(--mono); color: var(--muted); letter-spacing: 0.06em; }
+.method dd { margin: 0; max-width: 62em; }
+@media (max-width: 560px) { .method { grid-template-columns: 1fr; gap: 2px; } .method dd { margin-bottom: 10px; } }
+.loading { color: var(--muted); font-size: 14px; }
+@media (prefers-reduced-motion: no-preference) {
+  .beat { animation: beat 1.6s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+  @keyframes beat { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.8); opacity: 0.35; } }
+}
+</style>
+
+<main>
+  <header class="mast">
+    <span class="label">행정안전부 보도자료 <span class="num" id="m-n">3,648</span>건 · <span id="m-range">2024. 1. 2.–2026. 11. 18.</span></span>
+    <h1>보도자료의 시계</h1>
+    <p class="lede">행안부는 재난을 맡은 부처라, 보도자료가 나오는 때를 보면 이 나라의 시간이 보입니다. 해마다 같은 때 돌아오는 재난, 예고 없이 뛰는 사고, 그리고 요일과 시각에 맞춰 풀리는 보도까지, 세 개의 시계로 읽었습니다.</p>
+    <nav class="dials" aria-label="세 시계">
+      <a class="dial" href="#season"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="19" fill="none" stroke="#2f4250" stroke-width="2"/><path d="M22 3 A19 19 0 0 1 41 22" fill="none" stroke="#ebcfa7" stroke-width="4"/><path d="M22 41 A19 19 0 0 1 6 31" fill="none" stroke="#dbe1dd" stroke-width="4"/><path d="M39 31 A19 19 0 0 1 22 41" fill="none" stroke="#689daf" stroke-width="4"/></svg><span><b>계절 시계</b>자연재난은 달력대로 온다</span></a>
+      <a class="dial" href="#pulse"><svg viewBox="0 0 44 44" aria-hidden="true"><path d="M2 26 H14 L17 18 L21 36 L25 8 L29 26 H42" fill="none" stroke="#d56b41" stroke-width="2.6" stroke-linejoin="round"/></svg><span><b>사고의 심전도</b>사회재난은 예고 없이 뛴다</span></a>
+      <a class="dial" href="#week"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="19" fill="none" stroke="#2f4250" stroke-width="2"/><path d="M22 22 V9 M22 22 L31 26" stroke="#8eabc9" stroke-width="2.6" stroke-linecap="round"/><circle cx="22" cy="22" r="2.4" fill="#eef0ea"/></svg><span><b>일주일 시계</b>보도자료는 언제 풀리나</span></a>
+    </nav>
+  </header>
+
+  <!-- 1. 계절 시계 -->
+  <section class="poster" id="season" aria-labelledby="h-season">
+    <span class="label">계절 시계 · 자연재난</span>
+    <h2 id="h-season">자연재난 보도는 달력대로 온다</h2>
+    <p class="claim" id="season-claim">제목에 재난 이름이 들어간 보도자료를 날짜 자리에 점으로 찍었습니다. 안쪽 고리부터 2024·2025·2026년입니다. 폭염은 여름, 대설·한파는 겨울, 산불은 봄에 몰리고, 지진만 계절을 가리지 않습니다.</p>
+    <div class="chips" id="nat-chips" role="group" aria-label="재난 종류 골라 보기"></div>
+    <div class="split">
+      <div class="chart" id="radial"><p class="loading">자료를 불러오는 중…</p></div>
+      <div style="display:grid;gap:18px;min-width:0">
+        <div>
+          <p class="label" style="margin-bottom:8px">종류별 열두 달 지문 · 가장 많은 석 달의 몫</p>
+          <div class="prints" id="prints"></div>
+          <p class="hint" style="margin-top:8px">시계에 초점을 두고 ←→를 누르면 날짜순으로 옮겨 갑니다. 막대는 2024·2025년 두 해의 달별 보도자료 수, 진한 부분이 가장 많이 몰린 연달은 석 달입니다. 줄을 누르면 시계에서 그 종류만 밝아집니다.</p>
+        </div>
+        <div class="readout" id="nat-read" aria-live="polite"><span class="r-meta">점을 가리키거나 누르면</span><span>그날 나온 보도자료 제목이 여기 나옵니다.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 사고의 심전도 -->
+  <section class="poster" id="pulse" aria-labelledby="h-pulse">
+    <span class="label">사고의 심전도 · 사회재난</span>
+    <h2 id="h-pulse">사고는 예고 없이 심장을 뛰게 한다</h2>
+    <p class="claim" id="pulse-claim">화재·사고·참사·전산장애처럼 사람이 만든 재난이 제목에 나온 보도자료를 주마다 세어 심전도처럼 그렸습니다. 계절이 없고, 큰 사고가 나면 몇 주 동안 크게 뜁니다.</p>
+    <div class="stat-row" id="pulse-stats"></div>
+    <div class="chart scroll" id="ecg-wrap" tabindex="0" aria-label="주별 사회재난 보도자료 심전도, 가로로 밀어 볼 수 있음"><p class="loading">자료를 불러오는 중…</p></div>
+    <p class="hint">좁은 화면에서는 옆으로 밀어 보세요. 주를 가리키거나 누르면(키보드는 ←→) 그 주의 제목이 아래에 나옵니다. 옅은 세로 띠는 10월입니다.</p>
+    <div class="split">
+      <div class="readout" id="soc-read" aria-live="polite"><span class="r-meta">주를 가리키거나 누르면</span><span>그 주의 보도자료 제목이 여기 나옵니다.</span></div>
+      <div><p class="label" style="margin-bottom:4px">큰 박동을 만든 사건</p><div class="events" id="events"></div></div>
+    </div>
+  </section>
+
+  <!-- 3. 일주일 시계 -->
+  <section class="poster" id="week" aria-labelledby="h-week">
+    <span class="label">일주일 시계 · 보도 시점</span>
+    <h2 id="h-week">월요일 아침 신문, 화요일 국무회의, 일요일엔 재난</h2>
+    <p class="claim" id="week-claim">보도자료 첨부 파일 이름 앞에는 언제부터 보도해도 되는지가 적혀 있습니다. 「(조간)」은 다음 날 아침 신문부터, 「(16시)」는 그 시각부터입니다. 점 하나가 보도자료 하나입니다.</p>
+    <div class="week-legend" id="week-legend"></div>
+    <div class="split">
+      <div class="chart" id="grid"><p class="loading">자료를 불러오는 중…</p></div>
+      <div style="display:grid;gap:18px;min-width:0">
+        <div class="chart" id="clock"></div>
+        <div class="reveal" id="sun-q">
+          <span><b>일요일에 나온 보도자료 <span class="num" id="sun-n">38</span>건.</b> 무엇에 관한 것이었을까요?</span>
+          <button type="button" id="sun-btn">답 보기</button>
+          <p class="ans" id="sun-ans" hidden></p>
+        </div>
+      </div>
+    </div>
+    <div class="readout" id="week-read" aria-live="polite"><span class="r-meta">칸을 가리키거나 누르면</span><span>그 요일·방식의 보도자료 몇 건이 여기 나옵니다.</span></div>
+  </section>
+
+  <dl class="method">
+    <dt>자료</dt>
+    <dd>직접 만든 <a href="https://claude.ai/artifact/AZYidBSeAFxTHH5CZjY7XW" target="_blank" rel="noopener">행안부 보도자료 DB</a>(행정안전부 누리집 보도자료 게시판, 첨부 원문까지 수집). 계절 시계와 심전도는 <span class="num" id="d-n">3,648</span>건 전체(<span id="d-range"></span>, 등록일 기준), 일주일 시계는 첨부 파일 이름이 함께 저장된 <span id="d-e"></span>의 보도자료입니다.</dd>
+    <dt>분류</dt>
+    <dd>제목에 나온 말로 나눴습니다. 자연재난은 앞에서부터 처음 맞는 하나로 정합니다: 산불 → 지진 → 태풍·강풍(태풍·강풍·풍랑) → 호우·장마(호우·장마·폭우·홍수·침수·산사태·우기·풍수해) → 폭염(폭염·무더위·열대야) → 대설·한파(대설·폭설·한파·강추위·동파) → 가뭄. 사회재난은 자연재난 말이 없는 제목 가운데 화재·사고·참사·붕괴·폭발·전산장애·장애(장애인 제외)·정전·오물·풍선·침몰·추락·유출·인파·테러·싱크홀·땅꺼짐이 나온 것입니다. 예방 홍보(“등산사고에 주의하세요”)도 들어갑니다.</dd>
+    <dt>사건 묶음</dt>
+    <dd>사회재난 보도자료 가운데 사건 이름이 제목에 나오고 정한 기간 안에 있는 것을 셌습니다(예: 국가정보자원관리원 화재는 2025. 9. 26.–12. 31.의 ‘국가정보자원관리원·전산장애·정보시스템’ 제목).</dd>
+    <dt>보도 시점</dt>
+    <dd>첫 번째 첨부 파일 이름 앞의 「YYMMDD (시점)」을 읽었습니다. 요일은 파일 이름의 날짜로 정했습니다. 회의·행사 연동은 「국무회의 종료 시」, 「본회의 의결 시」, 「브리핑 시작 시」 같은 표기입니다. 시점 표기가 없거나 읽지 못한 <span id="d-skip"></span>건은 뺐습니다.</dd>
+    <dt>읽을 때 주의</dt>
+    <dd>제목만 보고 나눴으므로 본문에만 재난이 나오는 보도자료는 빠지고, 같은 말이 다른 뜻으로 쓰인 제목이 섞일 수 있습니다. 보도자료 수는 그 일에 대해 행안부가 얼마나 자주 알렸는지를 보여 줄 뿐, 피해의 크기와는 다릅니다.</dd>
+  </dl>
+</main>
+
+<script>
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const s = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+  const fmt = (n) => n.toLocaleString("ko-KR");
+  const kdate = (iso) => { const [y, m, d] = iso.split("-").map(Number); return `${y}. ${m}. ${d}.`; };
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const URL0 = "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=";
+  const link = (ntt, title) => `<a href="${URL0}${encodeURIComponent(ntt)}" target="_blank" rel="noopener">${esc(title)}</a>`;
+  const WD = ["월", "화", "수", "목", "금", "토", "일"];
+  const COL = { rain: "--rain", typhoon: "--typhoon", heat: "--heat", fire: "--fire", quake: "--quake", snow: "--snow", drought: "--drought" };
+
+  fetch("data.json").then((r) => r.json()).then(start).catch(() => {
+    document.querySelectorAll(".loading").forEach((e) => (e.textContent = "자료를 불러오지 못했습니다. 페이지를 새로 고쳐 보세요."));
+  });
+
+  function start(D) {
+    // 머리글·방법 숫자
+    document.getElementById("m-n").textContent = fmt(D.n_docs);
+    document.getElementById("m-range").textContent = `${kdate(D.first)}–${kdate(D.last)}`;
+    document.getElementById("d-n").textContent = fmt(D.n_docs);
+    document.getElementById("d-range").textContent = `${kdate(D.first)}–${kdate(D.last)}`;
+    document.getElementById("d-e").textContent = `${kdate(D.E.first)}–${kdate(D.E.last)} ${fmt(D.E.n)}건`;
+    document.getElementById("d-skip").textContent = fmt(D.E.total - D.E.n);
+    season(D); pulse(D); week(D);
+  }
+
+  /* ---------- 1. 계절 시계 ---------- */
+  function season(D) {
+    const types = D.natTypes, byType = {};
+    types.forEach(([k]) => (byType[k] = D.nat.filter((r) => r[1] === k).length));
+    const st = D.natStat;
+    const mname = (m) => ((m - 1) % 12) + 1;
+    const span = (k) => { const a = st[k].start; return `${a}~${mname(a + 2)}월`; };
+    document.getElementById("season-claim").innerHTML =
+      `제목에 재난 이름이 들어간 보도자료 <b>${fmt(D.nat.length)}건</b>을 날짜 자리에 점으로 찍었습니다. 안쪽 고리부터 2024·2025·2026년입니다. 2024·2025년 두 해를 보면 폭염 보도자료의 <b>${Math.round(st.heat.share)}%</b>가 ${span("heat")}, 대설·한파는 <b>${Math.round(st.snow.share)}%</b>가 ${span("snow")}, 산불은 <b>${Math.round(st.fire.share)}%</b>가 ${span("fire")}에 나왔습니다. 지진만 계절을 가리지 않습니다(가장 많은 석 달에 ${Math.round(st.quake.share)}%).`;
+
+    // 칩
+    let active = null;
+    const chipBox = document.getElementById("nat-chips");
+    const allChip = document.createElement("button");
+    allChip.className = "chip"; allChip.type = "button"; allChip.textContent = "모두"; allChip.setAttribute("aria-pressed", "true");
+    chipBox.appendChild(allChip);
+    const chipEls = {};
+    types.forEach(([k, name]) => {
+      const b = document.createElement("button"); b.className = "chip"; b.type = "button"; b.setAttribute("aria-pressed", "false");
+      b.innerHTML = `<i style="background:var(${COL[k]})"></i>${name} <span class="num" style="color:var(--muted)">${byType[k]}</span>`;
+      b.onclick = () => setActive(active === k ? null : k); chipBox.appendChild(b); chipEls[k] = b;
+    });
+    allChip.onclick = () => setActive(null);
+
+    // 원형 달력
+    const W = 800, C = W / 2, R0 = 118, BAND = 78, GAP = 8;
+    const svg = s("svg", { viewBox: `0 0 ${W} ${W}`, role: "img", "aria-label": "자연재난 보도자료 원형 달력: 12시 방향이 1월 1일, 시계 방향으로 한 해" });
+    const box = document.getElementById("radial"); box.innerHTML = ""; box.appendChild(svg);
+    const years = ["2024", "2025", "2026"];
+    const ringIn = (yi) => R0 + yi * (BAND + GAP), ringOut = (yi) => ringIn(yi) + BAND;
+    const MD = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], MS = MD.reduce((a, d, i) => (a.push((a[i] || 0) + d), a), [0]);
+    const ang = (m, d) => ((MS[m - 1] + d - 0.5) / 366) * Math.PI * 2 - Math.PI / 2;
+    const P = (r, a) => [C + r * Math.cos(a), C + r * Math.sin(a)];
+    // 계절 바탕과 달 눈금
+    const g0 = s("g", {}, svg);
+    years.forEach((y, yi) => {
+      s("circle", { cx: C, cy: C, r: (ringIn(yi) + ringOut(yi)) / 2, fill: "none", stroke: css("--panel"), "stroke-width": BAND }, g0);
+    });
+    for (let m = 1; m <= 12; m++) {
+      const a = ang(m, 0.5) - (0.5 / 366) * Math.PI * 2;
+      const [x1, y1] = P(R0 - 6, a), [x2, y2] = P(ringOut(2) + 6, a);
+      s("line", { x1, y1, x2, y2, stroke: css("--grid-2"), "stroke-width": m === 1 ? 1.6 : 1 }, g0);
+      const am = ang(m, MD[m - 1] / 2);
+      const [lx, ly] = P(ringOut(2) + 26, am);
+      const t = s("text", { x: lx, y: ly, "text-anchor": "middle", "dominant-baseline": "central", fill: css("--ink-2"), "font-size": 21, "font-weight": 500 }, g0);
+      t.textContent = `${m}월`;
+    }
+    years.forEach((y, yi) => {
+      const [x, y2] = P((ringIn(yi) + ringOut(yi)) / 2, -Math.PI / 2 - 0.035);
+      const t = s("text", { x: x - 2, y: y2, "text-anchor": "end", "dominant-baseline": "central", fill: css("--ink-2"), "font-size": 19, "font-family": "IBM Plex Mono, monospace" }, g0);
+      t.textContent = y;
+    });
+    // 점: 같은 날은 바깥으로 쌓는다
+    const stack = {}, dots = [];
+    const gd = s("g", {}, svg);
+    const sorted = D.nat.slice().sort((a, b) => (a[0] < b[0] ? -1 : 1));
+    sorted.forEach((r) => {
+      const [y, m, d] = r[0].split("-").map(Number); const yi = years.indexOf(String(y)); if (yi < 0) return;
+      const key = r[0]; const k = (stack[key] = (stack[key] || 0) + 1) - 1;
+      const rad = ringIn(yi) + 9 + k * 12;
+      const a = ang(m, d); const [x, yy] = P(Math.min(rad, ringOut(yi) - 6), a);
+      const c = s("circle", { cx: x.toFixed(1), cy: yy.toFixed(1), r: 5.4, fill: css(COL[r[1]]), stroke: css("--ground"), "stroke-width": 1.2 }, gd);
+      dots.push({ x, y: yy, r, c });
+    });
+    // 가운데
+    const big = s("text", { x: C, y: C - 8, "text-anchor": "middle", fill: css("--ink"), "font-size": 64, "font-family": "Black Han Sans, sans-serif" }, svg);
+    const small = s("text", { x: C, y: C + 32, "text-anchor": "middle", fill: css("--muted"), "font-size": 16 }, svg);
+    const ring = s("circle", { cx: 0, cy: 0, r: 10, fill: "none", stroke: css("--ink"), "stroke-width": 2, opacity: 0 }, svg);
+    const setCenter = () => {
+      const n = active ? byType[active] : D.nat.length;
+      big.textContent = fmt(n); small.textContent = active ? `${types.find((t) => t[0] === active)[1]} 보도자료` : "자연재난 보도자료";
+    };
+    setCenter();
+
+    // 지문(열두 달 막대)
+    const pBox = document.getElementById("prints"); const printEls = {};
+    types.forEach(([k, name]) => {
+      const S = st[k]; const max = Math.max(...S.months, 1);
+      const b = document.createElement("button"); b.type = "button"; b.className = "print"; b.setAttribute("aria-pressed", "false");
+      b.setAttribute("aria-label", `${name}: 가장 많은 석 달 ${S.start}월부터 ${S.share}%`);
+      b.innerHTML = `<span class="p-name"><i style="background:var(${COL[k]})"></i>${name}</span><svg viewBox="0 0 120 30" preserveAspectRatio="none" aria-hidden="true"></svg><span class="p-share">${Math.round(S.share)}%<small>${S.start}~${mname(S.start + 2)}월</small></span>`;
+      const ps = b.querySelector("svg");
+      S.months.forEach((v, i) => {
+        const inWin = [0, 1, 2].some((j) => mname(S.start + j) === i + 1);
+        const h = (v / max) * 26;
+        s("rect", { x: i * 10 + 1, y: 29 - h, width: 8, height: Math.max(h, 0.8), fill: inWin ? css(COL[k]) : css("--grid-2") }, ps);
+      });
+      b.onclick = () => setActive(active === k ? null : k);
+      pBox.appendChild(b); printEls[k] = b;
+    });
+
+    function setActive(k) {
+      active = k;
+      allChip.setAttribute("aria-pressed", String(!k));
+      types.forEach(([t]) => { chipEls[t].setAttribute("aria-pressed", String(t === k)); printEls[t].setAttribute("aria-pressed", String(t === k)); });
+      dots.forEach((p) => p.c.setAttribute("opacity", !k || p.r[1] === k ? 1 : 0.12));
+      setCenter();
+    }
+
+    // 가리키기
+    const read = document.getElementById("nat-read"); let pinned = null;
+    const show = (p) => {
+      if (!p) return;
+      ring.setAttribute("cx", p.x); ring.setAttribute("cy", p.y); ring.setAttribute("opacity", 1);
+      const same = D.nat.filter((r) => r[0] === p.r[0] && (!active || r[1] === active));
+      const nm = (k) => types.find((t) => t[0] === k)[1];
+      read.innerHTML = `<span class="r-meta">${kdate(p.r[0])} · ${same.length}건</span><ul>${same.map((r) => `<li><span style="color:var(${COL[r[1]]})">●</span> ${nm(r[1])} · ${link(r[2], r[3])}</li>`).join("")}</ul>`;
+    };
+    const nearest = (ev) => {
+      const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+      const q = pt.matrixTransform(svg.getScreenCTM().inverse()); let best = null, bd = 18 * 18;
+      dots.forEach((p) => { if (active && p.r[1] !== active) return; const dd = (p.x - q.x) ** 2 + (p.y - q.y) ** 2; if (dd < bd) { bd = dd; best = p; } });
+      return best;
+    };
+    svg.addEventListener("pointermove", (ev) => { if (ev.pointerType === "mouse" && !pinned) show(nearest(ev)); });
+    svg.addEventListener("click", (ev) => { const p = nearest(ev); pinned = p; if (p) show(p); });
+    // 키보드: 시계에 초점을 두고 ←→로 날짜를 옮긴다
+    svg.setAttribute("tabindex", "0"); let ki = -1;
+    svg.addEventListener("keydown", (ev) => {
+      if (ev.key !== "ArrowRight" && ev.key !== "ArrowLeft") return; ev.preventDefault();
+      const vis = dots.filter((p) => !active || p.r[1] === active); if (!vis.length) return;
+      ki = ev.key === "ArrowRight" ? Math.min(ki + 1, vis.length - 1) : Math.max(ki - 1, 0); pinned = vis[ki]; show(vis[ki]);
+    });
+  }
+
+  /* ---------- 2. 사고의 심전도 ---------- */
+  function pulse(D) {
+    const W = D.weekly, n = D.soc.length, ev = D.events;
+    const nat = ev.find((e) => e.name.startsWith("국가정보자원관리원"));
+    const days = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5) + 1;
+    const crowd = D.soc.filter((r) => /이태원|핼러윈|인파/.test(r[2])); const ym = {};
+    crowd.forEach((r) => { const k = r[0].slice(0, 7); ym[k] = (ym[k] || 0) + 1; });
+    const octN = crowd.filter((r) => r[0].slice(5, 7) === "10").length;
+    const otherMax = Math.max(...Object.entries(ym).filter(([k]) => k.slice(5) !== "10").map(([, v]) => v));
+    document.getElementById("pulse-claim").innerHTML =
+      `화재·사고·참사·전산장애처럼 사람이 만든 재난이 제목에 나온 보도자료 <b>${fmt(n)}건</b>을 주마다 세어 심전도처럼 그렸습니다. 계절이 없는 대신 큰 사고가 나면 몇 주 동안 크게 뜁니다. 국가정보자원관리원 화재 하나로 <b>${days(nat.first, nat.last)}일</b> 동안 <b>${nat.n}건</b>이 나왔습니다. 그래도 계절처럼 돌아오는 박동이 하나 있습니다. 이태원참사 추모와 인파 관리 보도자료는 1년 내내 나오지만 10월에 가장 많습니다. 세 해의 10월에 ${octN}건이 나왔고, 다른 달은 많아야 ${otherMax}건입니다.`;
+    const T = D.socTop10;
+    document.getElementById("pulse-stats").innerHTML = [
+      [fmt(n), "사회재난 보도자료(제목 기준)"],
+      [`${T.share}%`, `${fmt(T.weeks)}주 가운데 가장 바쁜 10주에 몰린 몫`],
+      [`${nat.n}건`, `국가정보자원관리원 화재 뒤 ${days(nat.first, nat.last)}일 동안`],
+    ].map(([a, b]) => `<div class="stat"><strong class="num">${a}</strong><span>${b}</span></div>`).join("");
+
+    // 심전도
+    const wrap = document.getElementById("ecg-wrap"); wrap.innerHTML = "";
+    const VW = 1100, VH = 330, L = 40, Rt = 14, top = 64, base = 250;
+    const svg = s("svg", { viewBox: `0 0 ${VW} ${VH}`, role: "img", "aria-label": "주별 사회재난 보도자료 수를 심전도처럼 그린 그림" });
+    svg.style.minWidth = "880px"; wrap.appendChild(svg);
+    const max = Math.max(...W.map((w) => w[1]));
+    const x = (i) => L + (i / (W.length - 1)) * (VW - L - Rt);
+    const yk = (v) => (v / max) * (base - top);
+    // 심전도 종이
+    const gp = s("g", {}, svg);
+    for (let gx = L; gx <= VW - Rt; gx += 10) s("line", { x1: gx, y1: top - 30, x2: gx, y2: base + 40, stroke: css("--grid"), "stroke-width": (gx - L) % 50 === 0 ? 1 : 0.5 }, gp);
+    for (let gy = base + 40; gy >= top - 30; gy -= 10) s("line", { x1: L, y1: gy, x2: VW - Rt, y2: gy, stroke: css("--grid"), "stroke-width": (base + 40 - gy) % 50 === 0 ? 1 : 0.5 }, gp);
+    // 10월 띠, 해 경계
+    W.forEach((w, i) => {
+      if (w[0].slice(5, 7) === "10") s("rect", { x: x(i) - 3.6, y: top - 30, width: 7.4, height: base + 70 - top, fill: css("--pulse"), opacity: 0.06 }, gp);
+      if (i > 0 && w[0].slice(0, 4) !== W[i - 1][0].slice(0, 4)) {
+        s("line", { x1: x(i), y1: top - 30, x2: x(i), y2: base + 44, stroke: css("--grid-2"), "stroke-width": 1.4 }, gp);
+        const t = s("text", { x: x(i) + 6, y: base + 62, fill: css("--muted"), "font-size": 13, "font-family": "IBM Plex Mono, monospace" }, gp); t.textContent = w[0].slice(0, 4);
+      }
+    });
+    const t0 = s("text", { x: L + 6, y: base + 62, fill: css("--muted"), "font-size": 13, "font-family": "IBM Plex Mono, monospace" }, gp); t0.textContent = W[0][0].slice(0, 4);
+    // y 눈금
+    [0, 5, 10].filter((v) => v <= max).forEach((v) => {
+      const t = s("text", { x: L - 8, y: base - yk(v), "text-anchor": "end", "dominant-baseline": "central", fill: css("--muted"), "font-size": 12, "font-family": "IBM Plex Mono, monospace" }, svg); t.textContent = v;
+    });
+    const unit = s("text", { x: L - 8, y: top - 40, "text-anchor": "start", fill: css("--muted"), "font-size": 12 }, svg); unit.textContent = "주별 건수";
+    // 파형: 주마다 작은 QRS
+    let d = `M${L},${base}`; const dx = (VW - L - Rt) / (W.length - 1);
+    W.forEach((w, i) => {
+      const cx = x(i), h = yk(w[1]);
+      if (w[1] === 0) { d += ` L${(cx + dx / 2).toFixed(1)},${base}`; return; }
+      d += ` L${(cx - dx * 0.32).toFixed(1)},${base} L${(cx - dx * 0.18).toFixed(1)},${(base + Math.min(h * 0.12, 8)).toFixed(1)} L${cx.toFixed(1)},${(base - h).toFixed(1)} L${(cx + dx * 0.18).toFixed(1)},${(base + Math.min(h * 0.28, 16)).toFixed(1)} L${(cx + dx * 0.32).toFixed(1)},${base} L${(cx + dx / 2).toFixed(1)},${base}`;
+    });
+    s("path", { d, fill: "none", stroke: css("--pulse"), "stroke-width": 1.8, "stroke-linejoin": "round" }, svg);
+    // 사건 표지
+    const labeled = ev.filter((e) => e.peakN >= 4).sort((a, b) => (a.peak < b.peak ? -1 : 1));
+    const nick = { "국가정보자원관리원 화재·전산장애": "국가정보자원관리원 화재", "대전 대덕구 공장 화재": "대전 공장 화재", "제주항공 여객기 사고": "제주항공 여객기 사고", "화성 공장 화재": "화성 공장 화재" };
+    labeled.forEach((e, j) => {
+      const i = W.findIndex((w) => w[0] === e.peak); if (i < 0) return;
+      const wk = W[i][1], px = x(i), py = base - yk(wk);
+      s("circle", { cx: px, cy: py, r: 4.5, fill: css("--hot") }, svg);
+      const ly = top - 40 + (j % 2) * 22, anchor = px > VW - 200 ? "end" : "start";
+      s("line", { x1: px, y1: py - 6, x2: px, y2: ly + 6, stroke: css("--hot"), "stroke-width": 1, "stroke-dasharray": "2 3" }, svg);
+      const t = s("text", { x: px + (anchor === "end" ? -6 : 6), y: ly, "text-anchor": anchor, "dominant-baseline": "central", fill: css("--ink"), "font-size": 14, "font-weight": 500 }, svg);
+      t.textContent = `${nick[e.name] || e.name} · 그 주 ${wk}건`;
+    });
+    // 끝점 박동
+    const last = W.length - 1;
+    s("circle", { cx: x(last), cy: base, r: 4, fill: css("--hot"), class: "beat" }, svg);
+    // 가리키기
+    const hl = s("rect", { x: 0, y: top - 30, width: dx, height: base + 70 - top, fill: css("--ink"), opacity: 0 }, svg);
+    const read = document.getElementById("soc-read"); let pinned = false;
+    const showW = (i) => {
+      if (i < 0 || i >= W.length) return;
+      hl.setAttribute("x", x(i) - dx / 2); hl.setAttribute("opacity", 0.08);
+      const a = W[i][0], b = new Date(Date.parse(a) + 6 * 864e5).toISOString().slice(0, 10);
+      const rows = D.soc.filter((r) => r[0] >= a && r[0] <= b).sort((p, q) => (p[0] < q[0] ? -1 : 1));
+      read.innerHTML = `<span class="r-meta">${kdate(a)}–${kdate(b)} 주 · ${rows.length}건</span>` + (rows.length ? `<ul>${rows.slice(0, 6).map((r) => `<li>${r[0].slice(5).replace("-", ".")} ${link(r[1], r[2])}</li>`).join("")}</ul>${rows.length > 6 ? `<span class="hint">외 ${rows.length - 6}건</span>` : ""}` : "<span>이 주에는 사회재난 보도자료가 없습니다.</span>");
+    };
+    const idx = (ev) => { const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY; const q = pt.matrixTransform(svg.getScreenCTM().inverse()); return Math.round((q.x - L) / dx); };
+    svg.addEventListener("pointermove", (e) => { if (e.pointerType === "mouse" && !pinned) showW(idx(e)); });
+    svg.addEventListener("click", (e) => { pinned = true; showW(idx(e)); });
+    let wi = W.findIndex((w) => w[1] === max);
+    wrap.addEventListener("keydown", (e) => { if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return; e.preventDefault(); wi = Math.max(0, Math.min(W.length - 1, wi + (e.key === "ArrowRight" ? 1 : -1))); pinned = true; showW(wi); });
+    const pk = W.findIndex((w) => w[1] === max); showW(pk); hl.setAttribute("opacity", 0.08);
+
+    // 사건 목록
+    const evMax = Math.max(...ev.map((e) => e.n));
+    document.getElementById("events").innerHTML = ev.map((e) => {
+      const span = e.first.slice(0, 4) === e.last.slice(0, 4) && days(e.first, e.last) < 120 ? `${kdate(e.first)}–${kdate(e.last)} · ${days(e.first, e.last)}일` : `${e.first.slice(0, 4)}–${e.last.slice(0, 4)}년 내내 · 10월이 ${Math.round(e.oct * 100)}%`;
+      return `<div class="ev"><b>${esc(e.name)}</b><span class="ev-n">${e.n}</span><span class="ev-bar" style="width:${(e.n / evMax) * 100}%"></span><span class="ev-when">${span}</span></div>`;
+    }).join("");
+  }
+
+  /* ---------- 3. 일주일 시계 ---------- */
+  function week(D) {
+    const E = D.emb;
+    const K = [["morning", "조간", "--k-morning"], ["hour", "시각 지정", "--k-hour"], ["now", "즉시", "--k-now"], ["event", "회의·행사 연동", "--k-event"], ["evening", "석간", "--k-evening"], ["ref", "보도참고자료", "--k-ref"]];
+    const cnt = (k, w) => E.filter((e) => e[2] === k && (w === undefined || e[1] === w)).length;
+    const mor = cnt("morning"), monMor = cnt("morning", 0);
+    const evs = E.filter((e) => e[4] === "국무회의"), evTue = evs.filter((e) => e[1] === 1).length;
+    const hours = {}; E.filter((e) => e[2] === "hour").forEach((e) => { const h = Math.floor(e[3]); hours[h] = (hours[h] || 0) + 1; });
+    const nHour = cnt("hour"); const hPeak = +Object.keys(hours).reduce((a, b) => (hours[a] >= hours[b] ? a : b));
+    const byDay = D.E.byDay;
+    document.getElementById("week-claim").innerHTML =
+      `보도자료 첨부 파일 이름 앞에는 언제부터 보도해도 되는지가 적혀 있습니다. 「(조간)」은 다음 날 아침 신문부터, 「(16시)」는 그 시각부터입니다. ${kdate(D.E.first)}부터 ${fmt(D.E.n)}건 가운데 <b>${Math.round((mor / D.E.n) * 100)}%</b>가 조간이고, 조간이 가장 많은 날은 <b>월요일(${monMor}건)</b>입니다. 국무회의가 끝나야 풀리는 보도자료 ${evs.length}건 가운데 <b>${evTue}건</b>이 화요일이고, 시각을 정한 ${fmt(nHour)}건은 <b>${hPeak}시</b>에 가장 많습니다. 점 하나가 보도자료 하나입니다.`;
+    document.getElementById("week-legend").innerHTML = K.map(([k, n, c]) => `<span><i style="background:var(${c})"></i>${n} <span class="num" style="color:var(--muted)">${fmt(cnt(k))}</span></span>`).join("");
+
+    // 점판 (좁은 화면에서는 방식 이름을 줄 위에 얹는다)
+    const box = document.getElementById("grid");
+    let narrowNow = null;
+    const drawGrid = () => {
+    const narrow = box.clientWidth < 560; if (narrow === narrowNow) return; narrowNow = narrow; box.innerHTML = "";
+    const CW = narrow ? 56 : 96, RH = [0], LW = narrow ? 0 : 92, TH = 34, PAD = 8, STEP = narrow ? 5.6 : 6.4, COLS = narrow ? 9 : 13, LBL = narrow ? 22 : 0;
+    const rowH = K.map(([k]) => { const m = Math.max(...[0, 1, 2, 3, 4, 5, 6].map((w) => cnt(k, w))); return Math.max(34, Math.ceil(m / COLS) * STEP + PAD * 2 + 14) + LBL; });
+    rowH.forEach((h, i) => RH.push(RH[i] + h));
+    const VW = LW + CW * 7, VH = TH + RH[RH.length - 1] + 30;
+    const svg = s("svg", { viewBox: `0 0 ${VW} ${VH}`, role: "img", "aria-label": "요일과 보도 방식별 보도자료 수 점판" }); box.appendChild(svg);
+    WD.forEach((w, i) => {
+      const t = s("text", { x: LW + CW * i + CW / 2, y: TH - 12, "text-anchor": "middle", fill: i >= 5 ? css("--heat") : css("--ink"), "font-size": 17, "font-weight": 700 }, svg); t.textContent = w;
+      const tt = s("text", { x: LW + CW * i + CW / 2, y: VH - 10, "text-anchor": "middle", fill: css("--muted"), "font-size": 13, "font-family": "IBM Plex Mono, monospace" }, svg); tt.textContent = fmt(byDay[i]);
+    });
+    if (!narrow) { const tl = s("text", { x: LW - 10, y: VH - 10, "text-anchor": "end", fill: css("--muted"), "font-size": 12 }, svg); tl.textContent = "합계"; }
+    const read = document.getElementById("week-read"); let pinned = null; const hits = [];
+    K.forEach(([k, name, c], ri) => {
+      const y0 = TH + RH[ri];
+      s("line", { x1: 0, y1: y0, x2: VW, y2: y0, stroke: css("--grid"), "stroke-width": 1 }, svg);
+      const t = s("text", { x: 0, y: y0 + (narrow ? 16 : 22), fill: css("--ink-2"), "font-size": narrow ? 13 : 14, "font-weight": narrow ? 500 : 400 }, svg); t.textContent = name;
+      for (let w = 0; w < 7; w++) {
+        const rows = E.filter((e) => e[2] === k && e[1] === w);
+        const x0 = LW + CW * w + (CW - COLS * STEP) / 2 + STEP / 2;
+        rows.forEach((e, j) => s("circle", { cx: x0 + (j % COLS) * STEP, cy: y0 + LBL + PAD + 3 + Math.floor(j / COLS) * STEP, r: narrow ? 2.2 : 2.5, fill: css(c) }, svg));
+        if (rows.length) { const ct = s("text", { x: LW + CW * w + CW / 2, y: y0 + LBL + PAD + 3 + Math.ceil(rows.length / COLS) * STEP + 9, "text-anchor": "middle", fill: css("--muted"), "font-size": 12, "font-family": "IBM Plex Mono, monospace" }, svg); ct.textContent = rows.length; }
+        const h = s("rect", { x: LW + CW * w + 1, y: y0 + 1, width: CW - 2, height: rowH[ri] - 2, class: "cell-hit", tabindex: 0, role: "button", "aria-label": `${WD[w]}요일 ${name} ${rows.length}건` }, svg);
+        const showC = () => {
+          hits.forEach((x) => x.classList.remove("on")); h.classList.add("on");
+          const pick = rows.slice(-6).reverse();
+          read.innerHTML = `<span class="r-meta">${WD[w]}요일 · ${name} · ${rows.length}건${rows.length > 6 ? " (최근 6건)" : ""}</span>` + (rows.length ? `<ul>${pick.map((e) => `<li>${kdate(e[0])}${e[2] === "hour" ? ` ${Math.floor(e[3])}시${e[3] % 1 ? Math.round((e[3] % 1) * 60) + "분" : ""}` : ""} · ${link(e[5], e[6] || "(제목 없음)")}</li>`).join("")}</ul>` : "<span>없습니다.</span>");
+        };
+        h.addEventListener("pointerenter", (ev) => { if (ev.pointerType === "mouse" && !pinned) showC(); });
+        h.addEventListener("click", () => { pinned = h; showC(); });
+        h.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); pinned = h; showC(); } });
+        hits.push(h);
+      }
+    });
+    };
+    drawGrid(); let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(drawGrid, 150); });
+
+    // 24시 시계: 시각 지정 보도자료
+    const cb = document.getElementById("clock"); cb.innerHTML = "";
+    const S = 380, C = S / 2, r0 = 64, r1 = 150;
+    const cs = s("svg", { viewBox: `0 0 ${S} ${S + 26}`, role: "img", "aria-label": `시각을 정한 보도자료 ${nHour}건의 시각별 수, 24시간 시계` }); cb.appendChild(cs);
+    const hmax = Math.max(...Object.values(hours));
+    s("circle", { cx: C, cy: C, r: r1 + 6, fill: css("--panel"), stroke: css("--rule") }, cs);
+    s("circle", { cx: C, cy: C, r: r0, fill: css("--ground"), stroke: css("--grid-2") }, cs);
+    const A = (h) => (h / 24) * Math.PI * 2 - Math.PI / 2;
+    for (let h = 0; h < 24; h++) {
+      const a0 = A(h) + 0.02, a1 = A(h + 1) - 0.02, v = hours[h] || 0, rr = r0 + 4 + (v / hmax) * (r1 - r0 - 8);
+      if (v) s("path", { d: `M${C + (r0 + 3) * Math.cos(a0)},${C + (r0 + 3) * Math.sin(a0)} L${C + rr * Math.cos(a0)},${C + rr * Math.sin(a0)} A${rr},${rr} 0 0 1 ${C + rr * Math.cos(a1)},${C + rr * Math.sin(a1)} L${C + (r0 + 3) * Math.cos(a1)},${C + (r0 + 3) * Math.sin(a1)} Z`, fill: h === hPeak ? css("--ink") : css("--k-hour") }, cs);
+      if (h % 3 === 0) { const am = A(h); const t = s("text", { x: C + (r1 + 20) * Math.cos(am), y: C + (r1 + 20) * Math.sin(am), "text-anchor": "middle", "dominant-baseline": "central", fill: css("--muted"), "font-size": 13, "font-family": "IBM Plex Mono, monospace" }, cs); t.textContent = h; }
+    }
+    const ct = s("text", { x: C, y: C - 6, "text-anchor": "middle", fill: css("--ink"), "font-size": 34, "font-family": "Black Han Sans, sans-serif" }, cs); ct.textContent = `${hPeak}시`;
+    const cs2 = s("text", { x: C, y: C + 20, "text-anchor": "middle", fill: css("--muted"), "font-size": 13 }, cs); cs2.textContent = `${hours[hPeak]}건`;
+    const cap = s("text", { x: C, y: S + 18, "text-anchor": "middle", fill: css("--ink-2"), "font-size": 14 }, cs); cap.textContent = `시각을 정한 보도자료 ${fmt(nHour)}건, 몇 시부터 보도했나`;
+
+    // 일요일 퀴즈
+    const su = D.sunday;
+    document.getElementById("sun-n").textContent = su.n;
+    document.getElementById("sun-btn").onclick = (e) => {
+      const a = document.getElementById("sun-ans"); a.hidden = false; e.target.hidden = true;
+      a.innerHTML = `<b>${su.n}건 가운데 ${su.disaster}건</b>이 호우·대설·산불·화재 같은 재난 대응이었고, <b>${su.now}건</b>은 「즉시」 보도였습니다. 일요일에 나오는 보도자료는 대개 재난이 났다는 뜻입니다. 점판의 일요일 칸을 눌러 보세요.`;
+    };
+  }
+})();
+</script>
