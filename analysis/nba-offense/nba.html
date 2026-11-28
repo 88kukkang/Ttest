@@ -1,0 +1,636 @@
+<title>NBA 공격 50년</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6.16/dist/plot.umd.min.js"></script>
+<style>
+/* Layout: 분석 보고서 한 장. 머리글(핵심 다섯 가지) → 차례 → 1 속도 → 2 득점과 효율 → 3 선수 득점 분포 → 4 득점 집중 → 5 선수 비교 → 방법.
+   차트는 Observable Plot으로 그리고, 색은 design/palette.json 팔레트(코트 주황·남색 계열)에서 골랐다. */
+:root {
+  --bg: #f4f5f2; --paper: #fbfbf9; --ink: #1b2226; --ink-2: #47525a; --muted: #5d686f; --rule: #cfd5d1; --grid: #e2e6e2;
+  --a: #d56b41; --b: #3e6f90; --c: #80a15a; --d: #903a43; --e: #928a7f; --f: #689daf;
+  --heat-lo: #f4f5f2; --heat-hi: #3e6f90;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12171a; --paper: #182024; --ink: #e8ece9; --ink-2: #bec7ca; --muted: #9aa5aa; --rule: #31404a; --grid: #253139;
+    --a: #dc8c67; --b: #8eabc9; --c: #abc07b; --d: #d6b0a7; --e: #b6a392; --f: #a7c4c2;
+    --heat-lo: #182024; --heat-hi: #8eabc9; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12171a; --paper: #182024; --ink: #e8ece9; --ink-2: #bec7ca; --muted: #9aa5aa; --rule: #31404a; --grid: #253139;
+  --a: #dc8c67; --b: #8eabc9; --c: #abc07b; --d: #d6b0a7; --e: #b6a392; --f: #a7c4c2;
+  --heat-lo: #182024; --heat-hi: #8eabc9; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.75 var(--sans); word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px; }
+main { max-width: 1080px; margin: 0 auto; display: grid; gap: 56px; }
+a { color: var(--b); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--a); outline-offset: 2px; }
+p { margin: 0; }
+h1, h2, h3 { margin: 0; text-wrap: balance; letter-spacing: -0.015em; }
+h1 { font-size: clamp(38px, 7vw, 72px); line-height: 1.08; font-weight: 700; }
+h2 { font-size: clamp(26px, 3.6vw, 36px); line-height: 1.25; font-weight: 700; }
+h3 { font-size: 19px; line-height: 1.4; font-weight: 700; }
+.num { font-variant-numeric: tabular-nums; }
+.label { font: 500 12px/1.4 var(--mono); letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
+.lede { font-size: clamp(17px, 2vw, 19px); color: var(--ink-2); max-width: 42em; }
+.prose { max-width: 44em; color: var(--ink-2); display: grid; gap: 10px; }
+.prose b { color: var(--ink); }
+.head { display: grid; gap: 16px; }
+
+.keys { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.key { border-top: 3px solid var(--ink); padding-top: 10px; display: grid; gap: 4px; align-content: start; }
+.key strong { font: 600 clamp(26px, 3.4vw, 34px)/1.1 var(--mono); letter-spacing: -0.02em; }
+.key span { font-size: 14.5px; color: var(--ink-2); line-height: 1.55; }
+.toc { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 15px; }
+.toc a { color: var(--ink-2); }
+
+section.part { display: grid; gap: 22px; border-top: 2px solid var(--ink); padding-top: 18px; }
+.fig { background: var(--paper); border: 1px solid var(--rule); padding: 16px 18px 14px; display: grid; gap: 10px; min-width: 0; }
+.fig .cap { font-size: 13.5px; color: var(--muted); max-width: 60em; }
+.fig .cap b { color: var(--ink-2); }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
+.chart { min-width: 0; overflow-x: auto; }
+.chart svg { display: block; max-width: 100%; height: auto; }
+.chart figure { margin: 0; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-size: 14px; color: var(--ink-2); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--ink-2); }
+.seg button { font: 500 13.5px var(--sans); background: var(--paper); color: var(--ink-2); border: 0; padding: 7px 12px; cursor: pointer; min-height: 36px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+select, input[type="search"] { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); padding: 6px 8px; min-height: 36px; }
+input[type="range"] { width: min(420px, 100%); accent-color: var(--a); }
+.play { font: 500 14px var(--sans); background: var(--a); color: #fff; border: 0; padding: 7px 14px; cursor: pointer; min-height: 36px; }
+.big-season { font: 600 22px var(--mono); min-width: 5.5em; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13.5px; color: var(--ink-2); }
+.legend span { display: inline-flex; gap: 7px; align-items: center; }
+.legend i { width: 14px; height: 3px; display: inline-block; }
+.legend i.dot { width: 10px; height: 10px; border-radius: 50%; }
+table.t { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.t th, table.t td { padding: 6px 8px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; }
+table.t th:nth-child(-n+3), table.t td:nth-child(-n+3) { text-align: left; }
+table.t thead th { font: 500 12px var(--mono); color: var(--muted); border-bottom: 1px solid var(--rule); }
+table.t td { font-variant-numeric: tabular-nums; }
+.tbl { overflow-x: auto; max-height: 34rem; overflow-y: auto; }
+.up { color: var(--c); } .down { color: var(--d); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 500 13px var(--sans); border: 1px solid var(--rule); background: var(--paper); color: var(--ink); padding: 4px 6px 4px 10px; display: inline-flex; gap: 6px; align-items: center; }
+.chip i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.chip button { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 15px; padding: 0 4px; min-height: 24px; }
+.verdict { border-left: 4px solid var(--a); padding: 6px 0 6px 16px; font-size: 16.5px; max-width: 46em; display: grid; gap: 10px; }
+.verdict table.t { max-width: 30em; }
+table.t.dec th:nth-child(n+2), table.t.dec td:nth-child(n+2) { text-align: right; }
+.verdict b { color: var(--ink); }
+.method { display: grid; grid-template-columns: 9em minmax(0, 1fr); gap: 10px 20px; border-top: 2px solid var(--ink); padding-top: 18px; font-size: 14.5px; color: var(--ink-2); }
+.method dt { font: 500 12px/2 var(--mono); color: var(--muted); letter-spacing: 0.06em; }
+.method dd { margin: 0; max-width: 62em; }
+@media (max-width: 560px) { .method { grid-template-columns: 1fr; gap: 2px; } .method dd { margin-bottom: 10px; } }
+.loading { color: var(--muted); }
+g[aria-label="tip"] path { fill: var(--paper); stroke: var(--rule); }
+g[aria-label="tip"] text, g[aria-label="tip"] tspan { fill: var(--ink); }
+</style>
+
+<main>
+  <header class="head">
+    <span class="label">NBA 정규리그 1976-77 ~ 2025-26 · 50시즌</span>
+    <h1>NBA 공격 50년</h1>
+    <p class="lede">ABA와 합쳐진 1976-77 시즌부터 2025-26 시즌까지, 공격이 얼마나 빨라졌는지, 득점이 쉬워졌는지, 한 선수에게 득점이 몰리는지, 그리고 시대가 다른 선수의 득점을 그대로 견줘도 되는지를 리그·팀·선수 기록으로 살폈습니다.</p>
+    <div class="keys" id="keys"><p class="loading">자료를 불러오는 중…</p></div>
+    <nav class="toc" aria-label="차례">
+      <a href="#pace">1. 공격은 빨라졌나</a><a href="#eff">2. 득점은 쉬워졌나</a><a href="#dist">3. 선수 득점 분포</a><a href="#conc">4. 한 사람에게 몰리나</a><a href="#cmp">5. 선수끼리 그냥 비교해도 되나</a><a href="#method">자료와 방법</a>
+    </nav>
+  </header>
+
+  <!-- 1. 속도 -->
+  <section class="part" id="pace">
+    <span class="label">1 · 속도</span>
+    <h2>공격은 빨라졌나: 2000년대에 가장 느렸다가 다시 빨라졌다</h2>
+    <div class="prose" id="pace-text"></div>
+    <div class="fig">
+      <div class="controls"><div class="seg" id="pace-mode" role="group" aria-label="단위"><button type="button" aria-pressed="true" data-m="pace">48분당 공격 횟수(페이스)</button><button type="button" aria-pressed="false" data-m="sec">공격 한 번에 걸린 시간(초)</button></div></div>
+      <div class="chart" id="c-pace"></div>
+      <p class="cap">점은 시즌, 선은 5시즌 이동평균입니다. 페이스는 한 팀이 48분 동안 가진 공격 횟수 추정치(Basketball-Reference)이고, 공격 한 번 시간은 2,880초 ÷ (페이스 × 2)로 계산했습니다. 1998-99(50경기)·2011-12(66경기)·2019-20·2020-21은 단축 시즌입니다.</p>
+    </div>
+    <div class="grid2">
+      <div class="fig"><h3>팀당 경기 야투 시도·자유투·실책</h3><div class="chart" id="c-volume"></div><p class="cap">공격 횟수 ≈ 야투 시도 + 0.44 × 자유투 시도 + 실책 − 공격 리바운드. 경기당 값입니다.</p></div>
+      <div class="fig"><h3>실책률과 공격 리바운드율</h3><div class="chart" id="c-tov"></div><p class="cap">실책률은 공격 100번당 실책, 공격 리바운드율은 잡을 수 있는 공격 리바운드 가운데 잡은 몫(%).</p></div>
+    </div>
+  </section>
+
+  <!-- 2. 효율 -->
+  <section class="part" id="eff">
+    <span class="label">2 · 득점과 효율</span>
+    <h2>득점은 쉬워졌나: 경기당 득점보다 공격 100번당 득점이 더 정직하다</h2>
+    <div class="prose" id="eff-text"></div>
+    <div class="fig">
+      <h3>팀 경기당 득점 = 페이스 × 공격 100번당 득점 ÷ 100</h3>
+      <div class="legend"><span><i style="background:var(--a)"></i>경기당 득점</span><span><i style="background:var(--b)"></i>공격 100번당 득점(공격 효율)</span><span><i style="background:var(--e)"></i>페이스</span></div>
+      <div class="chart" id="c-decomp"></div>
+      <p class="cap">세 지표를 1976-77 시즌 = 100으로 맞춘 지수입니다. 경기당 득점이 페이스를 따라 내려갔다가 효율을 따라 올라온 모양을 보세요.</p>
+    </div>
+    <div class="grid2">
+      <div class="fig"><h3>슛 효율</h3><div class="legend" id="lg-eff"></div><div class="chart" id="c-shoot"></div><p class="cap">TS%(true shooting)는 자유투까지 넣은 슛 효율, eFG%는 3점을 1.5개로 쳐 준 야투율입니다.</p></div>
+      <div class="fig"><h3>야투 가운데 3점 시도 비율</h3><div class="chart" id="c-3par"></div><p class="cap">3점 라인은 1979-80에 생겼고, 1994-95~1996-97에는 거리를 22피트로 줄였습니다.</p></div>
+    </div>
+    <div class="grid2">
+      <div class="fig"><h3>경기당 득점의 구성</h3><div class="legend"><span><i class="dot" style="background:var(--b)"></i>2점 야투</span><span><i class="dot" style="background:var(--a)"></i>3점 야투</span><span><i class="dot" style="background:var(--c)"></i>자유투</span></div><div class="chart" id="c-mix"></div></div>
+      <div class="fig"><h3>자유투 시도 비율(FTA ÷ FGA)</h3><div class="chart" id="c-ftr"></div><p class="cap">야투 100개당 자유투 시도. 반칙을 얻어 내는 공격이 얼마나 많았는지 봅니다.</p></div>
+    </div>
+    <div class="fig">
+      <h3>리그 평균 지표 둘러보기</h3>
+      <div class="controls"><label for="explore-a">지표</label><select id="explore-a"></select><label for="explore-b">함께 볼 지표</label><select id="explore-b"></select></div>
+      <div class="chart" id="c-explore"></div>
+      <p class="cap">두 지표는 각각의 축(왼쪽·오른쪽)으로 그렸습니다. 리그 평균은 Basketball-Reference의 시즌별 리그 평균 표입니다.</p>
+    </div>
+  </section>
+
+  <!-- 3. 분포 -->
+  <section class="part" id="dist">
+    <span class="label">3 · 선수 득점 분포</span>
+    <h2>선수들의 경기당 득점은 어떻게 퍼져 있나</h2>
+    <div class="prose" id="dist-text"></div>
+    <div class="fig">
+      <h3>시즌별 경기당 득점 분포(주전급 선수)</h3>
+      <div class="controls"><div class="seg" id="heat-mode" role="group" aria-label="기준"><button type="button" aria-pressed="true" data-m="ppg">경기당 득점</button><button type="button" aria-pressed="false" data-m="p100">공격 100번당 득점</button><button type="button" aria-pressed="false" data-m="usg">사용률(USG%)</button></div></div>
+      <div class="chart" id="c-heat"></div>
+      <p class="cap">세로 한 줄이 한 시즌, 칸 색이 진할수록 그 구간에 든 주전급 선수 비율이 높습니다. 주전급은 82경기 기준 1,500분 이상 뛴 선수입니다(단축 시즌은 비율대로 줄임). 사용률은 1977-78부터 있습니다.</p>
+    </div>
+    <div class="fig">
+      <h3>한 시즌씩 넘겨 보기</h3>
+      <div class="controls">
+        <button type="button" class="play" id="hist-play">재생</button>
+        <input type="range" id="hist-y" min="1977" max="2026" step="1" value="2026" aria-label="시즌">
+        <span class="big-season" id="hist-label"></span>
+        <div class="seg" id="hist-mode" role="group" aria-label="기준"><button type="button" aria-pressed="true" data-m="ppg">경기당 득점</button><button type="button" aria-pressed="false" data-m="p100">100번당 득점</button><button type="button" aria-pressed="false" data-m="usg">사용률</button></div>
+        <label><input type="checkbox" id="hist-ref" checked> 1986-87 겹쳐 보기</label>
+      </div>
+      <div class="chart" id="c-hist"></div>
+      <p class="cap" id="hist-cap"></p>
+    </div>
+    <div class="grid2">
+      <div class="fig"><h3>분위수와 득점왕</h3><div class="legend"><span><i style="background:var(--d)"></i>득점왕</span><span><i style="background:var(--a)"></i>상위 10%</span><span><i style="background:var(--b)"></i>중앙값</span><span><i style="background:var(--e)"></i>하위 10%</span></div><div class="chart" id="c-pct"></div><p class="cap">주전급 선수 경기당 득점의 분위수. 득점왕은 경기 수 70% 이상 출전한 선수 가운데 1위입니다.</p></div>
+      <div class="fig"><h3>20·25·30점 이상 득점자 수(팀당)</h3><div class="legend"><span><i style="background:var(--b)"></i>20점+</span><span><i style="background:var(--a)"></i>25점+</span><span><i style="background:var(--d)"></i>30점+</span></div><div class="chart" id="c-nscorers"></div><p class="cap">팀 수가 22개에서 30개로 늘었으므로 팀 수로 나눴습니다. 경기 수 70% 이상 출전 선수 기준.</p></div>
+    </div>
+  </section>
+
+  <!-- 4. 집중 -->
+  <section class="part" id="conc">
+    <span class="label">4 · 득점 집중</span>
+    <h2>한 사람에게 몰리나: 코트 위에서는 더, 시즌 전체로는 덜</h2>
+    <div class="prose" id="conc-text"></div>
+    <div class="fig">
+      <h3>같은 에이스, 세 가지 잣대</h3>
+      <div class="legend"><span><i style="background:var(--a)"></i>코트 위 몫: 팀 1옵션의 사용률</span><span><i style="background:var(--b)"></i>경기 기준 몫: 팀 최다 득점 선수의 경기당 득점 ÷ 팀 경기당 득점</span><span><i style="background:var(--e)"></i>시즌 합계 몫: 그 선수의 시즌 득점 ÷ 팀 시즌 득점</span></div>
+      <div class="chart" id="c-three"></div>
+      <p class="cap">세 값 모두 팀마다 계산해 리그 평균을 냈습니다. 사용률은 1977-78부터입니다. 경기 기준 몫은 팀 경기의 절반 이상 뛴 선수 가운데 경기당 득점 1위로 계산했습니다.</p>
+    </div>
+    <div class="fig">
+      <h3>왜 갈리나: 에이스는 덜 뛰고, 뛸 때 더 넣고, 팀은 더 많은 선수를 쓴다</h3>
+      <div class="grid2" id="c-why"></div>
+      <p class="cap">팀마다 경기당 득점 1위 선수(경기 절반 이상 출전)의 평균. ‘팀이 쓴 선수’는 한 시즌 그 팀 경기에 한 번이라도 나온 선수 수입니다.</p>
+    </div>
+    <div class="fig">
+      <h3>팀 득점 가운데 그 팀 최다 득점 선수의 몫(시즌 합계)</h3>
+      <div class="chart" id="c-topshare"></div>
+      <p class="cap">점 하나가 한 팀의 한 시즌(마우스를 올리면 팀과 선수), 선은 리그 평균입니다. 시즌 도중 팀을 옮긴 선수는 팀마다 따로 셌습니다.</p>
+    </div>
+    <div class="grid2">
+      <div class="fig"><h3>실질적인 득점원 수</h3><div class="chart" id="c-eff-n"></div><p class="cap">팀 득점을 선수별 몫으로 나눈 뒤 1 ÷ (몫²의 합)으로 계산했습니다. 다섯 명이 똑같이 넣으면 5, 한 명이 다 넣으면 1입니다.</p></div>
+      <div class="fig"><h3>팀 1옵션의 사용률과 사용률 30% 이상 선수</h3><div class="legend"><span><i style="background:var(--a)"></i>팀 최고 사용률(평균, 왼쪽)</span><span><i style="background:var(--b)"></i>사용률 30%+ 선수 수(팀당, 오른쪽)</span></div><div class="chart" id="c-usg"></div><p class="cap">사용률은 선수가 코트에 있을 때 팀 공격이 그 선수의 야투·자유투·실책으로 끝난 비율입니다. 팀 최고 사용률은 82경기 기준 500분 이상 뛴 선수 중 최고값.</p></div>
+    </div>
+    <div class="fig">
+      <h3>최다 득점 선수 몫, 시즌별 분포</h3>
+      <div class="controls">
+        <button type="button" class="play" id="share-play">재생</button>
+        <input type="range" id="share-y" min="1977" max="2026" step="1" value="2026" aria-label="시즌">
+        <span class="big-season" id="share-label"></span>
+        <div class="seg" id="share-mode" role="group" aria-label="기준"><button type="button" aria-pressed="true" data-m="top">1위 몫</button><button type="button" aria-pressed="false" data-m="top2">1·2위 몫</button><button type="button" aria-pressed="false" data-m="topUsg">1위 사용률</button></div>
+      </div>
+      <div class="chart" id="c-sharehist"></div>
+      <p class="cap" id="share-cap"></p>
+    </div>
+    <div class="fig">
+      <h3>한 선수에게 가장 크게 기댄 팀 시즌</h3>
+      <div class="controls"><label for="share-era">시대</label><select id="share-era"><option value="all">50시즌 전체</option><option value="1977-1986">1976-77~1985-86</option><option value="1987-1996">1986-87~1995-96</option><option value="1997-2006">1996-97~2005-06</option><option value="2007-2016">2006-07~2015-16</option><option value="2017-2026">2016-17~2025-26</option></select></div>
+      <div class="tbl" id="t-share"></div>
+    </div>
+  </section>
+
+  <!-- 5. 비교 -->
+  <section class="part" id="cmp">
+    <span class="label">5 · 선수 비교</span>
+    <h2>시대가 다른 선수의 득점, 그냥 견줘도 될까</h2>
+    <div class="prose" id="cmp-text"></div>
+    <div class="fig">
+      <h3>보정하면 무엇이 바뀌나: 역대 경기당 득점 상위 시즌</h3>
+      <div class="controls">
+        <div class="seg" id="rank-mode" role="group" aria-label="순위 기준"><button type="button" aria-pressed="true" data-m="ppg">그대로</button><button type="button" aria-pressed="false" data-m="adjP">속도 보정</button><button type="button" aria-pressed="false" data-m="adjB">속도+효율 보정</button><button type="button" aria-pressed="false" data-m="p100">100번당 득점</button></div>
+      </div>
+      <div class="tbl" id="t-rank"></div>
+      <p class="cap">경기 수 70% 이상 출전한 선수-시즌. 속도 보정 = 경기당 득점 × (2025-26 리그 페이스 ÷ 그 선수 팀의 페이스). 속도+효율 보정은 여기에 (2025-26 리그 공격 효율 ÷ 그 시즌 리그 공격 효율)을 곱했습니다. ‘변화’는 그대로 순위와 견준 자리 이동입니다.</p>
+    </div>
+    <div class="grid2">
+      <div class="fig"><h3>득점왕: 그대로 vs 보정</h3><div class="legend"><span><i class="dot" style="background:var(--e)"></i>그대로</span><span><i class="dot" style="background:var(--a)"></i>속도 보정</span><span><i class="dot" style="background:var(--b)"></i>속도+효율 보정</span></div><div class="chart" id="c-leaders"></div><p class="cap">시즌마다 득점왕 한 명. 2025-26 환경이라면 몇 점이었을지로 옮겼습니다.</p></div>
+      <div class="fig"><h3>보정의 크기: 시즌별 곱하는 값</h3><div class="legend"><span><i style="background:var(--a)"></i>속도 보정(리그 평균 기준)</span><span><i style="background:var(--b)"></i>속도+효율 보정</span></div><div class="chart" id="c-factor"></div><p class="cap">1보다 크면 그 시즌 득점을 키워야 2025-26과 견줄 수 있다는 뜻입니다.</p></div>
+    </div>
+    <div class="fig">
+      <h3>선수 골라 견주기: 나이별 경기당 득점</h3>
+      <div class="controls">
+        <input type="search" id="p-search" list="p-list" placeholder="선수 이름(영문)으로 찾기" aria-label="선수 찾기" autocomplete="off"><datalist id="p-list"></datalist>
+        <div class="seg" id="p-mode" role="group" aria-label="기준"><button type="button" aria-pressed="true" data-m="ppg">그대로</button><button type="button" aria-pressed="false" data-m="adjP">속도 보정</button><button type="button" aria-pressed="false" data-m="adjB">속도+효율 보정</button><button type="button" aria-pressed="false" data-m="ts">TS% (리그 대비)</button></div>
+      </div>
+      <div class="chips" id="p-chips"></div>
+      <div class="chart" id="c-players"></div>
+      <p class="cap">출전 500분 이상 시즌만. 이름을 입력해 고르면 더해지고, ×를 누르면 빠집니다(최대 8명). TS%(리그 대비)는 그 선수의 TS%에서 그 시즌 리그 평균 TS%를 뺀 값(%포인트)입니다.</p>
+    </div>
+    <div class="verdict" id="verdict"></div>
+  </section>
+
+  <dl class="method" id="method">
+    <dt>자료</dt>
+    <dd><a href="https://www.basketball-reference.com" target="_blank" rel="noopener">Basketball-Reference.com</a>의 시즌별 리그 평균 표, 팀 기록(합계·고급), 선수 기록(경기당·100포제션당·고급)을 2026년 11월에 받아 계산했습니다. 정규리그만 봤고, 2026-27 시즌(진행 중)은 넣지 않았습니다. 공공데이터가 아니며 이 사이트의 추정치(페이스, 공격 효율, 사용률)를 그대로 썼습니다.</dd>
+    <dt>선수 기준</dt>
+    <dd>주전급은 82경기 기준 1,500분 이상, 득점 순위는 팀 경기 수의 70% 이상 출전입니다. 시즌 도중 팀을 옮긴 선수는 선수 분포에서 합계 한 줄로, 팀 득점 집중에서는 팀마다 따로 셌습니다. 선수 득점 합계는 경기당 득점 × 경기 수로 계산해 반올림 오차가 조금 있습니다.</dd>
+    <dt>보정</dt>
+    <dd>속도 보정은 선수가 뛴 팀의 페이스(이적 선수는 출전 시간 가중 평균)를 2025-26 리그 평균 페이스로 바꾼 값, 효율 보정은 리그 평균 공격 효율(100번당 득점)의 비율입니다. 출전 시간, 역할, 수비 수준, 규칙 변화는 보정하지 않았습니다.</dd>
+    <dt>읽을 때 주의</dt>
+    <dd>1976-77 시즌은 실책 기록이 없어 사용률이 비어 있습니다. 3점슛은 1979-80부터입니다. 단축 시즌(1998-99, 2011-12, 2019-20, 2020-21)은 경기 수가 적어 일부 지표가 튈 수 있습니다.</dd>
+  </dl>
+</main>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const fmt = (n, d = 1) => (n == null ? "–" : n.toLocaleString("ko-KR", { minimumFractionDigits: d, maximumFractionDigits: d }));
+  const pct = (n, d = 1) => (n == null ? "–" : fmt(n * 100, d) + "%");
+  const lab = (y) => `${y - 1}-${String(y).slice(2)}`;
+  // 숫자로 끝나는 말 뒤 조사: 끝 숫자의 읽는 소리로 받침을 정한다(0 영, 1 일, 3 삼, 6 육, 7 칠, 8 팔은 받침)
+  const ga = (t) => t + (/[013678]$/.test(t) ? "이" : "가");
+  const font = getComputedStyle(document.body).fontFamily;
+  let D, S, LG, P, TM, REF;
+  const renders = [];
+  const W = (el) => Math.max(300, Math.min(1040, el.clientWidth));
+  const base = (el, o) => ({ width: W(el), height: o.height || Math.round(Math.max(240, Math.min(360, W(el) * 0.42))), marginLeft: 48, marginRight: o.marginRight ?? 20, marginBottom: 34,
+    style: { background: css("--paper"), color: css("--ink-2"), fontFamily: font, fontSize: "12px", overflow: "visible" }, ...o });
+  const put = (el, chart) => { el.innerHTML = ""; el.append(chart); };
+  const xY = (el) => ({ label: null, tickFormat: (d) => lab(d), ticks: W(el) < 640 ? 4 : 8 });
+  const roll = (arr, key, k = 5) => arr.map((d, i) => { const w = arr.slice(Math.max(0, i - Math.floor(k / 2)), i + Math.ceil(k / 2)).map((x) => x[key]).filter((v) => v != null); return { y: d.y, v: w.length ? d3.mean(w) : null }; });
+  const segs = (id, cb) => { const box = $(id); box.querySelectorAll("button").forEach((b) => (b.onclick = () => { box.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); cb(b.dataset.m); })); return () => box.querySelector('[aria-pressed="true"]').dataset.m; };
+
+  fetch("nba_data.json").then((r) => r.json()).then(init).catch((e) => { console.error(e); document.querySelectorAll(".loading").forEach((x) => (x.textContent = "자료를 불러오지 못했습니다. 새로 고쳐 보세요.")); });
+
+  function init(data) {
+    D = data; S = data.seasons; LG = Object.fromEntries(S.map((s) => [s.y, s.lg]));
+    P = data.players.map((r) => Object.fromEntries(data.pcols.map((k, i) => [k, r[i]])));
+    TM = data.teams.map((r) => Object.fromEntries(data.tcols.map((k, i) => [k, r[i]])));
+    const last = S[S.length - 1].y; REF = { pace: LG[last].pace, ortg: LG[last].off_rtg };
+    const sMap = Object.fromEntries(S.map((s) => [s.y, s]));
+    P.forEach((p) => {
+      const G = sMap[p.y].G;
+      p.min = p.mpg * p.g; p.q = p.min >= (1500 * G) / 82; p.sc = p.g >= Math.ceil(0.7 * G);
+      p.adjP = p.tpace ? (p.ppg * REF.pace) / p.tpace : null; p.adjB = p.adjP != null ? (p.adjP * REF.ortg) / LG[p.y].off_rtg : null;
+      p.rts = p.ts != null ? (p.ts - LG[p.y].ts_pct) * 100 : null;
+    });
+    S.forEach((s) => { s.sec = 2880 / (2 * s.lg.pace); s.p3ar = s.lg.fg3a_per_g != null ? s.lg.fg3a_per_g / s.lg.fga_per_g : 0; s.ftr = s.lg.fta_per_g / s.lg.fga_per_g; });
+    ["hist-y", "share-y"].forEach((id) => { $(id).min = S[0].y; $(id).max = last; $(id).value = last; });
+    keys(); paceSec(); effSec(); distSec(); concSec(); cmpSec();
+    let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => renders.forEach((f) => f()), 200); });
+    const mq = matchMedia("(prefers-color-scheme: dark)"); mq.addEventListener?.("change", () => renders.forEach((f) => f()));
+    new MutationObserver(() => renders.forEach((f) => f())).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  }
+  const first = () => S[0], lastS = () => S[S.length - 1];
+  const minBy = (k) => S.reduce((a, s) => (s[k] < a[k] ? s : a)), maxBy = (k) => S.reduce((a, s) => (s[k] > a[k] ? s : a));
+  const lgMin = (k) => S.reduce((a, s) => (s.lg[k] < a.lg[k] ? s : a)), lgMax = (k) => S.reduce((a, s) => (s.lg[k] > a.lg[k] ? s : a));
+
+  /* ---------- 핵심 ---------- */
+  function keys() {
+    const a = first(), z = lastS(), slow = lgMin("pace");
+    const sc = (y) => P.filter((p) => p.y === y && p.sc);
+    const n30 = (y) => sc(y).filter((p) => p.ppg >= 30).length;
+    $("keys").innerHTML = [
+      [`${fmt(a.lg.pace)} → ${fmt(slow.lg.pace)} → ${fmt(z.lg.pace)}`, `48분당 공격 횟수. ${a.s}에서 ${slow.s}까지 줄었다가 ${z.s}에 다시 늘었습니다.`],
+      [`${fmt(a.lg.off_rtg)} → ${fmt(z.lg.off_rtg)}`, `공격 100번당 득점. 50년 동안 ${fmt(z.lg.off_rtg - a.lg.off_rtg)}점 올랐고, ${ga(lgMax("off_rtg").s)} 가장 높습니다.`],
+      [`${pct(S.find((s) => s.y === 1980).p3ar, 0)} → ${pct(z.p3ar, 0)}`, `야투 가운데 3점 시도 비율(1979-80 → ${z.s}).`],
+      [`${fmt(S.find((s) => s.topUsg != null).topUsg)} → ${fmt(z.topUsg)}%`, `팀 1옵션의 사용률(1977-78 → ${z.s}). 시즌 합계 득점 몫은 오히려 ${pct(a.topShare)} → ${pct(z.topShare)}.`],
+      [`${n30(a.y)}명 → ${n30(z.y)}명`, `경기당 30점 이상 넣은 선수(${a.s} → ${z.s}).`],
+    ].map(([b, t]) => `<div class="key"><strong class="num">${b}</strong><span>${t}</span></div>`).join("");
+  }
+
+  /* ---------- 1. 속도 ---------- */
+  function paceSec() {
+    const a = first(), z = lastS(), slow = lgMin("pace"), fast = lgMax("pace");
+    $("pace-text").innerHTML = `<p>${a.s} 시즌 한 팀은 48분 동안 공격을 <b>${fmt(a.lg.pace)}번</b> 했습니다. 공격 횟수는 1990년대 내내 줄어 <b>${slow.s}에 ${fmt(slow.lg.pace)}번</b>으로 가장 적었고, 이후 늘어 ${z.s}에는 <b>${fmt(z.lg.pace)}번</b>입니다. 공격 한 번에 걸린 시간으로 바꾸면 ${fmt(a.sec)}초 → ${fmt(slow.sec)}초 → ${fmt(z.sec)}초입니다.</p><p>그러니 “요즘 농구가 빠르다”는 말은 2000년대와 견주면 맞지만, 50년 전과 견주면 <b>아직 그때보다 느립니다</b>(가장 빨랐던 시즌은 ${fast.s}, ${fmt(fast.lg.pace)}번). 대신 공격 한 번의 내용이 달라졌습니다. 실책이 줄어 공격이 슛으로 끝나는 일이 늘었고, 공격 리바운드는 줄어 두 번째 기회는 적어졌습니다.</p>`;
+    const mode = segs("pace-mode", draw);
+    function draw() {
+      const m = mode(), el = $("c-pace"), key = m === "pace" ? "pace" : "sec";
+      const rows = S.map((s) => ({ y: s.y, v: key === "pace" ? s.lg.pace : s.sec, s: s.s }));
+      const r5 = roll(rows, "v");
+      put(el, Plot.plot(base(el, { x: xY(el), y: { label: key === "pace" ? "48분당 공격 횟수" : "초", grid: true, zero: false },
+        marks: [Plot.ruleY([d3.mean(rows, (d) => d.v)], { stroke: css("--grid") }), Plot.line(r5, { x: "y", y: "v", stroke: css("--a"), strokeWidth: 2.4 }),
+          Plot.dot(rows, { x: "y", y: "v", r: 3, fill: css("--a"), fillOpacity: 0.5, tip: true, title: (d) => `${d.s}\n${fmt(d.v)}${key === "pace" ? "번" : "초"}` })] })));
+    }
+    draw(); renders.push(draw);
+    const vol = () => {
+      const el = $("c-volume"); const rows = S.flatMap((s) => [["야투 시도", s.lg.fga_per_g], ["자유투 시도", s.lg.fta_per_g], ["실책", s.lg.tov_per_g], ["공격 리바운드", s.lg.orb_per_g]].map(([k, v]) => ({ y: s.y, k, v })).filter((d) => d.v != null));
+      put(el, Plot.plot(base(el, { height: 280, x: xY(el), y: { label: "경기당", grid: true }, color: { domain: ["야투 시도", "자유투 시도", "실책", "공격 리바운드"], range: [css("--b"), css("--c"), css("--d"), css("--e")], legend: true },
+        marks: [Plot.line(rows, { x: "y", y: "v", stroke: "k", strokeWidth: 2, tip: true, title: (d) => `${lab(d.y)} ${d.k} ${fmt(d.v)}` })] })));
+    };
+    vol(); renders.push(vol);
+    const tov = () => {
+      const el = $("c-tov"); const rows = S.flatMap((s) => [["실책률", s.lg.tov_pct], ["공격 리바운드율", s.lg.orb_pct]].map(([k, v]) => ({ y: s.y, k, v })).filter((d) => d.v != null));
+      put(el, Plot.plot(base(el, { height: 280, x: xY(el), y: { label: "%", grid: true }, color: { domain: ["실책률", "공격 리바운드율"], range: [css("--d"), css("--e")], legend: true },
+        marks: [Plot.line(rows, { x: "y", y: "v", stroke: "k", strokeWidth: 2, tip: true, title: (d) => `${lab(d.y)} ${d.k} ${fmt(d.v)}%` })] })));
+    };
+    tov(); renders.push(tov);
+  }
+
+  /* ---------- 2. 효율 ---------- */
+  function effSec() {
+    const a = first(), z = lastS(), lowP = lgMin("pts_per_g"), hiO = lgMax("off_rtg"), lowO = lgMin("off_rtg");
+    const tsA = a.lg.ts_pct, tsZ = z.lg.ts_pct, fg2 = (s) => (s.lg.fg_per_g - (s.lg.fg3_per_g || 0)) / (s.lg.fga_per_g - (s.lg.fg3a_per_g || 0));
+    $("eff-text").innerHTML = `<p>팀 경기당 득점은 ${a.s} ${fmt(a.lg.pts_per_g)}점에서 ${lowP.s} <b>${fmt(lowP.lg.pts_per_g)}점</b>까지 떨어졌다가 ${z.s} <b>${fmt(z.lg.pts_per_g)}점</b>이 됐습니다. 그런데 경기당 득점은 공격 횟수(페이스)와 공격 한 번의 효율을 곱한 값이라, 득점이 쉬워졌는지는 <b>공격 100번당 득점</b>으로 봐야 합니다. 이 값은 ${lowO === a ? `50시즌 중 가장 낮았던 ${a.s}의 ${fmt(a.lg.off_rtg)}점에서` : `${a.s} ${fmt(a.lg.off_rtg)}점, 가장 낮았던 ${lowO.s} ${fmt(lowO.lg.off_rtg)}점을 지나`} ${hiO === z ? `가장 높은 ${z.s}의 <b>${fmt(z.lg.off_rtg)}점</b>까지 올랐습니다` : `${hiO.s} <b>${fmt(hiO.lg.off_rtg)}점</b>으로 가장 높았고 ${z.s} 시즌은 ${fmt(z.lg.off_rtg)}점입니다`}. 경기당 득점은 1990년대 말까지 크게 줄었다가 늘었지만, 공격 한 번의 값은 1990년대 말~2000년대 초에 잠시 내려간 것을 빼면 대체로 올랐습니다.</p><p>효율이 오르는 동안 슛 선택도 크게 바뀌었습니다. 3점 시도가 야투의 ${pct(z.p3ar, 0)}까지 늘었고, 리그 TS%는 ${pct(tsA)}에서 ${pct(tsZ)}로 올랐습니다. 2점 야투 성공률도 ${pct(fg2(a))}에서 ${pct(fg2(z))}로 올랐습니다. 먼 2점(미드레인지) 대신 골밑과 3점을 노리는 슛 선택이 늘어난 결과로 보이지만, 이 자료에는 슛 위치가 없어 직접 확인하지는 못했습니다.</p>`;
+    const dec = () => {
+      const el = $("c-decomp"), a0 = S[0].lg;
+      const rows = S.flatMap((s) => [["경기당 득점", s.lg.pts_per_g / a0.pts_per_g * 100], ["공격 100번당 득점", s.lg.off_rtg / a0.off_rtg * 100], ["페이스", s.lg.pace / a0.pace * 100]].map(([k, v]) => ({ y: s.y, k, v })));
+      put(el, Plot.plot(base(el, { x: xY(el), y: { label: "1976-77 = 100", grid: true, zero: false }, color: { domain: ["경기당 득점", "공격 100번당 득점", "페이스"], range: [css("--a"), css("--b"), css("--e")] },
+        marks: [Plot.ruleY([100], { stroke: css("--rule") }), Plot.line(rows, { x: "y", y: "v", stroke: "k", strokeWidth: 2.4 }), Plot.dot(rows, Plot.pointerX({ x: "y", y: "v", fill: "k", r: 4 })),
+          Plot.tip(rows, Plot.pointerX({ x: "y", y: "v", title: (d) => `${lab(d.y)} ${d.k} ${fmt(d.v)}` }))] })));
+    };
+    dec(); renders.push(dec);
+    const EK = [["TS%", "ts_pct", "--a"], ["eFG%", "efg_pct", "--b"], ["야투율", "fg_pct", "--e"], ["3점 성공률", "fg3_pct", "--c"], ["자유투 성공률", "ft_pct", "--f"]];
+    $("lg-eff").innerHTML = EK.map(([n, , c]) => `<span><i style="background:var(${c})"></i>${n}</span>`).join("");
+    const sh = () => {
+      const el = $("c-shoot"); const rows = S.flatMap((s) => EK.map(([k, f]) => ({ y: s.y, k, v: s.lg[f] })).filter((d) => d.v != null));
+      put(el, Plot.plot(base(el, { height: 300, x: xY(el), y: { label: "%", grid: true, tickFormat: (d) => Math.round(d * 100) }, color: { domain: EK.map((e) => e[0]), range: EK.map((e) => css(e[2])) },
+        marks: [Plot.line(rows, { x: "y", y: "v", stroke: "k", strokeWidth: 2, tip: true, title: (d) => `${lab(d.y)} ${d.k} ${pct(d.v)}` })] })));
+    };
+    sh(); renders.push(sh);
+    const p3 = () => {
+      const el = $("c-3par"); const rows = S.map((s) => ({ y: s.y, v: s.p3ar }));
+      put(el, Plot.plot(base(el, { height: 300, x: xY(el), y: { label: "3점 시도 ÷ 야투 시도", grid: true, tickFormat: "%" },
+        marks: [Plot.rectX([{ a: 1994.5, b: 1997.5 }], { x1: "a", x2: "b", y1: 0, y2: 0.5, fill: css("--grid"), fillOpacity: 0.8 }), Plot.areaY(rows, { x: "y", y: "v", fill: css("--a"), fillOpacity: 0.2 }), Plot.line(rows, { x: "y", y: "v", stroke: css("--a"), strokeWidth: 2.4 }),
+          Plot.dot(rows, { x: "y", y: "v", r: 2.5, fill: css("--a"), tip: true, title: (d) => `${lab(d.y)} ${pct(d.v)}` }), Plot.text([{ x: 1996, y: 0.47 }], { x: "x", y: "y", text: () => "짧은 3점 라인", fill: css("--muted"), fontSize: 11 })] })));
+    };
+    p3(); renders.push(p3);
+    const mix = () => {
+      const el = $("c-mix");
+      const rows = S.flatMap((s) => { const L = s.lg, t3 = (L.fg3_per_g || 0) * 3, ft = L.ft_per_g, t2 = L.pts_per_g - t3 - ft; return [["2점 야투", t2], ["3점 야투", t3], ["자유투", ft]].map(([k, v]) => ({ y: s.y, k, v })); });
+      put(el, Plot.plot(base(el, { height: 300, x: xY(el), y: { label: "경기당 득점", grid: true }, color: { domain: ["2점 야투", "3점 야투", "자유투"], range: [css("--b"), css("--a"), css("--c")] },
+        marks: [Plot.areaY(rows, { x: "y", y: "v", fill: "k", fillOpacity: 0.85, tip: true, title: (d) => `${lab(d.y)} ${d.k} ${fmt(d.v)}점` })] })));
+    };
+    mix(); renders.push(mix);
+    const ftr = () => {
+      const el = $("c-ftr"); const rows = S.map((s) => ({ y: s.y, v: s.ftr }));
+      put(el, Plot.plot(base(el, { height: 300, x: xY(el), y: { label: "FTA ÷ FGA", grid: true, zero: false },
+        marks: [Plot.line(rows, { x: "y", y: "v", stroke: css("--c"), strokeWidth: 2.4 }), Plot.dot(rows, { x: "y", y: "v", r: 2.5, fill: css("--c"), tip: true, title: (d) => `${lab(d.y)} ${fmt(d.v, 3)}` })] })));
+    };
+    ftr(); renders.push(ftr);
+    // 탐색기
+    const M = [["pts_per_g", "경기당 득점"], ["pace", "페이스"], ["off_rtg", "공격 100번당 득점"], ["ts_pct", "TS%"], ["efg_pct", "eFG%"], ["fg_pct", "야투율"], ["fg3_pct", "3점 성공률"], ["ft_pct", "자유투 성공률"],
+      ["fga_per_g", "경기당 야투 시도"], ["fg3a_per_g", "경기당 3점 시도"], ["fta_per_g", "경기당 자유투 시도"], ["tov_per_g", "경기당 실책"], ["tov_pct", "실책률"], ["orb_per_g", "경기당 공격 리바운드"], ["orb_pct", "공격 리바운드율"], ["ast_per_g", "경기당 어시스트"], ["ft_rate", "자유투 비율(FT/FGA)"], ["age", "평균 나이"],
+      ["_topShare", "팀 1위 득점 몫"], ["_eff", "실질 득점원 수"], ["_top10", "득점 상위 10명 평균"]];
+    $("explore-a").innerHTML = M.map(([k, n]) => `<option value="${k}">${n}</option>`).join("");
+    $("explore-b").innerHTML = `<option value="">(없음)</option>` + M.map(([k, n]) => `<option value="${k}">${n}</option>`).join("");
+    $("explore-a").value = "fg3a_per_g"; $("explore-b").value = "off_rtg";
+    const val = (s, k) => (k.startsWith("_") ? s[k.slice(1)] : s.lg[k]);
+    const ex = () => {
+      const el = $("c-explore"), ka = $("explore-a").value, kb = $("explore-b").value, na = M.find((m) => m[0] === ka)[1];
+      const A = S.map((s) => ({ y: s.y, v: val(s, ka) })).filter((d) => d.v != null);
+      const marks = [Plot.line(A, { x: "y", y: "v", stroke: css("--a"), strokeWidth: 2.4 }), Plot.dot(A, { x: "y", y: "v", r: 3, fill: css("--a"), tip: true, title: (d) => `${lab(d.y)} ${na} ${fmt(d.v, d.v < 2 ? 3 : 1)}` })];
+      let yB = null;
+      if (kb && kb !== ka) {
+        const B = S.map((s) => ({ y: s.y, v: val(s, kb) })).filter((d) => d.v != null), nb = M.find((m) => m[0] === kb)[1];
+        const [a0, a1] = d3.extent(A, (d) => d.v), [b0, b1] = d3.extent(B, (d) => d.v), sc = (v) => a0 + ((v - b0) / (b1 - b0 || 1)) * (a1 - a0);
+        marks.push(Plot.line(B, { x: "y", y: (d) => sc(d.v), stroke: css("--b"), strokeWidth: 2.2, strokeDasharray: "5 3" }), Plot.dot(B, { x: "y", y: (d) => sc(d.v), r: 2.6, fill: css("--b"), tip: true, title: (d) => `${lab(d.y)} ${nb} ${fmt(d.v, d.v < 2 ? 3 : 1)}` }),
+          Plot.axisY(d3.ticks(b0, b1, 5), { anchor: "right", y: sc, tickFormat: (d) => (b1 < 2 ? fmt(d, 2) : fmt(d, 0)), label: nb, color: css("--b") }));
+        yB = true;
+      }
+      put(el, Plot.plot(base(el, { marginRight: yB ? 56 : 20, x: xY(el), y: { label: na, grid: true, zero: false, tickFormat: (d) => (A[0].v < 2 ? fmt(d, 2) : fmt(d, 0)) }, marks })));
+    };
+    $("explore-a").onchange = ex; $("explore-b").onchange = ex; ex(); renders.push(ex);
+  }
+
+  /* ---------- 3. 분포 ---------- */
+  const BIN = { ppg: [0, 40, 2, "경기당 득점"], p100: [0, 50, 2.5, "100번당 득점"], usg: [8, 40, 1.6, "사용률(%)"] };
+  function distSec() {
+    const a = first(), z = lastS();
+    const q = (y) => P.filter((p) => p.y === y && p.q);
+    const share20 = (y) => { const r = q(y); return r.filter((p) => p.ppg >= 20).length / r.length; };
+    const p100med = (y) => d3.median(q(y), (p) => p.p100);
+    $("dist-text").innerHTML = `<p>주전급 선수의 경기당 득점 중앙값은 ${a.s} ${fmt(a.p50)}점, ${minBy("p50").s} ${fmt(minBy("p50").p50)}점, ${z.s} ${fmt(z.p50)}점입니다. 주전급 가운데 20점 이상 넣은 선수의 비율은 ${a.s} ${pct(share20(a.y), 0)}, ${z.s} ${pct(share20(z.y), 0)}입니다. 공격 100번당 득점으로 바꾸면 중앙값은 ${fmt(p100med(a.y))}점 → ${fmt(p100med(z.y))}점으로, 경기당 득점보다 변화가 더 고릅니다.</p><p>분포의 꼬리, 곧 득점 상위 선수는 2010년대 후반부터 두꺼워졌습니다. 상위 10%의 경기당 득점은 ${minBy("p90").s}에 ${fmt(minBy("p90").p90)}점으로 가장 낮았고 ${z.s}에는 ${fmt(z.p90)}점입니다.</p>`;
+    const hm = segs("heat-mode", heat);
+    function heat() {
+      const m = hm(), [lo, hi, st, name] = BIN[m], el = $("c-heat");
+      const cells = [];
+      S.forEach((s) => {
+        const r = q(s.y).map((p) => p[m]).filter((v) => v != null); if (!r.length) return;
+        for (let b = lo; b < hi; b += st) { const n = r.filter((v) => v >= b && (v < b + st || (b + st >= hi && v >= b))).length; cells.push({ y: s.y, b, b2: b + st, v: n / r.length, n }); }
+      });
+      put(el, Plot.plot(base(el, { height: 360, marginLeft: 52, x: { label: null, type: "band", tickFormat: (d) => (W(el) < 640 ? (d % 10 === 2 ? `${String(d - 1).slice(2)}-${String(d).slice(2)}` : "") : d % 5 === 2 ? lab(d) : "") }, y: { label: name, domain: [lo, hi] },
+        color: { type: "sqrt", range: [css("--heat-lo"), css("--heat-hi")], label: "선수 비율", legend: true, tickFormat: "%" },
+        marks: [Plot.rect(cells, { x: "y", y1: "b", y2: "b2", fill: "v", inset: 0, tip: true, title: (d) => `${lab(d.y)}\n${fmt(d.b, 1)}~${fmt(d.b2, 1)}: ${d.n}명 (${pct(d.v)})` }),
+          Plot.line(S.map((s) => ({ y: s.y, v: d3.median(q(s.y), (p) => p[m]) })).filter((d) => d.v != null), { x: "y", y: "v", stroke: css("--a"), strokeWidth: 2 })] })));
+    }
+    heat(); renders.push(heat);
+    // 히스토그램 넘기기
+    const hmode = segs("hist-mode", hist);
+    const slider = $("hist-y"); slider.oninput = hist; $("hist-ref").onchange = hist;
+    function hist() {
+      const y = +slider.value, m = hmode(), [lo, hi, st, name] = BIN[m], el = $("c-hist");
+      $("hist-label").textContent = lab(y);
+      const cur = q(y).map((p) => ({ v: p[m], n: p.n })).filter((d) => d.v != null);
+      const ref = $("hist-ref").checked && y !== 1987 ? q(1987).map((p) => ({ v: p[m] })).filter((d) => d.v != null) : [];
+      const th = d3.range(lo, hi + st / 2, st);
+      const binsOf = (arr) => d3.bin().domain([lo, hi]).thresholds(th).value((d) => Math.min(Math.max(d.v, lo), hi - 1e-9))(arr).map((b) => ({ x1: b.x0, x2: b.x1, v: b.length / arr.length, names: b.map((d) => d.n) }));
+      const bc = binsOf(cur), br = ref.length ? binsOf(ref) : [];
+      put(el, Plot.plot(base(el, { height: 300, x: { label: name, domain: [lo, hi] }, y: { label: "선수 비율", grid: true, tickFormat: "%", domain: [0, m === "usg" ? 0.16 : 0.2] },
+        marks: [Plot.rectY(bc, { x1: "x1", x2: "x2", y: "v", fill: css("--a"), fillOpacity: 0.85, inset: 1, tip: true, title: (d) => `${fmt(d.x1, 1)}~${fmt(d.x2, 1)}: ${d.names.length}명 (${pct(d.v)})${d.names.length && d.x1 >= (m === "usg" ? 28 : 25) ? "\n" + d.names.slice(0, 6).join(", ") : ""}` }),
+          br.length ? Plot.lineY(br.flatMap((b) => [{ x: b.x1, v: b.v }, { x: b.x2, v: b.v }]), { x: "x", y: "v", stroke: css("--b"), strokeWidth: 2 }) : null,
+          Plot.ruleY([0])] })));
+      const med = d3.median(cur, (d) => d.v), top = q(y).filter((p) => p[m] != null).sort((x, z) => z[m] - x[m]).slice(0, 3);
+      $("hist-cap").innerHTML = `${lab(y)} 주전급 ${cur.length}명, 중앙값 <b>${fmt(med)}</b>. 가장 높은 선수: ${top.map((p) => `${p.n} ${fmt(p[m])}`).join(", ")}.${br.length ? " 파란 선은 1986-87 분포." : ""}`;
+    }
+    hist(); renders.push(hist);
+    let timer = null;
+    $("hist-play").onclick = () => {
+      if (timer) { clearInterval(timer); timer = null; $("hist-play").textContent = "재생"; return; }
+      if (+slider.value >= +slider.max) slider.value = slider.min; $("hist-play").textContent = "멈춤";
+      timer = setInterval(() => { if (+slider.value >= +slider.max) { clearInterval(timer); timer = null; $("hist-play").textContent = "재생"; return; } slider.value = +slider.value + 1; hist(); }, 450);
+    };
+    const pc = () => {
+      const el = $("c-pct"); const rows = S.flatMap((s) => [["득점왕", s.lead.ppg], ["상위 10%", s.p90], ["중앙값", s.p50], ["하위 10%", s.p10]].map(([k, v]) => ({ y: s.y, k, v, who: k === "득점왕" ? s.lead.n : "" })));
+      put(el, Plot.plot(base(el, { height: 300, x: xY(el), y: { label: "경기당 득점", grid: true }, color: { domain: ["득점왕", "상위 10%", "중앙값", "하위 10%"], range: [css("--d"), css("--a"), css("--b"), css("--e")] },
+        marks: [Plot.line(rows, { x: "y", y: "v", stroke: "k", strokeWidth: 2 }), Plot.dot(rows.filter((d) => d.k === "득점왕"), { x: "y", y: "v", r: 3, fill: css("--d"), tip: true, title: (d) => `${lab(d.y)} 득점왕 ${d.who} ${fmt(d.v)}점` })] })));
+    };
+    pc(); renders.push(pc);
+    const ns = () => {
+      const el = $("c-nscorers"); const rows = S.flatMap((s) => [["20점+", s.n20], ["25점+", s.n25], ["30점+", s.n30]].map(([k, v]) => ({ y: s.y, k, v: v / s.nTeams, n: v })));
+      put(el, Plot.plot(base(el, { height: 300, x: xY(el), y: { label: "팀당 선수 수", grid: true }, color: { domain: ["20점+", "25점+", "30점+"], range: [css("--b"), css("--a"), css("--d")] },
+        marks: [Plot.line(rows, { x: "y", y: "v", stroke: "k", strokeWidth: 2, tip: true, title: (d) => `${lab(d.y)} ${d.k}: ${d.n}명 (팀당 ${fmt(d.v, 2)})` })] })));
+    };
+    ns(); renders.push(ns);
+  }
+
+  /* ---------- 4. 집중 ---------- */
+  function concSec() {
+    const a = first(), z = lastS(), lowS = minBy("topShare"), hiS = maxBy("topShare");
+    const lowE = maxBy("eff"), hiE = minBy("eff");
+    const firstUsg = S.find((s) => s.topUsg != null);
+    const usg30 = (s) => (s.nUsg30 ?? 0) / s.nTeams;
+    const lastDecade = S.filter((s) => s.y >= 2017), firstDecade = S.filter((s) => s.y <= 1986), midDecade = S.filter((s) => s.y >= 1997 && s.y <= 2006);
+    const pg0 = S[0], usg0 = S.find((s) => s.topUsg != null), dec = (a1, b1, k) => d3.mean(S.filter((s) => s.y >= a1 && s.y <= b1), (s) => s[k]);
+    $("conc-text").innerHTML = `<p>‘몰린다’를 어떻게 재느냐에 따라 답이 갈립니다. <b>코트 위에서는 더 몰립니다.</b> 팀 1옵션의 사용률(코트에 있을 때 팀 공격이 그 선수의 슛·자유투·실책으로 끝난 비율)은 ${usg0.s} 평균 ${fmt(usg0.topUsg)}%에서 ${z.s} ${fmt(z.topUsg)}%로 올랐고, 사용률 30%를 넘는 선수는 팀당 ${fmt(usg30(usg0), 2)}명에서 ${fmt(usg30(z), 2)}명이 됐습니다.</p><p><b>한 경기로 보면 거의 그대로입니다.</b> 팀 최다 득점 선수의 경기당 득점이 팀 경기당 득점에서 차지하는 몫은 ${a.s} ${pct(a.pgShare)}, ${z.s} ${pct(z.pgShare)}이고, 50시즌 내내 ${pct(minBy("pgShare").pgShare)}~${pct(maxBy("pgShare").pgShare)} 사이였습니다.</p><p><b>시즌 전체로 보면 오히려 덜 몰립니다.</b> 시즌 득점 합계에서 그 팀 1위 선수의 몫은 1976-77~1985-86 평균 ${pct(dec(1977, 1986, "topShare"))}, 2016-17~2025-26 평균 ${pct(dec(2017, 2026, "topShare"))}이고 ${ga(z.s)} ${pct(z.topShare)}로 50시즌 중 ${S.slice().sort((x, y) => x.topShare - y.topShare).indexOf(z) + 1}번째로 낮습니다. 팀 득점을 실질적으로 나눠 넣는 선수 수도 ${fmt(a.eff)}명에서 ${fmt(z.eff)}명으로 늘었습니다.</p><p>세 잣대가 갈리는 까닭은 출전입니다. 팀 에이스는 경기당 ${fmt(a.aceMpg)}분에서 ${fmt(z.aceMpg)}분으로 덜 뛰고, 36분당 득점은 ${fmt(a.aceP36)}점에서 ${fmt(z.aceP36)}점으로 늘었습니다. 팀 경기의 ${pct(a.topGames, 0)}에 나오던 팀 최다 득점 선수는 이제 ${pct(z.topGames, 0)}에 나오고, 한 팀이 시즌에 쓰는 선수는 ${fmt(a.nUsed)}명에서 ${fmt(z.nUsed)}명으로 늘었습니다. 뛰는 동안 더 많이 맡지만, 덜 뛰고 덜 나오니 시즌 합계로는 몫이 줄어듭니다.</p>`;
+    const three = () => {
+      const el = $("c-three"); const rows = S.flatMap((s) => [["코트 위 몫(사용률)", s.topUsg != null ? s.topUsg / 100 : null], ["경기 기준 몫", s.pgShare], ["시즌 합계 몫", s.topShare]].map(([k, v]) => ({ y: s.y, k, v })).filter((d) => d.v != null));
+      put(el, Plot.plot(base(el, { height: 340, x: xY(el), y: { label: "%", grid: true, tickFormat: (d) => Math.round(d * 100), domain: [0.14, 0.33] }, color: { domain: ["코트 위 몫(사용률)", "경기 기준 몫", "시즌 합계 몫"], range: [css("--a"), css("--b"), css("--e")] },
+        marks: [Plot.line(rows, { x: "y", y: "v", stroke: "k", strokeWidth: 2.4 }), Plot.dot(rows, { x: "y", y: "v", fill: "k", r: 2.4, tip: true, title: (d) => `${lab(d.y)} ${d.k} ${pct(d.v)}` })] })));
+    };
+    three(); renders.push(three);
+    const why = () => {
+      const box = $("c-why"); box.innerHTML = "";
+      const K = [["aceMpg", "에이스 경기당 출전 시간(분)", 1, "--b"], ["aceP36", "에이스 36분당 득점", 1, "--a"], ["topGames", "팀 최다 득점 선수가 뛴 경기 비율(%)", 100, "--d"], ["nUsed", "팀이 시즌에 쓴 선수 수(명)", 1, "--c"]];
+      K.forEach(([k, n, m, c]) => {
+        const el = document.createElement("div"); el.className = "chart"; box.append(el);
+        const rows = S.map((s) => ({ y: s.y, v: s[k] * m }));
+        put(el, Plot.plot(base(el, { height: 210, marginLeft: 40, x: xY(el), y: { label: n, grid: true, zero: false },
+          marks: [Plot.line(rows, { x: "y", y: "v", stroke: css(c), strokeWidth: 2 }), Plot.dot(rows, { x: "y", y: "v", r: 2.2, fill: css(c), tip: true, title: (d) => `${lab(d.y)} ${n} ${fmt(d.v)}` })] })));
+      });
+    };
+    why(); renders.push(why);
+    const tsh = () => {
+      const el = $("c-topshare");
+      const mean = S.map((s) => ({ y: s.y, v: s.topShare }));
+      put(el, Plot.plot(base(el, { height: 360, x: xY(el), y: { label: "팀 득점 중 1위 선수 몫", grid: true, tickFormat: "%" },
+        marks: [Plot.dot(TM, { x: (d) => d.y + ((d3.sum([...d.tm], (c) => c.charCodeAt(0)) % 11) / 10 - 0.5) * 0.6, y: "top", r: 2.6, fill: css("--b"), fillOpacity: 0.35, tip: true, title: (d) => `${lab(d.y)} ${d.tm}\n${d.topName} ${fmt(d.topPpg)}점, 팀 득점의 ${pct(d.top)}` }),
+          Plot.line(mean, { x: "y", y: "v", stroke: css("--a"), strokeWidth: 3 })] })));
+    };
+    tsh(); renders.push(tsh);
+    const en = () => {
+      const el = $("c-eff-n"); const rows = S.map((s) => ({ y: s.y, v: s.eff, t2: s.top2 }));
+      put(el, Plot.plot(base(el, { height: 290, x: xY(el), y: { label: "명", grid: true, zero: false },
+        marks: [Plot.line(roll(rows, "v"), { x: "y", y: "v", stroke: css("--c"), strokeWidth: 2.4 }), Plot.dot(rows, { x: "y", y: "v", r: 3, fill: css("--c"), fillOpacity: 0.55, tip: true, title: (d) => `${lab(d.y)} 실질 득점원 ${fmt(d.v, 2)}명\n1·2위 몫 ${pct(d.t2)}` })] })));
+    };
+    en(); renders.push(en);
+    const us = () => {
+      const el = $("c-usg"); const rows = S.filter((s) => s.topUsg != null);
+      const [a0, a1] = d3.extent(rows, (s) => s.topUsg), [b0, b1] = [0, d3.max(rows, usg30)], sc = (v) => a0 + ((v - b0) / (b1 - b0 || 1)) * (a1 - a0);
+      put(el, Plot.plot(base(el, { height: 290, marginRight: 50, x: xY(el), y: { label: "팀 최고 사용률(%)", grid: true, zero: false },
+        marks: [Plot.line(rows, { x: "y", y: "topUsg", stroke: css("--a"), strokeWidth: 2.4 }), Plot.dot(rows, { x: "y", y: "topUsg", r: 2.6, fill: css("--a"), tip: true, title: (s) => `${s.s} 팀 1옵션 평균 사용률 ${fmt(s.topUsg)}%` }),
+          Plot.line(rows, { x: "y", y: (s) => sc(usg30(s)), stroke: css("--b"), strokeWidth: 2, strokeDasharray: "5 3" }), Plot.dot(rows, { x: "y", y: (s) => sc(usg30(s)), r: 2.4, fill: css("--b"), tip: true, title: (s) => `${s.s} 사용률 30%+ ${s.nUsg30}명 (팀당 ${fmt(usg30(s), 2)})` }),
+          Plot.axisY(d3.ticks(b0, b1, 4), { anchor: "right", y: sc, label: "30%+ 선수(팀당)", tickFormat: (d) => fmt(d, 1), color: css("--b") })] })));
+    };
+    us(); renders.push(us);
+    // 분포 넘기기
+    const sm = segs("share-mode", sh); const sl = $("share-y"); sl.oninput = sh;
+    function sh() {
+      const y = +sl.value, m = sm(), el = $("c-sharehist"); $("share-label").textContent = lab(y);
+      const rows = TM.filter((t) => t.y === y && t[m] != null), all = TM.filter((t) => t[m] != null);
+      const isU = m === "topUsg", [lo, hi] = isU ? [18, 42] : m === "top" ? [0.1, 0.4] : [0.2, 0.6], st = isU ? 1 : 0.0125;
+      const th = d3.range(lo, hi + st / 2, st);
+      const bins = d3.bin().domain([lo, hi]).thresholds(th).value((d) => Math.min(Math.max(d[m], lo), hi - 1e-9))(rows).map((b) => ({ x1: b.x0, x2: b.x1, n: b.length, who: b.map((t) => `${t.tm} ${isU ? t.topUsgName : t.topName}`) }));
+      const allMean = d3.mean(all, (t) => t[m]);
+      const f2 = (v) => (isU ? fmt(v) + "%" : pct(v));
+      put(el, Plot.plot(base(el, { height: 290, x: { label: isU ? "팀 최고 사용률(%)" : m === "top" ? "팀 득점 중 1위 몫" : "팀 득점 중 1·2위 몫", domain: [lo, hi], tickFormat: isU ? null : "%" }, y: { label: "팀 수", grid: true, domain: [0, 9] },
+        marks: [Plot.rectY(bins, { x1: "x1", x2: "x2", y: "n", fill: css("--b"), inset: 1, tip: true, title: (d) => `${f2(d.x1)}~${f2(d.x2)}: ${d.n}팀\n${d.who.join("\n")}` }), Plot.ruleX([allMean], { stroke: css("--a"), strokeWidth: 2, strokeDasharray: "4 3" }), Plot.ruleY([0])] })));
+      const mean = d3.mean(rows, (t) => t[m]), mx = rows.reduce((a, t) => (t[m] > a[m] ? t : a), rows[0]);
+      $("share-cap").innerHTML = `${lab(y)} ${rows.length}팀 평균 <b>${f2(mean)}</b> (주황 점선은 50시즌 전체 평균 ${f2(allMean)}). 가장 높은 팀: ${mx.tm} · ${isU ? mx.topUsgName : mx.topName} ${f2(mx[m])}.`;
+    }
+    sh(); renders.push(sh);
+    let timer = null;
+    $("share-play").onclick = () => {
+      if (timer) { clearInterval(timer); timer = null; $("share-play").textContent = "재생"; return; }
+      if (+sl.value >= +sl.max) sl.value = sl.min; $("share-play").textContent = "멈춤";
+      timer = setInterval(() => { if (+sl.value >= +sl.max) { clearInterval(timer); timer = null; $("share-play").textContent = "재생"; return; } sl.value = +sl.value + 1; sh(); }, 450);
+    };
+    const tbl = () => {
+      const v = $("share-era").value; let rows = TM;
+      if (v !== "all") { const [a1, b1] = v.split("-").map(Number); rows = TM.filter((t) => t.y >= a1 && t.y <= b1); }
+      rows = rows.slice().sort((x, y) => y.top - x.top).slice(0, 20);
+      $("t-share").innerHTML = `<table class="t"><thead><tr><th>시즌</th><th>팀</th><th>선수</th><th>경기당 득점</th><th>팀 득점 중 몫</th><th>팀 야투 중 몫</th><th>팀 승</th></tr></thead><tbody>${rows.map((t) => `<tr><td>${lab(t.y)}</td><td>${t.tm}</td><td>${t.topName}</td><td>${fmt(t.topPpg)}</td><td>${pct(t.top)}</td><td>${pct(t.topFgaSh)}</td><td>${t.w ?? "–"}</td></tr>`).join("")}</tbody></table>`;
+    };
+    $("share-era").onchange = tbl; tbl();
+  }
+
+  /* ---------- 5. 비교 ---------- */
+  function cmpSec() {
+    const elig = P.filter((p) => p.sc && p.adjP != null);
+    const rankOf = (k) => elig.slice().sort((a, b) => b[k] - a[k]);
+    const R = { ppg: rankOf("ppg"), adjP: rankOf("adjP"), adjB: rankOf("adjB"), p100: rankOf("p100") };
+    const pos = (k) => new Map(R[k].map((p, i) => [p, i + 1]));
+    const posRaw = pos("ppg");
+    const facP = S.map((s) => ({ y: s.y, v: REF.pace / s.lg.pace })), facB = S.map((s) => ({ y: s.y, v: (REF.pace / s.lg.pace) * (REF.ortg / s.lg.off_rtg) }));
+    const top25 = (k) => new Set(R[k].slice(0, 25));
+    const stay = [...top25("ppg")].filter((p) => top25("adjB").has(p)).length;
+    const fp = facP.reduce((a, d) => (d.v > a.v ? d : a)), fb = facB.reduce((a, d) => (d.v > a.v ? d : a)), fbl = facB.slice(0, -1).reduce((a, d) => (d.v < a.v ? d : a));
+    // 득점왕 순위 상관
+    const L = S.map((s) => { const p = elig.find((x) => x.y === s.y && x.id === s.lead.id); return p ? { y: s.y, n: p.n, raw: p.ppg, adjP: p.adjP, adjB: p.adjB } : null; }).filter(Boolean);
+    const rk = (arr) => { const o = arr.map((v, i) => [v, i]).sort((a, b) => b[0] - a[0]); const r = []; o.forEach(([, i], j) => (r[i] = j)); return r; };
+    const corr = (a, b) => { const ma = d3.mean(a), mb = d3.mean(b); return d3.sum(a.map((x, i) => (x - ma) * (b[i] - mb))) / Math.sqrt(d3.sum(a.map((x) => (x - ma) ** 2)) * d3.sum(b.map((x) => (x - mb) ** 2))); };
+    const rho = corr(rk(L.map((d) => d.raw)), rk(L.map((d) => d.adjB)));
+    $("cmp-text").innerHTML = `<p>시대가 다르면 같은 경기당 30점도 무게가 다릅니다. 첫째, 경기당 공격 횟수가 달라 기회의 수가 다릅니다. 2025-26과 견주려면 가장 느렸던 ${lab(fp.y)} 시즌 득점에는 <b>${fmt(fp.v, 3)}</b>배를 곱해야 합니다. 둘째, 리그 전체의 공격 효율이 달라 같은 기회에서 나오는 점수가 다릅니다. 둘을 함께 보정하면 과거 시즌에 곱할 값은 <b>${fmt(fbl.v, 3)}배(${lab(fbl.y)})에서 ${fmt(fb.v, 3)}배(${lab(fb.y)})</b>까지 벌어집니다.</p><p>그 결과 역대 경기당 득점 상위 25시즌 가운데 속도와 효율을 함께 보정해도 상위 25에 남는 시즌은 <b>${stay}개</b>입니다. 시즌마다의 득점왕만 놓고 보면 보정 전후 순위의 상관(스피어만)은 <b>${fmt(rho, 2)}</b>입니다.</p>`;
+    const rm = segs("rank-mode", tb);
+    function tb() {
+      const k = rm(), rows = R[k].slice(0, 40), lbl = { ppg: "경기당 득점", adjP: "속도 보정", adjB: "속도+효율 보정", p100: "100번당 득점" };
+      $("t-rank").innerHTML = `<table class="t"><thead><tr><th>순위</th><th>선수</th><th>시즌·팀</th><th>경기당 득점</th><th>팀 페이스</th><th>속도 보정</th><th>속도+효율</th><th>100번당</th><th>TS% (리그 대비)</th><th>변화</th></tr></thead><tbody>${rows.map((p, i) => { const d = posRaw.get(p) - (i + 1); return `<tr><td>${i + 1}</td><td>${p.n}</td><td>${lab(p.y)} ${p.tm}</td><td>${fmt(p.ppg)}</td><td>${fmt(p.tpace)}</td><td>${fmt(p.adjP)}</td><td>${fmt(p.adjB)}</td><td>${fmt(p.p100)}</td><td>${p.ts != null ? pct(p.ts) + ` (${p.rts >= 0 ? "+" : ""}${fmt(p.rts)})` : "–"}</td><td class="${d > 0 ? "up" : d < 0 ? "down" : ""}">${k === "ppg" ? "" : d > 0 ? "▲" + d : d < 0 ? "▼" + -d + (posRaw.get(p) > 40 ? "" : "") : "–"}</td></tr>`; }).join("")}</tbody></table>`;
+    }
+    tb();
+    const ld = () => {
+      const el = $("c-leaders"); const rows = L.flatMap((d) => [["그대로", d.raw], ["속도 보정", d.adjP], ["속도+효율 보정", d.adjB]].map(([k, v]) => ({ y: d.y, k, v, n: d.n })));
+      put(el, Plot.plot(base(el, { height: 320, x: xY(el), y: { label: "경기당 득점", grid: true, zero: false }, color: { domain: ["그대로", "속도 보정", "속도+효율 보정"], range: [css("--e"), css("--a"), css("--b")] },
+        marks: [Plot.ruleX(L, { x: "y", y1: (d) => Math.min(d.raw, d.adjB), y2: (d) => Math.max(d.raw, d.adjB), stroke: css("--grid") }), Plot.dot(rows, { x: "y", y: "v", fill: "k", r: 3.4, tip: true, title: (d) => `${lab(d.y)} ${d.n}\n${d.k} ${fmt(d.v)}점` })] })));
+    };
+    ld(); renders.push(ld);
+    const fc = () => {
+      const el = $("c-factor"); const rows = [...facP.map((d) => ({ ...d, k: "속도" })), ...facB.map((d) => ({ ...d, k: "속도+효율" }))];
+      put(el, Plot.plot(base(el, { height: 320, x: xY(el), y: { label: "곱하는 값", grid: true, zero: false }, color: { domain: ["속도", "속도+효율"], range: [css("--a"), css("--b")] },
+        marks: [Plot.ruleY([1], { stroke: css("--ink-2") }), Plot.line(rows, { x: "y", y: "v", stroke: "k", strokeWidth: 2.4, tip: true, title: (d) => `${lab(d.y)} ${d.k} ×${fmt(d.v, 3)}` })] })));
+    };
+    fc(); renders.push(fc);
+    // 선수 고르기
+    const byId = d3.group(P, (p) => p.id);
+    const names = [...byId].map(([id, a]) => ({ id, n: a[0].n, tot: d3.sum(a, (p) => p.ppg * p.g), y0: d3.min(a, (p) => p.y), y1: d3.max(a, (p) => p.y) })).sort((a, b) => b.tot - a.tot);
+    $("p-list").innerHTML = names.map((p) => `<option value="${p.n} (${p.y0 - 1}~${p.y1})"></option>`).join("");
+    const PAL = ["--a", "--b", "--c", "--d", "--e", "--f", "--ink-2", "--muted"];
+    let chosen = ["jordami01", "bryanko01", "jamesle01", "curryst01", "gilgesh01"].filter((id) => byId.has(id));
+    const pm = segs("p-mode", pl);
+    $("p-search").onchange = () => {
+      const v = $("p-search").value, hit = names.find((p) => `${p.n} (${p.y0 - 1}~${p.y1})` === v) || names.find((p) => p.n.toLowerCase() === v.toLowerCase());
+      if (hit && !chosen.includes(hit.id) && chosen.length < 8) { chosen.push(hit.id); pl(); }
+      $("p-search").value = "";
+    };
+    function pl() {
+      const m = pm(), el = $("c-players");
+      $("p-chips").innerHTML = chosen.map((id, i) => `<span class="chip"><i style="background:var(${PAL[i]})"></i>${byId.get(id)[0].n}<button type="button" data-id="${id}" aria-label="${byId.get(id)[0].n} 빼기">×</button></span>`).join("");
+      $("p-chips").querySelectorAll("button").forEach((b) => (b.onclick = () => { chosen = chosen.filter((x) => x !== b.dataset.id); pl(); }));
+      const key = m === "ts" ? "rts" : m;
+      const rows = chosen.flatMap((id, i) => byId.get(id).filter((p) => p[key] != null).map((p) => ({ ...p, c: i, val: p[key] })));
+      const nm = chosen.map((id) => byId.get(id)[0].n);
+      put(el, Plot.plot(base(el, { height: 360, x: { label: "나이", grid: true }, y: { label: m === "ts" ? "TS% − 리그 평균(%p)" : "경기당 득점", grid: true, zero: m === "ts" },
+        color: { domain: nm, range: chosen.map((_, i) => css(PAL[i])), legend: true },
+        marks: [m === "ts" ? Plot.ruleY([0], { stroke: css("--ink-2") }) : null, Plot.line(rows, { x: "age", y: "val", z: "id", stroke: (d) => nm[d.c], strokeWidth: 2.2 }),
+          Plot.dot(rows, { x: "age", y: "val", fill: (d) => nm[d.c], r: 3.2, tip: true, title: (d) => `${d.n} · ${lab(d.y)} ${d.tm} (${d.age}세)\n그대로 ${fmt(d.ppg)} · 속도 보정 ${fmt(d.adjP)} · 속도+효율 ${fmt(d.adjB)}\nTS% ${d.ts != null ? pct(d.ts) : "–"} (리그 대비 ${d.rts != null ? fmt(d.rts) : "–"}%p)` })] })));
+    }
+    pl(); renders.push(pl);
+    // 결론: 10년 단위 평균 보정값
+    const decs = [[1977, 1986], [1987, 1996], [1997, 2006], [2007, 2016], [2017, 2025]].map(([a1, b1]) => {
+      const ss = S.filter((s) => s.y >= a1 && s.y <= b1);
+      return { lbl: `${lab(a1)}~${lab(b1)}`, p: d3.mean(ss, (s) => REF.pace / s.lg.pace), b: d3.mean(ss, (s) => (REF.pace / s.lg.pace) * (REF.ortg / s.lg.off_rtg)) };
+    });
+    const pctx = (v) => `${v >= 1 ? "+" : "−"}${fmt(Math.abs(v - 1) * 100, 0)}%`;
+    const lo = decs.reduce((x, y) => (Math.abs(y.p - 1) < Math.abs(x.p - 1) ? y : x)), hi = decs.reduce((x, y) => (y.b > x.b ? y : x));
+    $("verdict").innerHTML = `<p><b>정리하면</b> 2025-26과 견줄 때 10년 단위로 곱해야 하는 값은 다음과 같습니다.</p>
+      <div class="tbl"><table class="t dec"><thead><tr><th>시기</th><th>속도 보정</th><th>속도+효율 보정</th></tr></thead><tbody>${decs.map((d) => `<tr><td>${d.lbl}</td><td>${pctx(d.p)}</td><td>${pctx(d.b)}</td></tr>`).join("")}</tbody></table></div>
+      <p>공격 횟수만 맞추면 ${decs[0].lbl}처럼 페이스가 빨랐던 시기의 득점은 오히려 조금 깎아야 하고(${pctx(decs[0].p)}), 가장 느렸던 ${decs[2].lbl}의 득점은 ${pctx(decs[2].p)} 키워야 합니다. 리그 전체 효율까지 맞추면 과거 모든 시기의 득점을 키워야 하고, 그 폭은 ${ga(hi.lbl)} ${pctx(hi.b)}로 가장 큽니다.</p>
+      <p>그러니 경기당 득점을 <b>그대로 견줘도 되는 건 같은 시대 안에서, 또는 페이스가 비슷한 시기끼리</b>입니다. 시대를 건너면 적어도 페이스는 맞춰야 하고, 효율 보정은 선수의 슛 솜씨까지 리그 평균에 묻어 버리는 한계가 있으니 득점량(속도 보정)과 효율(리그 대비 TS%)을 나란히 보는 편이 안전합니다.</p>`;
+  }
+})();
+</script>
